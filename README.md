@@ -4,20 +4,9 @@
 
 - The Patterns and Practices AKS Secure Baseline repo is located [here](https://github.com/mspnp/aks-secure-baseline)
   - Please refer to the PnP repo as the `upstream repo`
+  - Please use Codespaces
 
 ## Deploying ASB
-
-<!-- 
-### Create Codespace
-
-> The OpenHack requires Codespaces and bash
-> If you have dotfiles that default to zsh, make sure to use bash as your terminal
-
-- The `AKS Secure Baseline` repo for the OpenHack is at [github/retaildevcrews/asb-spark](https://github.com/retaildevcrews/asb-spark)
-- Open this repo in your web browser
-- Create a new `Codespace` in this repo
-  - If the `fork option` appears, you need to request permission to the repo
-  - Do not choose fork -->
 
 ```bash
 
@@ -38,14 +27,8 @@ az account show -o table
 
 ```bash
 
-# <<<<<<<<<<<<<<<<<<<<<<<<< TODO: design review >>>>>>>>>>>>>>>>>>>>>>>>> 
-
-# Do we need to setup security group to ensure all team members have access to cluster?
-# For instance: "asb-ngsa-preprod". For testing I will continue using "asb-hack"
-
-
 # set your security group name
-export ASB_CLUSTER_ADMIN_GROUP=asb-hack
+export ASB_CLUSTER_ADMIN_GROUP=4-co
 
 # verify you are a member of the security group
 # if you are not a member, please request via Teams chat
@@ -70,9 +53,9 @@ az ad group member list -g $ASB_CLUSTER_ADMIN_GROUP  --query [].mailNickname -o 
 🛑 Set your deployment name per the above rules
 
 #### set the depoyment name
-# export ASB_DEPLOYMENT_NAME=[starts with a-z, [a-z,0-9], max length 18]
+# export ASB_DEPLOYMENT_NAME=[starts with a-z, [a-z,0-9], max length 8]
 
-export ASB_DEPLOYMENT_NAME=ngsacentralasbtest
+export ASB_DEPLOYMENT_NAME=ngsatest
 export ASB_DNS_NAME=ngsa-pre-central-asb-test
 export ASB_RG_NAME=ngsa-pre-central-asb-test
 
@@ -95,7 +78,7 @@ git branch -a | grep $ASB_DEPLOYMENT_NAME
 ```bash
 # Org App ID e.g BU0001A0008
 # export ASB_ORG_APP_ID_NAME=[starts with a-z, [a-z,0-9], min length 5, max length 11]
-export ASB_ORG_APP_ID_NAME="BUNewName01"
+export ASB_ORG_APP_ID_NAME="BU0001G0001"
 
 ```
 
@@ -106,9 +89,6 @@ export ASB_ORG_APP_ID_NAME="BUNewName01"
 > The cluster branch name must be the same as the Team name
 
 ```bash
-# <<<<<<<<<<<<<<<<<<<<<<<<< TODO: design review >>>>>>>>>>>>>>>>>>>>>>>>> 
-# We not need to create new branch since it is required in order to deploy flux.
-# I am assuming we want to continue using flux ? 
 
 # create a branch for your cluster
 # Do not change the branch name from $ASB_DEPLOYMENT_NAME
@@ -125,16 +105,13 @@ git push -u origin $ASB_DEPLOYMENT_NAME
 
 ### choose the closest pair - not all regions support ASB
 export ASB_LOCATION=centralus
-export ASB_GEO_LOCATION=eastus2
+export ASB_GEO_LOCATION=westus
 
 ```
 
 ### Save your work in-progress
 
 ```bash
-
-# <<<<<<<<<<<<<<<<<<<<<<<<< TODO: design review >>>>>>>>>>>>>>>>>>>>>>>>> 
-# We only need to install kubectl and kubelogin if we enable Codespaces
 
 # install kubectl and kubelogin
 sudo az aks install-cli
@@ -162,16 +139,15 @@ echo $ASB_DEPLOYMENT_NAME
 az account show -o table
 
 # <<<<<<<<<<<<<<<<<<<<<<<<< TODO: design review >>>>>>>>>>>>>>>>>>>>>>>>> 
-# Enable Codespaces, only available for public repos at this time
-
-🛑 # These secrets are for DNS 'aks-sb.com' , we need to update them if we use a different DNS e.g. cse.ms
+🛑 # These certs are for DNS 'aks-sb.com' , we need to update them if we use a different DNS 
+#               e.g. cse.ms
 # set env vars, these should be set into Codespaces enviroment 
 
 
 # <<<<<<<<<<<<<<<<<<<<<<<<< TODO: design review >>>>>>>>>>>>>>>>>>>>>>>>>
 # Note: the stored APP_GW_CERT kv value is not the same as the one stored in Codespaces 
 
-# export APP_GW_CERT=$(az keyvault secret show --subscription bartr-wcnp --vault-name rdc-certs -n aks-sb --query value -o tsv | tr -d '\n')
+export APP_GW_CERT=$(az keyvault secret show --subscription bartr-wcnp --vault-name rdc-certs -n aks-sb --query value -o tsv | tr -d '\n')
 export INGRESS_CERT=$(az keyvault secret show --subscription bartr-wcnp --vault-name rdc-certs -n aks-sb-crt --query value -o tsv | base64 | tr -d '\n')
 export INGRESS_KEY=$(az keyvault secret show --subscription bartr-wcnp --vault-name rdc-certs -n aks-sb-key --query value -o tsv | base64 | tr -d '\n')
 
@@ -365,14 +341,6 @@ git push
 
 ```bash
 # <<<<<<<<<<<<<<<<<<<<<<<<< TODO: design review >>>>>>>>>>>>>>>>>>>>>>>>>
-# how are we planning to create the dns record?
-# manully, gitops ? 
-# Question , do we want to move this back to gitops or keep it as manual step ? is it ok to keep it as separate step?
-# Look at this script and only execute the required commands to create the dns record in the correct DNS and subscription
-# https://github.com/retaildevcrews/asb-spark/blob/main/.github/workflows/create-dns-record.sh
-
-
-# <<<<<<<<<<<<<<<<<<<<<<<<< TODO: design review >>>>>>>>>>>>>>>>>>>>>>>>>
 # What is going to be resource group of DNS Zone for deployment,  it is "cse.ms" ??
 # We are using 'dns-rg' for triplets
 # For this Spike just using 'TLD'
@@ -444,6 +412,86 @@ curl https://${ASB_DOMAIN}/memory/version
 ### Congratulations! You have GitOps setup on ASB!
 
 ```
+
+## Cosmos DB in AKS secure baseline
+
+[Setup Cosmos DB in secure baseline](./docs/cosmos.md)
+
+### Create ngsa-cosmos deployment file, make sure to have [Cosmos DB in secure baseline ready to go](./docs/cosmos.md)
+
+```bash
+
+export ASB_NGSA_MI_CLIENT_ID=$(az identity show -n $ASB_NGSA_MI_NAME -g $ASB_RG_CORE --query "clientId" -o tsv)
+
+cat templates/ngsa-cosmos.yaml | envsubst > gitops/ngsa/ngsa-cosmos.yaml
+cat templates/ngsa-pod-identity.yaml | envsubst > gitops/ngsa/ngsa-pod-identity.yaml
+
+# save env vars
+./saveenv.sh -y
+
+```
+
+### Push to GitHub
+
+```bash
+
+# check deltas - there should be 1 new file
+git status
+
+# push to your branch
+git add gitops/ngsa/ngsa-cosmos.yaml
+git add gitops/ngsa/ngsa-pod-identity.yaml
+git commit -m "added ngsa-cosmos config"
+git push
+
+```
+
+Flux will pick up the latest changes. Use the command below to force flux to sync.
+
+```bash
+
+# force flux to sync changes
+fluxctl sync
+
+```
+
+### Validate
+
+```bash
+
+# wait for ngsa-cosmos pods to start
+### this can take 8-10 minutes as the cluster sets up pod identity, and secrets via the csi driver
+kubectl get pods -n ngsa
+
+curl https://${ASB_DOMAIN}/cosmos/version
+```
+
+### Import Loderunner into ACR
+
+```bash
+
+# import l8r into ACR
+
+ACR_NAME=$(az deployment group show -g $ASB_RG_CORE -n cluster-${ASB_DEPLOYMENT_NAME}  --query properties.outputs.containerRegistryName.value -o tsv)
+
+# list command -  az acr repository list -n $ACR_NAME
+
+az acr import --source ghcr.io/retaildevcrews/ngsa-lr:beta -n $ACR_NAME
+
+rm -f  load-test.yaml
+cat templates/load-test.yaml | envsubst > load-test.yaml
+
+```
+### Deploy Loderunner
+
+```bash
+kubectl apply -f load-test.yaml
+
+# <<<<<<<< TODO >>>>>>>>>>
+# Makue loderunner yaml file targets both ngsa-cosmos and ngsa-memory?
+
+```
+
 
 ### Resetting the cluster
 

@@ -2036,6 +2036,10 @@
         "containerRegistryName": {
             "type": "string",
             "value": "[variables('defaultAcrName')]"
+        },
+        "vnetNodePoolSubnetResourceId": {
+            "type": "string",
+            "value": "[variables('vnetNodePoolSubnetResourceId')]"
         }
     }
 }
