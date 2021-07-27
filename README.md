@@ -57,9 +57,9 @@ az ad group member list -g $ASB_CLUSTER_ADMIN_GROUP  --query [].displayName -o t
 #### set the depoyment name
 # export ASB_DEPLOYMENT_NAME=[starts with a-z, [a-z,0-9], max length 8]
 
-export ASB_DEPLOYMENT_NAME=ngsatest
-export ASB_DNS_NAME=ngsa-pre-central-asb-test
-export ASB_RG_NAME=ngsa-pre-central-asb-test
+export ASB_DEPLOYMENT_NAME=[e.g 'ngsatest']
+export ASB_DNS_NAME=[e.g 'ngsa-pre-central-asb-test']
+export ASB_RG_NAME=[e.g 'ngsa-pre-central-asb-test']
 
 ```
 
@@ -326,14 +326,10 @@ git push
 ### Create a DNS A record
 
 ```bash
-# <<<<<<<<<<<<<<<<<<<<<<<<< TODO: design review >>>>>>>>>>>>>>>>>>>>>>>>>
-# What is going to be resource group of DNS Zone for deployment,  it is "cse.ms" ??
 # We are using 'dns-rg' for triplets
-# For this Spike just using 'TLD'
 
 # resource group of DNS Zone for deployment
-
-DNS_ZONE_RG=TLD 
+DNS_ZONE_RG=dns-rg 
 
 # create the dns record
 az network dns record-set a add-record -g $DNS_ZONE_RG -z $ASB_DNS_ZONE -n $ASB_DNS_NAME -a $ASB_AKS_PIP --query fqdn
