@@ -31,8 +31,10 @@ az account show -o table
 export ASB_CLUSTER_ADMIN_GROUP=4-co
 
 # verify you are a member of the security group
-# if you are not a member, please request via Teams chat
-az ad group member list -g $ASB_CLUSTER_ADMIN_GROUP  --query [].mailNickname -o table
+# if you are not a member, please request access
+
+# Might need to execute this line if nested groups exist. 
+az ad group member list -g $ASB_CLUSTER_ADMIN_GROUP  --query [].displayName -o table
 
 ```
 
@@ -55,9 +57,9 @@ az ad group member list -g $ASB_CLUSTER_ADMIN_GROUP  --query [].mailNickname -o 
 #### set the depoyment name
 # export ASB_DEPLOYMENT_NAME=[starts with a-z, [a-z,0-9], max length 8]
 
-export ASB_DEPLOYMENT_NAME=ngsatest
-export ASB_DNS_NAME=ngsa-pre-central-asb-test
-export ASB_RG_NAME=ngsa-pre-central-asb-test
+export ASB_DEPLOYMENT_NAME=[e.g 'ngsatest']
+export ASB_DNS_NAME=[e.g 'ngsa-pre-central-asb-test']
+export ASB_RG_NAME=[e.g 'ngsa-pre-central-asb-test']
 
 ```
 
@@ -117,6 +119,10 @@ export ASB_GEO_LOCATION=westus
 sudo az aks install-cli
 
 # run the saveenv.sh script at any time to save ASB_* variables to ASB_DEPLOYMENT_NAME.asb.env
+
+# <<<<<<<<<<<<<<<<<<<<<<<<< TODO: design review >>>>>>>>>>>>>>>>>>>>>>>>>
+# if encounter a "Permission denied" issue run "chmod +x ./saveenv.sh"
+
 ./saveenv.sh -y
 
 # if your terminal environment gets cleared, you can source the file to reload the environment variables
@@ -138,9 +144,7 @@ echo $ASB_DEPLOYMENT_NAME
 # verify the correct subscription
 az account show -o table
 
-# <<<<<<<<<<<<<<<<<<<<<<<<< TODO: design review >>>>>>>>>>>>>>>>>>>>>>>>> 
-🛑 # set env vars, these should be set into Codespaces enviroment for "cse.ms"
-
+🛑 # These env vars are already set in Codespaces enviroment for "cse.ms"
 
 # check certs
 if [ -z $APP_GW_CERT ]; then echo "App Gateway cert not set correctly"; fi
@@ -171,17 +175,9 @@ export ASB_GIT_REPO=$(git remote get-url origin)
 export ASB_GIT_BRANCH=$ASB_DEPLOYMENT_NAME
 export ASB_GIT_PATH=gitops
 
-🛑 If you have Git configured to use SSH instead of HTTPS.
-The command "git remote get-url origin" returns the SSH url which it will cause the flux deployment to fail.
-Solution: Manually set the variable "ASB_GIT_REPO" to use with HTTPS url instead
-
-
-# <<<<<<<<<<<<<<<<<<<<<<<<< TODO: design review >>>>>>>>>>>>>>>>>>>>>>>>>
-# What is going to be our pre-prod domain name,  it is "cse.ms" ??
-# For this Spike just using 'aks-sb.com'
 
 # set default domain name
-export ASB_DNS_ZONE=aks-sb.com  
+export ASB_DNS_ZONE=cse.ms  
 
 export ASB_DOMAIN=${ASB_DNS_NAME}.${ASB_DNS_ZONE}
 
@@ -306,7 +302,6 @@ cat templates/flux.yaml | envsubst  > flux.yaml
 
 ```
 
-
 ### Push to GitHub
 > The setup process creates 4 new files
 >
@@ -331,14 +326,10 @@ git push
 ### Create a DNS A record
 
 ```bash
-# <<<<<<<<<<<<<<<<<<<<<<<<< TODO: design review >>>>>>>>>>>>>>>>>>>>>>>>>
-# What is going to be resource group of DNS Zone for deployment,  it is "cse.ms" ??
 # We are using 'dns-rg' for triplets
-# For this Spike just using 'TLD'
 
 # resource group of DNS Zone for deployment
-
-DNS_ZONE_RG=TLD 
+DNS_ZONE_RG=dns-rg 
 
 # create the dns record
 az network dns record-set a add-record -g $DNS_ZONE_RG -z $ASB_DNS_ZONE -n $ASB_DNS_NAME -a $ASB_AKS_PIP --query fqdn
