@@ -139,17 +139,8 @@ echo $ASB_DEPLOYMENT_NAME
 az account show -o table
 
 # <<<<<<<<<<<<<<<<<<<<<<<<< TODO: design review >>>>>>>>>>>>>>>>>>>>>>>>> 
-🛑 # These certs are for DNS 'aks-sb.com' , we need to update them if we use a different DNS 
-#               e.g. cse.ms
-# set env vars, these should be set into Codespaces enviroment 
+🛑 # set env vars, these should be set into Codespaces enviroment for "cse.ms"
 
-
-# <<<<<<<<<<<<<<<<<<<<<<<<< TODO: design review >>>>>>>>>>>>>>>>>>>>>>>>>
-# Note: the stored APP_GW_CERT kv value is not the same as the one stored in Codespaces 
-
-export APP_GW_CERT=$(az keyvault secret show --subscription bartr-wcnp --vault-name rdc-certs -n aks-sb --query value -o tsv | tr -d '\n')
-export INGRESS_CERT=$(az keyvault secret show --subscription bartr-wcnp --vault-name rdc-certs -n aks-sb-crt --query value -o tsv | base64 | tr -d '\n')
-export INGRESS_KEY=$(az keyvault secret show --subscription bartr-wcnp --vault-name rdc-certs -n aks-sb-key --query value -o tsv | base64 | tr -d '\n')
 
 # check certs
 if [ -z $APP_GW_CERT ]; then echo "App Gateway cert not set correctly"; fi
