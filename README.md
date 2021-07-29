@@ -451,9 +451,7 @@ curl https://${ASB_DOMAIN}/cosmos/version
 
 # import l8r into ACR
 
-ACR_NAME=$(az deployment group show -g $ASB_RG_CORE -n cluster-${ASB_DEPLOYMENT_NAME}  --query properties.outputs.containerRegistryName.value -o tsv)
-
-# list command -  az acr repository list -n $ACR_NAME
+export ACR_NAME=$(az deployment group show -g $ASB_RG_CORE -n cluster-${ASB_DEPLOYMENT_NAME}  --query properties.outputs.containerRegistryName.value -o tsv)
 
 az acr import --source ghcr.io/retaildevcrews/ngsa-lr:beta -n $ACR_NAME
 
@@ -466,8 +464,9 @@ cat templates/load-test.yaml | envsubst > load-test.yaml
 ```bash
 kubectl apply -f load-test.yaml
 
-# <<<<<<<< TODO >>>>>>>>>>
-# Make loderunner yaml file targets both ngsa-cosmos and ngsa-memory?
+# Check loaderunner logs and make sure 200 status code entries do exist for both ngsa-cosmos and ngsa-memory
+
+kubectl logs l8r-load-1 -n ngsa
 
 ```
 
