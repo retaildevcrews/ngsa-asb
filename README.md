@@ -394,7 +394,7 @@ curl https://${ASB_DOMAIN}/memory/version
 
 ## Cosmos DB in AKS secure baseline
 
-[Setup Cosmos DB in secure baseline](./docs/cosmos.md)
+🛑 [Setup Cosmos DB in secure baseline](./docs/cosmos.md)
 
 ### Create ngsa-cosmos deployment file, make sure to have [Cosmos DB in secure baseline ready to go](./docs/cosmos.md)
 
