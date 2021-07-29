@@ -120,9 +120,6 @@ sudo az aks install-cli
 
 # run the saveenv.sh script at any time to save ASB_* variables to ASB_DEPLOYMENT_NAME.asb.env
 
-# <<<<<<<<<<<<<<<<<<<<<<<<< TODO: design review >>>>>>>>>>>>>>>>>>>>>>>>>
-# if encounter a "Permission denied" issue run "chmod +x ./saveenv.sh"
-
 ./saveenv.sh -y
 
 # if your terminal environment gets cleared, you can source the file to reload the environment variables
@@ -470,7 +467,7 @@ cat templates/load-test.yaml | envsubst > load-test.yaml
 kubectl apply -f load-test.yaml
 
 # <<<<<<<< TODO >>>>>>>>>>
-# Makue loderunner yaml file targets both ngsa-cosmos and ngsa-memory?
+# Make loderunner yaml file targets both ngsa-cosmos and ngsa-memory?
 
 ```
 
@@ -523,8 +520,6 @@ Delete the cluster
 
 # resource group names
 export ASB_RG_CORE=rg-${ASB_RG_NAME}
-# export ASB_RG_HUB=rg-${ASB_RG_NAME}
-# export ASB_RG_SPOKE=rg-${ASB_RG_NAME}
 export ASB_RG_SHARED_HUB_SPOKE=rg-${ASB_RG_NAME}-shared
 
 export ASB_AKS_NAME=$(az deployment group show -g $ASB_RG_CORE -n cluster-${ASB_DEPLOYMENT_NAME} --query properties.outputs.aksClusterName.value -o tsv)
@@ -542,7 +537,6 @@ az monitor log-analytics workspace delete -y --force true -g $ASB_RG_SHARED_HUB_
 # delete the resource groups
 az group delete -y --no-wait -g $ASB_RG_CORE
 az group delete -y --no-wait -g $ASB_RG_SHARED_HUB_SPOKE
-# az group delete -y --no-wait -g $ASB_RG_SHARED_HUB_SPOKE
 
 # delete from .kube/config
 kubectl config delete-context $ASB_DEPLOYMENT_NAME
