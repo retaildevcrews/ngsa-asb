@@ -11,15 +11,15 @@ spec:
   restartPolicy: OnFailure
   containers:
   - name: l8r
-    image: $ACR_NAME.azurecr.io/retaildevcrews/ngsa-lr:beta
+    image: ${ACR_NAME}.azurecr.io/retaildevcrews/ngsa-lr:beta
     imagePullPolicy: Always
     args:
     - -l
     - "100"
     - -r
     - -s
-    - ${ASB_DOMAIN}/memory
-    - ${ASB_DOMAIN}/cosmos
+    - http://ngsa-memory.ngsa:8080
+    - http://ngsa-cosmos.ngsa:8080
     - -f
     - benchmark.json
     # - --prometheus
