@@ -180,7 +180,8 @@ export ASB_DOMAIN=${ASB_DNS_NAME}.${ASB_DNS_ZONE}
 
 # resource group names
 export ASB_RG_CORE=rg-${ASB_RG_NAME}
-export ASB_RG_SHARED_HUB_SPOKE=rg-${ASB_RG_NAME}-shared
+export ASB_RG_HUB=rg-${ASB_RG_NAME}-hub
+export ASB_RG_SPOKE=rg-${ASB_RG_NAME}-spoke
 
 # export AAD env vars
 export ASB_TENANT_ID=$(az account show --query tenantId -o tsv)
@@ -197,7 +198,8 @@ export ASB_TENANT_ID=$(az account show --query tenantId -o tsv)
 
 # create the resource groups
 az group create -n $ASB_RG_CORE -l $ASB_LOCATION
-az group create -n $ASB_RG_SHARED_HUB_SPOKE -l $ASB_LOCATION
+az group create -n $ASB_RG_HUB -l $ASB_LOCATION
+az group create -n $ASB_RG_SPOKE -l $ASB_LOCATION
 
 
 ```
@@ -211,16 +213,16 @@ cp networking/spoke-BU0001A0008.json networking/spoke-$ASB_ORG_APP_ID_NAME.json
 # this section takes 15-20 minutes to complete
 
 # create hub network
-az deployment group create -g $ASB_RG_SHARED_HUB_SPOKE -f networking/hub-default.json -p location=${ASB_LOCATION} --query name
-export ASB_VNET_HUB_ID=$(az deployment group show -g $ASB_RG_SHARED_HUB_SPOKE -n hub-default --query properties.outputs.hubVnetId.value -o tsv)
+az deployment group create -g $ASB_RG_HUB -f networking/hub-default.json -p location=${ASB_LOCATION} --query name
+export ASB_VNET_HUB_ID=$(az deployment group show -g $ASB_RG_HUB -n hub-default --query properties.outputs.hubVnetId.value -o tsv)
 
 # create spoke network
-az deployment group create -g $ASB_RG_SHARED_HUB_SPOKE -f networking/spoke-$ASB_ORG_APP_ID_NAME.json -p location=${ASB_LOCATION} orgAppId=${ASB_ORG_APP_ID_NAME} hubVnetResourceId="${ASB_VNET_HUB_ID}" --query name
-export ASB_NODEPOOLS_SUBNET_ID=$(az deployment group show -g $ASB_RG_SHARED_HUB_SPOKE -n spoke-$ASB_ORG_APP_ID_NAME --query properties.outputs.nodepoolSubnetResourceIds.value -o tsv)
+az deployment group create -g $ASB_RG_SPOKE -f networking/spoke-$ASB_ORG_APP_ID_NAME.json -p location=${ASB_LOCATION} orgAppId=${ASB_ORG_APP_ID_NAME} hubVnetResourceId="${ASB_VNET_HUB_ID}" --query name
+export ASB_NODEPOOLS_SUBNET_ID=$(az deployment group show -g $ASB_RG_SPOKE -n spoke-$ASB_ORG_APP_ID_NAME --query properties.outputs.nodepoolSubnetResourceIds.value -o tsv)
 
 # create Region A hub network
-az deployment group create -g $ASB_RG_SHARED_HUB_SPOKE -f networking/hub-regionA.json -p location=${ASB_LOCATION} nodepoolSubnetResourceIds="['${ASB_NODEPOOLS_SUBNET_ID}']" --query name
-export ASB_SPOKE_VNET_ID=$(az deployment group show -g $ASB_RG_SHARED_HUB_SPOKE -n spoke-$ASB_ORG_APP_ID_NAME --query properties.outputs.clusterVnetResourceId.value -o tsv)
+az deployment group create -g $ASB_RG_HUB -f networking/hub-regionA.json -p location=${ASB_LOCATION} nodepoolSubnetResourceIds="['${ASB_NODEPOOLS_SUBNET_ID}']" --query name
+export ASB_SPOKE_VNET_ID=$(az deployment group show -g $ASB_RG_SPOKE -n spoke-$ASB_ORG_APP_ID_NAME --query properties.outputs.clusterVnetResourceId.value -o tsv)
 
 ./saveenv.sh -y
 
@@ -238,6 +240,7 @@ az deployment group create -g $ASB_RG_CORE \
   -n cluster-${ASB_DEPLOYMENT_NAME} \
   -p location=${ASB_LOCATION} \
      geoRedundancyLocation=${ASB_GEO_LOCATION} \
+     deploymentName=${ASB_DEPLOYMENT_NAME} \
      orgAppId=${ASB_ORG_APP_ID_NAME} \
      nodepoolsRGName=${ASB_RG_NAME} \
      asbDnsName=${ASB_DNS_NAME} \
@@ -257,7 +260,7 @@ az deployment group create -g $ASB_RG_CORE \
 
 ```bash
 # set public ip address resource name
-export ASB_PIP_NAME='pip-'$ASB_ORG_APP_ID_NAME'-00'
+export ASB_PIP_NAME='pip-'$ASB_DEPLOYMENT_NAME'-'$ASB_ORG_APP_ID_NAME'-00'
 
 # get the name of the deployment key vault
 export ASB_KV_NAME=$(az deployment group show -g $ASB_RG_CORE -n cluster-${ASB_DEPLOYMENT_NAME} --query properties.outputs.keyVaultName.value -o tsv)
@@ -266,7 +269,7 @@ export ASB_KV_NAME=$(az deployment group show -g $ASB_RG_CORE -n cluster-${ASB_D
 export ASB_AKS_NAME=$(az deployment group show -g $ASB_RG_CORE -n cluster-${ASB_DEPLOYMENT_NAME} --query properties.outputs.aksClusterName.value -o tsv)
 
 # Get the public IP of our App gateway
-export ASB_AKS_PIP=$(az network public-ip show -g $ASB_RG_SHARED_HUB_SPOKE --name $ASB_PIP_NAME --query ipAddress -o tsv)
+export ASB_AKS_PIP=$(az network public-ip show -g $ASB_RG_SPOKE --name $ASB_PIP_NAME --query ipAddress -o tsv)
 
 # Get the AKS Ingress Controller Managed Identity details.
 export ASB_TRAEFIK_RESOURCE_ID=$(az deployment group show -g $ASB_RG_CORE -n cluster-${ASB_DEPLOYMENT_NAME} --query properties.outputs.aksIngressControllerPodManagedIdentityResourceId.value -o tsv)
@@ -519,11 +522,12 @@ Delete the cluster
 
 # resource group names
 export ASB_RG_CORE=rg-${ASB_RG_NAME}
-export ASB_RG_SHARED_HUB_SPOKE=rg-${ASB_RG_NAME}-shared
+export ASB_RG_HUB=rg-${ASB_RG_NAME}-hub
+export ASB_RG_SPOKE=rg-${ASB_RG_NAME}-spoke
 
 export ASB_AKS_NAME=$(az deployment group show -g $ASB_RG_CORE -n cluster-${ASB_DEPLOYMENT_NAME} --query properties.outputs.aksClusterName.value -o tsv)
 export ASB_KEYVAULT_NAME=$(az deployment group show -g $ASB_RG_CORE -n cluster-${ASB_DEPLOYMENT_NAME} --query properties.outputs.keyVaultName.value -o tsv)
-export ASB_LA_HUB=$(az monitor log-analytics workspace list -g $ASB_RG_SHARED_HUB_SPOKE --query [0].name -o tsv)
+export ASB_LA_HUB=$(az monitor log-analytics workspace list -g $ASB_RG_HUB --query [0].name -o tsv)
 
 # delete and purge the key vault
 az keyvault delete -n $ASB_KEYVAULT_NAME
@@ -531,11 +535,12 @@ az keyvault purge -n $ASB_KEYVAULT_NAME
 
 # hard delete Log Analytics
 az monitor log-analytics workspace delete -y --force true -g $ASB_RG_CORE -n la-${ASB_AKS_NAME}
-az monitor log-analytics workspace delete -y --force true -g $ASB_RG_SHARED_HUB_SPOKE -n $ASB_LA_HUB
+az monitor log-analytics workspace delete -y --force true -g $ASB_RG_HUB -n $ASB_LA_HUB
 
 # delete the resource groups
 az group delete -y --no-wait -g $ASB_RG_CORE
-az group delete -y --no-wait -g $ASB_RG_SHARED_HUB_SPOKE
+az group delete -y --no-wait -g $ASB_RG_HUB
+az group delete -y --no-wait -g $ASB_RG_SPOKE
 
 # delete from .kube/config
 kubectl config delete-context $ASB_DEPLOYMENT_NAME
@@ -544,7 +549,7 @@ kubectl config delete-context $ASB_DEPLOYMENT_NAME
 az group list -o table | grep $ASB_DEPLOYMENT_NAME
 
 ### sometimes the spokes group has to be deleted twice
-az group delete -y --no-wait -g $ASB_RG_SHARED_HUB_SPOKE
+az group delete -y --no-wait -g $ASB_RG_SPOKE
 
 ```
 
