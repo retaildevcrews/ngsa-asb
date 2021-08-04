@@ -2,6 +2,14 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
+        "deploymentName": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 8,
+            "metadata": {
+                "description": "Deployment name used in naming"
+            }
+        },
         "orgAppId": {
             "type": "string",
             "minLength": 5,
@@ -53,7 +61,7 @@
         "hubLaWorkspaceResourceId": "[resourceId(variables('hubRgName'), 'Microsoft.OperationalInsights/workspaces', variables('hubLaWorkspaceName'))]",
         "toHubPeeringName": "[concat('spoke-to-', variables('hubNetworkName'))]",
 
-        "primaryClusterPipName": "[concat('pip-', variables('orgAppId'), '-00')]"
+        "primaryClusterPipName": "[concat('pip-', parameters('deploymentName'), '-',variables('orgAppId'), '-00')]"
     },
     "resources": [
         {
