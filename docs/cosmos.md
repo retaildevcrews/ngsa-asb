@@ -73,7 +73,7 @@ az keyvault set-policy --secret-permissions set --object-id $(az ad signed-in-us
 az keyvault secret set -o table --vault-name $ASB_KV_NAME --name "CosmosDatabase" --value $ASB_IMDB_DB
 az keyvault secret set -o table --vault-name $ASB_KV_NAME --name "CosmosCollection" --value $ASB_IMDB_COL
 az keyvault secret set -o table --vault-name $ASB_KV_NAME --name "CosmosKey" \
-  --value $(az cosmosdb keys list -n $ASB_IMDB_NAME -g $ASB_RG_CORE --query primaryMasterKey -o tsv)
+  --value $(az cosmosdb keys list -n $ASB_IMDB_NAME -g $ASB_COSMOS_RG_NAME --query primaryMasterKey -o tsv)
 az keyvault secret set -o table --vault-name $ASB_KV_NAME --name "CosmosUrl" --value "https://${ASB_IMDB_NAME}.documents.azure.com:443/"
 
 # remove logged in user's access to key vault
