@@ -4,31 +4,19 @@ Prerequisites:
 
 - Follow setup instructions in [README.md](../README.md) to create an environment
 
-## Create cosmos
+## Set Cosmos env vars
 
 ```bash
 
-export ASB_IMDB_NAME="${ASB_DEPLOYMENT_NAME}-cosmos"
+export COSMOS_RG_NAME="[Cosmos resource group name]" # e.g rg-ngsa-asb-shared
+export ASB_IMDB_NAME="[Cosmos account name]" # e.g ngsa-asb-cosmos
 export ASB_IMDB_DB="imdb"
 export ASB_IMDB_COL="movies"
-export ASB_IMDB_RW_KEY="az cosmosdb keys list -n $ASB_IMDB_NAME -g $ASB_RG_CORE --query primaryMasterKey -o tsv"
-
-# create cosmos
-export ASB_COSMOS_ID=$(az cosmosdb create -g $ASB_RG_CORE -n $ASB_IMDB_NAME --query id -o tsv)
-az cosmosdb sql database create -a $ASB_IMDB_NAME -n $ASB_IMDB_DB -g $ASB_RG_CORE --throughput 1000
-az cosmosdb sql container create -p /partitionKey -g $ASB_RG_CORE -a $ASB_IMDB_NAME -d $ASB_IMDB_DB -n $ASB_IMDB_COL
+export ASB_IMDB_RW_KEY="az cosmosdb keys list -n $ASB_IMDB_NAME -g $COSMOS_RG_NAME --query primaryMasterKey -o tsv"
+export ASB_COSMOS_ID=$(az cosmosdb show -g $COSMOS_RG_NAME -n $ASB_IMDB_NAME --query id -o tsv)
 
 # save env vars
 ./saveenv.sh -y
-
-```
-
-## Load data into cosmos
-
-```bash
-
-# load data into cosmos
-docker run -it --rm retaildevcrew/imdb-import $ASB_IMDB_NAME $(eval $ASB_IMDB_RW_KEY) $ASB_IMDB_DB $ASB_IMDB_COL
 
 ```
 
