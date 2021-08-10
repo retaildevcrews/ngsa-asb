@@ -1,5 +1,5 @@
 {
-	"name": "ASB-Spark",
+	"name": "ASB-Ngsa",
 	"image": "ghcr.io/retaildevcrews/asb:latest",
 	//"build": { "dockerfile": "Dockerfile" },
 	"runArgs": [ "--init", "--privileged" ],
