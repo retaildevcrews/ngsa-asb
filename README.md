@@ -402,6 +402,7 @@ curl https://${ASB_DOMAIN}/memory/version
 ### Create ngsa-cosmos deployment file
 
 ```bash
+export ASB_NGSA_MI_CLIENT_ID=$(az identity show -n $ASB_NGSA_MI_NAME -g $ASB_RG_CORE --query "clientId" -o tsv)
 
 cat templates/ngsa-cosmos.yaml | envsubst > gitops/ngsa/ngsa-cosmos.yaml
 cat templates/ngsa-pod-identity.yaml | envsubst > gitops/ngsa/ngsa-pod-identity.yaml
