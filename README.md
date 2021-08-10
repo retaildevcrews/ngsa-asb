@@ -466,6 +466,10 @@ cat templates/load-test.yaml | envsubst > load-test.yaml
 ```bash
 kubectl apply -f load-test.yaml
 
+# Check loderunner pod l8r-load-1 until is running
+
+kubectl get pods -n ngsa
+
 # Check loderunner logs and make sure 200 status code entries do exist for both ngsa-cosmos and ngsa-memory
 
 kubectl logs l8r-load-1 -n ngsa
