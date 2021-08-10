@@ -8,12 +8,12 @@ Prerequisites:
 
 ```bash
 
-export COSMOS_RG_NAME="[Cosmos resource group name]" # e.g rg-ngsa-asb-shared
+export ASB_COSMOS_RG_NAME="[Cosmos resource group name]" # e.g rg-ngsa-asb-shared
 export ASB_IMDB_NAME="[Cosmos account name]" # e.g ngsa-asb-cosmos
 export ASB_IMDB_DB="imdb"
 export ASB_IMDB_COL="movies"
-export ASB_IMDB_RW_KEY="az cosmosdb keys list -n $ASB_IMDB_NAME -g $COSMOS_RG_NAME --query primaryMasterKey -o tsv"
-export ASB_COSMOS_ID=$(az cosmosdb show -g $COSMOS_RG_NAME -n $ASB_IMDB_NAME --query id -o tsv)
+export ASB_IMDB_RW_KEY="az cosmosdb keys list -n $ASB_IMDB_NAME -g $ASB_COSMOS_RG_NAME --query primaryMasterKey -o tsv"
+export ASB_COSMOS_ID=$(az cosmosdb show -g $ASB_COSMOS_RG_NAME -n $ASB_IMDB_NAME --query id -o tsv)
 
 # save env vars
 ./saveenv.sh -y
