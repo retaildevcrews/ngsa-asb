@@ -476,6 +476,36 @@ kubectl logs l8r-load-1 -n ngsa
 
 ```
 
+### Deploy Fluent Bit
+
+```bash
+# Import image into ACR
+az acr import --source fluent/fluent-bit:1.5 -n $ACR_NAME
+
+# Create namespace
+kubectl create ns fluentbit
+
+# Create secrets TODO get right values for $Ngsa_Log_RG and $NGSA_Log_Name
+kubectl create secret generic fluentbit-secrets --from-literal=WorkspaceId=$(az monitor log-analytics workspace show -g $Ngsa_Log_RG -n $Ngsa_Log_Name --query customerId -o tsv)   --from-literal=SharedKey=$(az monitor log-analytics workspace get-shared-keys -g $Ngsa_Log_RG -n $Ngsa_Log_Name --query primarySharedKey -o tsv) -n fluentbit
+
+# Load required yaml
+
+mkdir gitops/fluentbit
+
+cat templates/fluentbit/config-log.yaml | envsubst > gitops/fluentbit/config-log.yaml
+
+cat templates/fluentbit/daemonset.yaml | envsubst > gitops/fluentbit/daemonset.yaml
+
+cp templates/fluentbit/config.yaml gitops/fluentbit
+
+cp templates/fluentbit/role.yaml  gitops/fluentbit
+
+# Sync Flux
+fluxctl sync --k8s-fwd-ns flux-cd
+
+```
+
+
 
 ### Resetting the cluster
 
