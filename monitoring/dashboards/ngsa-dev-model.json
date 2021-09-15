@@ -19,7 +19,7 @@
   "links": [],
   "panels": [
     {
-      "collapsed": false,
+      "collapsed": true,
       "datasource": null,
       "gridPos": {
         "h": 1,
@@ -28,507 +28,508 @@
         "y": 0
       },
       "id": 4,
-      "panels": [],
+      "panels": [
+        {
+          "datasource": null,
+          "fieldConfig": {
+            "defaults": {
+              "custom": {},
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 10
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 3,
+            "w": 4,
+            "x": 0,
+            "y": 1
+          },
+          "id": 8,
+          "options": {
+            "colorMode": "value",
+            "graphMode": "area",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "reduceOptions": {
+              "calcs": [
+                "mean"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "textMode": "auto"
+          },
+          "pluginVersion": "7.3.0",
+          "targets": [
+            {
+              "appInsights": {
+                "dimension": [],
+                "metricName": "select",
+                "timeGrain": "auto"
+              },
+              "azureLogAnalytics": {
+                "query": "AzureDiagnostics\r\n| where ResourceProvider==\"MICROSOFT.DOCUMENTDB\" and Category == \"DataPlaneRequests\" and Resource == \"NGSA-DEV-COSMOS\"\r\n| where databaseName_s == \"imdb\"\r\n\r\n| where statusCode_s == 429\r\n| count",
+                "resultFormat": "time_series",
+                "workspace": "3ef39291-0240-4a58-8e90-6c83497353e3"
+              },
+              "azureMonitor": {
+                "aggOptions": [],
+                "dimensionFilter": "*",
+                "dimensionFilters": [],
+                "metricDefinition": "select",
+                "metricName": "select",
+                "metricNamespace": "select",
+                "resourceGroup": "select",
+                "resourceName": "select",
+                "timeGrain": "auto",
+                "timeGrains": [],
+                "top": "10"
+              },
+              "insightsAnalytics": {
+                "query": "",
+                "resultFormat": "time_series"
+              },
+              "queryType": "Azure Log Analytics",
+              "refId": "A",
+              "subscription": "648dcb5a-de1e-48b2-af6b-fe6ef28d355c"
+            }
+          ],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "Throttled Requests",
+          "type": "stat"
+        },
+        {
+          "aliasColors": {},
+          "bars": false,
+          "dashLength": 10,
+          "dashes": false,
+          "datasource": "Azure Monitor",
+          "description": "",
+          "fieldConfig": {
+            "defaults": {
+              "custom": {
+                "align": null,
+                "filterable": false
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "fill": 1,
+          "fillGradient": 0,
+          "gridPos": {
+            "h": 7,
+            "w": 17,
+            "x": 4,
+            "y": 1
+          },
+          "hiddenSeries": false,
+          "id": 2,
+          "legend": {
+            "avg": false,
+            "current": false,
+            "max": false,
+            "min": false,
+            "show": true,
+            "total": false,
+            "values": false
+          },
+          "lines": true,
+          "linewidth": 1,
+          "nullPointMode": "null",
+          "options": {
+            "alertThreshold": true
+          },
+          "percentage": false,
+          "pluginVersion": "7.3.0",
+          "pointradius": 2,
+          "points": false,
+          "renderer": "flot",
+          "seriesOverrides": [],
+          "spaceLength": 10,
+          "stack": false,
+          "steppedLine": false,
+          "targets": [
+            {
+              "appInsights": {
+                "dimension": [],
+                "metricName": "select",
+                "timeGrain": "auto"
+              },
+              "azureLogAnalytics": {
+                "query": "//change this example to create your own time series query\n<table name>                                                              //the table to query (e.g. Usage, Heartbeat, Perf)\n| where $__timeFilter(TimeGenerated)                                      //this is a macro used to show the full chart’s time range, choose the datetime column here\n| summarize count() by <group by column>, bin(TimeGenerated, $__interval) //change “group by column” to a column in your table, such as “Computer”. The $__interval macro is used to auto-select the time grain. Can also use 1h, 5m etc.\n| order by TimeGenerated asc",
+                "resultFormat": "time_series",
+                "workspace": "7f7b8792-0860-4fbf-83a1-32018810805e"
+              },
+              "azureMonitor": {
+                "aggOptions": [
+                  "Count"
+                ],
+                "aggregation": "Count",
+                "allowedTimeGrainsMs": [
+                  60000,
+                  300000,
+                  900000,
+                  1800000,
+                  3600000,
+                  21600000,
+                  43200000,
+                  86400000
+                ],
+                "dimensionFilter": "*",
+                "dimensionFilters": [],
+                "dimensions": [
+                  {
+                    "text": "DatabaseName",
+                    "value": "DatabaseName"
+                  },
+                  {
+                    "text": "CollectionName",
+                    "value": "CollectionName"
+                  },
+                  {
+                    "text": "Region",
+                    "value": "Region"
+                  },
+                  {
+                    "text": "StatusCode",
+                    "value": "StatusCode"
+                  },
+                  {
+                    "text": "OperationType",
+                    "value": "OperationType"
+                  },
+                  {
+                    "text": "Status",
+                    "value": "Status"
+                  }
+                ],
+                "metricDefinition": "Microsoft.DocumentDB/databaseAccounts",
+                "metricName": "TotalRequests",
+                "metricNamespace": "Microsoft.DocumentDB/databaseAccounts",
+                "resourceGroup": "ngsa-dev-shared-rg",
+                "resourceName": "ngsa-dev-cosmos",
+                "timeGrain": "auto",
+                "timeGrains": [
+                  {
+                    "text": "auto",
+                    "value": "auto"
+                  },
+                  {
+                    "text": "1 minute",
+                    "value": "PT1M"
+                  },
+                  {
+                    "text": "5 minutes",
+                    "value": "PT5M"
+                  },
+                  {
+                    "text": "15 minutes",
+                    "value": "PT15M"
+                  },
+                  {
+                    "text": "30 minutes",
+                    "value": "PT30M"
+                  },
+                  {
+                    "text": "1 hour",
+                    "value": "PT1H"
+                  },
+                  {
+                    "text": "6 hours",
+                    "value": "PT6H"
+                  },
+                  {
+                    "text": "12 hours",
+                    "value": "PT12H"
+                  },
+                  {
+                    "text": "1 day",
+                    "value": "P1D"
+                  }
+                ],
+                "top": "10"
+              },
+              "hide": false,
+              "insightsAnalytics": {
+                "query": "",
+                "resultFormat": "time_series"
+              },
+              "queryType": "Azure Monitor",
+              "refId": "A",
+              "subscription": "648dcb5a-de1e-48b2-af6b-fe6ef28d355c"
+            },
+            {
+              "appInsights": {
+                "dimension": [],
+                "metricName": "select",
+                "timeGrain": "auto"
+              },
+              "azureLogAnalytics": {
+                "query": "//change this example to create your own time series query\n<table name>                                                              //the table to query (e.g. Usage, Heartbeat, Perf)\n| where $__timeFilter(TimeGenerated)                                      //this is a macro used to show the full chart’s time range, choose the datetime column here\n| summarize count() by <group by column>, bin(TimeGenerated, $__interval) //change “group by column” to a column in your table, such as “Computer”. The $__interval macro is used to auto-select the time grain. Can also use 1h, 5m etc.\n| order by TimeGenerated asc",
+                "resultFormat": "time_series",
+                "workspace": "7f7b8792-0860-4fbf-83a1-32018810805e"
+              },
+              "azureMonitor": {
+                "aggOptions": [
+                  "Total",
+                  "Average"
+                ],
+                "aggregation": "Total",
+                "allowedTimeGrainsMs": [
+                  60000,
+                  300000,
+                  900000,
+                  1800000,
+                  3600000,
+                  21600000,
+                  43200000,
+                  86400000
+                ],
+                "dimensionFilter": "*",
+                "dimensionFilters": [],
+                "dimensions": [
+                  {
+                    "text": "DatabaseName",
+                    "value": "DatabaseName"
+                  },
+                  {
+                    "text": "CollectionName",
+                    "value": "CollectionName"
+                  },
+                  {
+                    "text": "Region",
+                    "value": "Region"
+                  },
+                  {
+                    "text": "StatusCode",
+                    "value": "StatusCode"
+                  },
+                  {
+                    "text": "OperationType",
+                    "value": "OperationType"
+                  },
+                  {
+                    "text": "Status",
+                    "value": "Status"
+                  }
+                ],
+                "metricDefinition": "Microsoft.DocumentDB/databaseAccounts",
+                "metricName": "TotalRequestUnits",
+                "metricNamespace": "Microsoft.DocumentDB/databaseAccounts",
+                "resourceGroup": "ngsa-dev-shared-rg",
+                "resourceName": "ngsa-dev-cosmos",
+                "timeGrain": "auto",
+                "timeGrains": [
+                  {
+                    "text": "auto",
+                    "value": "auto"
+                  },
+                  {
+                    "text": "1 minute",
+                    "value": "PT1M"
+                  },
+                  {
+                    "text": "5 minutes",
+                    "value": "PT5M"
+                  },
+                  {
+                    "text": "15 minutes",
+                    "value": "PT15M"
+                  },
+                  {
+                    "text": "30 minutes",
+                    "value": "PT30M"
+                  },
+                  {
+                    "text": "1 hour",
+                    "value": "PT1H"
+                  },
+                  {
+                    "text": "6 hours",
+                    "value": "PT6H"
+                  },
+                  {
+                    "text": "12 hours",
+                    "value": "PT12H"
+                  },
+                  {
+                    "text": "1 day",
+                    "value": "P1D"
+                  }
+                ],
+                "top": "10"
+              },
+              "hide": false,
+              "insightsAnalytics": {
+                "query": "",
+                "resultFormat": "time_series"
+              },
+              "queryType": "Azure Monitor",
+              "refId": "B",
+              "subscription": "648dcb5a-de1e-48b2-af6b-fe6ef28d355c"
+            }
+          ],
+          "thresholds": [],
+          "timeFrom": null,
+          "timeRegions": [],
+          "timeShift": null,
+          "title": "Total Requests (ngsa-dev-cosmos)",
+          "tooltip": {
+            "shared": true,
+            "sort": 0,
+            "value_type": "individual"
+          },
+          "type": "graph",
+          "xaxis": {
+            "buckets": null,
+            "mode": "time",
+            "name": null,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            },
+            {
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            }
+          ],
+          "yaxis": {
+            "align": false,
+            "alignLevel": null
+          }
+        },
+        {
+          "datasource": null,
+          "fieldConfig": {
+            "defaults": {
+              "custom": {},
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 4,
+            "w": 4,
+            "x": 0,
+            "y": 4
+          },
+          "id": 6,
+          "options": {
+            "colorMode": "value",
+            "graphMode": "area",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "reduceOptions": {
+              "calcs": [
+                "mean"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "textMode": "auto"
+          },
+          "pluginVersion": "7.3.0",
+          "targets": [
+            {
+              "appInsights": {
+                "dimension": [],
+                "metricName": "select",
+                "timeGrain": "auto"
+              },
+              "azureLogAnalytics": {
+                "query": "AzureMetrics \r\n| where MetricName == \"ProvisionedThroughput\" \r\n\r\n| summarize max(Count) ",
+                "resultFormat": "time_series",
+                "workspace": "3ef39291-0240-4a58-8e90-6c83497353e3"
+              },
+              "azureMonitor": {
+                "aggOptions": [],
+                "aggregation": "",
+                "dimensionFilter": "*",
+                "dimensionFilters": [],
+                "metricDefinition": "select",
+                "metricName": "select",
+                "metricNamespace": "select",
+                "resourceGroup": "ngsa-dev-shared-rg",
+                "resourceName": "select",
+                "timeGrain": "",
+                "timeGrains": [],
+                "top": "10"
+              },
+              "insightsAnalytics": {
+                "query": "",
+                "resultFormat": "time_series"
+              },
+              "queryType": "Azure Log Analytics",
+              "refId": "A",
+              "subscription": "648dcb5a-de1e-48b2-af6b-fe6ef28d355c"
+            }
+          ],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "Max Provisioned Throughput",
+          "type": "stat"
+        }
+      ],
       "title": "Cosmos DB Usage",
       "type": "row"
     },
     {
-      "datasource": null,
-      "fieldConfig": {
-        "defaults": {
-          "custom": {},
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 10
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 3,
-        "w": 4,
-        "x": 0,
-        "y": 1
-      },
-      "id": 8,
-      "options": {
-        "colorMode": "value",
-        "graphMode": "area",
-        "justifyMode": "auto",
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": [
-            "mean"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "textMode": "auto"
-      },
-      "pluginVersion": "7.3.0",
-      "targets": [
-        {
-          "appInsights": {
-            "dimension": [],
-            "metricName": "select",
-            "timeGrain": "auto"
-          },
-          "azureLogAnalytics": {
-            "query": "AzureDiagnostics\r\n| where ResourceProvider==\"MICROSOFT.DOCUMENTDB\" and Category == \"DataPlaneRequests\" and Resource == \"NGSA-DEV-COSMOS\"\r\n| where databaseName_s == \"imdb\"\r\n\r\n| where statusCode_s == 429\r\n| count",
-            "resultFormat": "time_series",
-            "workspace": "3ef39291-0240-4a58-8e90-6c83497353e3"
-          },
-          "azureMonitor": {
-            "aggOptions": [],
-            "dimensionFilter": "*",
-            "dimensionFilters": [],
-            "metricDefinition": "select",
-            "metricName": "select",
-            "metricNamespace": "select",
-            "resourceGroup": "select",
-            "resourceName": "select",
-            "timeGrain": "auto",
-            "timeGrains": [],
-            "top": "10"
-          },
-          "insightsAnalytics": {
-            "query": "",
-            "resultFormat": "time_series"
-          },
-          "queryType": "Azure Log Analytics",
-          "refId": "A",
-          "subscription": "648dcb5a-de1e-48b2-af6b-fe6ef28d355c"
-        }
-      ],
-      "timeFrom": null,
-      "timeShift": null,
-      "title": "Throttled Requests",
-      "type": "stat"
-    },
-    {
-      "aliasColors": {},
-      "bars": false,
-      "dashLength": 10,
-      "dashes": false,
-      "datasource": "Azure Monitor",
-      "description": "",
-      "fieldConfig": {
-        "defaults": {
-          "custom": {
-            "align": null,
-            "filterable": false
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "fill": 1,
-      "fillGradient": 0,
-      "gridPos": {
-        "h": 7,
-        "w": 16,
-        "x": 4,
-        "y": 1
-      },
-      "hiddenSeries": false,
-      "id": 2,
-      "legend": {
-        "avg": false,
-        "current": false,
-        "max": false,
-        "min": false,
-        "show": true,
-        "total": false,
-        "values": false
-      },
-      "lines": true,
-      "linewidth": 1,
-      "nullPointMode": "null",
-      "options": {
-        "alertThreshold": true
-      },
-      "percentage": false,
-      "pluginVersion": "7.3.0",
-      "pointradius": 2,
-      "points": false,
-      "renderer": "flot",
-      "seriesOverrides": [],
-      "spaceLength": 10,
-      "stack": false,
-      "steppedLine": false,
-      "targets": [
-        {
-          "appInsights": {
-            "dimension": [],
-            "metricName": "select",
-            "timeGrain": "auto"
-          },
-          "azureLogAnalytics": {
-            "query": "//change this example to create your own time series query\n<table name>                                                              //the table to query (e.g. Usage, Heartbeat, Perf)\n| where $__timeFilter(TimeGenerated)                                      //this is a macro used to show the full chart’s time range, choose the datetime column here\n| summarize count() by <group by column>, bin(TimeGenerated, $__interval) //change “group by column” to a column in your table, such as “Computer”. The $__interval macro is used to auto-select the time grain. Can also use 1h, 5m etc.\n| order by TimeGenerated asc",
-            "resultFormat": "time_series",
-            "workspace": "7f7b8792-0860-4fbf-83a1-32018810805e"
-          },
-          "azureMonitor": {
-            "aggOptions": [
-              "Count"
-            ],
-            "aggregation": "Count",
-            "allowedTimeGrainsMs": [
-              60000,
-              300000,
-              900000,
-              1800000,
-              3600000,
-              21600000,
-              43200000,
-              86400000
-            ],
-            "dimensionFilter": "*",
-            "dimensionFilters": [],
-            "dimensions": [
-              {
-                "text": "DatabaseName",
-                "value": "DatabaseName"
-              },
-              {
-                "text": "CollectionName",
-                "value": "CollectionName"
-              },
-              {
-                "text": "Region",
-                "value": "Region"
-              },
-              {
-                "text": "StatusCode",
-                "value": "StatusCode"
-              },
-              {
-                "text": "OperationType",
-                "value": "OperationType"
-              },
-              {
-                "text": "Status",
-                "value": "Status"
-              }
-            ],
-            "metricDefinition": "Microsoft.DocumentDB/databaseAccounts",
-            "metricName": "TotalRequests",
-            "metricNamespace": "Microsoft.DocumentDB/databaseAccounts",
-            "resourceGroup": "ngsa-dev-shared-rg",
-            "resourceName": "ngsa-dev-cosmos",
-            "timeGrain": "auto",
-            "timeGrains": [
-              {
-                "text": "auto",
-                "value": "auto"
-              },
-              {
-                "text": "1 minute",
-                "value": "PT1M"
-              },
-              {
-                "text": "5 minutes",
-                "value": "PT5M"
-              },
-              {
-                "text": "15 minutes",
-                "value": "PT15M"
-              },
-              {
-                "text": "30 minutes",
-                "value": "PT30M"
-              },
-              {
-                "text": "1 hour",
-                "value": "PT1H"
-              },
-              {
-                "text": "6 hours",
-                "value": "PT6H"
-              },
-              {
-                "text": "12 hours",
-                "value": "PT12H"
-              },
-              {
-                "text": "1 day",
-                "value": "P1D"
-              }
-            ],
-            "top": "10"
-          },
-          "hide": false,
-          "insightsAnalytics": {
-            "query": "",
-            "resultFormat": "time_series"
-          },
-          "queryType": "Azure Monitor",
-          "refId": "A",
-          "subscription": "648dcb5a-de1e-48b2-af6b-fe6ef28d355c"
-        },
-        {
-          "appInsights": {
-            "dimension": [],
-            "metricName": "select",
-            "timeGrain": "auto"
-          },
-          "azureLogAnalytics": {
-            "query": "//change this example to create your own time series query\n<table name>                                                              //the table to query (e.g. Usage, Heartbeat, Perf)\n| where $__timeFilter(TimeGenerated)                                      //this is a macro used to show the full chart’s time range, choose the datetime column here\n| summarize count() by <group by column>, bin(TimeGenerated, $__interval) //change “group by column” to a column in your table, such as “Computer”. The $__interval macro is used to auto-select the time grain. Can also use 1h, 5m etc.\n| order by TimeGenerated asc",
-            "resultFormat": "time_series",
-            "workspace": "7f7b8792-0860-4fbf-83a1-32018810805e"
-          },
-          "azureMonitor": {
-            "aggOptions": [
-              "Total",
-              "Average"
-            ],
-            "aggregation": "Total",
-            "allowedTimeGrainsMs": [
-              60000,
-              300000,
-              900000,
-              1800000,
-              3600000,
-              21600000,
-              43200000,
-              86400000
-            ],
-            "dimensionFilter": "*",
-            "dimensionFilters": [],
-            "dimensions": [
-              {
-                "text": "DatabaseName",
-                "value": "DatabaseName"
-              },
-              {
-                "text": "CollectionName",
-                "value": "CollectionName"
-              },
-              {
-                "text": "Region",
-                "value": "Region"
-              },
-              {
-                "text": "StatusCode",
-                "value": "StatusCode"
-              },
-              {
-                "text": "OperationType",
-                "value": "OperationType"
-              },
-              {
-                "text": "Status",
-                "value": "Status"
-              }
-            ],
-            "metricDefinition": "Microsoft.DocumentDB/databaseAccounts",
-            "metricName": "TotalRequestUnits",
-            "metricNamespace": "Microsoft.DocumentDB/databaseAccounts",
-            "resourceGroup": "ngsa-dev-shared-rg",
-            "resourceName": "ngsa-dev-cosmos",
-            "timeGrain": "auto",
-            "timeGrains": [
-              {
-                "text": "auto",
-                "value": "auto"
-              },
-              {
-                "text": "1 minute",
-                "value": "PT1M"
-              },
-              {
-                "text": "5 minutes",
-                "value": "PT5M"
-              },
-              {
-                "text": "15 minutes",
-                "value": "PT15M"
-              },
-              {
-                "text": "30 minutes",
-                "value": "PT30M"
-              },
-              {
-                "text": "1 hour",
-                "value": "PT1H"
-              },
-              {
-                "text": "6 hours",
-                "value": "PT6H"
-              },
-              {
-                "text": "12 hours",
-                "value": "PT12H"
-              },
-              {
-                "text": "1 day",
-                "value": "P1D"
-              }
-            ],
-            "top": "10"
-          },
-          "hide": false,
-          "insightsAnalytics": {
-            "query": "",
-            "resultFormat": "time_series"
-          },
-          "queryType": "Azure Monitor",
-          "refId": "B",
-          "subscription": "648dcb5a-de1e-48b2-af6b-fe6ef28d355c"
-        }
-      ],
-      "thresholds": [],
-      "timeFrom": null,
-      "timeRegions": [],
-      "timeShift": null,
-      "title": "Total Requests (ngsa-dev-cosmos)",
-      "tooltip": {
-        "shared": true,
-        "sort": 0,
-        "value_type": "individual"
-      },
-      "type": "graph",
-      "xaxis": {
-        "buckets": null,
-        "mode": "time",
-        "name": null,
-        "show": true,
-        "values": []
-      },
-      "yaxes": [
-        {
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
-        },
-        {
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
-        }
-      ],
-      "yaxis": {
-        "align": false,
-        "alignLevel": null
-      }
-    },
-    {
-      "datasource": null,
-      "fieldConfig": {
-        "defaults": {
-          "custom": {},
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 4,
-        "w": 4,
-        "x": 0,
-        "y": 4
-      },
-      "id": 6,
-      "options": {
-        "colorMode": "value",
-        "graphMode": "area",
-        "justifyMode": "auto",
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": [
-            "mean"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "textMode": "auto"
-      },
-      "pluginVersion": "7.3.0",
-      "targets": [
-        {
-          "appInsights": {
-            "dimension": [],
-            "metricName": "select",
-            "timeGrain": "auto"
-          },
-          "azureLogAnalytics": {
-            "query": "AzureMetrics \r\n| where MetricName == \"ProvisionedThroughput\" \r\n\r\n| summarize max(Count) ",
-            "resultFormat": "time_series",
-            "workspace": "3ef39291-0240-4a58-8e90-6c83497353e3"
-          },
-          "azureMonitor": {
-            "aggOptions": [],
-            "aggregation": "",
-            "dimensionFilter": "*",
-            "dimensionFilters": [],
-            "metricDefinition": "select",
-            "metricName": "select",
-            "metricNamespace": "select",
-            "resourceGroup": "ngsa-dev-shared-rg",
-            "resourceName": "select",
-            "timeGrain": "",
-            "timeGrains": [],
-            "top": "10"
-          },
-          "insightsAnalytics": {
-            "query": "",
-            "resultFormat": "time_series"
-          },
-          "queryType": "Azure Log Analytics",
-          "refId": "A",
-          "subscription": "648dcb5a-de1e-48b2-af6b-fe6ef28d355c"
-        }
-      ],
-      "timeFrom": null,
-      "timeShift": null,
-      "title": "Max Provisioned Throughput",
-      "type": "stat"
-    },
-    {
-      "collapsed": true,
+      "collapsed": false,
       "datasource": null,
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 8
+        "y": 1
       },
       "id": 10,
       "panels": [],
@@ -557,7 +558,7 @@
         "h": 4,
         "w": 4,
         "x": 0,
-        "y": 9
+        "y": 2
       },
       "id": 12,
       "options": {
@@ -632,7 +633,7 @@
         "h": 8,
         "w": 9,
         "x": 4,
-        "y": 9
+        "y": 2
       },
       "hiddenSeries": false,
       "id": 16,
@@ -763,7 +764,7 @@
         "h": 8,
         "w": 8,
         "x": 13,
-        "y": 9
+        "y": 2
       },
       "hiddenSeries": false,
       "id": 18,
@@ -888,7 +889,7 @@
         "h": 4,
         "w": 4,
         "x": 0,
-        "y": 13
+        "y": 6
       },
       "id": 14,
       "options": {
@@ -967,7 +968,7 @@
         "h": 3,
         "w": 4,
         "x": 0,
-        "y": 17
+        "y": 10
       },
       "id": 24,
       "options": {
@@ -1059,7 +1060,7 @@
         "h": 6,
         "w": 9,
         "x": 4,
-        "y": 17
+        "y": 10
       },
       "hiddenSeries": false,
       "id": 20,
@@ -1199,7 +1200,7 @@
         "h": 6,
         "w": 8,
         "x": 13,
-        "y": 17
+        "y": 10
       },
       "hiddenSeries": false,
       "id": 23,
@@ -1324,7 +1325,7 @@
         "h": 3,
         "w": 4,
         "x": 0,
-        "y": 20
+        "y": 13
       },
       "id": 25,
       "options": {
@@ -1406,7 +1407,7 @@
         "h": 3,
         "w": 4,
         "x": 0,
-        "y": 23
+        "y": 16
       },
       "id": 29,
       "options": {
@@ -1481,7 +1482,7 @@
         "h": 6,
         "w": 9,
         "x": 4,
-        "y": 23
+        "y": 16
       },
       "hiddenSeries": false,
       "id": 27,
@@ -1602,7 +1603,7 @@
         "h": 6,
         "w": 8,
         "x": 13,
-        "y": 23
+        "y": 16
       },
       "hiddenSeries": false,
       "id": 28,
@@ -1730,7 +1731,7 @@
         "h": 3,
         "w": 4,
         "x": 0,
-        "y": 26
+        "y": 19
       },
       "id": 30,
       "options": {
@@ -1786,6 +1787,231 @@
       "timeShift": null,
       "title": "ngsa-memory",
       "type": "stat"
+    },
+    {
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": null,
+            "filterable": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 10,
+        "x": 0,
+        "y": 22
+      },
+      "id": 32,
+      "options": {
+        "showHeader": true
+      },
+      "pluginVersion": "7.3.0",
+      "targets": [
+        {
+          "appInsights": {
+            "dimension": [],
+            "metricName": "select",
+            "timeGrain": "auto"
+          },
+          "azureLogAnalytics": {
+            "query": "ngsa_CL\r\n| where $__timeFilter(Date_t) \n    and k_container_s == \"app\" \r\n   and k_app_s == \"ngsa-cosmos\" \r\n   and LogName_s == \"Ngsa.RequestLog\"\r\n\r\n   and StatusCode_d >= 400\r\n| summarize count() by tostring(toint(StatusCode_d)), Path_s, Zone_s\r\n| project-rename StatusCode=StatusCode_d,RequestCount=count_,Path=Path_s, Zone=Zone_s",
+            "resultFormat": "time_series",
+            "workspace": "3ef39291-0240-4a58-8e90-6c83497353e3"
+          },
+          "azureMonitor": {
+            "aggOptions": [],
+            "dimensionFilter": "*",
+            "dimensionFilters": [],
+            "metricDefinition": "select",
+            "metricName": "select",
+            "metricNamespace": "select",
+            "resourceGroup": "select",
+            "resourceName": "select",
+            "timeGrain": "auto",
+            "timeGrains": [],
+            "top": "10"
+          },
+          "insightsAnalytics": {
+            "query": "",
+            "resultFormat": "time_series"
+          },
+          "queryType": "Azure Log Analytics",
+          "refId": "A",
+          "subscription": "648dcb5a-de1e-48b2-af6b-fe6ef28d355c"
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "Failed Requests (ngsa-cosmos)",
+      "type": "table"
+    },
+    {
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": null,
+            "filterable": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 11,
+        "x": 10,
+        "y": 22
+      },
+      "id": 33,
+      "options": {
+        "showHeader": true
+      },
+      "pluginVersion": "7.3.0",
+      "targets": [
+        {
+          "appInsights": {
+            "dimension": [],
+            "metricName": "select",
+            "timeGrain": "auto"
+          },
+          "azureLogAnalytics": {
+            "query": "ngsa_CL\r\n| where $__timeFilter(Date_t) \n    and k_container_s == \"app\" \r\n   and k_app_s == \"ngsa-memory\" \r\n   and LogName_s == \"Ngsa.RequestLog\"\r\n\r\n   and StatusCode_d >= 400\r\n| summarize count() by tostring(toint(StatusCode_d)), Path_s, Zone_s\r\n| project-rename StatusCode=StatusCode_d,RequestCount=count_,Path=Path_s, Zone=Zone_s",
+            "resultFormat": "time_series",
+            "workspace": "3ef39291-0240-4a58-8e90-6c83497353e3"
+          },
+          "azureMonitor": {
+            "aggOptions": [],
+            "dimensionFilter": "*",
+            "dimensionFilters": [],
+            "metricDefinition": "select",
+            "metricName": "select",
+            "metricNamespace": "select",
+            "resourceGroup": "select",
+            "resourceName": "select",
+            "timeGrain": "auto",
+            "timeGrains": [],
+            "top": "10"
+          },
+          "insightsAnalytics": {
+            "query": "",
+            "resultFormat": "time_series"
+          },
+          "queryType": "Azure Log Analytics",
+          "refId": "A",
+          "subscription": "648dcb5a-de1e-48b2-af6b-fe6ef28d355c"
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "Failed Requests (ngsa-memory)",
+      "type": "table"
+    },
+    {
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": null,
+            "filterable": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 21,
+        "x": 0,
+        "y": 29
+      },
+      "id": 35,
+      "options": {
+        "showHeader": true
+      },
+      "pluginVersion": "7.3.0",
+      "targets": [
+        {
+          "appInsights": {
+            "dimension": [],
+            "metricName": "select",
+            "timeGrain": "auto"
+          },
+          "azureLogAnalytics": {
+            "query": "loderunner_CL\r\n| where $__timeFilter(Date_t) and StatusCode_d > 200 \r\n| extend AppType = iff(Server_s contains 'ngsa-memory', 'ngsa-memory','ngsa-cosmos')\r\n| summarize countif(StatusCode_d > 200) by AppType, Zone_s, StatusCode_d\r\n| project-rename FailureCount=countif_, Zone=Zone_s, StatusCode=StatusCode_d\r\n| order by AppType, Zone, StatusCode",
+            "resultFormat": "time_series",
+            "workspace": "3ef39291-0240-4a58-8e90-6c83497353e3"
+          },
+          "azureMonitor": {
+            "aggOptions": [],
+            "dimensionFilter": "*",
+            "dimensionFilters": [],
+            "metricDefinition": "select",
+            "metricName": "select",
+            "metricNamespace": "select",
+            "resourceGroup": "select",
+            "resourceName": "select",
+            "timeGrain": "auto",
+            "timeGrains": [],
+            "top": "10"
+          },
+          "insightsAnalytics": {
+            "query": "",
+            "resultFormat": "time_series"
+          },
+          "queryType": "Azure Log Analytics",
+          "refId": "A",
+          "subscription": "648dcb5a-de1e-48b2-af6b-fe6ef28d355c"
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "LodeRunner Failures (Client)",
+      "type": "table"
     }
   ],
   "refresh": false,
@@ -1796,12 +2022,12 @@
     "list": []
   },
   "time": {
-    "from": "now-1h",
-    "to": "now"
+    "from": "2021-09-01T02:33:00.000Z",
+    "to": "2021-09-01T03:33:00.000Z"
   },
   "timepicker": {},
   "timezone": "utc",
   "title": "NGSA Dev Dashboard",
   "uid": "2IRD5FSnz",
-  "version": 85
+  "version": 91
 }
