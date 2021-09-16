@@ -485,8 +485,9 @@ az acr import --source fluent/fluent-bit:1.5 -n $ASB_ACR_NAME
 # Create namespace
 kubectl create ns fluentbit
 
-# Create secrets TODO get right values for $Ngsa_Log_RG and $NGSA_Log_Name
-kubectl create secret generic fluentbit-secrets --from-literal=WorkspaceId=$(az monitor log-analytics workspace show -g $Ngsa_Log_RG -n $Ngsa_Log_Name --query customerId -o tsv)   --from-literal=SharedKey=$(az monitor log-analytics workspace get-shared-keys -g $Ngsa_Log_RG -n $Ngsa_Log_Name --query primarySharedKey -o tsv) -n fluentbit
+export ASB_LA_WORKSPACE_NAME=la-$ASB_AKS_NAME
+
+kubectl create secret generic fluentbit-secrets --from-literal=WorkspaceId=$(az monitor log-analytics workspace show -g $ASB_RG_CORE -n $ASB_LA_WORKSPACE_NAME --query customerId -o tsv)   --from-literal=SharedKey=$(az monitor log-analytics workspace get-shared-keys -g $ASB_RG_CORE -n $ASB_LA_WORKSPACE_NAME --query primarySharedKey -o tsv) -n fluentbit
 
 # Load required yaml
 
