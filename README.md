@@ -432,7 +432,7 @@ Flux will pick up the latest changes. Use the command below to force flux to syn
 ```bash
 
 # force flux to sync changes
-fluxctl sync
+fluxctl sync --k8s-fwd-ns flux-cd
 
 ```
 
@@ -453,9 +453,9 @@ curl https://${ASB_DOMAIN}/cosmos/version
 
 # import l8r into ACR
 
-export ACR_NAME=$(az deployment group show -g $ASB_RG_CORE -n cluster-${ASB_DEPLOYMENT_NAME}  --query properties.outputs.containerRegistryName.value -o tsv)
+export ASB_ACR_NAME=$(az deployment group show -g $ASB_RG_CORE -n cluster-${ASB_DEPLOYMENT_NAME}  --query properties.outputs.containerRegistryName.value -o tsv)
 
-az acr import --source ghcr.io/retaildevcrews/ngsa-lr:beta -n $ACR_NAME
+az acr import --source ghcr.io/retaildevcrews/ngsa-lr:beta -n $ASB_ACR_NAME
 
 rm -f  load-test.yaml
 cat templates/load-test.yaml | envsubst > load-test.yaml
@@ -476,10 +476,47 @@ kubectl get pods -n ngsa
 kubectl logs l8r-load-1 -n ngsa
 
 ```
+### Deploy Fluent Bit
+
+```bash
+# Import image into ACR
+az acr import --source docker.io/fluent/fluent-bit:1.5 -n $ASB_ACR_NAME
+
+# Create namespace
+kubectl create ns fluentbit
+
+export ASB_LA_WORKSPACE_NAME=la-$ASB_AKS_NAME
+
+# Create secrets to authenticate with log analytics
+kubectl create secret generic fluentbit-secrets --from-literal=WorkspaceId=$(az monitor log-analytics workspace show -g $ASB_RG_CORE -n $ASB_LA_WORKSPACE_NAME --query customerId -o tsv)   --from-literal=SharedKey=$(az monitor log-analytics workspace get-shared-keys -g $ASB_RG_CORE -n $ASB_LA_WORKSPACE_NAME --query primarySharedKey -o tsv) -n fluentbit
+
+# Load required yaml
+
+mkdir gitops/fluentbit
+
+cat templates/fluentbit/config-log.yaml | envsubst > gitops/fluentbit/config-log.yaml
+
+cat templates/fluentbit/daemonset.yaml | envsubst > gitops/fluentbit/daemonset.yaml
+
+cp templates/fluentbit/config.yaml gitops/fluentbit
+
+cp templates/fluentbit/role.yaml  gitops/fluentbit
+
+git add gitops/fluentbit
+
+git commit -m "added fluentbit"
+
+git push
+
+# Sync Flux
+fluxctl sync --k8s-fwd-ns flux-cd
+
+```
 
 ### Deploy Grafana
 
-> #### [Please see Instructions to deploy Grafana here](./monitoring/README.md)
+#### [Please see Instructions to deploy Grafana here](./monitoring/README.md)
+
 
 ### Resetting the cluster
 
