@@ -461,6 +461,7 @@ rm -f  load-test.yaml
 cat templates/load-test.yaml | envsubst > load-test.yaml
 
 ```
+
 ### Deploy Loderunner
 
 ```bash
@@ -476,6 +477,9 @@ kubectl logs l8r-load-1 -n ngsa
 
 ```
 
+### Deploy Grafana
+
+> #### [Please see Instructions to deploy Grafana here](./monitoring/README.md)
 
 ### Resetting the cluster
 
