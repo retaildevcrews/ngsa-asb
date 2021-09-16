@@ -432,7 +432,7 @@ Flux will pick up the latest changes. Use the command below to force flux to syn
 ```bash
 
 # force flux to sync changes
-fluxctl sync
+fluxctl sync --k8s-fwd-ns flux-cd
 
 ```
 
@@ -500,6 +500,12 @@ cat templates/fluentbit/daemonset.yaml | envsubst > gitops/fluentbit/daemonset.y
 cp templates/fluentbit/config.yaml gitops/fluentbit
 
 cp templates/fluentbit/role.yaml  gitops/fluentbit
+
+git add gitops/fluentbit
+
+git commit -m "added fluentbit"
+
+git push
 
 # Sync Flux
 fluxctl sync --k8s-fwd-ns flux-cd
