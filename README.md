@@ -480,7 +480,7 @@ kubectl logs l8r-load-1 -n ngsa
 
 ```bash
 # Import image into ACR
-az acr import --source fluent/fluent-bit:1.5 -n $ASB_ACR_NAME
+az acr import --source docker.io/fluent/fluent-bit:1.5 -n $ASB_ACR_NAME
 
 # Create namespace
 kubectl create ns fluentbit
