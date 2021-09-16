@@ -24,7 +24,7 @@ spec:
       terminationGracePeriodSeconds: 10
       containers:
         - name: fluentbit
-          image: acraks6jqf6qyt7jarg.azurecr.io/fluent/fluent-bit:1.5
+          image: $ASB_ACR_NAME.azurecr.io/fluent/fluent-bit:1.5
           imagePullPolicy: Always
           ports:
             - containerPort: 2020
