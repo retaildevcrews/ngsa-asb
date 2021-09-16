@@ -17,9 +17,9 @@ The following instructions allow adding Azure Monitor data source to create cust
 
 ```bash
 # import Grafana into ACR
-export ACR_NAME=$(az deployment group show -g $ASB_RG_CORE -n cluster-${ASB_DEPLOYMENT_NAME}  --query properties.outputs.containerRegistryName.value -o tsv)
+export ASB_ACR_NAME=$(az deployment group show -g $ASB_RG_CORE -n cluster-${ASB_DEPLOYMENT_NAME}  --query properties.outputs.containerRegistryName.value -o tsv)
 
-az acr import --source docker.io/io/grafana/grafana:7.3.0 -n $ACR_NAME
+az acr import --source docker.io/io/grafana/grafana:7.3.0 -n $ASB_ACR_NAME
 
 # create grafana deployment file
 mkdir gitops/monitoring
