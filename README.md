@@ -461,6 +461,7 @@ rm -f  load-test.yaml
 cat templates/load-test.yaml | envsubst > load-test.yaml
 
 ```
+
 ### Deploy Loderunner
 
 ```bash
@@ -475,7 +476,6 @@ kubectl get pods -n ngsa
 kubectl logs l8r-load-1 -n ngsa
 
 ```
-
 ### Deploy Fluent Bit
 
 ```bash
@@ -513,6 +513,9 @@ fluxctl sync --k8s-fwd-ns flux-cd
 
 ```
 
+### Deploy Grafana
+
+#### [Please see Instructions to deploy Grafana here](./monitoring/README.md)
 
 
 ### Resetting the cluster
