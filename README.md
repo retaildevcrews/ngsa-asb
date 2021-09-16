@@ -453,9 +453,9 @@ curl https://${ASB_DOMAIN}/cosmos/version
 
 # import l8r into ACR
 
-export ACR_NAME=$(az deployment group show -g $ASB_RG_CORE -n cluster-${ASB_DEPLOYMENT_NAME}  --query properties.outputs.containerRegistryName.value -o tsv)
+export ASB_ACR_NAME=$(az deployment group show -g $ASB_RG_CORE -n cluster-${ASB_DEPLOYMENT_NAME}  --query properties.outputs.containerRegistryName.value -o tsv)
 
-az acr import --source ghcr.io/retaildevcrews/ngsa-lr:beta -n $ACR_NAME
+az acr import --source ghcr.io/retaildevcrews/ngsa-lr:beta -n $ASB_ACR_NAME
 
 rm -f  load-test.yaml
 cat templates/load-test.yaml | envsubst > load-test.yaml
@@ -480,7 +480,7 @@ kubectl logs l8r-load-1 -n ngsa
 
 ```bash
 # Import image into ACR
-az acr import --source fluent/fluent-bit:1.5 -n $ACR_NAME
+az acr import --source fluent/fluent-bit:1.5 -n $ASB_ACR_NAME
 
 # Create namespace
 kubectl create ns fluentbit
