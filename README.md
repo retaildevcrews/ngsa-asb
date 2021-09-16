@@ -487,6 +487,7 @@ kubectl create ns fluentbit
 
 export ASB_LA_WORKSPACE_NAME=la-$ASB_AKS_NAME
 
+# Create secrets to authenticate with log analytics
 kubectl create secret generic fluentbit-secrets --from-literal=WorkspaceId=$(az monitor log-analytics workspace show -g $ASB_RG_CORE -n $ASB_LA_WORKSPACE_NAME --query customerId -o tsv)   --from-literal=SharedKey=$(az monitor log-analytics workspace get-shared-keys -g $ASB_RG_CORE -n $ASB_LA_WORKSPACE_NAME --query primarySharedKey -o tsv) -n fluentbit
 
 # Load required yaml
