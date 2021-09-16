@@ -479,7 +479,7 @@ kubectl logs l8r-load-1 -n ngsa
 
 ### Deploy Grafana
 
-> #### [Please see Instructions to deploy Grafana and Ngsa dasboard here](/monitoring/README.md)
+> #### [Please see Instructions to deploy Grafana and Ngsa dasboard here](./monitoring/README.md)
 
 ### Resetting the cluster
 
