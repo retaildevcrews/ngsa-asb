@@ -1,0 +1,7 @@
+{
+    "zone": "dev",
+    "region": "dev",
+    "asb.ngsa.mi.name": "ngsadev-ngsa-id",
+    "asb.domain" : "ngsa-pre-central-dev.cse.ms",
+    "template": "ngsa-preprod.yaml"
+}

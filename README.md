@@ -170,8 +170,7 @@ echo $ASB_CLUSTER_ADMIN_ID
 # set GitOps repo
 export ASB_GIT_REPO=$(git remote get-url origin)
 export ASB_GIT_BRANCH=$ASB_DEPLOYMENT_NAME
-export ASB_GIT_PATH=gitops
-
+export ASB_GIT_PATH=deploy/$ASB_DEPLOYMENT_NAME
 
 # set default domain name
 export ASB_DNS_ZONE=cse.ms  
@@ -289,12 +288,10 @@ export ASB_INGRESS_KEY_NAME=appgw-ingress-internal-aks-ingress-key
 ```bash
 
 # traefik config
-rm -f gitops/ingress/02-traefik-config.yaml
-cat templates/traefik-config.yaml | envsubst > gitops/ingress/02-traefik-config.yaml
+cat templates/traefik-config.yaml | envsubst > $ASB_GIT_PATH/ingress/02-traefik-config.yaml
 
 # app ingress
-rm -f gitops/ngsa/ngsa-ingress.yaml
-cat templates/ngsa-ingress.yaml | envsubst > gitops/ngsa/ngsa-ingress.yaml
+cat templates/ngsa-ingress.yaml | envsubst > $ASB_GIT_PATH/ngsa/ngsa-ingress.yaml
 
 # GitOps (flux)
 rm -f flux.yaml
@@ -314,8 +311,8 @@ git status
 
 # push to your branch
 git add flux.yaml
-git add gitops/ingress/02-traefik-config.yaml
-git add gitops/ngsa/ngsa-ingress.yaml
+git add $ASB_GIT_PATH/ingress/02-traefik-config.yaml
+git add $ASB_GIT_PATH/ngsa/ngsa-ingress.yaml
 git add networking/spoke-$ASB_ORG_APP_ID_NAME.json
 
 git commit -m "added cluster config"
@@ -374,14 +371,20 @@ kubectl logs -n flux-cd -l app.kubernetes.io/name=flux
 
 ```
 
+## Deploying NGSA Applications
+
+### 🛑 Prerequisite - [Setup Cosmos DB in secure baseline](./docs/cosmos.md)
+
+There are two different options to choose from for deploying NGSA:
+- [Deploy using yaml with FluxCD](./docs/deployNgsaYaml.md)
+- [Deploy using AutoGitops with FluxCD](./docs/deployNgsaAgo.md)
+
 ### Validate Ingress
 
-> ASB uses `Traefik` for ingress
 
 ```bash
+After NGSA has been deployed, verify that ingress is working correctly
 
-# wait for traefik pods to start
-### this can take 2-3 minutes
 kubectl get pods -n ingress
 
 ## Verify with curl
@@ -390,92 +393,16 @@ kubectl get pods -n ingress
 
 # test https
 curl https://${ASB_DOMAIN}/memory/version
+curl https://${ASB_DOMAIN}/cosmos/version
 
 ### Congratulations! You have GitOps setup on ASB!
 
 ```
 
-## Cosmos DB in AKS secure baseline
 
-### 🛑 Prerequisite - [Setup Cosmos DB in secure baseline](./docs/cosmos.md)
 
-### Create ngsa-cosmos deployment file
 
-```bash
-export ASB_NGSA_MI_CLIENT_ID=$(az identity show -n $ASB_NGSA_MI_NAME -g $ASB_RG_CORE --query "clientId" -o tsv)
 
-cat templates/ngsa-cosmos.yaml | envsubst > gitops/ngsa/ngsa-cosmos.yaml
-cat templates/ngsa-pod-identity.yaml | envsubst > gitops/ngsa/ngsa-pod-identity.yaml
-
-# save env vars
-./saveenv.sh -y
-
-```
-
-### Push to GitHub
-
-```bash
-
-# check deltas - there should be 1 new file
-git status
-
-# push to your branch
-git add gitops/ngsa/ngsa-cosmos.yaml
-git add gitops/ngsa/ngsa-pod-identity.yaml
-git commit -m "added ngsa-cosmos config"
-git push
-
-```
-
-Flux will pick up the latest changes. Use the command below to force flux to sync.
-
-```bash
-
-# force flux to sync changes
-fluxctl sync --k8s-fwd-ns flux-cd
-
-```
-
-### Validate
-
-```bash
-
-# wait for ngsa-cosmos pods to start
-### this can take 8-10 minutes as the cluster sets up pod identity, and secrets via the csi driver
-kubectl get pods -n ngsa
-
-curl https://${ASB_DOMAIN}/cosmos/version
-```
-
-### Import Loderunner into ACR
-
-```bash
-
-# import l8r into ACR
-
-export ASB_ACR_NAME=$(az deployment group show -g $ASB_RG_CORE -n cluster-${ASB_DEPLOYMENT_NAME}  --query properties.outputs.containerRegistryName.value -o tsv)
-
-az acr import --source ghcr.io/retaildevcrews/ngsa-lr:beta -n $ASB_ACR_NAME
-
-rm -f  load-test.yaml
-cat templates/load-test.yaml | envsubst > load-test.yaml
-
-```
-
-### Deploy Loderunner
-
-```bash
-kubectl apply -f load-test.yaml
-
-# Check loderunner pod l8r-load-1 until is running
-
-kubectl get pods -n ngsa
-
-# Check loderunner logs and make sure 200 status code entries do exist for both ngsa-cosmos and ngsa-memory
-
-kubectl logs l8r-load-1 -n ngsa
-
-```
 ### Deploy Fluent Bit
 
 ```bash
@@ -492,17 +419,17 @@ kubectl create secret generic fluentbit-secrets --from-literal=WorkspaceId=$(az 
 
 # Load required yaml
 
-mkdir gitops/fluentbit
+mkdir $ASB_GIT_PATH/fluentbit
 
-cat templates/fluentbit/config-log.yaml | envsubst > gitops/fluentbit/config-log.yaml
+cat templates/fluentbit/config-log.yaml | envsubst > $ASB_GIT_PATH/fluentbit/config-log.yaml
 
-cat templates/fluentbit/daemonset.yaml | envsubst > gitops/fluentbit/daemonset.yaml
+cat templates/fluentbit/daemonset.yaml | envsubst > $ASB_GIT_PATH/fluentbit/daemonset.yaml
 
-cp templates/fluentbit/config.yaml gitops/fluentbit
+cp templates/fluentbit/config.yaml $ASB_GIT_PATH/fluentbit
 
-cp templates/fluentbit/role.yaml  gitops/fluentbit
+cp templates/fluentbit/role.yaml  $ASB_GIT_PATH/fluentbit
 
-git add gitops/fluentbit
+git add $ASB_GIT_PATH/fluentbit
 
 git commit -m "added fluentbit"
 

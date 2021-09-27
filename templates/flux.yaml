@@ -108,7 +108,7 @@ spec:
         args:
         - --git-url=$ASB_GIT_REPO
         - --git-branch=$ASB_GIT_BRANCH
-        - --git-path=$ASB_GIT_PATH
+        - --git-path=$ASB_GIT_PATH,/deploy/common
         - --git-readonly
         - --sync-state=secret
         - --listen-metrics=:3031
