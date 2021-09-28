@@ -49,30 +49,23 @@ fluxctl sync --k8s-fwd-ns flux-cd
 ### this can take 8-10 minutes as the cluster sets up pod identity, and secrets via the csi driver
 kubectl get pods -n ngsa
 
-curl https://${ASB_DOMAIN}/cosmos/version
-curl https://${ASB_DOMAIN}/memory/version
-curl https://${ASB_DOMAIN}/java/version
-```
-
-### Import Loderunner into ACR
-
-```bash
-
-# import l8r into ACR
-
-export ASB_ACR_NAME=$(az deployment group show -g $ASB_RG_CORE -n cluster-${ASB_DEPLOYMENT_NAME}  --query properties.outputs.containerRegistryName.value -o tsv)
-
-az acr import --source ghcr.io/retaildevcrews/ngsa-lr:beta -n $ASB_ACR_NAME
-
-rm -f  load-test.yaml
-cat templates/load-test.yaml | envsubst > load-test.yaml
-
+http https://${ASB_DOMAIN}/cosmos/version
+http https://${ASB_DOMAIN}/memory/version
+http https://${ASB_DOMAIN}/java/version
 ```
 
 ### Deploy Loderunner
 
 ```bash
-kubectl apply -f load-test.yaml
+
+cp templates/load-test.yaml $ASB_GIT_PATH/ngsa/load-test.yaml
+
+git add $ASB_GIT_PATH/ngsa/load-test.yaml
+git commit -m "added ngsa-lr "
+git push
+
+# force flux to sync changes
+fluxctl sync --k8s-fwd-ns flux-cd
 
 # Check loderunner pod l8r-load-1 until is running
 
