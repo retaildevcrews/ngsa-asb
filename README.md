@@ -389,13 +389,13 @@ After NGSA has been deployed, verify that ingress is working correctly
 
 kubectl get pods -n ingress
 
-## Verify with curl
+## Verify with http
 ### this can take 1-2 minutes
 ### if you get a 502 error retry until you get 200
 
 # test https
-curl https://${ASB_DOMAIN}/memory/version
-curl https://${ASB_DOMAIN}/cosmos/version
+http https://${ASB_DOMAIN}/memory/version
+http https://${ASB_DOMAIN}/cosmos/version
 
 ### Congratulations! You have GitOps setup on ASB!
 
