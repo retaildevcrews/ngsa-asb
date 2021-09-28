@@ -292,9 +292,6 @@ mkdir $ASB_GIT_PATH
 # traefik config
 cat templates/traefik-config.yaml | envsubst > $ASB_GIT_PATH/ingress/02-traefik-config.yaml
 
-# app ingress
-cat templates/ngsa-ingress.yaml | envsubst > $ASB_GIT_PATH/ngsa/ngsa-ingress.yaml
-
 # GitOps (flux)
 rm -f flux.yaml
 cat templates/flux.yaml | envsubst  > flux.yaml
