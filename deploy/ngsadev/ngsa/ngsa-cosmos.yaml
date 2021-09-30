@@ -29,7 +29,7 @@ spec:
           - --url-prefix
           - /cosmos
           - --zone
-          - dev
+          - centralus
           - --region
           - dev
 
