@@ -27,7 +27,7 @@ spec:
           - name: PROMETHEUS
             value: "true"
           - name: ZONE
-            value: "dev"
+            value: "centralus"
           - name: REGION
             value: "dev"
           - name: URL_PREFIX
