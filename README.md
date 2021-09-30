@@ -1,4 +1,4 @@
-# AKS Secure Baseline Pre-Prod deployment
+# NGSA AKS Secure Baseline Pre-Prod deployment
 
 > Welcome to the Patterns and Practices (PnP) AKS Secure Baseline (ASB)
 
@@ -78,6 +78,7 @@ git branch -a | grep $ASB_DEPLOYMENT_NAME
 🛑 Set Org App ID
 
 ```bash
+
 # Org App ID e.g BU0001A0008
 # export ASB_ORG_APP_ID_NAME=[starts with a-z, [a-z,0-9], min length 5, max length 11]
 export ASB_ORG_APP_ID_NAME="BU0001G0001"
@@ -85,10 +86,6 @@ export ASB_ORG_APP_ID_NAME="BU0001G0001"
 ```
 
 ### Create git branch
-
-> Do not PR a `cluster branch` into main
->
-> The cluster branch name must be the same as the Team name
 
 ```bash
 
