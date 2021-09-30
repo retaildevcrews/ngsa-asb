@@ -114,6 +114,7 @@ spec:
         - --listen-metrics=:3031
         - --git-timeout=30s
         - --registry-disable-scanning=true
+        - --sync-garbage-collection
 ---
 apiVersion: v1
 kind: Secret
