@@ -108,12 +108,13 @@ spec:
         args:
         - --git-url=$ASB_GIT_REPO
         - --git-branch=$ASB_GIT_BRANCH
-        - --git-path=$ASB_GIT_PATH
+        - --git-path=$ASB_GIT_PATH,deploy/bootstrap
         - --git-readonly
         - --sync-state=secret
         - --listen-metrics=:3031
         - --git-timeout=30s
         - --registry-disable-scanning=true
+        - --sync-garbage-collection
 ---
 apiVersion: v1
 kind: Secret

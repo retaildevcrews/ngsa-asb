@@ -22,8 +22,8 @@ export ASB_ACR_NAME=$(az deployment group show -g $ASB_RG_CORE -n cluster-${ASB_
 az acr import --source docker.io/io/grafana/grafana:7.3.0 -n $ASB_ACR_NAME
 
 # create grafana deployment file
-mkdir gitops/monitoring
-cat templates/grafana.yaml | envsubst  > gitops/monitoring/grafana.yaml
+mkdir $ASB_GIT_PATH/monitoring
+cat templates/grafana.yaml | envsubst  > $ASB_GIT_PATH/monitoring/grafana.yaml
 
 ```
 

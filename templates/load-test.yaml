@@ -11,7 +11,7 @@ spec:
   restartPolicy: OnFailure
   containers:
   - name: l8r
-    image: ${ACR_NAME}.azurecr.io/retaildevcrews/ngsa-lr:beta
+    image: ghcr.io/retaildevcrews/ngsa-lr:beta
     imagePullPolicy: Always
     args:
     - -l
