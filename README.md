@@ -436,9 +436,9 @@ fluxctl sync --k8s-fwd-ns flux-cd
 
 ```
 
-### Deploy Grafana
+### Deploy Grafana and Prometheus
 
-#### [Please see Instructions to deploy Grafana here](./monitoring/README.md)
+Please see Instructions to deploy Grafana and Prometheus [here](./monitoring/README.md)
 
 
 ### Resetting the cluster
