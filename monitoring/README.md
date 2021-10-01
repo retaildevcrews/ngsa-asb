@@ -24,10 +24,12 @@ az acr import --source docker.io/prom/prometheus:v2.30.0 -n $ASB_ACR_NAME
 az acr import --source docker.io/io/grafana/grafana:7.3.0 -n $ASB_ACR_NAME
 
 mkdir $ASB_GIT_PATH/monitoring
+# create monitoring namespace deployment file
+cat templates/monitoring.yaml | envsubst  > $ASB_GIT_PATH/monitoring/01-namespace.yaml
 # create prometheus deployment file
-cat templates/prometheus.yaml | envsubst  > $ASB_GIT_PATH/monitoring/prometheus.yaml
+cat templates/prometheus.yaml | envsubst  > $ASB_GIT_PATH/monitoring/02-prometheus.yaml
 # create grafana deployment file
-cat templates/grafana.yaml | envsubst  > $ASB_GIT_PATH/monitoring/grafana.yaml
+cat templates/grafana.yaml | envsubst  > $ASB_GIT_PATH/monitoring/03-grafana.yaml
 
 ```
 
