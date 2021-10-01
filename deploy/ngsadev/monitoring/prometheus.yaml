@@ -145,6 +145,9 @@ data:
       - job_name: 'ngsa-cosmos'
         static_configs:
           - targets: [ 'ngsa-cosmos.default.svc.cluster.local:8080' ]
+      - job_name: 'ngsa-java'
+        static_configs:
+          - targets: [ 'ngsa-java.default.svc.cluster.local:8080' ]
       - job_name: 'loderunner'
         static_configs:
           - targets: [ 'loderunner.default.svc.cluster.local:8080' ]
