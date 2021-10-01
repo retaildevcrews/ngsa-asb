@@ -95,3 +95,7 @@ Goto a browser to access grafana and perform the following steps:
 - Go to `Dashboards` > `Manage` page from left menu
 - Click `Import`
 - Upload dashboard file [ngsa-dev-model.json](../monitoring/dashboards/ngsa-dev-model.json)
+
+## Prometheus Design Notes
+
+- The Prometheus container runs as a non-root user and requires write permissions on a mounted volume. We used initContainers to change the ownership of the datastore directory.
