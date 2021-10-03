@@ -1,0 +1,7 @@
+{
+    "zone": "centralus",
+    "region": "westus",
+    "mi.name": "ngsaprec-ngsa-id",
+    "domain" : "ngsa-pre-central.cse.ms",
+    "template": "ngsa-preprod.yaml"
+}
