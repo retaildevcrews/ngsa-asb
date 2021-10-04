@@ -13,7 +13,7 @@ spec:
   template:
     metadata:
       labels:
-        aadpodidbinding: ngsadev-ngsa-id
+        aadpodidbinding: ngsaprec-ngsa-id
         app: ngsa-cosmos
         deploy: 21-10-04-07-24-27
         version: beta-1004-0724
@@ -33,7 +33,7 @@ spec:
           - --zone
           - centralus
           - --region
-          - dev
+          - westus
 
           ports:
             - name: http
@@ -96,9 +96,9 @@ metadata:
 spec:
   tls:
   - hosts:
-      - ngsa-pre-central-dev.cse.ms
+      - ngsa-pre-central.cse.ms
   rules:
-  - host: ngsa-pre-central-dev.cse.ms
+  - host: ngsa-pre-central.cse.ms
     http:
       paths:
       - path: /cosmos
