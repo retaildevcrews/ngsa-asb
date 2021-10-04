@@ -13,7 +13,7 @@ spec:
   template:
     metadata:
       labels:
-        aadpodidbinding: ngsadev-ngsa-id
+        aadpodidbinding: ngsaprec-ngsa-id
         app: ngsa-java
         deploy: 21-10-04-07-21-51
         version: beta-1004-0721
@@ -31,7 +31,7 @@ spec:
           - name: ZONE
             value: "centralus"
           - name: REGION
-            value: "dev"
+            value: "westus"
           - name: URL_PREFIX
             value: /java
 
@@ -96,9 +96,9 @@ metadata:
 spec:
   tls:
   - hosts:
-      - ngsa-pre-central-dev.cse.ms
+      - ngsa-pre-central.cse.ms
   rules:
-  - host: ngsa-pre-central-dev.cse.ms
+  - host: ngsa-pre-central.cse.ms
     http:
       paths:
       - path: /java
