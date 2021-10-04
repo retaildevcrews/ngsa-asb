@@ -3,5 +3,5 @@
     "region": "westus",
     "mi.name": "ngsaprec-ngsa-id",
     "domain" : "ngsa-pre-central.cse.ms",
-    "template": "ngsa-preprod.yaml"
+    "templates": "ngsa-cosmos.yaml,ngsa-memory.yaml,ngsa-java.yaml,loderunner.yaml"
 }
