@@ -1,45 +1,42 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ngsa-java
+  name: ngsa-cosmos
   namespace: ngsa
   labels:
-    app.kubernetes.io/name: ngsa-java
+    app.kubernetes.io/name: ngsa-cosmos
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: ngsa-java
+      app: ngsa-cosmos
   template:
     metadata:
       labels:
         aadpodidbinding: ngsaprec-ngsa-id
-        app: ngsa-java
-        deploy: 21-10-05-22-24-13
-        version: beta-1005-2224
+        app: ngsa-cosmos
+        deploy: 21-10-05-22-29-45
+        version: beta-1005-2229
       annotations:
         prometheus.io/scrape: 'true'
         prometheus.io/port: '8080'
     spec:
       containers:
         - name: app
-          image: ghcr.io/retaildevcrews/ngsa-java:beta
+          image: ghcr.io/retaildevcrews/ngsa-app:beta
           imagePullPolicy: Always
-          env:
-          - name: PROMETHEUS
-            value: "true"
-          - name: ZONE
-            value: "centralus"
-          - name: REGION
-            value: "westus"
-          - name: URL_PREFIX
-            value: /java
-
+          args:
+          - --prometheus
+          - --url-prefix
+          - /cosmos
+          - --zone
+          - centralus
+          - --region
+          - westus
           ports:
             - name: http
               containerPort: 8080
               protocol: TCP
-
           resources:
             limits:
               cpu: 500m
@@ -47,7 +44,6 @@ spec:
             requests:
               cpu: 500m
               memory: 512Mi
-
           volumeMounts:
             - name: secrets
               mountPath: "/app/secrets"
@@ -58,7 +54,6 @@ spec:
             readOnly: true
             volumeAttributes:
               secretProviderClass: ngsa-secrets
-
       nodeSelector:
         agentpool: npuser01
 
@@ -67,7 +62,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: ngsa-java
+  name: ngsa-cosmos
   namespace: ngsa
 spec:
   type: ClusterIP
@@ -77,14 +72,14 @@ spec:
       protocol: TCP
       name: http
   selector:
-    app: ngsa-java
+    app: ngsa-cosmos
 
 ---
 
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: ngsa-java-ingress
+  name: ngsa-cosmos-ingress
   namespace: ngsa
   annotations:
     kubernetes.io/ingress.allow-http: "false"
@@ -101,10 +96,10 @@ spec:
   - host: ngsa-pre-central.cse.ms
     http:
       paths:
-      - path: /java
+      - path: /cosmos
         pathType: Prefix
         backend:
           service:
-            name: ngsa-java
+            name: ngsa-cosmos
             port:
               number: 8080
