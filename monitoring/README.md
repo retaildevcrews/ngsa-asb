@@ -1,6 +1,6 @@
-# Adding Azure Monitor source in Grafana
+# Setup Monitoring
 
-The following instructions allow adding Azure Monitor data source to create custom Grafana dashboards in an existing AKS cluster.
+The following instructions deploy Prometheus and add an Azure Monitor data source to create custom Grafana dashboards in an existing AKS cluster.
 
 ## Prerequisites
 
@@ -10,30 +10,43 @@ The following instructions allow adding Azure Monitor data source to create cust
 
 ## Setup
 
-### Import Grafana into ACR
+### Import Prometheus and Grafana into ACR
 
-- Variables `ASB_RG_CORE` and `ASB_DEPLOYMENT_NAME` are from the cluster deployment script [Sort name](../README.md#set-deployment-short-name) and 
-[Variables](../README.md#set-variables-for-deployment)
+- Variables `ASB_RG_CORE` and `ASB_DEPLOYMENT_NAME` are from the cluster deployment script [Sort name](../README.md#set-deployment-short-name) and [Variables](../README.md#set-variables-for-deployment)
 
 ```bash
-# import Grafana into ACR
 export ASB_ACR_NAME=$(az deployment group show -g $ASB_RG_CORE -n cluster-${ASB_DEPLOYMENT_NAME}  --query properties.outputs.containerRegistryName.value -o tsv)
 
+# import Prometheus into ACR
+az acr import --source docker.io/prom/prometheus:v2.30.0 -n $ASB_ACR_NAME
+
+# import Grafana into ACR
 az acr import --source docker.io/io/grafana/grafana:7.3.0 -n $ASB_ACR_NAME
 
-# create grafana deployment file
 mkdir $ASB_GIT_PATH/monitoring
-cat templates/grafana.yaml | envsubst  > $ASB_GIT_PATH/monitoring/grafana.yaml
+# create monitoring namespace deployment file
+cat templates/monitoring.yaml | envsubst  > $ASB_GIT_PATH/monitoring/01-namespace.yaml
+# create prometheus deployment file
+cat templates/prometheus.yaml | envsubst  > $ASB_GIT_PATH/monitoring/02-prometheus.yaml
+# create grafana deployment file
+cat templates/grafana.yaml | envsubst  > $ASB_GIT_PATH/monitoring/03-grafana.yaml
 
 ```
 
-### Deploy Grafana
+### Deploy Prometheus and Grafana
 
 - Flux will pick up the latest changes. Use the command below to force flux to sync.
   
   ```bash
   fluxctl sync
   ```
+
+### Verify Prometheus Service
+
+- Check that it worked by running: `kubectl port-forward service/prometheus-service 9090:8080 -n monitoring`
+- Navigate to localhost:9090 in your browser. You should see a Prometheus query page.
+
+### Verify Grafana Service
 
 - Check that it worked by running the following: kubectl port-forward service/grafana 3000:3000 -n monitoring
 - Navigate to localhost:3000 in your browser. You should see a Grafana login page.
@@ -84,3 +97,7 @@ Goto a browser to access grafana and perform the following steps:
 - Go to `Dashboards` > `Manage` page from left menu
 - Click `Import`
 - Upload dashboard file [ngsa-dev-model.json](../monitoring/dashboards/ngsa-dev-model.json)
+
+## Prometheus Design Notes
+
+- The Prometheus container runs as a non-root user and requires write permissions on a mounted volume. We used initContainers to change the ownership of the datastore directory.
