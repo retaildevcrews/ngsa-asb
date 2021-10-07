@@ -1,22 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ngsa-java-java
+  name: ngsa-java
   namespace: ngsa
   labels:
-    app.kubernetes.io/name: ngsa-java-java
+    app.kubernetes.io/name: ngsa-java
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: ngsa-java-java
+      app: ngsa-java
   template:
     metadata:
       labels:
         aadpodidbinding: ngsadev-ngsa-id
-        app: ngsa-java-java
-        deploy: 21-10-05-22-30-17
-        version: beta-1005-2230
+        app: ngsa-java
+        deploy: 21-10-07-16-09-41
+        version: beta-1007-1609
       annotations:
         prometheus.io/scrape: 'true'
         prometheus.io/port: '8080'
@@ -67,7 +67,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: ngsa-java-java
+  name: ngsa-java
   namespace: ngsa
 spec:
   type: ClusterIP
@@ -77,14 +77,14 @@ spec:
       protocol: TCP
       name: http
   selector:
-    app: ngsa-java-java
+    app: ngsa-java
 
 ---
 
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: ngsa-java-java-ingress
+  name: ngsa-java-ingress
   namespace: ngsa
   annotations:
     kubernetes.io/ingress.allow-http: "false"
@@ -105,6 +105,6 @@ spec:
         pathType: Prefix
         backend:
           service:
-            name: ngsa-java-java
+            name: ngsa-java
             port:
               number: 8080
