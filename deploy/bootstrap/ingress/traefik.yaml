@@ -1,3 +1,10 @@
+kind: Namespace
+apiVersion: v1
+metadata:
+  labels:
+    name: ingress
+  name: ingress
+---
 kind: ServiceAccount
 apiVersion: v1
 metadata:
