@@ -286,8 +286,9 @@ export ASB_INGRESS_KEY_NAME=appgw-ingress-internal-aks-ingress-key
 
 mkdir $ASB_GIT_PATH
 
+mkdir $ASB_GIT_PATH/ingress
 # traefik config
-cat templates/traefik-config.yaml | envsubst > $ASB_GIT_PATH/ingress/02-traefik-config.yaml
+cat templates/traefik-config.yaml | envsubst > $ASB_GIT_PATH/ingress/traefik-config.yaml
 
 # GitOps (flux)
 rm -f flux.yaml
