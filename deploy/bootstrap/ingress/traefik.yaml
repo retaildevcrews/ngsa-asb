@@ -131,7 +131,7 @@ data:
       [http.middlewares.app-gateway-snet.ipWhiteList]
         sourceRange = ["10.240.4.16/28"]
       [http.middlewares.ngsa-stripprefix.stripPrefix]
-        prefixes = ["/memory", "/cosmos","/tiny"]
+        prefixes = ["/memory", "/cosmos","/tiny","/java"]
     [entryPoints]
       [entryPoints.metrics]
         address = ":8082"
