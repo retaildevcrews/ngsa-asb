@@ -1,16 +1,21 @@
 apiVersion: v1
+kind: Namespace
+metadata:
+  name: loderunner
+---
+apiVersion: v1
 kind: Pod
 
 metadata:
-  name: l8r-load-1
-  namespace: ngsa
+  name: loderunner
+  namespace: loderunner
   labels:
-    app: l8r-load-1
+    app: loderunner
 
 spec:
   restartPolicy: OnFailure
   containers:
-  - name: l8r
+  - name: loderunner
     image: ghcr.io/retaildevcrews/ngsa-lr:beta
     imagePullPolicy: Always
     args:
