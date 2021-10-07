@@ -15,13 +15,14 @@ The following instructions deploy Prometheus and add an Azure Monitor data sourc
 - Variables `ASB_RG_CORE` and `ASB_DEPLOYMENT_NAME` are from the cluster deployment script [Sort name](../README.md#set-deployment-short-name) and [Variables](../README.md#set-variables-for-deployment)
 
 ```bash
+
 export ASB_ACR_NAME=$(az deployment group show -g $ASB_RG_CORE -n cluster-${ASB_DEPLOYMENT_NAME}  --query properties.outputs.containerRegistryName.value -o tsv)
 
 # import Prometheus into ACR
 az acr import --source docker.io/prom/prometheus:v2.30.0 -n $ASB_ACR_NAME
 
 # import Grafana into ACR
-az acr import --source docker.io/io/grafana/grafana:7.3.0 -n $ASB_ACR_NAME
+az acr import --source docker.io/grafana/grafana:7.3.0 -n $ASB_ACR_NAME
 
 mkdir $ASB_GIT_PATH/monitoring
 # create monitoring namespace deployment file
@@ -38,7 +39,9 @@ cat templates/grafana.yaml | envsubst  > $ASB_GIT_PATH/monitoring/03-grafana.yam
 - Flux will pick up the latest changes. Use the command below to force flux to sync.
   
   ```bash
-  fluxctl sync
+  
+  fluxctl sync --k8s-fwd-ns flux-cd
+  
   ```
 
 ### Verify Prometheus Service
