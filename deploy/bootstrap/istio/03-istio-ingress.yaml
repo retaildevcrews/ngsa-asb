@@ -1,0 +1,60 @@
+apiVersion: install.istio.io/v1alpha1
+kind: IstioOperator
+metadata:
+  namespace: istio-system
+  name: istio-default
+spec:
+  profile: default
+  # PRODUCTION READINESS CHANGE REQUIRED
+  # The Istio images should be sourced from a non-public container registry, such as the
+  # one deployed along side of this reference implementation.
+  # - az acr import --source docker.io/istio/operator:1.11.3 -n <your-acr-instance-name>
+  # - az acr import --source docker.io/istio/pilot:1.11.3 -n <your-acr-instance-name>
+  # - az acr import --source docker.io/istio/proxyv2:1.11.3 -n <your-acr-instance-name>
+  # and then set this to
+  # hub: <your-acr-instance-name>.azurecr.io
+  hub: docker.io/istio
+  components:
+    pilot:
+      k8s:
+        resources:
+          limits:
+            cpu: 1000m
+            memory: 512M
+          requests:
+            cpu: 500m
+            memory: 256M
+    ingressGateways:
+    - name: istio-ingressgateway
+      label:
+        aadpodidbinding: podmi-ingress-controller
+      k8s:
+        resources:
+          limits:
+            cpu: 1000m
+            memory: 512M
+          requests:
+            cpu: 500m
+            memory: 256M
+        nodeSelector:
+          agentpool: npuser01
+        service:
+          type: LoadBalancer
+          loadBalancerIP: 10.240.4.4
+          externalTrafficPolicy: Local
+        serviceAnnotations:
+          service.beta.kubernetes.io/azure-load-balancer-internal: "true"
+          service.beta.kubernetes.io/azure-load-balancer-internal-subnet: "snet-clusteringressservices"
+        overlays:
+        - apiVersion: apps/v1
+          kind: Deployment
+          name: istio-ingressgateway
+          patches:
+          - path: spec.template.spec.volumes[name:ingressgateway-certs]
+            value:
+              name: ingressgateway-certs
+              csi:
+                driver: secrets-store.csi.k8s.io
+                readOnly: true
+                volumeAttributes:
+                  secretProviderClass: istio-ingress-tls-secret-csi-akv

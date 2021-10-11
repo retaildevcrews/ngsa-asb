@@ -1,19 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ngsa-cosmos
+  name: ngsa-java
   namespace: ngsa
   labels:
-    app.kubernetes.io/name: ngsa-cosmos
+    app.kubernetes.io/name: ngsa-java
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: ngsa-cosmos
+      app: ngsa-java
   template:
     metadata:
       labels:
-        app: ngsa-cosmos
+        app: ngsa-java
         aadpodidbinding: $ASB_NGSA_MI_NAME
       annotations:
         prometheus.io/scrape: 'true'
@@ -21,17 +21,17 @@ spec:
     spec:
       containers:
         - name: app
-          image: ghcr.io/retaildevcrews/ngsa-app:beta
+          image: ghcr.io/retaildevcrews/ngsa-java:beta
           imagePullPolicy: Always
-
-          args:
-          - --prometheus
-          - --url-prefix
-          - /cosmos
-          - --zone
-          - az-eastus2
-          - --region
-          - East
+          env:
+          - name: PROMETHEUS
+            value: "true"
+          - name: ZONE
+            value: "centralus"
+          - name: REGION
+            value: "dev"
+          - name: URL_PREFIX
+            value: /java
 
           ports:
             - name: http
@@ -65,7 +65,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: ngsa-cosmos
+  name: ngsa-java
   namespace: ngsa
 spec:
   type: ClusterIP
@@ -75,14 +75,14 @@ spec:
       protocol: TCP
       name: http
   selector:
-    app: ngsa-cosmos
+    app: ngsa-java
 
 ---
 
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
 metadata:
-  name: ngsa-cosmos-vs
+  name: ngsa-java-vs
   namespace: ngsa
 spec:
   gateways:
@@ -92,13 +92,13 @@ spec:
   http:
   - match:
     - uri:
-        prefix: /cosmos/
+        prefix: /java/
     - uri:
-        exact: /cosmos
+        exact: /java
     rewrite:
       uri: /
     route:
     - destination:
         port:
           number: 8080
-        host: ngsa-cosmos
+        host: ngsa-java

@@ -1,0 +1,41 @@
+apiVersion: aadpodidentity.k8s.io/v1
+kind: AzureIdentity
+metadata:
+  name: istio-ingress-id
+  namespace: istio-system
+spec:
+  type: 0
+  resourceID: $ASB_ISTIO_RESOURCE_ID
+  clientID: $ASB_ISTIO_CLIENT_ID
+---
+apiVersion: aadpodidentity.k8s.io/v1
+kind: AzureIdentityBinding
+metadata:
+  name: istio-ingress-id-binding
+  namespace: istio-system
+spec:
+  azureIdentity: istio-ingress-id
+  selector: podmi-ingress-controller
+---
+
+apiVersion: secrets-store.csi.x-k8s.io/v1alpha1
+kind: SecretProviderClass
+metadata:
+  name: istio-ingress-tls-secret-csi-akv
+  namespace: istio-system
+spec:
+  provider: azure
+  parameters:
+    usePodIdentity: "true"
+    keyvaultName: $ASB_KV_NAME 
+    objects:  |
+      array:
+        - |
+          objectName: $ASB_INGRESS_CERT_NAME
+          objectAlias: tls.crt
+          objectType: secret
+        - |
+          objectName: $ASB_INGRESS_KEY_NAME
+          objectAlias: tls.key
+          objectType: secret
+    tenantId: $ASB_TENANT_ID
