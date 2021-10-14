@@ -33,7 +33,7 @@ spec:
           - 0
       containers:
         - name: grafana
-          image: .azurecr.io/grafana/grafana:7.3.0
+          image: acraks6jqf6qyt7jarg.azurecr.io/grafana/grafana:7.3.0
           imagePullPolicy: Always
           ports:
             - containerPort: 3000
