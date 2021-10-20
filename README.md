@@ -303,13 +303,12 @@ cat templates/flux.yaml | envsubst  > flux.yaml
 
 ```bash
 
-# check deltas - there should be 4 new files
+# check deltas - there should be 3 new files
 git status
 
 # push to your branch
 git add flux.yaml
 git add $ASB_GIT_PATH/istio/istio-pod-identity-config.yaml
-git add $ASB_GIT_PATH/ngsa/ngsa-ingress.yaml
 git add networking/spoke-$ASB_ORG_APP_ID_NAME.json
 
 git commit -m "added cluster config"
@@ -376,13 +375,13 @@ There are two different options to choose from for deploying NGSA:
 - [Deploy using yaml with FluxCD](./docs/deployNgsaYaml.md)
 - [Deploy using AutoGitops with FluxCD](./docs/deployNgsaAgo.md)
 
-### Validate Ingress
-
+### Validate Istio Ingress
 
 ```bash
-After NGSA has been deployed, verify that ingress is working correctly
 
-kubectl get pods -n ingress
+After NGSA has been deployed, verify that Istio ingress is working correctly
+
+kubectl get pods -n istio-system
 
 ## Verify with http
 ### this can take 1-2 minutes
@@ -395,10 +394,6 @@ http https://${ASB_DOMAIN}/cosmos/version
 ### Congratulations! You have GitOps setup on ASB!
 
 ```
-
-
-
-
 
 ### Deploy Fluent Bit
 
