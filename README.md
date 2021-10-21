@@ -268,8 +268,8 @@ export ASB_AKS_NAME=$(az deployment group show -g $ASB_RG_CORE -n cluster-${ASB_
 export ASB_AKS_PIP=$(az network public-ip show -g $ASB_RG_SPOKE --name $ASB_PIP_NAME --query ipAddress -o tsv)
 
 # Get the AKS Ingress Controller Managed Identity details.
-export ASB_TRAEFIK_RESOURCE_ID=$(az deployment group show -g $ASB_RG_CORE -n cluster-${ASB_DEPLOYMENT_NAME} --query properties.outputs.aksIngressControllerPodManagedIdentityResourceId.value -o tsv)
-export ASB_TRAEFIK_CLIENT_ID=$(az deployment group show -g $ASB_RG_CORE -n cluster-${ASB_DEPLOYMENT_NAME} --query properties.outputs.aksIngressControllerPodManagedIdentityClientId.value -o tsv)
+export ASB_ISTIO_RESOURCE_ID=$(az deployment group show -g $ASB_RG_CORE -n cluster-${ASB_DEPLOYMENT_NAME} --query properties.outputs.aksIngressControllerPodManagedIdentityResourceId.value -o tsv)
+export ASB_ISTIO_CLIENT_ID=$(az deployment group show -g $ASB_RG_CORE -n cluster-${ASB_DEPLOYMENT_NAME} --query properties.outputs.aksIngressControllerPodManagedIdentityClientId.value -o tsv)
 export ASB_POD_MI_ID=$(az identity show -n podmi-ingress-controller -g $ASB_RG_CORE --query principalId -o tsv)
 
 # config traefik
@@ -286,9 +286,9 @@ export ASB_INGRESS_KEY_NAME=appgw-ingress-internal-aks-ingress-key
 
 mkdir $ASB_GIT_PATH
 
-mkdir $ASB_GIT_PATH/ingress
-# traefik config
-cat templates/traefik-config.yaml | envsubst > $ASB_GIT_PATH/ingress/traefik-config.yaml
+mkdir $ASB_GIT_PATH/istio
+# istio pod identity config
+cat templates/istio-pod-identity.yaml | envsubst > $ASB_GIT_PATH/istio/istio-pod-identity-config.yaml
 
 # GitOps (flux)
 rm -f flux.yaml
@@ -303,13 +303,12 @@ cat templates/flux.yaml | envsubst  > flux.yaml
 
 ```bash
 
-# check deltas - there should be 4 new files
+# check deltas - there should be 3 new files
 git status
 
 # push to your branch
 git add flux.yaml
-git add $ASB_GIT_PATH/ingress/02-traefik-config.yaml
-git add $ASB_GIT_PATH/ngsa/ngsa-ingress.yaml
+git add $ASB_GIT_PATH/istio/istio-pod-identity-config.yaml
 git add networking/spoke-$ASB_ORG_APP_ID_NAME.json
 
 git commit -m "added cluster config"
@@ -376,13 +375,13 @@ There are two different options to choose from for deploying NGSA:
 - [Deploy using yaml with FluxCD](./docs/deployNgsaYaml.md)
 - [Deploy using AutoGitops with FluxCD](./docs/deployNgsaAgo.md)
 
-### Validate Ingress
-
+### Validate Istio Ingress
 
 ```bash
-After NGSA has been deployed, verify that ingress is working correctly
 
-kubectl get pods -n ingress
+After NGSA has been deployed, verify that Istio ingress is working correctly
+
+kubectl get pods -n istio-system
 
 ## Verify with http
 ### this can take 1-2 minutes
@@ -395,10 +394,6 @@ http https://${ASB_DOMAIN}/cosmos/version
 ### Congratulations! You have GitOps setup on ASB!
 
 ```
-
-
-
-
 
 ### Deploy Fluent Bit
 
@@ -455,7 +450,8 @@ Please see Instructions to deploy Grafana and Prometheus [here](./monitoring/REA
 ### order matters as the deletes will hang and flux could try to re-deploy
 kubectl delete ns flux-cd
 kubectl delete ns ngsa
-kubectl delete ns ingress
+kubectl delete ns istio-system
+kubectl delete ns istio-operator
 kubectl delete ns cluster-baseline-settings
 
 # check the namespaces
