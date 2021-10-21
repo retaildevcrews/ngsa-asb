@@ -5,7 +5,7 @@ metadata:
   name: istio-default
 spec:
   profile: default
-  hub: acraks6jqf6qyt7jarg.azurecr.io/istio
+  hub: ghcr.io/retaildevcrews/istio
   components:
     pilot:
       k8s:

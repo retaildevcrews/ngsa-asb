@@ -221,7 +221,7 @@ spec:
       serviceAccountName: istio-operator
       containers:
         - name: istio-operator
-          image: acraks6jqf6qyt7jarg.azurecr.io/istio/operator:1.11.3
+          image: ghcr.io/retaildevcrews/istio/operator:1.11.3
           command:
           - operator
           - server
