@@ -5,15 +5,7 @@ metadata:
   name: istio-default
 spec:
   profile: default
-  # PRODUCTION READINESS CHANGE REQUIRED
-  # The Istio images should be sourced from a non-public container registry, such as the
-  # one deployed along side of this reference implementation.
-  # - az acr import --source docker.io/istio/operator:1.11.3 -n <your-acr-instance-name>
-  # - az acr import --source docker.io/istio/pilot:1.11.3 -n <your-acr-instance-name>
-  # - az acr import --source docker.io/istio/proxyv2:1.11.3 -n <your-acr-instance-name>
-  # and then set this to
-  # hub: <your-acr-instance-name>.azurecr.io
-  hub: docker.io/istio
+  hub: acraks6jqf6qyt7jarg.azurecr.io/istio
   components:
     pilot:
       k8s:
