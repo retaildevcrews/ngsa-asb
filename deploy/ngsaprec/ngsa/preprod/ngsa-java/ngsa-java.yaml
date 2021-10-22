@@ -15,8 +15,8 @@ spec:
       labels:
         aadpodidbinding: ngsaprec-ngsa-id
         app: ngsa-java
-        deploy: 21-10-21-20-42-47
-        version: beta-1021-2042
+        deploy: 21-10-22-16-59-04
+        version: beta-1022-1659
       annotations:
         prometheus.io/scrape: 'true'
         prometheus.io/port: '8080'
@@ -81,30 +81,26 @@ spec:
 
 ---
 
-apiVersion: networking.k8s.io/v1
-kind: Ingress
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
 metadata:
-  name: ngsa-java-ingress
+  name: ngsa-java-vs
   namespace: ngsa
-  annotations:
-    kubernetes.io/ingress.allow-http: "false"
-    kubernetes.io/ingress.class: traefik-internal
-    traefik.ingress.kubernetes.io/router.entrypoints: websecure
-    traefik.ingress.kubernetes.io/router.tls: "true"
-    traefik.ingress.kubernetes.io/router.tls.options: default
-    traefik.ingress.kubernetes.io/router.middlewares: ngsa-stripprefix@file
 spec:
-  tls:
-  - hosts:
-      - ngsa-pre-central.cse.ms
-  rules:
-  - host: ngsa-pre-central.cse.ms
-    http:
-      paths:
-      - path: /java
-        pathType: Prefix
-        backend:
-          service:
-            name: ngsa-java
-            port:
-              number: 8080
+  gateways:
+  - ngsa-gateway
+  hosts:
+  - ngsa-pre-central.cse.ms
+  http:
+  - match:
+    - uri:
+        prefix: /java/
+    - uri:
+        exact: /java
+    rewrite:
+      uri: /
+    route:
+    - destination:
+        port:
+          number: 8080
+        host: ngsa-java
