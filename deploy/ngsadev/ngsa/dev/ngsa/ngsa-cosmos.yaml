@@ -15,8 +15,8 @@ spec:
       labels:
         aadpodidbinding: ngsadev-ngsa-id
         app: ngsa-cosmos
-        deploy: 21-10-21-20-28-37
-        version: beta-1021-2028
+        deploy: 21-10-22-16-53-38
+        version: beta-1022-1653
       annotations:
         prometheus.io/scrape: 'true'
         prometheus.io/port: '8080'
