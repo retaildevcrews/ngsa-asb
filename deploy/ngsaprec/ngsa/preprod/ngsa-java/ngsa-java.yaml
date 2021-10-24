@@ -15,8 +15,8 @@ spec:
       labels:
         aadpodidbinding: ngsaprec-ngsa-id
         app: ngsa-java
-        deploy: 21-10-22-16-59-04
-        version: beta-1022-1659
+        deploy: 21-10-24-06-11-10
+        version: beta-1024-0611
       annotations:
         prometheus.io/scrape: 'true'
         prometheus.io/port: '8080'
