@@ -134,16 +134,16 @@ data:
           - targets: ['kube-state-metrics.kube-system.svc.cluster.local:8080']
       - job_name: 'ngsa-memory'
         static_configs:
-          - targets: [ 'ngsa-memory.default.svc.cluster.local:8080' ]
+          - targets: [ 'ngsa-memory.ngsa.svc.cluster.local:8080' ]
       - job_name: 'ngsa-cosmos'
         static_configs:
-          - targets: [ 'ngsa-cosmos.default.svc.cluster.local:8080' ]
+          - targets: [ 'ngsa-cosmos.ngsa.svc.cluster.local:8080' ]
       - job_name: 'ngsa-java'
         static_configs:
-          - targets: [ 'ngsa-java.default.svc.cluster.local:8080' ]
+          - targets: [ 'ngsa-java.ngsa.svc.cluster.local:8080' ]
       - job_name: 'loderunner'
         static_configs:
-          - targets: [ 'loderunner.default.svc.cluster.local:8080' ]
+          - targets: [ 'loderunner.loderunner.svc.cluster.local:8080' ]
       - job_name: 'kubernetes-cadvisor'
         scheme: https
         tls_config:
