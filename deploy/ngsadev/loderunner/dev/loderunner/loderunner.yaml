@@ -14,13 +14,17 @@ spec:
     metadata:
       labels:
         app: loderunner
-        deploy: 21-10-27-15-54-07
-        version: beta-1027-1554
+        deploy: 21-10-27-16-21-37
+        version: beta-1027-1621
     spec:
       containers:
         - name: app
           image: ghcr.io/retaildevcrews/ngsa-lr:beta
           imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
           resources:
             limits:
               memory: "512Mi"
