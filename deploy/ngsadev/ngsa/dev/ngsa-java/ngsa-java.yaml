@@ -15,8 +15,8 @@ spec:
       labels:
         aadpodidbinding: ngsadev-ngsa-id
         app: ngsa-java
-        deploy: 21-10-31-06-11-00
-        version: beta-1031-0611
+        deploy: 21-11-01-20-24-39
+        version: beta-1101-2024
     spec:
       containers:
         - name: app
@@ -85,7 +85,7 @@ metadata:
   namespace: ngsa
 spec:
   gateways:
-  - ngsa-gateway
+  - istio-system/istio-gateway
   hosts:
   - ngsa-pre-central-dev.cse.ms
   http:
