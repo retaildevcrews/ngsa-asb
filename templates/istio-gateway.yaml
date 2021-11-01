@@ -16,4 +16,5 @@ spec:
       serverCertificate: /etc/istio/ingressgateway-certs/tls.crt
       privateKey: /etc/istio/ingressgateway-certs/tls.key
     hosts:
-    - "*/${ASB_DOMAIN}"
+    - "ngsa/${ASB_DOMAIN}"
+    - "monitoring/${ASB_DOMAIN}"
