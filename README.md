@@ -287,8 +287,12 @@ export ASB_INGRESS_KEY_NAME=appgw-ingress-internal-aks-ingress-key
 mkdir $ASB_GIT_PATH
 
 mkdir $ASB_GIT_PATH/istio
+
 # istio pod identity config
 cat templates/istio-pod-identity.yaml | envsubst > $ASB_GIT_PATH/istio/istio-pod-identity-config.yaml
+
+# istio gateway config
+cat templates/istio-gateway.yaml | envsubst > $ASB_GIT_PATH/istio/istio-gateway.yaml
 
 # GitOps (flux)
 rm -f flux.yaml
@@ -303,12 +307,13 @@ cat templates/flux.yaml | envsubst  > flux.yaml
 
 ```bash
 
-# check deltas - there should be 3 new files
+# check deltas - there should be 4 new files
 git status
 
 # push to your branch
 git add flux.yaml
 git add $ASB_GIT_PATH/istio/istio-pod-identity-config.yaml
+git add $ASB_GIT_PATH/istio/istio-gateway.yaml
 git add networking/spoke-$ASB_ORG_APP_ID_NAME.json
 
 git commit -m "added cluster config"

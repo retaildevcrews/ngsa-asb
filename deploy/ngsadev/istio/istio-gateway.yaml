@@ -1,8 +1,8 @@
 apiVersion: networking.istio.io/v1alpha3
 kind: Gateway
 metadata:
-  name: ngsa-gateway
-  namespace: ngsa
+  name: istio-gateway
+  namespace: istio-system
 spec:
   selector:
     istio: ingressgateway
@@ -16,4 +16,5 @@ spec:
       serverCertificate: /etc/istio/ingressgateway-certs/tls.crt
       privateKey: /etc/istio/ingressgateway-certs/tls.key
     hosts:
-    - ngsa-pre-central.cse.ms
+    - "ngsa/ngsa-pre-central-dev.cse.ms"
+    - "monitoring/ngsa-pre-central-dev.cse.ms"
