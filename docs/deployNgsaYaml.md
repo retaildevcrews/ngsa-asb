@@ -9,7 +9,6 @@ cat templates/ngsa-cosmos.yaml | envsubst > $ASB_GIT_PATH/ngsa/ngsa-cosmos.yaml
 cat templates/ngsa-memory.yaml | envsubst > $ASB_GIT_PATH/ngsa/ngsa-memory.yaml
 cat templates/ngsa-java.yaml | envsubst > $ASB_GIT_PATH/ngsa/ngsa-java.yaml
 cat templates/ngsa-pod-identity.yaml | envsubst > $ASB_GIT_PATH/ngsa/ngsa-pod-identity.yaml
-cat templates/ngsa-istio-gateway.yaml | envsubst > $ASB_GIT_PATH/ngsa/ngsa-istio-gateway.yaml
 
 # save env vars
 ./saveenv.sh -y
@@ -20,7 +19,7 @@ cat templates/ngsa-istio-gateway.yaml | envsubst > $ASB_GIT_PATH/ngsa/ngsa-istio
 
 ```bash
 
-# check deltas - there should be 1 new file
+# check deltas - there should be 4 new files
 git status
 
 # push to your branch
@@ -28,7 +27,6 @@ git add $ASB_GIT_PATH/ngsa/ngsa-cosmos.yaml
 git add $ASB_GIT_PATH/ngsa/ngsa-memory.yaml
 git add $ASB_GIT_PATH/ngsa/ngsa-java.yaml
 git add $ASB_GIT_PATH/ngsa/ngsa-pod-identity.yaml
-git add $ASB_GIT_PATH/ngsa/ngsa-istio-gateway.yaml
 git commit -m "added ngsa-cosmos config"
 git push
 
