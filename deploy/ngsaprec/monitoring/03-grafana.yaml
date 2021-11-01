@@ -34,6 +34,7 @@ spec:
       containers:
         - name: grafana
           image: acrakshr7e7hgazu2h4.azurecr.io/grafana/grafana:7.3.0
+          imagePullPolicy: Always
           env:
           - name: GF_SERVER_ROOT_URL
             value: "%(protocol)s://%(domain)s:%(http_port)s/grafana/"
@@ -41,7 +42,6 @@ spec:
             value: "ngsa-pre-central.cse.ms"
           - name: GF_SERVER_SERVE_FROM_SUB_PATH
             value: "true"                        
-          imagePullPolicy: Always
           ports:
             - containerPort: 3000
               name: http-grafana
