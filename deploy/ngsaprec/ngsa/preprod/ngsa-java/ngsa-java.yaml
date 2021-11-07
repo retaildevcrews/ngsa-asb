@@ -15,8 +15,8 @@ spec:
       labels:
         aadpodidbinding: ngsaprec-ngsa-id
         app: ngsa-java
-        deploy: 21-11-04-18-59-48
-        version: beta-1104-1859
+        deploy: 21-11-07-06-12-25
+        version: beta-1107-0612
     spec:
       containers:
         - name: app
