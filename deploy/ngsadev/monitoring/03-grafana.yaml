@@ -10,6 +10,29 @@ spec:
     requests:
       storage: 1Gi
 ---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-config
+  namespace: monitoring
+data:
+  grafana.ini:  |
+    [auth]
+    disable_login_form = true
+
+    [auth.basic]
+    enabled = false
+
+    [auth.azuread]
+    name = Azure AD
+    enabled = true
+    allow_sign_up = true
+    client_id = fd5eb37b-023e-4656-8ef9-4e79fef957aa
+    scopes = openid email profile
+    auth_url = https://login.microsoftonline.com/72f988bf-86f1-41af-91ab-2d7cd011db47/oauth2/v2.0/authorize
+    token_url = https://login.microsoftonline.com/72f988bf-86f1-41af-91ab-2d7cd011db47/oauth2/v2.0/token
+
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -26,6 +49,7 @@ spec:
     metadata:
       labels:
         app: grafana
+        aadpodidbinding: grafana-id
     spec:
       securityContext:
         fsGroup: 472
@@ -37,11 +61,16 @@ spec:
           imagePullPolicy: Always
           env:
           - name: GF_SERVER_ROOT_URL
-            value: "%(protocol)s://%(domain)s:%(http_port)s/grafana/"
+            value: "https://%(domain)s/grafana/"
           - name: GF_SERVER_DOMAIN
-            value: "ngsa-pre-central.cse.ms"
+            value: "ngsa-pre-central-dev.cse.ms"
           - name: GF_SERVER_SERVE_FROM_SUB_PATH
-            value: "true"   
+            value: "true"
+          - name: GF_AUTH_AZUREAD_CLIENT_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: grafana-aad-client-secret
+                key: clientSecret
           ports:
             - containerPort: 3000
               name: http-grafana
@@ -74,10 +103,26 @@ spec:
           volumeMounts:
             - mountPath: /var/lib/grafana
               name: grafana-pv
+            - mountPath: /etc/grafana
+              name: grafana-config
+            - mountPath: /mnt/secrets
+              readOnly: true
+              name: grafana-aad-auth-secret
       volumes:
         - name: grafana-pv
           persistentVolumeClaim:
             claimName: grafana-pvc
+        - name: grafana-config
+          configMap:
+            name: grafana-config
+        - name: grafana-aad-auth-secret
+          csi:
+            driver: secrets-store.csi.k8s.io
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: grafana-aad-auth-secret
+      nodeSelector:
+        agentpool: npuser01
 ---
 apiVersion: v1
 kind: Service
