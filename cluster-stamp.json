@@ -181,7 +181,7 @@
         "laNewWorkspaceName" : "[concat('la-', variables('clusterName'))]",
         "logAnalyticsWorkspaceName": "[if(and(empty(parameters('laWorkspaceName')),empty(parameters('laResourceGroup'))), variables('laNewWorkspaceName'),if(not(or(empty(parameters('laWorkspaceName')),empty(parameters('laResourceGroup')))),parameters('laWorkspaceName'),null()))]",
         "isNewLogAnalytics" : "[equals(variables('logAnalyticsWorkspaceName'), variables('laNewWorkspaceName'))]",
-        "logAnalyticsResourceGroup": "[if(variables('isNewLogAnalytics'), resourceGroup(), parameters('laResourceGroup'))]",
+        "logAnalyticsResourceGroup": "[if(variables('isNewLogAnalytics'), resourceGroup().name, parameters('laResourceGroup'))]",
         "containerInsightsSolutionName": "[concat('ContainerInsights(', variables('logAnalyticsWorkspaceName'),')')]",
         "defaultAcrName": "[concat('acraks', variables('subRgUniqueString'))]",
 
