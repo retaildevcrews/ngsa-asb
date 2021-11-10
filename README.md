@@ -13,7 +13,7 @@
 🛑 Run these commands one at a time
 
 # login to your Azure subscription
-az login
+az login --use-device-code
 
 # verify the correct subscription
 # use az account set -s <sub> to change the sub if required
@@ -230,6 +230,7 @@ export ASB_SPOKE_VNET_ID=$(az deployment group show -g $ASB_RG_SPOKE -n spoke-$A
 
 ### this section takes 15-20 minutes
 
+# Note: If using an existing Log Analytics workspace, pass in the laWorkspaceName and laResourceGroup paramaters to the following command
 # create AKS
 az deployment group create -g $ASB_RG_CORE \
   -f cluster-stamp.json \
@@ -248,8 +249,7 @@ az deployment group create -g $ASB_RG_CORE \
      appGatewayListenerCertificate=${APP_GW_CERT_CSMS} \
      aksIngressControllerCertificate="$(echo $INGRESS_CERT_CSMS | base64 -d)" \
      aksIngressControllerKey="$(echo $INGRESS_KEY_CSMS | base64 -d)" \
-     --query name
-
+     --query name -c
 ```
 
 #### Set AKS env vars
