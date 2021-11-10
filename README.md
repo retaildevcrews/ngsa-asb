@@ -213,7 +213,7 @@ az deployment group create -g $ASB_RG_HUB -f networking/hub-default.json -p loca
 export ASB_VNET_HUB_ID=$(az deployment group show -g $ASB_RG_HUB -n hub-default --query properties.outputs.hubVnetId.value -o tsv)
 
 # create spoke network
-az deployment group create -g $ASB_RG_SPOKE -f networking/spoke-$ASB_ORG_APP_ID_NAME.json -p location=${ASB_LOCATION} orgAppId=${ASB_ORG_APP_ID_NAME} hubVnetResourceId="${ASB_VNET_HUB_ID}" --query name
+az deployment group create -g $ASB_RG_SPOKE -f networking/spoke-$ASB_ORG_APP_ID_NAME.json -p location=${ASB_LOCATION} orgAppId=${ASB_ORG_APP_ID_NAME} hubVnetResourceId="${ASB_VNET_HUB_ID}" deploymentName=${ASB_DEPLOYMENT_NAME} --query name
 export ASB_NODEPOOLS_SUBNET_ID=$(az deployment group show -g $ASB_RG_SPOKE -n spoke-$ASB_ORG_APP_ID_NAME --query properties.outputs.nodepoolSubnetResourceIds.value -o tsv)
 
 # create Region A hub network
