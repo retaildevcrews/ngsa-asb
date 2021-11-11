@@ -230,8 +230,9 @@ export ASB_SPOKE_VNET_ID=$(az deployment group show -g $ASB_RG_SPOKE -n spoke-$A
 
 ### this section takes 15-20 minutes
 
-# Note: If using an existing Log Analytics workspace, pass in the laWorkspaceName and laResourceGroup paramaters to the following command
-# create AKS
+# Create AKS
+
+# Note: If using an existing Log Analytics workspace, uncomment and populate the laWorkspaceName and laResourceGroup paramaters
 az deployment group create -g $ASB_RG_CORE \
   -f cluster-stamp.json \
   -n cluster-${ASB_DEPLOYMENT_NAME} \
@@ -249,6 +250,8 @@ az deployment group create -g $ASB_RG_CORE \
      appGatewayListenerCertificate=${APP_GW_CERT_CSMS} \
      aksIngressControllerCertificate="$(echo $INGRESS_CERT_CSMS | base64 -d)" \
      aksIngressControllerKey="$(echo $INGRESS_KEY_CSMS | base64 -d)" \
+     #laWorkspaceName=<LogAnalyticsWorkspaceName> \
+     #laResourceGroup=<LogAnalyticsResourceGroupName> \
      --query name -c
 ```
 
