@@ -10,6 +10,24 @@
                 "description": "Deployment name used in naming"
             }
         },
+        "laWorkspaceName":{
+            "type": "string",
+            "minLength": 0,
+            "maxLength": 24,
+            "defaultValue": "",
+            "metadata": {
+                "description": "Log Analytics Workspace Name to Use"
+            }
+        },
+        "laResourceGroup":{
+            "type": "string",
+            "minLength": 0,
+            "maxLength": 24,
+            "defaultValue": "",
+            "metadata": {
+                "description": "Resource Group where Log Analytics is"
+            }
+        },
         "nodepoolsRGName": {
             "type": "string",
             "metadata": {
@@ -144,7 +162,7 @@
             }
         },
         "kubernetesVersion": {
-            "defaultValue": "1.20.5",
+            "defaultValue": "1.20.9",
             "type": "string"
         }
     },
@@ -160,7 +178,10 @@
 
         "nodeResourceGroupName": "[concat('rg-', parameters('nodepoolsRGName'), '-nodepools')]",
         "clusterName": "[concat('aks-', variables('subRgUniqueString'))]",
-        "logAnalyticsWorkspaceName": "[concat('la-', variables('clusterName'))]",
+        "laNewWorkspaceName" : "[concat('la-', variables('clusterName'))]",
+        "logAnalyticsWorkspaceName": "[if(and(empty(parameters('laWorkspaceName')),empty(parameters('laResourceGroup'))), variables('laNewWorkspaceName'),if(not(or(empty(parameters('laWorkspaceName')),empty(parameters('laResourceGroup')))),parameters('laWorkspaceName'),null()))]",
+        "isNewLogAnalytics" : "[equals(variables('logAnalyticsWorkspaceName'), variables('laNewWorkspaceName'))]",
+        "logAnalyticsResourceGroup": "[if(variables('isNewLogAnalytics'), resourceGroup().name, parameters('laResourceGroup'))]",
         "containerInsightsSolutionName": "[concat('ContainerInsights(', variables('logAnalyticsWorkspaceName'),')')]",
         "defaultAcrName": "[concat('acraks', variables('subRgUniqueString'))]",
 
@@ -313,10 +334,10 @@
                     "apiVersion": "2017-05-01-preview",
                     "dependsOn": [
                         "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]",
-                        "[resourceId('Microsoft.OperationalInsights/workspaces', variables('logAnalyticsWorkspaceName'))]"
+                        "[resourceId('Microsoft.OperationalInsights/workspaces', variables('laNewWorkspaceName'))]"
                     ],
                     "properties": {
-                        "workspaceId": "[resourceId('Microsoft.OperationalInsights/workspaces', variables('logAnalyticsWorkspaceName'))]",
+                        "workspaceId": "[resourceId(variables('logAnalyticsResourceGroup'), 'Microsoft.OperationalInsights/workspaces', variables('logAnalyticsWorkspaceName'))]",
                         "logs": [
                             {
                                 "category": "AuditEvent",
@@ -664,10 +685,10 @@
                     "name": "/Microsoft.Insights/default",
                     "dependsOn": [
                         "[resourceId('Microsoft.Network/applicationGateways', variables('agwName'))]",
-                        "[resourceId('Microsoft.OperationalInsights/workspaces', variables('logAnalyticsWorkspaceName'))]"
+                        "[resourceId('Microsoft.OperationalInsights/workspaces', variables('laNewWorkspaceName'))]"
                     ],
                     "properties": {
-                        "workspaceId": "[resourceId('Microsoft.OperationalInsights/workspaces', variables('logAnalyticsWorkspaceName'))]",
+                        "workspaceId": "[resourceId(variables('logAnalyticsResourceGroup'), 'Microsoft.OperationalInsights/workspaces', variables('logAnalyticsWorkspaceName'))]",
                         "logs": [
                             {
                                 "category": "ApplicationGatewayAccessLog",
@@ -758,9 +779,10 @@
             }
         },
         {
+            "condition":"[variables('isNewLogAnalytics')]",
             "type": "Microsoft.OperationalInsights/workspaces",
             "apiVersion": "2020-08-01",
-            "name": "[variables('logAnalyticsWorkspaceName')]",
+            "name": "[variables('laNewWorkspaceName')]",
             "location": "[parameters('location')]",
             "properties": {
                 "sku": {
@@ -770,11 +792,12 @@
             },
             "resources": [
                 {
+                    "condition":"[variables('isNewLogAnalytics')]",
                     "type": "savedSearches",
                     "apiVersion": "2020-08-01",
                     "name": "AllPrometheus",
                     "dependsOn": [
-                        "[concat('Microsoft.OperationalInsights/workspaces/', variables('logAnalyticsWorkspaceName'))]"
+                        "[concat('Microsoft.OperationalInsights/workspaces/', variables('laNewWorkspaceName'))]"
                     ],
                     "properties": {
                         "eTag": "*",
@@ -785,11 +808,12 @@
                     }
                 },
                 {
+                    "condition":"[variables('isNewLogAnalytics')]",
                     "type": "savedSearches",
                     "apiVersion": "2020-08-01",
                     "name": "ForbiddenReponsesOnIngress",
                     "dependsOn": [
-                        "[concat('Microsoft.OperationalInsights/workspaces/', variables('logAnalyticsWorkspaceName'))]"
+                        "[concat('Microsoft.OperationalInsights/workspaces/', variables('laNewWorkspaceName'))]"
                     ],
                     "properties": {
                         "eTag": "*",
@@ -800,11 +824,12 @@
                     }
                 },
                 {
+                    "condition":"[variables('isNewLogAnalytics')]",
                     "type": "savedSearches",
                     "apiVersion": "2020-08-01",
                     "name": "NodeRebootRequested",
                     "dependsOn": [
-                        "[concat('Microsoft.OperationalInsights/workspaces/', variables('logAnalyticsWorkspaceName'))]"
+                        "[concat('Microsoft.OperationalInsights/workspaces/', variables('laNewWorkspaceName'))]"
                     ],
                     "properties": {
                         "eTag": "*",
@@ -817,6 +842,7 @@
             ]
         },
         {
+            "condition":"[variables('isNewLogAnalytics')]",
             "name": "PodFailedScheduledQuery",
             "type": "Microsoft.Insights/scheduledQueryRules",
             "apiVersion": "2018-04-16",
@@ -829,7 +855,7 @@
                 "enabled": "true",
                 "source": {
                     "query": "[concat('//https://docs.microsoft.com/azure/azure-monitor/insights/container-insights-alerts \r\n let endDateTime = now(); let startDateTime = ago(1h); let trendBinSize = 1m; let clusterName = \"',variables('clusterName'),'\"; KubePodInventory | where TimeGenerated < endDateTime | where TimeGenerated >= startDateTime | where ClusterName == clusterName | distinct ClusterName, TimeGenerated | summarize ClusterSnapshotCount = count() by bin(TimeGenerated, trendBinSize), ClusterName | join hint.strategy=broadcast ( KubePodInventory | where TimeGenerated < endDateTime | where TimeGenerated >= startDateTime | distinct ClusterName, Computer, PodUid, TimeGenerated, PodStatus | summarize TotalCount = count(), PendingCount = sumif(1, PodStatus =~ \"Pending\"), RunningCount = sumif(1, PodStatus =~ \"Running\"), SucceededCount = sumif(1, PodStatus =~ \"Succeeded\"), FailedCount = sumif(1, PodStatus =~ \"Failed\") by ClusterName, bin(TimeGenerated, trendBinSize) ) on ClusterName, TimeGenerated | extend UnknownCount = TotalCount - PendingCount - RunningCount - SucceededCount - FailedCount | project TimeGenerated, TotalCount = todouble(TotalCount) / ClusterSnapshotCount, PendingCount = todouble(PendingCount) / ClusterSnapshotCount, RunningCount = todouble(RunningCount) / ClusterSnapshotCount, SucceededCount = todouble(SucceededCount) / ClusterSnapshotCount, FailedCount = todouble(FailedCount) / ClusterSnapshotCount, UnknownCount = todouble(UnknownCount) / ClusterSnapshotCount| summarize AggregatedValue = avg(FailedCount) by bin(TimeGenerated, trendBinSize)')]",
-                    "dataSourceId": "[resourceId('Microsoft.OperationalInsights/workspaces', variables('logAnalyticsWorkspaceName'))]",
+                    "dataSourceId": "[resourceId(variables('logAnalyticsResourceGroup'), 'Microsoft.OperationalInsights/workspaces', variables('logAnalyticsWorkspaceName'))]",
                     "queryType": "ResultCount"
                 },
                 "schedule": {
@@ -881,15 +907,16 @@
             }
         },
         {
+            "condition":"[variables('isNewLogAnalytics')]",
             "type": "Microsoft.OperationsManagement/solutions",
             "apiVersion": "2015-11-01-preview",
             "name": "[variables('containerInsightsSolutionName')]",
             "location": "[parameters('location')]",
             "dependsOn": [
-                "[resourceId('Microsoft.OperationalInsights/workspaces', variables('logAnalyticsWorkspaceName'))]"
+                "[resourceId('Microsoft.OperationalInsights/workspaces', variables('laNewWorkspaceName'))]"
             ],
             "properties": {
-                "workspaceResourceId": "[resourceId('Microsoft.OperationalInsights/workspaces', variables('logAnalyticsWorkspaceName'))]"
+                "workspaceResourceId": "[resourceId(variables('logAnalyticsResourceGroup'), 'Microsoft.OperationalInsights/workspaces', variables('logAnalyticsWorkspaceName'))]"
             },
             "plan": {
                 "name": "[variables('containerInsightsSolutionName')]",
@@ -899,15 +926,16 @@
             }
         },
         {
+            "condition":"[variables('isNewLogAnalytics')]",
             "type": "Microsoft.OperationsManagement/solutions",
             "apiVersion": "2015-11-01-preview",
             "name": "[concat('KeyVaultAnalytics(', variables('logAnalyticsWorkspaceName'),')')]",
             "location": "[parameters('location')]",
             "dependsOn": [
-                "[resourceId('Microsoft.OperationalInsights/workspaces', variables('logAnalyticsWorkspaceName'))]"
+                "[resourceId('Microsoft.OperationalInsights/workspaces', variables('laNewWorkspaceName'))]"
             ],
             "properties": {
-                "workspaceResourceId": "[resourceId('Microsoft.OperationalInsights/workspaces', variables('logAnalyticsWorkspaceName'))]"
+                "workspaceResourceId": "[resourceId(variables('logAnalyticsResourceGroup'), 'Microsoft.OperationalInsights/workspaces', variables('logAnalyticsWorkspaceName'))]"
             },
             "plan": {
                 "name": "[concat('KeyVaultAnalytics(', variables('logAnalyticsWorkspaceName'),')')]",
@@ -983,10 +1011,10 @@
                     "name": "Microsoft.Insights/default",
                     "dependsOn": [
                         "[resourceId('Microsoft.ContainerRegistry/registries', variables('defaultAcrName'))]",
-                        "[resourceId('Microsoft.OperationalInsights/workspaces', variables('logAnalyticsWorkspaceName'))]"
+                        "[resourceId('Microsoft.OperationalInsights/workspaces', variables('laNewWorkspaceName'))]"
                     ],
                     "properties": {
-                        "workspaceId": "[resourceId('Microsoft.OperationalInsights/workspaces', variables('logAnalyticsWorkspaceName'))]",
+                        "workspaceId": "[resourceId(variables('logAnalyticsResourceGroup'), 'Microsoft.OperationalInsights/workspaces', variables('logAnalyticsWorkspaceName'))]",
                         "metrics": [
                             {
                                 "timeGrain": "PT1M",
@@ -1140,7 +1168,7 @@
                     "omsagent": {
                         "enabled": true,
                         "config": {
-                            "logAnalyticsWorkspaceResourceId": "[resourceId('Microsoft.OperationalInsights/workspaces', variables('logAnalyticsWorkspaceName'))]"
+                            "logAnalyticsWorkspaceResourceId": "[resourceId(variables('logAnalyticsResourceGroup'), 'Microsoft.OperationalInsights/workspaces', variables('logAnalyticsWorkspaceName'))]"
                         }
                     },
                     "aciConnectorLinux": {
@@ -1231,10 +1259,10 @@
                     "name": "Microsoft.Insights/default",
                     "dependsOn": [
                         "[resourceId('Microsoft.ContainerService/managedClusters', variables('clusterName'))]",
-                        "[resourceId('Microsoft.OperationalInsights/workspaces', variables('logAnalyticsWorkspaceName'))]"
+                        "[resourceId('Microsoft.OperationalInsights/workspaces', variables('laNewWorkspaceName'))]"
                     ],
                     "properties": {
-                        "workspaceId": "[resourceId('Microsoft.OperationalInsights/workspaces', variables('logAnalyticsWorkspaceName'))]",
+                        "workspaceId": "[resourceId(variables('logAnalyticsResourceGroup'), 'Microsoft.OperationalInsights/workspaces', variables('logAnalyticsWorkspaceName'))]",
                         "logs": [
                             {
                                 "category": "cluster-autoscaler",
