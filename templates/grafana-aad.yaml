@@ -10,6 +10,28 @@ spec:
     requests:
       storage: 1Gi
 ---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-config
+  namespace: monitoring
+data:
+  grafana.ini:  |
+    [auth]
+    disable_login_form = true
+
+    [auth.basic]
+    enabled = false
+
+    [auth.azuread]
+    name = Azure AD
+    enabled = true
+    allow_sign_up = true
+    client_id = ${ASB_GRAFANA_SP_CLIENT_ID}
+    scopes = openid email profile
+    auth_url = https://login.microsoftonline.com/${ASB_GRAFANA_SP_TENANT_ID}/oauth2/v2.0/authorize
+    token_url = https://login.microsoftonline.com/${ASB_GRAFANA_SP_TENANT_ID}/oauth2/v2.0/token
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -26,6 +48,7 @@ spec:
     metadata:
       labels:
         app: grafana
+        aadpodidbinding: $ASB_GRAFANA_MI_NAME
     spec:
       securityContext:
         fsGroup: 472
@@ -42,6 +65,11 @@ spec:
             value: "${ASB_DOMAIN}"
           - name: GF_SERVER_SERVE_FROM_SUB_PATH
             value: "true"
+          - name: GF_AUTH_AZUREAD_CLIENT_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: grafana-aad-client-secret
+                key: clientSecret
           ports:
             - containerPort: 3000
               name: http-grafana
@@ -74,10 +102,26 @@ spec:
           volumeMounts:
             - mountPath: /var/lib/grafana
               name: grafana-pv
+            - mountPath: /etc/grafana
+              name: grafana-config
+            - mountPath: /mnt/secrets
+              readOnly: true
+              name: grafana-aad-auth-secret
       volumes:
         - name: grafana-pv
           persistentVolumeClaim:
             claimName: grafana-pvc
+        - name: grafana-config
+          configMap:
+            name: grafana-config
+        - name: grafana-aad-auth-secret
+          csi:
+            driver: secrets-store.csi.k8s.io
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: grafana-aad-auth-secret
+      nodeSelector:
+        agentpool: npuser01
 ---
 apiVersion: v1
 kind: Service
