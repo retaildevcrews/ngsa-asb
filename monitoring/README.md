@@ -65,10 +65,10 @@ First, follow the steps detailed in the [Grafana documentation](https://grafana.
 # Optional: Add client secret using AZ CLI
 # You can also add it manually using the Azure portal with the secret name "grafana-aad-client-secret" [Recommended]
 
-# give logged in user access to key vault
+# Optional: give logged in user access to key vault
 az keyvault set-policy --secret-permissions set --object-id $(az ad signed-in-user show --query objectId -o tsv) -n $ASB_KV_NAME -g $ASB_RG_CORE
 
-# set grafana AAD client secrets
+# Optional: set grafana AAD client secrets
 az keyvault secret set -o table --vault-name $ASB_KV_NAME --name "grafana-aad-client-secret" --value [insert CLIENT_SECRET]
 
 # set grafana AAD ids
@@ -83,6 +83,8 @@ cat templates/grafana-aad.yaml | envsubst  > $ASB_GIT_PATH/monitoring/03-grafana
 cat templates/grafana-pod-identity.yaml | envsubst  > $ASB_GIT_PATH/monitoring/04-grafana-pod-identity.yaml
 
 ```
+
+Add, commit and push the modified files using git to your working branch.
 
 ### Deploy Prometheus and Grafana
 
