@@ -27,11 +27,10 @@ data:
     name = Azure AD
     enabled = true
     allow_sign_up = true
-    client_id = fd5eb37b-023e-4656-8ef9-4e79fef957aa
+    client_id = ${ASB_GRAFANA_SP_CLIENT_ID}
     scopes = openid email profile
-    auth_url = https://login.microsoftonline.com/72f988bf-86f1-41af-91ab-2d7cd011db47/oauth2/v2.0/authorize
-    token_url = https://login.microsoftonline.com/72f988bf-86f1-41af-91ab-2d7cd011db47/oauth2/v2.0/token
-
+    auth_url = https://login.microsoftonline.com/${ASB_GRAFANA_SP_TENANT_ID}/oauth2/v2.0/authorize
+    token_url = https://login.microsoftonline.com/${ASB_GRAFANA_SP_TENANT_ID}/oauth2/v2.0/token
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -49,7 +48,7 @@ spec:
     metadata:
       labels:
         app: grafana
-        aadpodidbinding: grafana-id
+        aadpodidbinding: $ASB_GRAFANA_MI_NAME
     spec:
       securityContext:
         fsGroup: 472
@@ -57,13 +56,13 @@ spec:
           - 0
       containers:
         - name: grafana
-          image: acraks6jqf6qyt7jarg.azurecr.io/grafana/grafana:7.3.0
+          image: ${ASB_ACR_NAME}.azurecr.io/grafana/grafana:7.3.0
           imagePullPolicy: Always
           env:
           - name: GF_SERVER_ROOT_URL
             value: "https://%(domain)s/grafana/"
           - name: GF_SERVER_DOMAIN
-            value: "ngsa-pre-central-dev.cse.ms"
+            value: "${ASB_DOMAIN}"
           - name: GF_SERVER_SERVE_FROM_SUB_PATH
             value: "true"
           - name: GF_AUTH_AZUREAD_CLIENT_SECRET
@@ -137,9 +136,7 @@ spec:
     - port: 3000
       protocol: TCP
       targetPort: http-grafana
-
 ---
-
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
 metadata:
@@ -149,7 +146,7 @@ spec:
   gateways:
   - istio-system/istio-gateway
   hosts:
-  - ngsa-pre-central-dev.cse.ms
+  - ${ASB_DOMAIN}
   http:
   - match:
     - uri:
@@ -163,3 +160,4 @@ spec:
         port:
           number: 3000
         host: grafana
+  

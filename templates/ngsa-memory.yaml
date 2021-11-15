@@ -74,7 +74,7 @@ metadata:
   namespace: ngsa
 spec:
   gateways:
-  - ngsa-gateway
+  - istio-system/istio-gateway
   hosts:
   - ${ASB_DOMAIN}
   http:

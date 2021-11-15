@@ -27,15 +27,64 @@ az acr import --source ghcr.io/cse-labs/jumpbox -n $ASB_ACR_NAME
 # import Grafana into ACR
 az acr import --source docker.io/grafana/grafana:7.3.0 -n $ASB_ACR_NAME
 
+```
+
+### Create Deployment Templates
+
+```bash
+
 mkdir $ASB_GIT_PATH/monitoring
 # create monitoring namespace deployment file
 cat templates/monitoring.yaml | envsubst  > $ASB_GIT_PATH/monitoring/01-namespace.yaml
 # create prometheus deployment file
 cat templates/prometheus.yaml | envsubst  > $ASB_GIT_PATH/monitoring/02-prometheus.yaml
+
+```
+
+#### Option 1: Prepare Grafana deployment for basic auth
+
+Deploy the standard version of Grafana using basic auth, essentially providing username and password for login.
+
+```bash
+
 # create grafana deployment file
 cat templates/grafana.yaml | envsubst  > $ASB_GIT_PATH/monitoring/03-grafana.yaml
 
 ```
+
+#### Option 2: Prepare Grafana deployment for Azure Active Directory (AAD)
+
+Deploy Grafana that uses AAD as the authentication mechanism. This process is a bit more involved as you will need to configure a Service Principal.
+
+First, follow the steps detailed in the [Grafana documentation](https://grafana.com/docs/grafana/latest/auth/azuread/#create-the-azure-ad-application) to create the AAD Service Principal. Use the `ASB_DOMAIN` value as the `grafana domain` for the redirect URLs. Note the `TENANT_ID`, `CLIENT_ID` and `CLIENT_SECRET` values as you'll be needing these for the deployment template.
+
+**Note**: The `CLIENT_SECRET` will be mounted from Key Vault and into the Grafana pod using Pod Identity. Rather than creating a whole new Managed Identity, Grafana makes use of NGSA's managed identity to grab the secret from Key Vault. Ensure that you have it setup by following the [Cosmos pod identity setup guide](../docs/cosmos.md#aad-pod-identity-setup-for-app).
+
+```bash
+
+# Optional: Add client secret using AZ CLI
+# You can also add it manually using the Azure portal with the secret name "grafana-aad-client-secret" [Recommended]
+
+# Optional: give logged in user access to key vault
+az keyvault set-policy --secret-permissions set --object-id $(az ad signed-in-user show --query objectId -o tsv) -n $ASB_KV_NAME -g $ASB_RG_CORE
+
+# Optional: set grafana AAD client secrets
+az keyvault secret set -o table --vault-name $ASB_KV_NAME --name "grafana-aad-client-secret" --value [insert CLIENT_SECRET]
+
+# set grafana AAD ids
+export ASB_GRAFANA_SP_CLIENT_ID=[insert CLIENT_ID]
+export ASB_GRAFANA_SP_TENANT_ID=[insert TENANT_ID]
+export ASB_GRAFANA_MI_NAME=grafana-id
+
+# create grafana deployment file
+cat templates/grafana-aad.yaml | envsubst  > $ASB_GIT_PATH/monitoring/03-grafana.yaml
+
+# create grafana pod identity deployment file
+cat templates/grafana-pod-identity.yaml | envsubst  > $ASB_GIT_PATH/monitoring/04-grafana-pod-identity.yaml
+
+```
+
+Add, commit and push the modified files using git to your working branch.
 
 ### Deploy Prometheus and Grafana
 
@@ -47,6 +96,45 @@ cat templates/grafana.yaml | envsubst  > $ASB_GIT_PATH/monitoring/03-grafana.yam
   
   ```
 
+### Configure Grafana using AAD
+
+Ensure that you have added the proper users/groups in the Grafana's AAD service principal, the proper role mappings in the Manifest and [configured the `groupMembershipClaims`](https://grafana.com/docs/grafana/latest/auth/azuread/#configure-allowed-groups). If the pods are running, verify that you can access the grafana endpoint at `https://{ASB_DOMAIN}/grafana`. You should only see an option to sign in with Microsoft.
+
+The login step may not work just yet, because the WAF can block the redirect requests from AAD to the grafana endpoint. If this is the case, add a firewall exclusion policy to avoid flagging these specific requests from AAD.
+
+```bash
+
+# create waf policy
+export ASB_WAF_POLICY_NAME="${ASB_DEPLOYMENT_NAME}-waf-policy"
+
+az network application-gateway waf-policy create -n $ASB_WAF_POLICY_NAME -g $ASB_RG_CORE
+
+# create custom rule in waf policy
+export ASB_WAF_POLICY_RULE="grafanaAADAuth"
+export ASB_WAF_POLICY_RULE_PRIORITY="2"
+
+az network application-gateway waf-policy custom-rule create \
+  -n $ASB_WAF_POLICY_RULE --policy-name $ASB_WAF_POLICY_NAME -g $ASB_RG_CORE \
+  --action Allow --priority $ASB_WAF_POLICY_RULE_PRIORITY --rule-type MatchRule
+
+# add allow rule conditions for AAD redirect request
+# add condition to check whether the redirectURI is going to /grafana/login/azuread 
+az network application-gateway waf-policy custom-rule match-condition add \
+  -n $ASB_WAF_POLICY_RULE --policy-name $ASB_WAF_POLICY_NAME -g $ASB_RG_CORE \
+  --match-variables RequestUri --operator Contains --values "/grafana/login/azuread" \
+  --transforms UrlDecode Lowercase
+
+# use prevention mode and enable waf policy
+az network application-gateway waf-policy policy-setting update \
+  --policy-name $ASB_WAF_POLICY_NAME -g $ASB_RG_CORE --mode Prevention --state Enabled
+
+# note the application gateway name in resource group
+az network application-gateway list -g $ASB_RG_CORE --query "[].{Name:name}" -o tsv
+
+```
+
+**IMPORTANT**: With the WAF policy now created, you will need to associate this policy with the application gateway. Unfortunately, there currently isn't a way to do this using the AZ CLI. You can do this through the Azure portal by accessing the Application Gateway WAF policy in the core resource group, select `Associated application gateways` in the sidebar and `Add association` to the gateway name as you've noted in the last step above.
+
 ### Verify Prometheus Service
 
 - Check that it worked by running: `kubectl port-forward service/prometheus-service 9090:8080 -n monitoring`
@@ -56,7 +144,8 @@ cat templates/grafana.yaml | envsubst  > $ASB_GIT_PATH/monitoring/03-grafana.yam
 
 - Check that it worked by running the following: kubectl port-forward service/grafana 3000:3000 -n monitoring
 - Navigate to localhost:3000 in your browser. You should see a Grafana login page.
-- Use admin for both the username and password to login.
+- If you setup Grafana using basic auth, use admin for both the username and password to login.
+- If you setup Grafana using AAD, sign in using Microsoft. If you cannot access Grafana, check if you are added as a user/group member in the Grafana AAD Service Principal. If you encounter a `403` from the Application gateway, ensure the WAF policy conditions are accurate and is associated with the application gateway.
 
 ### Adding required permissions/secrets from Azure Portal
 
