@@ -60,6 +60,8 @@ First, follow the steps detailed in the [Grafana documentation](https://grafana.
 
 **Note**: The `CLIENT_SECRET` will be mounted from Key Vault and into the Grafana pod using Pod Identity. Rather than creating a whole new Managed Identity, Grafana makes use of NGSA's managed identity to grab the secret from Key Vault. Ensure that you have it setup by following the [Cosmos pod identity setup guide](../docs/cosmos.md#aad-pod-identity-setup-for-app).
 
+Grafana with AAD will authorize users to the same AAD security group used to authorize users to the ASB cluster.
+
 ```bash
 
 # Optional: Add client secret using AZ CLI
