@@ -1,4 +1,4 @@
-# NGSA AKS Secure Baseline Pre-Prod deployment
+ # NGSA AKS Secure Baseline Pre-Prod deployment
 
 > Welcome to the Patterns and Practices (PnP) AKS Secure Baseline (ASB)
 
@@ -102,9 +102,9 @@ git push -u origin $ASB_DEPLOYMENT_NAME
 
 🛑 Only choose one pair from the below block
 
-### choose the closest pair - not all regions support ASB
+### Set for deployment of resources. Cluster region will be set in a different step
 export ASB_LOCATION=centralus
-export ASB_GEO_LOCATION=westus
+
 
 ```
 
@@ -170,7 +170,7 @@ export ASB_GIT_BRANCH=$ASB_DEPLOYMENT_NAME
 export ASB_GIT_PATH=deploy/$ASB_DEPLOYMENT_NAME
 
 # set default domain name
-export ASB_DNS_ZONE=cse.ms  
+export ASB_DNS_ZONE=cse.ms
 
 export ASB_DOMAIN=${ASB_DNS_NAME}.${ASB_DNS_ZONE}
 
@@ -200,27 +200,40 @@ az group create -n $ASB_RG_SPOKE -l $ASB_LOCATION
 
 ```
 
-#### Setup Network
+#### Setup Network for the first time
 
 ```bash
-# Create your spoke deployment file 
-cp networking/spoke-BU0001A0008.json networking/spoke-$ASB_ORG_APP_ID_NAME.json
-
 # this section takes 15-20 minutes to complete
 
 # create hub network
-az deployment group create -g $ASB_RG_HUB -f networking/hub-default.json -p location=${ASB_LOCATION} --query name
+az deployment group create -g $ASB_RG_HUB -f networking/hub-default.json -p location=${ASB_LOCATION} -c --query name
 export ASB_VNET_HUB_ID=$(az deployment group show -g $ASB_RG_HUB -n hub-default --query properties.outputs.hubVnetId.value -o tsv)
 
+# Create your spoke deployment file 
+cp networking/spoke-BU0001A0008.json networking/spoke-$ASB_ORG_APP_ID_NAME.json
+
+# Set Spoke IP address prefix
+export ASB_SPOKE_IP_PREFIX="10.240"
+
 # create spoke network
-az deployment group create -g $ASB_RG_SPOKE -f networking/spoke-$ASB_ORG_APP_ID_NAME.json -p location=${ASB_LOCATION} orgAppId=${ASB_ORG_APP_ID_NAME} hubVnetResourceId="${ASB_VNET_HUB_ID}" deploymentName=${ASB_DEPLOYMENT_NAME} --query name
+az deployment group create \
+  -g $ASB_RG_SPOKE \
+  -f networking/spoke-$ASB_ORG_APP_ID_NAME.json \
+  -p location=${ASB_LOCATION} \
+     orgAppId=${ASB_ORG_APP_ID_NAME} \
+     hubVnetResourceId="${ASB_VNET_HUB_ID}" \
+     deploymentName=${ASB_DEPLOYMENT_NAME} \
+     spokeIpPrefix=${ASB_SPOKE_IP_PREFIX} -c --query name
+
+
 export ASB_NODEPOOLS_SUBNET_ID=$(az deployment group show -g $ASB_RG_SPOKE -n spoke-$ASB_ORG_APP_ID_NAME --query properties.outputs.nodepoolSubnetResourceIds.value -o tsv)
 
 # create Region A hub network
-az deployment group create -g $ASB_RG_HUB -f networking/hub-regionA.json -p location=${ASB_LOCATION} nodepoolSubnetResourceIds="['${ASB_NODEPOOLS_SUBNET_ID}']" --query name
+az deployment group create -g $ASB_RG_HUB -f networking/hub-regionA.json -p location=${ASB_LOCATION} nodepoolSubnetResourceIds="['${ASB_NODEPOOLS_SUBNET_ID}']" -c --query name
 export ASB_SPOKE_VNET_ID=$(az deployment group show -g $ASB_RG_SPOKE -n spoke-$ASB_ORG_APP_ID_NAME --query properties.outputs.clusterVnetResourceId.value -o tsv)
 
 ./saveenv.sh -y
+
 
 ```
 
@@ -228,15 +241,20 @@ export ASB_SPOKE_VNET_ID=$(az deployment group show -g $ASB_RG_SPOKE -n spoke-$A
 
 ```bash
 
+# Validate that you are using the correct vnet for cluster deployment
+echo $ASB_SPOKE_VNET_ID
+echo $ASB_ORG_APP_ID_NAME
+
+### Set cluster locations by choosing the closest pair - not all regions support ASB
+export ASB_CLUSTER_LOCATION=centralus
+export ASB_CLUSTER_GEO_LOCATION=westus
 ### this section takes 15-20 minutes
 
 # Create AKS
-
-# Note: If using an existing Log Analytics workspace, uncomment and populate the laWorkspaceName and laResourceGroup paramaters
 az deployment group create -g $ASB_RG_CORE \
   -f cluster-stamp.json \
   -n cluster-${ASB_DEPLOYMENT_NAME} \
-  -p location=${ASB_LOCATION} \
+  -p location=${ASB_CLUSTER_LOCATION} \
      geoRedundancyLocation=${ASB_GEO_LOCATION} \
      deploymentName=${ASB_DEPLOYMENT_NAME} \
      orgAppId=${ASB_ORG_APP_ID_NAME} \
@@ -250,8 +268,6 @@ az deployment group create -g $ASB_RG_CORE \
      appGatewayListenerCertificate=${APP_GW_CERT_CSMS} \
      aksIngressControllerCertificate="$(echo $INGRESS_CERT_CSMS | base64 -d)" \
      aksIngressControllerKey="$(echo $INGRESS_KEY_CSMS | base64 -d)" \
-     #laWorkspaceName=<LogAnalyticsWorkspaceName> \
-     #laResourceGroup=<LogAnalyticsResourceGroupName> \
      --query name -c
 ```
 
@@ -275,7 +291,10 @@ export ASB_ISTIO_RESOURCE_ID=$(az deployment group show -g $ASB_RG_CORE -n clust
 export ASB_ISTIO_CLIENT_ID=$(az deployment group show -g $ASB_RG_CORE -n cluster-${ASB_DEPLOYMENT_NAME} --query properties.outputs.aksIngressControllerPodManagedIdentityClientId.value -o tsv)
 export ASB_POD_MI_ID=$(az identity show -n podmi-ingress-controller -g $ASB_RG_CORE --query principalId -o tsv)
 
-# config traefik
+# Get the name of Azure Container Registry
+export ASB_ACR_NAME=$(az deployment group show -g $ASB_RG_CORE -n cluster-${ASB_DEPLOYMENT_NAME}  --query properties.outputs.containerRegistryName.value -o tsv)
+
+# config certs
 export ASB_INGRESS_CERT_NAME=appgw-ingress-internal-aks-ingress-tls
 export ASB_INGRESS_KEY_NAME=appgw-ingress-internal-aks-ingress-key
 
@@ -317,7 +336,7 @@ git status
 git add flux.yaml
 git add $ASB_GIT_PATH/istio/istio-pod-identity-config.yaml
 git add $ASB_GIT_PATH/istio/istio-gateway.yaml
-git add networking/spoke-$ASB_ORG_APP_ID_NAME.json
+git add networking/spoke-*.json
 
 git commit -m "added cluster config"
 git push
