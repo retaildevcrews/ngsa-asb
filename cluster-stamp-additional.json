@@ -6,7 +6,6 @@
             "type": "string",
             "minLength": 0,
             "maxLength": 24,
-            "defaultValue": "",
             "metadata": {
                 "description": "Log Analytics Workspace Name to Use"
             }
@@ -15,7 +14,6 @@
             "type": "string",
             "minLength": 0,
             "maxLength": 40,
-            "defaultValue": "",
             "metadata": {
                 "description": "Resource Group where Log Analytics is"
             }
@@ -149,11 +147,8 @@
         "baseName": "[concat('aks-',variables('subRgUniqueString'))]",
         "clusterName": "[concat(variables('baseName'),'-',parameters('location'))]",
         "clusterNameTrunc": "[substring(variables('clusterName'), 0, 25)]",
-        "laNewWorkspaceName" : "[concat('la-', variables('baseName'))]",
-        "logAnalyticsWorkspaceName": "[if(and(empty(parameters('laWorkspaceName')),empty(parameters('laResourceGroup'))), variables('laNewWorkspaceName'),if(not(or(empty(parameters('laWorkspaceName')),empty(parameters('laResourceGroup')))),parameters('laWorkspaceName'),null()))]",
-        "isNewLogAnalytics" : "[equals(variables('logAnalyticsWorkspaceName'), variables('laNewWorkspaceName'))]",
-        "logAnalyticsResourceGroup": "[if(variables('isNewLogAnalytics'), resourceGroup().name, parameters('laResourceGroup'))]",
-        "containerInsightsSolutionName": "[concat('ContainerInsights(', variables('logAnalyticsWorkspaceName'),')')]",
+        "logAnalyticsWorkspaceName" : "[parameters('laWorkspaceName')]",
+        "logAnalyticsResourceGroup": "[parameters('laResourceGroup')]",
         "defaultAcrName": "[concat('acraks', variables('subRgUniqueString'))]",
 
         "vNetResourceGroup": "[split(parameters('targetVnetResourceId'),'/')[4]]",
@@ -257,76 +252,11 @@
             }
         },
         {
-            "condition":"[variables('isNewLogAnalytics')]",
-            "type": "Microsoft.OperationalInsights/workspaces",
-            "apiVersion": "2020-08-01",
-            "name": "[variables('laNewWorkspaceName')]",
-            "location": "[parameters('location')]",
-            "properties": {
-                "sku": {
-                    "name": "PerGB2018"
-                },
-                "retentionInDays": 30
-            },
-            "resources": [
-                {
-                    "condition":"[variables('isNewLogAnalytics')]",
-                    "type": "savedSearches",
-                    "apiVersion": "2020-08-01",
-                    "name": "AllPrometheus",
-                    "dependsOn": [
-                        "[concat('Microsoft.OperationalInsights/workspaces/', variables('laNewWorkspaceName'))]"
-                    ],
-                    "properties": {
-                        "eTag": "*",
-                        "category": "Prometheus",
-                        "displayName": "All collected Prometheus information",
-                        "query": "InsightsMetrics | where Namespace == \"prometheus\"",
-                        "version": 1
-                    }
-                },
-                {
-                    "condition":"[variables('isNewLogAnalytics')]",
-                    "type": "savedSearches",
-                    "apiVersion": "2020-08-01",
-                    "name": "ForbiddenReponsesOnIngress",
-                    "dependsOn": [
-                        "[concat('Microsoft.OperationalInsights/workspaces/', variables('laNewWorkspaceName'))]"
-                    ],
-                    "properties": {
-                        "eTag": "*",
-                        "category": "Prometheus",
-                        "displayName": "Increase number of forbidden response on the Ingress Controller",
-                        "query": "let value = toscalar(InsightsMetrics | where Namespace == \"prometheus\" and Name == \"traefik_entrypoint_requests_total\" | where parse_json(Tags).code == 403 | summarize Value = avg(Val) by bin(TimeGenerated, 5m) | summarize min = min(Value)); InsightsMetrics | where Namespace == \"prometheus\" and Name == \"traefik_entrypoint_requests_total\" | where parse_json(Tags).code == 403 | summarize AggregatedValue = avg(Val)-value by bin(TimeGenerated, 5m) | order by TimeGenerated | render barchart",
-                        "version": 1
-                    }
-                },
-                {
-                    "condition":"[variables('isNewLogAnalytics')]",
-                    "type": "savedSearches",
-                    "apiVersion": "2020-08-01",
-                    "name": "NodeRebootRequested",
-                    "dependsOn": [
-                        "[concat('Microsoft.OperationalInsights/workspaces/', variables('laNewWorkspaceName'))]"
-                    ],
-                    "properties": {
-                        "eTag": "*",
-                        "category": "Prometheus",
-                        "displayName": "Nodes reboot required by kured",
-                        "query": "InsightsMetrics | where Namespace == \"prometheus\" and Name == \"kured_reboot_required\" | where Val > 0",
-                        "version": 1
-                    }
-                }
-            ]
-        },
-        {
-            "condition":"[variables('isNewLogAnalytics')]",
             "name": "[concat('PodFailedScheduledQuery-', variables('clusterName'))]",
             "type": "Microsoft.Insights/scheduledQueryRules",
             "apiVersion": "2018-04-16",
             "location": "[parameters('location')]",
             "dependsOn": [
-                "[resourceId('Microsoft.OperationsManagement/solutions',variables('containerInsightsSolutionName'))]",
                 "[resourceId('Microsoft.ContainerService/managedClusters', variables('clusterName'))]"
             ],
             "properties": {
@@ -357,50 +287,11 @@
             }
         },
         {
-            "condition":"[variables('isNewLogAnalytics')]",
-            "type": "Microsoft.OperationsManagement/solutions",
-            "apiVersion": "2015-11-01-preview",
-            "name": "[variables('containerInsightsSolutionName')]",
-            "location": "[parameters('location')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.OperationalInsights/workspaces', variables('laNewWorkspaceName'))]"
-            ],
-            "properties": {
-                "workspaceResourceId": "[resourceId(variables('logAnalyticsResourceGroup'), 'Microsoft.OperationalInsights/workspaces', variables('logAnalyticsWorkspaceName'))]"
-            },
-            "plan": {
-                "name": "[variables('containerInsightsSolutionName')]",
-                "product": "OMSGallery/ContainerInsights",
-                "promotionCode": "",
-                "publisher": "Microsoft"
-            }
-        },
-        {
-            "condition":"[variables('isNewLogAnalytics')]",
-            "type": "Microsoft.OperationsManagement/solutions",
-            "apiVersion": "2015-11-01-preview",
-            "name": "[concat('KeyVaultAnalytics(', variables('logAnalyticsWorkspaceName'),')')]",
-            "location": "[parameters('location')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.OperationalInsights/workspaces', variables('laNewWorkspaceName'))]"
-            ],
-            "properties": {
-                "workspaceResourceId": "[resourceId(variables('logAnalyticsResourceGroup'), 'Microsoft.OperationalInsights/workspaces', variables('logAnalyticsWorkspaceName'))]"
-            },
-            "plan": {
-                "name": "[concat('KeyVaultAnalytics(', variables('logAnalyticsWorkspaceName'),')')]",
-                "product": "OMSGallery/KeyVaultAnalytics",
-                "promotionCode": "",
-                "publisher": "Microsoft"
-            }
-        },
-        {
             "type": "Microsoft.ContainerService/managedClusters",
             "apiVersion": "2021-02-01",
             "name": "[variables('clusterName')]",
             "location": "[parameters('location')]",
             "dependsOn": [
-                "[resourceId('Microsoft.OperationsManagement/solutions', variables('containerInsightsSolutionName'))]",
                 "[resourceId(variables('vNetResourceGroup'), 'Microsoft.Resources/deployments', 'EnsureClusterIdentityHasRbacToSelfManagedResources')]",
                 "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('clusterControlPlaneIdentityName'))]",
                 "[resourceId('Microsoft.Authorization/policyAssignments', variables('policyAssignmentNameAKSLinuxRestrictive'))]",
@@ -569,8 +460,7 @@
                     "apiVersion": "2017-05-01-preview",
                     "name": "Microsoft.Insights/default",
                     "dependsOn": [
-                        "[resourceId('Microsoft.ContainerService/managedClusters', variables('clusterName'))]",
-                        "[resourceId('Microsoft.OperationalInsights/workspaces', variables('laNewWorkspaceName'))]"
+                        "[resourceId('Microsoft.ContainerService/managedClusters', variables('clusterName'))]"
                     ],
                     "properties": {
                         "workspaceId": "[resourceId(variables('logAnalyticsResourceGroup'), 'Microsoft.OperationalInsights/workspaces', variables('logAnalyticsWorkspaceName'))]",
@@ -602,8 +492,7 @@
             "apiVersion": "2018-03-01",
             "name": "[concat('Node CPU utilization high for ', variables('clusterName'), ' CI-1')]",
             "dependsOn": [
-                "[resourceId('Microsoft.ContainerService/managedClusters', variables('clusterName'))]",
-                "[resourceId('Microsoft.OperationsManagement/solutions',variables('containerInsightsSolutionName'))]"
+                "[resourceId('Microsoft.ContainerService/managedClusters', variables('clusterName'))]"
             ],
             "properties": {
                 "actions": [],
@@ -648,8 +537,7 @@
             "apiVersion": "2018-03-01",
             "name": "[concat('Node working set memory utilization high for ', variables('clusterName'), ' CI-2')]",
             "dependsOn": [
-                "[resourceId('Microsoft.ContainerService/managedClusters', variables('clusterName'))]",
-                "[resourceId('Microsoft.OperationsManagement/solutions',variables('containerInsightsSolutionName'))]"
+                "[resourceId('Microsoft.ContainerService/managedClusters', variables('clusterName'))]"
             ],
             "properties": {
                 "actions": [],
@@ -694,8 +582,7 @@
             "apiVersion": "2018-03-01",
             "name": "[concat('Jobs completed more than 6 hours ago for ', variables('clusterName'), ' CI-11')]",
             "dependsOn": [
-                "[resourceId('Microsoft.ContainerService/managedClusters', variables('clusterName'))]",
-                "[resourceId('Microsoft.OperationsManagement/solutions',variables('containerInsightsSolutionName'))]"
+                "[resourceId('Microsoft.ContainerService/managedClusters', variables('clusterName'))]"
             ],
             "properties": {
                 "actions": [],
@@ -747,8 +634,7 @@
             "apiVersion": "2018-03-01",
             "name": "[concat('Container CPU usage high for ', variables('clusterName'), ' CI-9')]",
             "dependsOn": [
-                "[resourceId('Microsoft.ContainerService/managedClusters', variables('clusterName'))]",
-                "[resourceId('Microsoft.OperationsManagement/solutions',variables('containerInsightsSolutionName'))]"
+                "[resourceId('Microsoft.ContainerService/managedClusters', variables('clusterName'))]"
             ],
             "properties": {
                 "actions": [],
@@ -800,8 +686,7 @@
             "apiVersion": "2018-03-01",
             "name": "[concat('Container working set memory usage high for ', variables('clusterName'), ' CI-10')]",
             "dependsOn": [
-                "[resourceId('Microsoft.ContainerService/managedClusters', variables('clusterName'))]",
-                "[resourceId('Microsoft.OperationsManagement/solutions',variables('containerInsightsSolutionName'))]"
+                "[resourceId('Microsoft.ContainerService/managedClusters', variables('clusterName'))]"
             ],
             "properties": {
                 "actions": [],
@@ -853,8 +738,7 @@
             "apiVersion": "2018-03-01",
             "name": "[concat('Pods in failed state for ', variables('clusterName'), ' CI-4')]",
             "dependsOn": [
-                "[resourceId('Microsoft.ContainerService/managedClusters', variables('clusterName'))]",
-                "[resourceId('Microsoft.OperationsManagement/solutions',variables('containerInsightsSolutionName'))]"
+                "[resourceId('Microsoft.ContainerService/managedClusters', variables('clusterName'))]"
             ],
             "properties": {
                 "actions": [],
@@ -899,8 +783,7 @@
             "apiVersion": "2018-03-01",
             "name": "[concat('Disk usage high for ', variables('clusterName'), ' CI-5')]",
             "dependsOn": [
-                "[resourceId('Microsoft.ContainerService/managedClusters', variables('clusterName'))]",
-                "[resourceId('Microsoft.OperationsManagement/solutions',variables('containerInsightsSolutionName'))]"
+                "[resourceId('Microsoft.ContainerService/managedClusters', variables('clusterName'))]"
             ],
             "properties": {
                 "actions": [],
@@ -952,8 +835,7 @@
             "apiVersion": "2018-03-01",
             "name": "[concat('Nodes in not ready status for ', variables('clusterName'), ' CI-3')]",
             "dependsOn": [
-                "[resourceId('Microsoft.ContainerService/managedClusters', variables('clusterName'))]",
-                "[resourceId('Microsoft.OperationsManagement/solutions',variables('containerInsightsSolutionName'))]"
+                "[resourceId('Microsoft.ContainerService/managedClusters', variables('clusterName'))]"
             ],
             "properties": {
                 "actions": [],
@@ -998,8 +880,7 @@
             "apiVersion": "2018-03-01",
             "name": "[concat('Containers getting OOM killed for ', variables('clusterName'), ' CI-6')]",
             "dependsOn": [
-                "[resourceId('Microsoft.ContainerService/managedClusters', variables('clusterName'))]",
-                "[resourceId('Microsoft.OperationsManagement/solutions',variables('containerInsightsSolutionName'))]"
+                "[resourceId('Microsoft.ContainerService/managedClusters', variables('clusterName'))]"
             ],
             "properties": {
                 "actions": [],
@@ -1051,8 +932,7 @@
             "apiVersion": "2018-03-01",
             "name": "[concat('Persistent volume usage high for ', variables('clusterName'), ' CI-18')]",
             "dependsOn": [
-                "[resourceId('Microsoft.ContainerService/managedClusters', variables('clusterName'))]",
-                "[resourceId('Microsoft.OperationsManagement/solutions',variables('containerInsightsSolutionName'))]"
+                "[resourceId('Microsoft.ContainerService/managedClusters', variables('clusterName'))]"
             ],
             "properties": {
                 "actions": [],
@@ -1104,8 +984,7 @@
             "apiVersion": "2018-03-01",
             "name": "[concat('Pods not in ready state for ', variables('clusterName'), ' CI-8')]",
             "dependsOn": [
-                "[resourceId('Microsoft.ContainerService/managedClusters', variables('clusterName'))]",
-                "[resourceId('Microsoft.OperationsManagement/solutions',variables('containerInsightsSolutionName'))]"
+                "[resourceId('Microsoft.ContainerService/managedClusters', variables('clusterName'))]"
             ],
             "properties": {
                 "actions": [],
@@ -1157,8 +1036,7 @@
             "apiVersion": "2018-03-01",
             "name": "[concat('Restarting container count for ', variables('clusterName'), ' CI-7')]",
             "dependsOn": [
-                "[resourceId('Microsoft.ContainerService/managedClusters', variables('clusterName'))]",
-                "[resourceId('Microsoft.OperationsManagement/solutions',variables('containerInsightsSolutionName'))]"
+                "[resourceId('Microsoft.ContainerService/managedClusters', variables('clusterName'))]"
             ],
             "properties": {
                 "actions": [],
