@@ -30,10 +30,17 @@ data:
         storage.total_limit_size  15M
     [OUTPUT]
         Name            azure
-        Match           kube.var.log.containers.ngsa*.*
+        Match           kube.var.log.containers.ngsa*_ngsa*
         Customer_ID     ${WORKSPACE_ID}
         Shared_Key      ${SHARED_KEY}
         Log_Type        ${NGSA_LOG}
+        storage.total_limit_size  15M
+    [OUTPUT]
+        Name            azure
+        Match           kube.var.log.containers.ngsa*_istio-proxy*
+        Customer_ID     ${WORKSPACE_ID}
+        Shared_Key      ${SHARED_KEY}
+        Log_Type        ${ISTIO_LOG}
         storage.total_limit_size  15M
   input-kubernetes.conf: |
     [INPUT]
