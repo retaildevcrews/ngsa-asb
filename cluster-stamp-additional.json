@@ -255,7 +255,7 @@
             "name": "[concat('PodFailedScheduledQuery-', variables('clusterName'))]",
             "type": "Microsoft.Insights/scheduledQueryRules",
             "apiVersion": "2018-04-16",
-            "location": "[parameters('location')]",
+            "location": "centralus",
             "dependsOn": [
                 "[resourceId('Microsoft.ContainerService/managedClusters', variables('clusterName'))]"
             ],

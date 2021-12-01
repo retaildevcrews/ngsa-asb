@@ -24,7 +24,7 @@
                 "description": "The regional hub network to which this regional spoke will peer to."
             }
         },
-        "location": {
+        "spokeLocation": {
             "type": "string",
             "allowedValues": [
                 "australiaeast",
@@ -44,7 +44,30 @@
                 "southeastasia"
             ],
             "metadata": {
-                "description": "The spokes's regional affinity, must be the same as the hub's location. All resources tied to this spoke will also be homed in this region. The network team maintains this approved regional list which is a subset of zones with Availability Zone support."
+                "description": "The spokes's regional affinity. All resources tied to this spoke will also be homed in this region. The network team maintains this approved regional list which is a subset of zones with Availability Zone support."
+            }
+        },
+        "hubLocation": {
+            "type": "string",
+            "allowedValues": [
+                "australiaeast",
+                "canadacentral",
+                "centralus",
+                "eastus",
+                "eastus2",
+                "westus2",
+                "francecentral",
+                "germanywestcentral",
+                "northeurope",
+                "southafricanorth",
+                "southcentralus",
+                "uksouth",
+                "westeurope",
+                "japaneast",
+                "southeastasia"
+            ],
+            "metadata": {
+                "description": "The hub regional affinity."
             }
         },
         "spokeIpPrefix": {
@@ -60,12 +83,12 @@
         "orgAppId": "[parameters('orgAppId')]",
         "clusterVNetName": "[concat('vnet-spoke-', variables('orgAppId'), '-00')]",
 
-        "routeTableName": "[concat('route-to-', parameters('location'), '-hub-fw')]",
+        "routeTableName": "[concat('route-to-', parameters('spokeLocation'), '-hub-fw')]",
         "hubRgName": "[split(parameters('hubVnetResourceId'),'/')[4]]",
         "hubNetworkName": "[split(parameters('hubVnetResourceId'),'/')[8]]",
 
-        "hubFwResourceId": "[resourceId(variables('hubRgName'), 'Microsoft.Network/azureFirewalls', concat('fw-', parameters('location')))]",
-        "hubLaWorkspaceName": "[concat('la-hub-', parameters('location'), '-', uniqueString(parameters('hubVnetResourceId')))]",
+        "hubFwResourceId": "[resourceId(variables('hubRgName'), 'Microsoft.Network/azureFirewalls', concat('fw-', parameters('hubLocation')))]",
+        "hubLaWorkspaceName": "[concat('la-hub-', parameters('hubLocation'), '-', uniqueString(parameters('hubVnetResourceId')))]",
         "hubLaWorkspaceResourceId": "[resourceId(variables('hubRgName'), 'Microsoft.OperationalInsights/workspaces', variables('hubLaWorkspaceName'))]",
         "toHubPeeringName": "[concat('spoke-to-', variables('hubNetworkName'))]",
 
@@ -77,7 +100,7 @@
             "type": "Microsoft.Network/routeTables",
             "apiVersion": "2020-05-01",
             "name": "[variables('routeTableName')]",
-            "location": "[parameters('location')]",
+            "location": "[parameters('spokeLocation')]",
             "comments": "Next hop to regional hub Azure Firewall",
             "properties": {
                 "routes": [
@@ -96,7 +119,7 @@
             "type": "Microsoft.Network/networkSecurityGroups",
             "apiVersion": "2020-05-01",
             "name": "[concat('nsg-', variables('clusterVNetName'), '-nodepools')]",
-            "location": "[parameters('location')]",
+            "location": "[parameters('spokeLocation')]",
             "comments": "Default NSG on the AKS nodepools. Feel free to constrict further!",
             "properties": {
                 "securityRules": []
@@ -129,7 +152,7 @@
             "type": "Microsoft.Network/networkSecurityGroups",
             "apiVersion": "2020-05-01",
             "name": "[concat('nsg-', variables('clusterVNetName'), '-aksilbs')]",
-            "location": "[parameters('location')]",
+            "location": "[parameters('spokeLocation')]",
             "comments": "Default NSG on the AKS ILB subnet. Feel free to constrict further!",
             "properties": {
                 "securityRules": []
@@ -162,7 +185,7 @@
             "name": "[concat('nsg-', variables('clusterVNetName'), '-appgw')]",
             "type": "Microsoft.Network/networkSecurityGroups",
             "apiVersion": "2020-05-01",
-            "location": "[parameters('location')]",
+            "location": "[parameters('spokeLocation')]",
             "comments": "NSG on the App Gateway subnet.",
             "properties": {
                 "securityRules": [
@@ -264,7 +287,7 @@
             "type": "Microsoft.Network/virtualNetworks",
             "apiVersion": "2020-05-01",
             "name": "[variables('clusterVNetName')]",
-            "location": "[parameters('location')]",
+            "location": "[parameters('spokeLocation')]",
             "comments": "65,536 (-reserved) IPs available to the workload, split across two subnets for AKS and one for App Gateway.",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/routeTables', variables('routeTableName'))]",
@@ -395,7 +418,7 @@
             "type": "Microsoft.Network/publicIpAddresses",
             "apiVersion": "2020-05-01",
             "name": "[variables('primaryClusterPipName')]",
-            "location": "[parameters('location')]",
+            "location": "[parameters('spokeLocation')]",
             "comments": "Used as primary entry point for workload. Expected to be assigned to an Azure Application Gateway.",
             "sku": {
                 "name": "Standard"

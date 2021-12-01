@@ -2,6 +2,7 @@
 ```bash
 
 
+
 # Set Org App ID for additional spoke (this must be unique per spoke)
 # export ASB_ORG_APP_ID_NAME=[starts with a-z, [a-z,0-9], min length 5, max length 11]
 export ASB_ORG_APP_ID_NAME="BU0001G0002"
@@ -12,11 +13,18 @@ export ASB_SPOKE_IP_PREFIX="10.241"
 # Create your spoke deployment file 
 cp networking/spoke-BU0001A0008.json networking/spoke-$ASB_ORG_APP_ID_NAME.json
 
+# Set spoke location
+export ASB_SPOKE_LOCATION=westus2
+
+# Ensure correct hub location is set.
+echo $ASB_HUB_LOCATION
+
 # create spoke network
 az deployment group create \
   -g $ASB_RG_SPOKE \
   -f networking/spoke-$ASB_ORG_APP_ID_NAME.json \
-  -p location=${ASB_LOCATION} \
+  -p spokeLocation=${ASB_SPOKE_LOCATION} \
+     hubLocation=${ASB_HUB_LOCATION} \
      orgAppId=${ASB_ORG_APP_ID_NAME} \
      hubVnetResourceId="${ASB_VNET_HUB_ID}" \
      deploymentName=${ASB_DEPLOYMENT_NAME} \
@@ -25,7 +33,7 @@ az deployment group create \
 export ASB_NODEPOOLS_SUBNET_ID=$(az deployment group show -g $ASB_RG_SPOKE -n spoke-$ASB_ORG_APP_ID_NAME --query properties.outputs.nodepoolSubnetResourceIds.value -o tsv)
 
 # Add address range of spoke to existing hub ipGroup
-az network ip-group update --name ipg-$ASB_LOCATION-AksNodepools --resource-group $ASB_RG_HUB --add ipAddresses "$ASB_SPOKE_IP_PREFIX.0.0/22"
+az network ip-group update --name ipg-$ASB_HUB_LOCATION-AksNodepools --resource-group $ASB_RG_HUB --add ipAddresses "$ASB_SPOKE_IP_PREFIX.0.0/22"
 export ASB_SPOKE_VNET_ID=$(az deployment group show -g $ASB_RG_SPOKE -n spoke-$ASB_ORG_APP_ID_NAME --query properties.outputs.clusterVnetResourceId.value -o tsv)
 
 ```
@@ -35,8 +43,6 @@ export ASB_SPOKE_VNET_ID=$(az deployment group show -g $ASB_RG_SPOKE -n spoke-$A
 
 ```bash
 
-DONT FORGET TO CHANGE DEPLOYMENT NAME
-
 # Validate that you are using desired spoke network and orgId. Refer to network setup instructions to get correct values.
 echo $ASB_SPOKE_VNET_ID
 echo $ASB_ORG_APP_ID_NAME
@@ -45,8 +51,10 @@ echo $ASB_ORG_APP_ID_NAME
 export ASB_LA_NAME=$(az deployment group show -g $ASB_RG_CORE -n cluster-${ASB_DEPLOYMENT_NAME} --query properties.outputs.logAnalyticsName.value -o tsv)
 
 ### Set cluster locations by choosing the closest pair - not all regions support ASB. Make sure there has not been a cluster to this region before.
-export ASB_CLUSTER_LOCATION=westus2
+# Note: cluster location must be the same as spoke location
+export ASB_CLUSTER_LOCATION=${ASB_SPOKE_LOCATION}
 export ASB_CLUSTER_GEO_LOCATION=westcentralus
+
 
 # Update deployment name to ensure unique deployment
 export ASB_DEPLOYMENT_NAME=$ASB_DEPLOYMENT_NAME-$ASB_CLUSTER_LOCATION
@@ -56,7 +64,6 @@ export ASB_DEPLOYMENT_NAME=$ASB_DEPLOYMENT_NAME-$ASB_CLUSTER_LOCATION
 
 # Create AKS
 
-# Note: If using an existing Log Analytics workspace, uncomment and populate the laWorkspaceName and laResourceGroup paramaters
 az deployment group create -g $ASB_RG_CORE \
   -f cluster-stamp-additional.json \
   -n cluster-${ASB_DEPLOYMENT_NAME} \
@@ -74,9 +81,12 @@ az deployment group create -g $ASB_RG_CORE \
      laResourceGroup=${ASB_RG_CORE} \
      --query name -c
 
-az network private-dns record-set a add-record -g rg-ngsa-pre-joaquin-multinet-test -z cse.ms -n ngsa-pre-joaquin-multinet-test-westus2 -a 10.241.4.4
+# Add DNS Record to Private DNS zone
+az network private-dns record-set a add-record -g ${ASB_RG_CORE} -z ${ASB_DNS_ZONE} -n ${ASB_RG_NAME}-${ASB_SPOKE_LOCATION} -a ${ASB_SPOKE_IP_PREFIX}.4.4
 
-az network private-dns link vnet create -n to_vnet-spoke-bu0001g0002-00 -e false -g rg-ngsa-pre-joaquin-multinet-test -v '/subscriptions/648dcb5a-de1e-48b2-af6b-fe6ef28d355c/resourceGroups/rg-ngsa-pre-joaquin-multinet-test-spoke/providers/Microsoft.Network/virtualNetworks/vnet-spoke-BU0001G0002-00' -z cse.ms
+# Add Virtual Network Link to Private DNS zone
+az network private-dns link vnet create -n "to_vnet-spoke-$ASB_ORG_APP_ID_NAME-00" -e false -g ${ASB_RG_CORE} -v ${ASB_SPOKE_VNET_ID} -z ${ASB_DNS_ZONE}
+
 
 
 ```

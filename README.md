@@ -103,7 +103,8 @@ git push -u origin $ASB_DEPLOYMENT_NAME
 🛑 Only choose one pair from the below block
 
 ### Set for deployment of resources. Cluster region will be set in a different step
-export ASB_LOCATION=centralus
+export ASB_HUB_LOCATION=centralus
+export ASB_SPOKE_LOCATION=centralus
 
 
 ```
@@ -193,9 +194,9 @@ export ASB_TENANT_ID=$(az account show --query tenantId -o tsv)
 ```bash
 
 # create the resource groups
-az group create -n $ASB_RG_CORE -l $ASB_LOCATION
-az group create -n $ASB_RG_HUB -l $ASB_LOCATION
-az group create -n $ASB_RG_SPOKE -l $ASB_LOCATION
+az group create -n $ASB_RG_CORE -l $ASB_HUB_LOCATION
+az group create -n $ASB_RG_HUB -l $ASB_HUB_LOCATION
+az group create -n $ASB_RG_SPOKE -l $ASB_SPOKE_LOCATION
 
 
 ```
@@ -206,7 +207,7 @@ az group create -n $ASB_RG_SPOKE -l $ASB_LOCATION
 # this section takes 15-20 minutes to complete
 
 # create hub network
-az deployment group create -g $ASB_RG_HUB -f networking/hub-default.json -p location=${ASB_LOCATION} -c --query name
+az deployment group create -g $ASB_RG_HUB -f networking/hub-default.json -p location=${ASB_HUB_LOCATION} -c --query name
 export ASB_VNET_HUB_ID=$(az deployment group show -g $ASB_RG_HUB -n hub-default --query properties.outputs.hubVnetId.value -o tsv)
 
 # Create your spoke deployment file 
@@ -219,7 +220,8 @@ export ASB_SPOKE_IP_PREFIX="10.240"
 az deployment group create \
   -g $ASB_RG_SPOKE \
   -f networking/spoke-$ASB_ORG_APP_ID_NAME.json \
-  -p location=${ASB_LOCATION} \
+  -p spokeLocation=${ASB_SPOKE_LOCATION} \
+     hubLocation=${ASB_HUB_LOCATION} \
      orgAppId=${ASB_ORG_APP_ID_NAME} \
      hubVnetResourceId="${ASB_VNET_HUB_ID}" \
      deploymentName=${ASB_DEPLOYMENT_NAME} \
@@ -229,7 +231,7 @@ az deployment group create \
 export ASB_NODEPOOLS_SUBNET_ID=$(az deployment group show -g $ASB_RG_SPOKE -n spoke-$ASB_ORG_APP_ID_NAME --query properties.outputs.nodepoolSubnetResourceIds.value -o tsv)
 
 # create Region A hub network
-az deployment group create -g $ASB_RG_HUB -f networking/hub-regionA.json -p location=${ASB_LOCATION} nodepoolSubnetResourceIds="['${ASB_NODEPOOLS_SUBNET_ID}']" -c --query name
+az deployment group create -g $ASB_RG_HUB -f networking/hub-regionA.json -p location=${ASB_HUB_LOCATION} nodepoolSubnetResourceIds="['${ASB_NODEPOOLS_SUBNET_ID}']" -c --query name
 export ASB_SPOKE_VNET_ID=$(az deployment group show -g $ASB_RG_SPOKE -n spoke-$ASB_ORG_APP_ID_NAME --query properties.outputs.clusterVnetResourceId.value -o tsv)
 
 ./saveenv.sh -y
@@ -245,9 +247,11 @@ export ASB_SPOKE_VNET_ID=$(az deployment group show -g $ASB_RG_SPOKE -n spoke-$A
 echo $ASB_SPOKE_VNET_ID
 echo $ASB_ORG_APP_ID_NAME
 
-### Set cluster locations by choosing the closest pair - not all regions support ASB
-export ASB_CLUSTER_LOCATION=centralus
+# Set cluster location by choosing the closest pair - not all regions support ASB.
+# Note: cluster location must be the same as spoke location
+export ASB_CLUSTER_LOCATION=${ASB_SPOKE_LOCATION}
 export ASB_CLUSTER_GEO_LOCATION=westus
+
 ### this section takes 15-20 minutes
 
 # Create AKS
