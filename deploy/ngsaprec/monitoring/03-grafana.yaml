@@ -31,7 +31,6 @@ data:
     scopes = openid email profile
     auth_url = https://login.microsoftonline.com/72f988bf-86f1-41af-91ab-2d7cd011db47/oauth2/v2.0/authorize
     token_url = https://login.microsoftonline.com/72f988bf-86f1-41af-91ab-2d7cd011db47/oauth2/v2.0/token
-    allowed_groups = 0f65bee4-7b95-48bf-b660-e821fe24106d
 ---
 apiVersion: apps/v1
 kind: Deployment
