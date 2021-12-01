@@ -259,7 +259,7 @@ az deployment group create -g $ASB_RG_CORE \
   -f cluster-stamp.json \
   -n cluster-${ASB_DEPLOYMENT_NAME} \
   -p location=${ASB_CLUSTER_LOCATION} \
-     geoRedundancyLocation=${ASB_GEO_LOCATION} \
+     geoRedundancyLocation=${ASB_CLUSTER_GEO_LOCATION} \
      deploymentName=${ASB_DEPLOYMENT_NAME} \
      orgAppId=${ASB_ORG_APP_ID_NAME} \
      nodepoolsRGName=${ASB_RG_NAME} \
