@@ -61,6 +61,11 @@ spec:
                 configMapKeyRef:
                   name: fluentbit-log-config
                   key: ngsaLog
+            - name: ISTIO_LOG
+              valueFrom:
+                configMapKeyRef:
+                  name: fluentbit-log-config
+                  key: istioLog
             - name: LODE_LOG
               valueFrom:
                 configMapKeyRef:

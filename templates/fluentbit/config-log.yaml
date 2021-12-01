@@ -9,3 +9,4 @@ data:
   region: $ASB_GEO_LOCATION
   lodeLog: loderunner
   ngsaLog: ngsa
+  istioLog: ingress

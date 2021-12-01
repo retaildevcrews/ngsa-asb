@@ -9,3 +9,4 @@ data:
   region: westus
   lodeLog: loderunner
   ngsaLog: ngsa
+  istioLog: ingress
