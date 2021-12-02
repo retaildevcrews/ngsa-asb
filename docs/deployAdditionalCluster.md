@@ -59,7 +59,6 @@ export ASB_LA_NAME=$(az deployment group show -g $ASB_RG_CORE -n cluster-${ASB_D
 export ASB_CLUSTER_LOCATION=${ASB_SPOKE_LOCATION}
 export ASB_CLUSTER_GEO_LOCATION=westcentralus
 
-
 # Add DNS Record to Private DNS zone
 az network private-dns record-set a add-record -g ${ASB_RG_CORE} -z ${ASB_DNS_ZONE} -n ${ASB_RG_NAME}-${ASB_SPOKE_LOCATION} -a ${ASB_SPOKE_IP_PREFIX}.4.4
 
@@ -69,18 +68,11 @@ az network private-dns link vnet create -n "to_vnet-spoke-$ASB_ORG_APP_ID_NAME-0
 # Add Virtual Network link to ACR Private DNS Zone
 az network private-dns link vnet create -n "to_vnet-spoke-$ASB_ORG_APP_ID_NAME-00" -e false -g ${ASB_RG_CORE} -v ${ASB_SPOKE_VNET_ID} -z privatelink.azurecr.io
 
+# retrieve the resource id for azure container registry instance
+export ASB_ACR_RESOURCE_ID=$(az acr show -n $ASB_ACR_NAME -g $ASB_RG_CORE --query id -o tsv)
 
-#GRANT PERMISSIONS
-#Taz role assignment create --role "AcrPull" --assignee "0b9d5170-876c-4e27-9392-463faf7a26bd" --scope "/subscriptions/648dcb5a-de1e-48b2-af6b-fe6ef28d355c/resourceGroups/rg-jasb-central-test/providers/Microsoft.ContainerRegistry/registries/acraksade3xkor52uvu"
-#Note: 0b9d5170-876c-4e27-9392-463faf7a26bd is the id of the managed identity for aks-ade3xkor52uvu-westus2-agentpool
-
-# 1.0 get and pass acrResourceId
-az acr show -n $ASB_ACR_NAME -g $ASB_RG_CORE --query id
-
-# 2.0 get and pass acrPrivateDnsResourceId 
-az network private-dns zone show -n privatelink.azurecr.io -g ${ASB_RG_CORE} --query id
-
-# 3.0 Grant PullFromACR permission
+# retrieve the resource id for acr private dns zone
+export ASB_ACR_DNS_ZONE_RESOURCE_ID=$(az network private-dns zone show -n privatelink.azurecr.io -g ${ASB_RG_CORE} --query id)
 
 ### this section takes 15-20 minutes
 
@@ -101,13 +93,16 @@ az deployment group create -g $ASB_RG_CORE \
      aksIngressControllerKey="$(echo $INGRESS_KEY_CSMS | base64 -d)" \
      laWorkspaceName=${ASB_LA_NAME} \
      laResourceGroup=${ASB_RG_CORE} \
+     acrResourceId=${ASB_ACR_RESOURCE_ID} \
+     acrPrivateDnsResourceId=${ASB_ACR_DNS_ZONE_RESOURCE_ID} \
      --query name -c
 
+# Grant PullFromACR permission
+export ASB_CLUSTER_AGENTPOOL_NAME=$(az deployment group show -g $ASB_RG_CORE -n cluster-${ASB_DEPLOYMENT_NAME}-$ASB_CLUSTER_LOCATION --query properties.outputs.aksClusterName.value -o tsv)-agentpool
 
+export ASB_CLUSTER_AGENTPOOL_RESOURCE_ID=$(az identity show -n $ASB_CLUSTER_AGENTPOOL_NAME -g $ASB_RG_CORE-nodepools-$ASB_CLUSTER_LOCATION --query principalId -o tsv)
 
-
-
-
+az role assignment create --role "AcrPull" --assignee ${ASB_CLUSTER_AGENTPOOL_RESOURCE_ID} --scope ${ASB_ACR_RESOURCE_ID}
 
 
 ```
