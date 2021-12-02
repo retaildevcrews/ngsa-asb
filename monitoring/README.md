@@ -69,6 +69,8 @@ Be sure you have fully followed the instructions mentioned above. Once you are s
 - Add this group to the Grafana Service Principal. Do this by searching for the SP in AAD ->  Enterprise Applications. Then select your SP and add the group with a Grafana Role under "Users/Groups".
 - Save the Group ID for deployment
 
+##### Deployment Steps
+
 ```bash
 
 # Optional: Add client secret using AZ CLI
