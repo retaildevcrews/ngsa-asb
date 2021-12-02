@@ -31,7 +31,7 @@ data:
     scopes = openid email profile
     auth_url = https://login.microsoftonline.com/${ASB_GRAFANA_SP_TENANT_ID}/oauth2/v2.0/authorize
     token_url = https://login.microsoftonline.com/${ASB_GRAFANA_SP_TENANT_ID}/oauth2/v2.0/token
-    allowed_groups = ${ASB_CLUSTER_ADMIN_ID}
+    allowed_groups = ${ASB_GRAFANA_AAD_GROUP_ID}
 ---
 apiVersion: apps/v1
 kind: Deployment
