@@ -16,8 +16,12 @@ cp networking/spoke-BU0001A0008.json networking/spoke-$ASB_ORG_APP_ID_NAME.json
 # Set spoke location
 export ASB_SPOKE_LOCATION=westus2
 
-# Ensure correct hub location is set.
+# Ensure the following variables are set. Use the env file for reference.
+
+echo $ASB_RG_SPOKE
 echo $ASB_HUB_LOCATION
+echo $ASB_VNET_HUB_ID
+echo $ASB_DEPLOYMENT_NAME
 
 # create spoke network
 az deployment group create \
@@ -26,7 +30,7 @@ az deployment group create \
   -p spokeLocation=${ASB_SPOKE_LOCATION} \
      hubLocation=${ASB_HUB_LOCATION} \
      orgAppId=${ASB_ORG_APP_ID_NAME} \
-     hubVnetResourceId="${ASB_VNET_HUB_ID}" \
+     hubVnetResourceId=${ASB_VNET_HUB_ID} \
      deploymentName=${ASB_DEPLOYMENT_NAME} \
      spokeIpPrefix=${ASB_SPOKE_IP_PREFIX} -c --query name
 
@@ -56,9 +60,27 @@ export ASB_CLUSTER_LOCATION=${ASB_SPOKE_LOCATION}
 export ASB_CLUSTER_GEO_LOCATION=westcentralus
 
 
-# Update deployment name to ensure unique deployment
-export ASB_DEPLOYMENT_NAME=$ASB_DEPLOYMENT_NAME-$ASB_CLUSTER_LOCATION
+# Add DNS Record to Private DNS zone
+az network private-dns record-set a add-record -g ${ASB_RG_CORE} -z ${ASB_DNS_ZONE} -n ${ASB_RG_NAME}-${ASB_SPOKE_LOCATION} -a ${ASB_SPOKE_IP_PREFIX}.4.4
 
+# Add Virtual Network Link to Private DNS zone
+az network private-dns link vnet create -n "to_vnet-spoke-$ASB_ORG_APP_ID_NAME-00" -e false -g ${ASB_RG_CORE} -v ${ASB_SPOKE_VNET_ID} -z ${ASB_DNS_ZONE}
+
+# Add Virtual Network link to ACR Private DNS Zone
+az network private-dns link vnet create -n "to_vnet-spoke-$ASB_ORG_APP_ID_NAME-00" -e false -g ${ASB_RG_CORE} -v ${ASB_SPOKE_VNET_ID} -z privatelink.azurecr.io
+
+
+#GRANT PERMISSIONS
+#Taz role assignment create --role "AcrPull" --assignee "0b9d5170-876c-4e27-9392-463faf7a26bd" --scope "/subscriptions/648dcb5a-de1e-48b2-af6b-fe6ef28d355c/resourceGroups/rg-jasb-central-test/providers/Microsoft.ContainerRegistry/registries/acraksade3xkor52uvu"
+#Note: 0b9d5170-876c-4e27-9392-463faf7a26bd is the id of the managed identity for aks-ade3xkor52uvu-westus2-agentpool
+
+# 1.0 get and pass acrResourceId
+az acr show -n $ASB_ACR_NAME -g $ASB_RG_CORE --query id
+
+# 2.0 get and pass acrPrivateDnsResourceId 
+az network private-dns zone show -n privatelink.azurecr.io -g ${ASB_RG_CORE} --query id
+
+# 3.0 Grant PullFromACR permission
 
 ### this section takes 15-20 minutes
 
@@ -66,9 +88,9 @@ export ASB_DEPLOYMENT_NAME=$ASB_DEPLOYMENT_NAME-$ASB_CLUSTER_LOCATION
 
 az deployment group create -g $ASB_RG_CORE \
   -f cluster-stamp-additional.json \
-  -n cluster-${ASB_DEPLOYMENT_NAME} \
+  -n cluster-${ASB_DEPLOYMENT_NAME}-$ASB_CLUSTER_LOCATION \
   -p location=${ASB_CLUSTER_LOCATION} \
-     geoRedundancyLocation=${ASB_GEO_LOCATION} \
+     geoRedundancyLocation=${ASB_CLUSTER_GEO_LOCATION} \
      orgAppId=${ASB_ORG_APP_ID_NAME} \
      nodepoolsRGName=${ASB_RG_NAME} \
      targetVnetResourceId=${ASB_SPOKE_VNET_ID} \
@@ -81,11 +103,10 @@ az deployment group create -g $ASB_RG_CORE \
      laResourceGroup=${ASB_RG_CORE} \
      --query name -c
 
-# Add DNS Record to Private DNS zone
-az network private-dns record-set a add-record -g ${ASB_RG_CORE} -z ${ASB_DNS_ZONE} -n ${ASB_RG_NAME}-${ASB_SPOKE_LOCATION} -a ${ASB_SPOKE_IP_PREFIX}.4.4
 
-# Add Virtual Network Link to Private DNS zone
-az network private-dns link vnet create -n "to_vnet-spoke-$ASB_ORG_APP_ID_NAME-00" -e false -g ${ASB_RG_CORE} -v ${ASB_SPOKE_VNET_ID} -z ${ASB_DNS_ZONE}
+
+
+
 
 
 

@@ -128,6 +128,18 @@
                 "description": "For Azure resources that support native geo-redunancy, provide the location the redundant service will have its secondary. Should be different than the location parameter and ideally should be a paired region - https://docs.microsoft.com/azure/best-practices-availability-paired-regions. This region does not need to support availability zones."
             }
         },
+        "acrResourceId": {
+            "type": "string",
+            "metadata": {
+                "description": "Resource ID of Azure Container Registry"
+            }
+        },
+        "acrPrivateDnsResourceId": {
+            "type": "string",
+            "metadata": {
+                "description": "Resource ID of PrivateDNS Zone for ACR"
+            }
+        },        
         "kubernetesVersion": {
             "defaultValue": "1.20.9",
             "type": "string"
@@ -136,7 +148,6 @@
     "variables": {
         "networkContributorRole": "[concat(subscription().Id, '/providers/Microsoft.Authorization/roleDefinitions/4d97b98b-1d4f-4787-a291-c67834d212e7')]",
         "monitoringMetricsPublisherRole": "[concat(subscription().Id, '/providers/Microsoft.Authorization/roleDefinitions/3913510d-42f4-4e42-8a64-420c390055eb')]",
-        "acrPullRole": "[concat(subscription().Id, '/providers/Microsoft.Authorization/roleDefinitions/7f951dda-4ed3-4680-a7ca-43fe172d538d')]",
         "managedIdentityOperatorRole": "[concat(subscription().Id, '/providers/Microsoft.Authorization/roleDefinitions/f1a07417-d97a-45cb-824c-7a7467783830')]",
         "virtualMachineContributorRole": "[concat(subscription().Id, '/providers/Microsoft.Authorization/roleDefinitions/9980e02c-c2be-4d73-94e8-173b1dc7cf3c')]",
         "readerRole": "[concat(subscription().Id, '/providers/Microsoft.Authorization/roleDefinitions/acdd72a7-3385-48ef-bd42-f606fba81ae7')]",
@@ -155,7 +166,6 @@
         "vnetName": "[split(parameters('targetVnetResourceId'),'/')[8]]",
         "vnetNodePoolSubnetResourceId": "[concat(parameters('targetVnetResourceId'), '/subnets/snet-clusternodes')]",
         "vnetIngressServicesSubnetResourceId": "[concat(parameters('targetVnetResourceId'), '/subnets/snet-cluster-ingressservices')]",
-
 
         "clusterControlPlaneIdentityName": "[concat('mi-', variables('clusterName'), '-controlplane')]",
 
@@ -1029,6 +1039,49 @@
                 "targetResourceType": "microsoft.containerservice/managedclusters",
                 "windowSize": "PT5M"
             }
+        },
+        {
+            "type": "Microsoft.Network/privateEndpoints",
+            "apiVersion": "2020-05-01",
+            "name": "[concat('nodepool-to-acr', parameters('location'))]",
+            "location": "[parameters('location')]",
+            "properties": {
+                "subnet": {
+                    "id": "[variables('vnetNodePoolSubnetResourceId')]"
+                },
+                "privateLinkServiceConnections": [
+                    {
+                        "name": "nodepools",
+                        "properties": {
+                            "privateLinkServiceId": "[parameters('acrResourceId')]",
+                            "groupIds": [
+                                "registry"
+                            ]
+                        }
+                    }
+                ]
+            },
+            "resources": [
+                {
+                    "type": "privateDnsZoneGroups",
+                    "apiVersion": "2020-05-01",
+                    "name": "default",
+                    "location": "[parameters('location')]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Network/privateEndpoints', concat('nodepool-to-acr', parameters('location')))]"
+                    ],
+                    "properties": {
+                        "privateDnsZoneConfigs": [
+                            {
+                                "name": "privatelink-azurecr-io",
+                                "properties": {
+                                    "privateDnsZoneId": "[parameters('acrPrivateDnsResourceId')]]"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
         },
         {
             "type": "Microsoft.Insights/metricAlerts",

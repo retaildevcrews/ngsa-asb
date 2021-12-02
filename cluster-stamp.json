@@ -1042,7 +1042,7 @@
         {
             "type": "Microsoft.Network/privateEndpoints",
             "apiVersion": "2020-05-01",
-            "name": "nodepool-to-acr",
+            "name": "[concat('nodepool-to-acr', parameters('location'))]",
             "location": "[parameters('location')]",
             "dependsOn": [
                 "[resourceId('Microsoft.ContainerRegistry/registries/replications', variables('defaultAcrName'), parameters('geoRedundancyLocation'))]"
@@ -1070,7 +1070,7 @@
                     "name": "default",
                     "location": "[parameters('location')]",
                     "dependsOn": [
-                        "[resourceId('Microsoft.Network/privateEndpoints', 'nodepool-to-acr')]",
+                        "[resourceId('Microsoft.Network/privateEndpoints', concat('nodepool-to-acr', parameters('location')))]",
                         "[resourceId('Microsoft.Network/privateDnsZones', variables('acrPrivateDnsZonesName'))]"
                     ],
                     "properties": {
