@@ -60,16 +60,10 @@ First, follow the steps detailed in the [Grafana documentation](https://grafana.
 
 **Note**: The `CLIENT_SECRET` will be mounted from Key Vault and into the Grafana pod using Pod Identity. Rather than creating a whole new Managed Identity, Grafana makes use of NGSA's managed identity to grab the secret from Key Vault. Ensure that you have it setup by following the [Cosmos pod identity setup guide](../docs/cosmos.md#aad-pod-identity-setup-for-app).
 
-##### Grafana AAD Authorization
-Grafana with AAD will authorize users by checking whether the user is a member of a specified AAD group.
-
-**Important**: You must ensure this AAD group is a `security group` and not a distribution list. Users who should be authorized for Grafana access must be a **direct member** of this group, not a member of a nested group. Furthermore, you need to set the `groupMembershipClaims` field in the Grafana AAD service principal manifest to "Application Group". The Grafana setup steps mentioned "Application Group, Security Group" but adding "Security Group" may result in unauthorized errors for users who are members of more than 200 AAD groups.
-
-Be sure you have fully followed the instructions mentioned above. Once you are sure, follow the [Grafana documentation](https://grafana.com/docs/grafana/latest/auth/azuread/#configure-allowed-groups) to setup group based authorization. Make a note of the AAD Group you used, you will need to:
-- Add this group to the Grafana Service Principal. Do this by searching for the SP in AAD ->  Enterprise Applications. Then select your SP and add the group with a Grafana Role under "Users/Groups".
-- Save the Group ID for deployment
-
-##### Deployment Steps
+You'll need to run a few more steps to completely setup the AAD Service Principal.
+1. Navigate to the Service Principal you created in AAD -> Enterprise Applications. Search for your application and click on it.
+2. If you haven't added the users already, go ahead and add them in the "Users and groups" menu from the sidebar.
+3. Go to "Properties", select "Yes" for the "Assignment required?" option and save. This ensures users only assigned to the Service Principal can access Grafana.
 
 ```bash
 
@@ -86,9 +80,6 @@ az keyvault secret set -o table --vault-name $ASB_KV_NAME --name "grafana-aad-cl
 export ASB_GRAFANA_SP_CLIENT_ID=[insert CLIENT_ID]
 export ASB_GRAFANA_SP_TENANT_ID=[insert TENANT_ID]
 export ASB_GRAFANA_MI_NAME=grafana-id
-
-# set grafana authorization AAD group id
-export ASB_GRAFANA_AAD_GROUP_ID=0640f678-95f8-403e-b102-a35c6cf9948d
 
 # create grafana deployment file
 cat templates/grafana-aad.yaml | envsubst  > $ASB_GIT_PATH/monitoring/03-grafana.yaml
