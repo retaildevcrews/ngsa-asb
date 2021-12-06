@@ -15,8 +15,8 @@ spec:
       labels:
         aadpodidbinding: ngsadev-ngsa-id
         app: ngsa-cosmos
-        deploy: 21-11-28-06-07-32
-        version: beta-1128-0607
+        deploy: 21-12-06-17-36-09
+        version: beta-1206-1736
     spec:
       containers:
         - name: app
