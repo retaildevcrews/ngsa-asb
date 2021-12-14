@@ -15,8 +15,8 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
-  "id": 1,
-  "iteration": 1631734404124,
+  "id": 3,
+  "iteration": 1639507351043,
   "links": [],
   "panels": [
     {
@@ -87,7 +87,7 @@
           "azureLogAnalytics": {
             "query": "AzureDiagnostics\r\n| where ResourceProvider==\"MICROSOFT.DOCUMENTDB\" and Category == \"DataPlaneRequests\" and Resource == \"NGSA-DEV-COSMOS\"\r\n| where databaseName_s == \"imdb\"\r\n\r\n| where statusCode_s == 429\r\n| count",
             "resultFormat": "time_series",
-            "workspace": "3ef39291-0240-4a58-8e90-6c83497353e3"
+            "workspace": "bf927982-70be-4146-9a9b-ef246b4dbdbc"
           },
           "azureMonitor": {
             "aggOptions": [],
@@ -237,7 +237,7 @@
             ],
             "metricDefinition": "Microsoft.DocumentDB/databaseAccounts",
             "metricName": "TotalRequests",
-            "metricNamespace": "Microsoft.DocumentDB/databaseAccounts",
+            "metricNamespace": "microsoft.documentdb/databaseaccounts",
             "resourceGroup": "ngsa-dev-shared-rg",
             "resourceName": "ngsa-dev-cosmos",
             "timeGrain": "auto",
@@ -304,7 +304,8 @@
           "azureMonitor": {
             "aggOptions": [
               "Total",
-              "Average"
+              "Average",
+              "Maximum"
             ],
             "aggregation": "Total",
             "allowedTimeGrainsMs": [
@@ -347,7 +348,7 @@
             ],
             "metricDefinition": "Microsoft.DocumentDB/databaseAccounts",
             "metricName": "TotalRequestUnits",
-            "metricNamespace": "Microsoft.DocumentDB/databaseAccounts",
+            "metricNamespace": "microsoft.documentdb/databaseaccounts",
             "resourceGroup": "ngsa-dev-shared-rg",
             "resourceName": "ngsa-dev-cosmos",
             "timeGrain": "auto",
@@ -492,7 +493,7 @@
           "azureLogAnalytics": {
             "query": "AzureMetrics \r\n| where MetricName == \"ProvisionedThroughput\" \r\n\r\n| summarize max(Count) ",
             "resultFormat": "time_series",
-            "workspace": "3ef39291-0240-4a58-8e90-6c83497353e3"
+            "workspace": "bf927982-70be-4146-9a9b-ef246b4dbdbc"
           },
           "azureMonitor": {
             "aggOptions": [],
@@ -537,6 +538,20 @@
       "type": "row"
     },
     {
+      "collapsed": false,
+      "datasource": null,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 9
+      },
+      "id": 70,
+      "panels": [],
+      "title": "          Successful Server Requests",
+      "type": "row"
+    },
+    {
       "datasource": null,
       "fieldConfig": {
         "defaults": {
@@ -555,10 +570,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 4,
-        "w": 4,
+        "h": 3,
+        "w": 7,
         "x": 0,
-        "y": 9
+        "y": 10
       },
       "id": 12,
       "options": {
@@ -586,7 +601,7 @@
           "azureLogAnalytics": {
             "query": "ngsa_CL\r\n| where  k_container_s == \"app\" \r\n   and k_app_s == \"ngsa-cosmos\" \r\n   and LogName_s == \"Ngsa.RequestLog\"\r\n\r\n| summarize RequestSuccessRate = round(100.0*countif(StatusCode_d < 400)/count(),4)\r\n| project RequestSuccessRate",
             "resultFormat": "time_series",
-            "workspace": "3ef39291-0240-4a58-8e90-6c83497353e3"
+            "workspace": "bf927982-70be-4146-9a9b-ef246b4dbdbc"
           },
           "azureMonitor": {
             "aggOptions": [],
@@ -616,6 +631,164 @@
       "type": "stat"
     },
     {
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {},
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 7,
+        "x": 7,
+        "y": 10
+      },
+      "id": 14,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "mean"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "pluginVersion": "7.3.0",
+      "targets": [
+        {
+          "appInsights": {
+            "dimension": [],
+            "metricName": "select",
+            "timeGrain": "auto"
+          },
+          "azureLogAnalytics": {
+            "query": "ngsa_CL\r\n| where  k_container_s == \"app\" \r\n   and k_app_s == \"ngsa-memory\" \r\n   and LogName_s == \"Ngsa.RequestLog\"\r\n\r\n| summarize RequestSuccessRate = round(100.0*countif(StatusCode_d < 400)/count(),4)\r\n| project RequestSuccessRate",
+            "resultFormat": "time_series",
+            "workspace": "bf927982-70be-4146-9a9b-ef246b4dbdbc"
+          },
+          "azureMonitor": {
+            "aggOptions": [],
+            "dimensionFilter": "*",
+            "dimensionFilters": [],
+            "metricDefinition": "select",
+            "metricName": "select",
+            "metricNamespace": "select",
+            "resourceGroup": "select",
+            "resourceName": "select",
+            "timeGrain": "auto",
+            "timeGrains": [],
+            "top": "10"
+          },
+          "insightsAnalytics": {
+            "query": "",
+            "resultFormat": "time_series"
+          },
+          "queryType": "Azure Log Analytics",
+          "refId": "A",
+          "subscription": "648dcb5a-de1e-48b2-af6b-fe6ef28d355c"
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "ngsa-memory",
+      "type": "stat"
+    },
+    {
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {},
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 7,
+        "x": 14,
+        "y": 10
+      },
+      "id": 56,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "mean"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "pluginVersion": "7.3.0",
+      "targets": [
+        {
+          "appInsights": {
+            "dimension": [],
+            "metricName": "select",
+            "timeGrain": "auto"
+          },
+          "azureLogAnalytics": {
+            "query": "ngsa_CL\r\n| where  k_container_s == \"app\" \r\n   and k_app_s == \"ngsa-java\" \r\n   and LogName_s == \"Ngsa.RequestLog\"\r\n\r\n| summarize RequestSuccessRate = round(100.0*countif(StatusCode_d < 400)/count(),4)\r\n| project RequestSuccessRate",
+            "resultFormat": "time_series",
+            "workspace": "bf927982-70be-4146-9a9b-ef246b4dbdbc"
+          },
+          "azureMonitor": {
+            "aggOptions": [],
+            "dimensionFilter": "*",
+            "dimensionFilters": [],
+            "metricDefinition": "select",
+            "metricName": "select",
+            "metricNamespace": "select",
+            "resourceGroup": "select",
+            "resourceName": "select",
+            "timeGrain": "auto",
+            "timeGrains": [],
+            "top": "10"
+          },
+          "insightsAnalytics": {
+            "query": "",
+            "resultFormat": "time_series"
+          },
+          "queryType": "Azure Log Analytics",
+          "refId": "A",
+          "subscription": "648dcb5a-de1e-48b2-af6b-fe6ef28d355c"
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "ngsa-java",
+      "type": "stat"
+    },
+    {
       "aliasColors": {},
       "bars": false,
       "dashLength": 10,
@@ -630,10 +803,10 @@
       "fill": 1,
       "fillGradient": 0,
       "gridPos": {
-        "h": 8,
-        "w": 9,
-        "x": 4,
-        "y": 9
+        "h": 6,
+        "w": 7,
+        "x": 0,
+        "y": 13
       },
       "hiddenSeries": false,
       "id": 16,
@@ -669,9 +842,9 @@
             "timeGrain": "auto"
           },
           "azureLogAnalytics": {
-            "query": "ngsa_CL\r\n| where k_container_s == \"app\"\r\n   and k_app_s == \"ngsa-cosmos\" \r\n\r\n   and LogName_s == \"Ngsa.RequestLog\"\n   and Zone_s has_any ($Zone)\r\n| summarize RequestSuccessRate = 100.0 * countif(StatusCode_d < 400) / count() by bin_at(Date_t, 2m, datetime(00:00))\r\n| project-rename Date=Date_t",
+            "query": "ngsa_CL\r\n| where  $__timeFilter(Date_t)\n   and k_container_s == \"app\"\r\n   and k_app_s == \"ngsa-cosmos\" \r\n\r\n   and LogName_s == \"Ngsa.RequestLog\"\n   and Zone_s has_any ($Zone)\r\n| summarize RequestSuccessRate = 100.0 * countif(StatusCode_d < 400) / count() by bin_at(Date_t, 2m, datetime(00:00))\r\n| project-rename Date=Date_t",
             "resultFormat": "time_series",
-            "workspace": "3ef39291-0240-4a58-8e90-6c83497353e3"
+            "workspace": "bf927982-70be-4146-9a9b-ef246b4dbdbc"
           },
           "azureMonitor": {
             "aggOptions": [],
@@ -761,10 +934,10 @@
       "fill": 1,
       "fillGradient": 0,
       "gridPos": {
-        "h": 8,
-        "w": 8,
-        "x": 13,
-        "y": 9
+        "h": 6,
+        "w": 7,
+        "x": 7,
+        "y": 13
       },
       "hiddenSeries": false,
       "id": 18,
@@ -800,9 +973,9 @@
             "timeGrain": "auto"
           },
           "azureLogAnalytics": {
-            "query": "ngsa_CL\r\n| where k_container_s == \"app\"\r\n   and k_app_s == \"ngsa-memory\" \r\n\r\n   and LogName_s == \"Ngsa.RequestLog\"\n      and Zone_s has_any ($Zone)\r\n| summarize RequestSuccessRate = 100.0 * countif(StatusCode_d < 400) / count() by bin_at(Date_t, 2m, datetime(00:00))\r\n| project-rename Date=Date_t",
+            "query": "ngsa_CL\r\n| where  $__timeFilter(Date_t) \n   and k_container_s == \"app\"\r\n   and k_app_s == \"ngsa-memory\" \r\n\r\n   and LogName_s == \"Ngsa.RequestLog\"\n      and Zone_s has_any ($Zone)\r\n| summarize RequestSuccessRate = 100.0 * countif(StatusCode_d < 400) / count() by bin_at(Date_t, 2m, datetime(00:00))\r\n| project-rename Date=Date_t",
             "resultFormat": "time_series",
-            "workspace": "3ef39291-0240-4a58-8e90-6c83497353e3"
+            "workspace": "bf927982-70be-4146-9a9b-ef246b4dbdbc"
           },
           "azureMonitor": {
             "aggOptions": [],
@@ -868,6 +1041,151 @@
       }
     },
     {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {},
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 6,
+        "w": 7,
+        "x": 14,
+        "y": 13
+      },
+      "hiddenSeries": false,
+      "id": 57,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": true,
+      "linewidth": 1,
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "7.3.0",
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "appInsights": {
+            "dimension": [],
+            "metricName": "select",
+            "timeGrain": "auto"
+          },
+          "azureLogAnalytics": {
+            "query": "ngsa_CL\r\n| where  $__timeFilter(Date_t) \n   and k_container_s == \"app\"\r\n   and k_app_s == \"ngsa-java\" \r\n\r\n   and LogName_s == \"Ngsa.RequestLog\"\n      and Zone_s has_any ($Zone)\r\n| summarize RequestSuccessRate = 100.0 * countif(StatusCode_d < 400) / count() by bin_at(Date_t, 2m, datetime(00:00))\r\n| project-rename Date=Date_t",
+            "resultFormat": "time_series",
+            "workspace": "bf927982-70be-4146-9a9b-ef246b4dbdbc"
+          },
+          "azureMonitor": {
+            "aggOptions": [],
+            "dimensionFilter": "*",
+            "dimensionFilters": [],
+            "metricDefinition": "select",
+            "metricName": "select",
+            "metricNamespace": "select",
+            "resourceGroup": "select",
+            "resourceName": "select",
+            "timeGrain": "auto",
+            "timeGrains": [],
+            "top": "10"
+          },
+          "insightsAnalytics": {
+            "query": "",
+            "resultFormat": "time_series"
+          },
+          "queryType": "Azure Log Analytics",
+          "refId": "A",
+          "subscription": "648dcb5a-de1e-48b2-af6b-fe6ef28d355c"
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "% Successful Server Requests (ngsa-java)",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
+    },
+    {
+      "collapsed": false,
+      "datasource": null,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 19
+      },
+      "id": 72,
+      "panels": [],
+      "title": "          Failed Server Requests",
+      "type": "row"
+    },
+    {
       "datasource": null,
       "fieldConfig": {
         "defaults": {
@@ -886,12 +1204,12 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 4,
-        "w": 4,
+        "h": 3,
+        "w": 7,
         "x": 0,
-        "y": 13
+        "y": 20
       },
-      "id": 14,
+      "id": 24,
       "options": {
         "colorMode": "value",
         "graphMode": "area",
@@ -915,9 +1233,88 @@
             "timeGrain": "auto"
           },
           "azureLogAnalytics": {
-            "query": "ngsa_CL\r\n| where  k_container_s == \"app\" \r\n   and k_app_s == \"ngsa-memory\" \r\n   and LogName_s == \"Ngsa.RequestLog\"\r\n\r\n| summarize RequestSuccessRate = round(100.0*countif(StatusCode_d < 400)/count(),4)\r\n| project RequestSuccessRate",
+            "query": "ngsa_CL\r\n| where $__timeFilter(Date_t)\n   and k_container_s == \"app\" \r\n   and k_app_s == \"ngsa-cosmos\" \r\n   and LogName_s == \"Ngsa.RequestLog\"\r\n\r\n| summarize FailedRequestCount=countif(StatusCode_d >= 400)\r\n| project FailedRequestCount",
             "resultFormat": "time_series",
-            "workspace": "3ef39291-0240-4a58-8e90-6c83497353e3"
+            "workspace": "bf927982-70be-4146-9a9b-ef246b4dbdbc"
+          },
+          "azureMonitor": {
+            "aggOptions": [],
+            "dimensionFilter": "*",
+            "dimensionFilters": [],
+            "metricDefinition": "select",
+            "metricName": "select",
+            "metricNamespace": "select",
+            "resourceGroup": "select",
+            "resourceName": "select",
+            "timeGrain": "auto",
+            "timeGrains": [],
+            "top": "10"
+          },
+          "insightsAnalytics": {
+            "query": "",
+            "resultFormat": "time_series"
+          },
+          "queryType": "Azure Log Analytics",
+          "refId": "A",
+          "subscription": "648dcb5a-de1e-48b2-af6b-fe6ef28d355c"
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "ngsa-cosmos",
+      "type": "stat"
+    },
+    {
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {},
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 7,
+        "x": 7,
+        "y": 20
+      },
+      "id": 25,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "mean"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "pluginVersion": "7.3.0",
+      "targets": [
+        {
+          "appInsights": {
+            "dimension": [],
+            "metricName": "select",
+            "timeGrain": "auto"
+          },
+          "azureLogAnalytics": {
+            "query": "ngsa_CL\r\n| where $__timeFilter(Date_t)\n   and k_container_s == \"app\" \r\n   and k_app_s == \"ngsa-memory\" \r\n   and LogName_s == \"Ngsa.RequestLog\"\r\n\r\n| summarize FailedRequestCount=countif(StatusCode_d >= 400)\r\n| project FailedRequestCount",
+            "resultFormat": "time_series",
+            "workspace": "bf927982-70be-4146-9a9b-ef246b4dbdbc"
           },
           "azureMonitor": {
             "aggOptions": [],
@@ -966,11 +1363,11 @@
       },
       "gridPos": {
         "h": 3,
-        "w": 4,
-        "x": 0,
-        "y": 17
+        "w": 7,
+        "x": 14,
+        "y": 20
       },
-      "id": 24,
+      "id": 58,
       "options": {
         "colorMode": "value",
         "graphMode": "area",
@@ -994,9 +1391,9 @@
             "timeGrain": "auto"
           },
           "azureLogAnalytics": {
-            "query": "ngsa_CL\r\n| where $__timeFilter(Date_t)\n   and k_container_s == \"app\" \r\n   and k_app_s == \"ngsa-cosmos\" \r\n   and LogName_s == \"Ngsa.RequestLog\"\r\n\r\n| summarize FailedRequestCount=countif(StatusCode_d >= 400)\r\n| project FailedRequestCount",
+            "query": "ngsa_CL\r\n| where $__timeFilter(Date_t)\n   and k_container_s == \"app\" \r\n   and k_app_s == \"ngsa-java\" \r\n   and LogName_s == \"Ngsa.RequestLog\"\r\n\r\n| summarize FailedRequestCount=countif(StatusCode_d >= 400)\r\n| project FailedRequestCount",
             "resultFormat": "time_series",
-            "workspace": "3ef39291-0240-4a58-8e90-6c83497353e3"
+            "workspace": "bf927982-70be-4146-9a9b-ef246b4dbdbc"
           },
           "azureMonitor": {
             "aggOptions": [],
@@ -1022,7 +1419,7 @@
       ],
       "timeFrom": null,
       "timeShift": null,
-      "title": "ngsa-cosmos",
+      "title": "ngsa-java",
       "type": "stat"
     },
     {
@@ -1057,10 +1454,10 @@
       "fill": 1,
       "fillGradient": 0,
       "gridPos": {
-        "h": 6,
-        "w": 9,
-        "x": 4,
-        "y": 17
+        "h": 7,
+        "w": 7,
+        "x": 0,
+        "y": 23
       },
       "hiddenSeries": false,
       "id": 20,
@@ -1100,7 +1497,7 @@
           "azureLogAnalytics": {
             "query": "let _series_data = materialize(\r\nngsa_CL\r\n| where $__timeFilter(Date_t)\r\n   and  k_container_s == \"app\" \r\n   and k_app_s == \"ngsa-cosmos\"  \r\n\r\n   and LogName_s == \"Ngsa.RequestLog\"\n   and Zone_s has_any ($Zone)   \r\n| summarize FailedRequests=countif(StatusCode_d >= 400) by StatusCode_d , bin(Date_t, 1m) );\r\n\r\n\r\n\r\n_series_data \r\n| summarize sum(FailedRequests) by Date_t\n| project-rename FailedRequests=sum_FailedRequests\n\r\n| order by Date_t asc\n\n\r\n\n",
             "resultFormat": "time_series",
-            "workspace": "3ef39291-0240-4a58-8e90-6c83497353e3"
+            "workspace": "bf927982-70be-4146-9a9b-ef246b4dbdbc"
           },
           "azureMonitor": {
             "aggOptions": [],
@@ -1197,10 +1594,10 @@
       "fill": 1,
       "fillGradient": 0,
       "gridPos": {
-        "h": 6,
-        "w": 8,
-        "x": 13,
-        "y": 17
+        "h": 7,
+        "w": 7,
+        "x": 7,
+        "y": 23
       },
       "hiddenSeries": false,
       "id": 23,
@@ -1238,7 +1635,7 @@
           "azureLogAnalytics": {
             "query": "let _series_data = materialize(\r\nngsa_CL\r\n| where $__timeFilter(Date_t)\r\n   and  k_container_s == \"app\" \r\n   and k_app_s == \"ngsa-memory\"  \r\n\r\n   and LogName_s == \"Ngsa.RequestLog\"\n   and Zone_s has_any ($Zone)\r\n| summarize FailedRequests=countif(StatusCode_d >= 400) by StatusCode_d , bin(Date_t, 1m) );\r\n\r\n\r\n\r\n_series_data \r\n| summarize sum(FailedRequests) by Date_t\n| project-rename FailedRequests=sum_FailedRequests\r\n| order by Date_t asc\n\n\r\n\n",
             "resultFormat": "time_series",
-            "workspace": "3ef39291-0240-4a58-8e90-6c83497353e3"
+            "workspace": "bf927982-70be-4146-9a9b-ef246b4dbdbc"
           },
           "azureMonitor": {
             "aggOptions": [],
@@ -1304,10 +1701,165 @@
       }
     },
     {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
       "datasource": null,
       "fieldConfig": {
         "defaults": {
-          "custom": {},
+          "custom": {
+            "align": null,
+            "filterable": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 7,
+        "w": 7,
+        "x": 14,
+        "y": 23
+      },
+      "hiddenSeries": false,
+      "id": 59,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": true,
+      "linewidth": 1,
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "7.3.0",
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "appInsights": {
+            "dimension": [],
+            "metricName": "select",
+            "timeGrain": "auto"
+          },
+          "azureLogAnalytics": {
+            "query": "let _series_data = materialize(\r\nngsa_CL\r\n| where $__timeFilter(Date_t)\r\n   and  k_container_s == \"app\" \r\n   and k_app_s == \"ngsa-java\"  \r\n\r\n   and LogName_s == \"Ngsa.RequestLog\"\n   and Zone_s has_any ($Zone)\r\n| summarize FailedRequests=countif(StatusCode_d >= 400) by StatusCode_d , bin(Date_t, 1m) );\r\n\r\n\r\n\r\n_series_data \r\n| summarize sum(FailedRequests) by Date_t\n| project-rename FailedRequests=sum_FailedRequests\r\n| order by Date_t asc\n\n\r\n\n",
+            "resultFormat": "time_series",
+            "workspace": "bf927982-70be-4146-9a9b-ef246b4dbdbc"
+          },
+          "azureMonitor": {
+            "aggOptions": [],
+            "dimensionFilter": "*",
+            "dimensionFilters": [],
+            "metricDefinition": "select",
+            "metricName": "select",
+            "metricNamespace": "select",
+            "resourceGroup": "select",
+            "resourceName": "select",
+            "timeGrain": "auto",
+            "timeGrains": [],
+            "top": "10"
+          },
+          "insightsAnalytics": {
+            "query": "",
+            "resultFormat": "time_series"
+          },
+          "queryType": "Azure Log Analytics",
+          "refId": "A",
+          "subscription": "648dcb5a-de1e-48b2-af6b-fe6ef28d355c"
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "Failed Server Requests (ngsa-java)",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
+    },
+    {
+      "collapsed": false,
+      "datasource": null,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 30
+      },
+      "id": 74,
+      "panels": [],
+      "title": "          Average LodeRunner Requests Per Minute",
+      "type": "row"
+    },
+    {
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": null,
+            "filterable": false
+          },
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -1323,11 +1875,11 @@
       },
       "gridPos": {
         "h": 3,
-        "w": 4,
+        "w": 7,
         "x": 0,
-        "y": 20
+        "y": 31
       },
-      "id": 25,
+      "id": 29,
       "options": {
         "colorMode": "value",
         "graphMode": "area",
@@ -1351,9 +1903,91 @@
             "timeGrain": "auto"
           },
           "azureLogAnalytics": {
-            "query": "ngsa_CL\r\n| where $__timeFilter(Date_t)\n   and k_container_s == \"app\" \r\n   and k_app_s == \"ngsa-memory\" \r\n   and LogName_s == \"Ngsa.RequestLog\"\r\n\r\n| summarize FailedRequestCount=countif(StatusCode_d >= 400)\r\n| project FailedRequestCount",
+            "query": "ngsa_CL\r\n| where $__timeFilter(Date_t)\n  and k_container_s == \"app\" \r\n   and k_app_s == \"ngsa-cosmos\" \r\n   and LogName_s == \"Ngsa.RequestLog\"\r\n\r\n| summarize count() by bin(Date_t,1m)\r\n| summarize round(avg(count_),0)\r\n| project AvgRequests=avg_count_",
             "resultFormat": "time_series",
-            "workspace": "3ef39291-0240-4a58-8e90-6c83497353e3"
+            "workspace": "bf927982-70be-4146-9a9b-ef246b4dbdbc"
+          },
+          "azureMonitor": {
+            "aggOptions": [],
+            "dimensionFilter": "*",
+            "dimensionFilters": [],
+            "metricDefinition": "select",
+            "metricName": "select",
+            "metricNamespace": "select",
+            "resourceGroup": "select",
+            "resourceName": "select",
+            "timeGrain": "auto",
+            "timeGrains": [],
+            "top": "10"
+          },
+          "insightsAnalytics": {
+            "query": "",
+            "resultFormat": "time_series"
+          },
+          "queryType": "Azure Log Analytics",
+          "refId": "A",
+          "subscription": "648dcb5a-de1e-48b2-af6b-fe6ef28d355c"
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "ngsa-cosmos",
+      "type": "stat"
+    },
+    {
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": null,
+            "filterable": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 7,
+        "x": 7,
+        "y": 31
+      },
+      "id": 30,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "mean"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "pluginVersion": "7.3.0",
+      "targets": [
+        {
+          "appInsights": {
+            "dimension": [],
+            "metricName": "select",
+            "timeGrain": "auto"
+          },
+          "azureLogAnalytics": {
+            "query": "ngsa_CL\r\n| where $__timeFilter(Date_t)\n  and k_container_s == \"app\" \r\n   and k_app_s == \"ngsa-memory\" \r\n   and LogName_s == \"Ngsa.RequestLog\"\r\n\r\n| summarize count() by bin(Date_t,1m)\r\n| summarize round(avg(count_),0)\r\n| project AvgRequests=avg_count_",
+            "resultFormat": "time_series",
+            "workspace": "bf927982-70be-4146-9a9b-ef246b4dbdbc"
           },
           "azureMonitor": {
             "aggOptions": [],
@@ -1405,11 +2039,11 @@
       },
       "gridPos": {
         "h": 3,
-        "w": 4,
-        "x": 0,
-        "y": 23
+        "w": 7,
+        "x": 14,
+        "y": 31
       },
-      "id": 29,
+      "id": 60,
       "options": {
         "colorMode": "value",
         "graphMode": "area",
@@ -1433,9 +2067,9 @@
             "timeGrain": "auto"
           },
           "azureLogAnalytics": {
-            "query": "ngsa_CL\r\n| where $__timeFilter(Date_t)\n  and k_container_s == \"app\" \r\n   and k_app_s == \"ngsa-cosmos\" \r\n   and LogName_s == \"Ngsa.RequestLog\"\r\n\r\n| summarize count() by bin(Date_t,1m)\r\n| summarize round(avg(count_),0)\r\n| project AvgRequests=avg_count_",
+            "query": "ngsa_CL\r\n| where $__timeFilter(Date_t)\n  and k_container_s == \"app\" \r\n   and k_app_s == \"ngsa-java\" \r\n   and LogName_s == \"Ngsa.RequestLog\"\r\n\r\n| summarize count() by bin(Date_t,1m)\r\n| summarize round(avg(count_),0)\r\n| project AvgRequests=avg_count_",
             "resultFormat": "time_series",
-            "workspace": "3443a44b-df35-460d-9c32-312356edae05"
+            "workspace": "bf927982-70be-4146-9a9b-ef246b4dbdbc"
           },
           "azureMonitor": {
             "aggOptions": [],
@@ -1461,8 +2095,22 @@
       ],
       "timeFrom": null,
       "timeShift": null,
-      "title": "ngsa-cosmos",
+      "title": "ngsa-java",
       "type": "stat"
+    },
+    {
+      "collapsed": false,
+      "datasource": null,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 34
+      },
+      "id": 76,
+      "panels": [],
+      "title": "          Server Requests",
+      "type": "row"
     },
     {
       "aliasColors": {},
@@ -1479,10 +2127,10 @@
       "fill": 1,
       "fillGradient": 0,
       "gridPos": {
-        "h": 6,
-        "w": 9,
-        "x": 4,
-        "y": 23
+        "h": 7,
+        "w": 7,
+        "x": 0,
+        "y": 35
       },
       "hiddenSeries": false,
       "id": 27,
@@ -1518,9 +2166,9 @@
             "timeGrain": "auto"
           },
           "azureLogAnalytics": {
-            "query": "ngsa_CL\r\n| where $__timeFilter(Date_t)\n   and  k_container_s == \"app\"\r\n   and k_app_s == \"ngsa-cosmos\" \r\n\r\n   and LogName_s == \"Ngsa.RequestLog\"\n   and Zone_s has_any ($Zone)   \r\n| summarize count() by bin_at(Date_t, 1m, datetime(00:00))\r\n| project-rename Date=Date_t,ServerRequests=count_\r\n| order by Date desc",
+            "query": "ngsa_CL\r\n| where $__timeFilter(Date_t)\n   and k_container_s == \"app\"\r\n   and k_app_s == \"ngsa-cosmos\"\n   and LogName_s == \"Ngsa.RequestLog\"\n   and Zone_s has_any ($Zone)   \r\n| summarize count() by bin_at(Date_t, 1m, datetime(00:00))\r\n| project-rename Date=Date_t,ServerRequests=count_\r\n| order by Date asc",
             "resultFormat": "time_series",
-            "workspace": "3ef39291-0240-4a58-8e90-6c83497353e3"
+            "workspace": "bf927982-70be-4146-9a9b-ef246b4dbdbc"
           },
           "azureMonitor": {
             "aggOptions": [],
@@ -1600,10 +2248,10 @@
       "fill": 1,
       "fillGradient": 0,
       "gridPos": {
-        "h": 6,
-        "w": 8,
-        "x": 13,
-        "y": 23
+        "h": 7,
+        "w": 7,
+        "x": 7,
+        "y": 35
       },
       "hiddenSeries": false,
       "id": 28,
@@ -1639,9 +2287,9 @@
             "timeGrain": "auto"
           },
           "azureLogAnalytics": {
-            "query": "ngsa_CL\r\n| where $__timeFilter(Date_t)\n   and  k_container_s == \"app\"\r\n   and k_app_s == \"ngsa-memory\" \r\n\r\n   and LogName_s == \"Ngsa.RequestLog\"\n    and Zone_s has_any ($Zone)  \r\n| summarize count() by bin_at(Date_t, 1m, datetime(00:00))\r\n| project-rename Date=Date_t,ServerRequests=count_\r\n| order by Date desc",
+            "query": "ngsa_CL\r\n| where  $__timeFilter(Date_t)\n   and  k_container_s == \"app\"\r\n   and k_app_s == \"ngsa-memory\" \r\n\r\n   and LogName_s == \"Ngsa.RequestLog\"\n    and Zone_s has_any ($Zone)  \r\n| summarize count() by bin_at(Date_t, 1m, datetime(00:00))\r\n| project-rename Date=Date_t, ServerRequests=count_\r\n| order by Date asc",
             "resultFormat": "time_series",
-            "workspace": "3ef39291-0240-4a58-8e90-6c83497353e3"
+            "workspace": "bf927982-70be-4146-9a9b-ef246b4dbdbc"
           },
           "azureMonitor": {
             "aggOptions": [],
@@ -1707,48 +2355,51 @@
       }
     },
     {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
       "datasource": null,
       "fieldConfig": {
         "defaults": {
-          "custom": {
-            "align": null,
-            "filterable": false
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              }
-            ]
-          }
+          "custom": {}
         },
         "overrides": []
       },
+      "fill": 1,
+      "fillGradient": 0,
       "gridPos": {
-        "h": 3,
-        "w": 4,
-        "x": 0,
-        "y": 26
+        "h": 7,
+        "w": 7,
+        "x": 14,
+        "y": 35
       },
-      "id": 30,
+      "hiddenSeries": false,
+      "id": 61,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": true,
+      "linewidth": 1,
+      "nullPointMode": "null",
       "options": {
-        "colorMode": "value",
-        "graphMode": "area",
-        "justifyMode": "auto",
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": [
-            "mean"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "textMode": "auto"
+        "alertThreshold": true
       },
+      "percentage": false,
       "pluginVersion": "7.3.0",
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
       "targets": [
         {
           "appInsights": {
@@ -1757,9 +2408,9 @@
             "timeGrain": "auto"
           },
           "azureLogAnalytics": {
-            "query": "ngsa_CL\r\n| where $__timeFilter(Date_t)\n  and k_container_s == \"app\" \r\n   and k_app_s == \"ngsa-memory\" \r\n   and LogName_s == \"Ngsa.RequestLog\"\r\n\r\n| summarize count() by bin(Date_t,1m)\r\n| summarize round(avg(count_),0)\r\n| project AvgRequests=avg_count_",
+            "query": "ngsa_CL\r\n| where  $__timeFilter(Date_t)\n   and  k_container_s == \"app\"\r\n   and k_app_s == \"ngsa-java\" \r\n\r\n   and LogName_s == \"Ngsa.RequestLog\"\n    and Zone_s has_any ($Zone)  \r\n| summarize count() by bin_at(Date_t, 1m, datetime(00:00))\r\n| project-rename Date=Date_t, ServerRequests=count_\r\n| order by Date asc",
             "resultFormat": "time_series",
-            "workspace": "3443a44b-df35-460d-9c32-312356edae05"
+            "workspace": "bf927982-70be-4146-9a9b-ef246b4dbdbc"
           },
           "azureMonitor": {
             "aggOptions": [],
@@ -1783,10 +2434,60 @@
           "subscription": "648dcb5a-de1e-48b2-af6b-fe6ef28d355c"
         }
       ],
+      "thresholds": [],
       "timeFrom": null,
+      "timeRegions": [],
       "timeShift": null,
-      "title": "ngsa-memory",
-      "type": "stat"
+      "title": "Server Requests (ngsa-java)",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
+    },
+    {
+      "collapsed": false,
+      "datasource": null,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 42
+      },
+      "id": 78,
+      "panels": [],
+      "title": "          Failed Server Requests",
+      "type": "row"
     },
     {
       "datasource": null,
@@ -1815,9 +2516,9 @@
       },
       "gridPos": {
         "h": 7,
-        "w": 10,
+        "w": 7,
         "x": 0,
-        "y": 29
+        "y": 43
       },
       "id": 32,
       "options": {
@@ -1834,7 +2535,7 @@
           "azureLogAnalytics": {
             "query": "ngsa_CL\r\n| where $__timeFilter(Date_t) \n    and k_container_s == \"app\" \r\n   and k_app_s == \"ngsa-cosmos\" \r\n   and LogName_s == \"Ngsa.RequestLog\"\r\n\r\n   and StatusCode_d >= 400\n   and Zone_s has_any ($Zone)\r\n| summarize count() by tostring(toint(StatusCode_d)), Path_s, Zone_s\r\n| project-rename StatusCode=StatusCode_d,RequestCount=count_,Path=Path_s, Zone=Zone_s",
             "resultFormat": "time_series",
-            "workspace": "3ef39291-0240-4a58-8e90-6c83497353e3"
+            "workspace": "bf927982-70be-4146-9a9b-ef246b4dbdbc"
           },
           "azureMonitor": {
             "aggOptions": [],
@@ -1890,9 +2591,9 @@
       },
       "gridPos": {
         "h": 7,
-        "w": 11,
-        "x": 10,
-        "y": 29
+        "w": 7,
+        "x": 7,
+        "y": 43
       },
       "id": 33,
       "options": {
@@ -1909,7 +2610,7 @@
           "azureLogAnalytics": {
             "query": "ngsa_CL\r\n| where $__timeFilter(Date_t) \n    and k_container_s == \"app\" \r\n   and k_app_s == \"ngsa-memory\" \r\n   and LogName_s == \"Ngsa.RequestLog\"\r\n\r\n   and StatusCode_d >= 400\n    and Zone_s has_any ($Zone)  \r\n| summarize count() by tostring(toint(StatusCode_d)), Path_s, Zone_s\r\n| project-rename StatusCode=StatusCode_d,RequestCount=count_,Path=Path_s, Zone=Zone_s",
             "resultFormat": "time_series",
-            "workspace": "3ef39291-0240-4a58-8e90-6c83497353e3"
+            "workspace": "bf927982-70be-4146-9a9b-ef246b4dbdbc"
           },
           "azureMonitor": {
             "aggOptions": [],
@@ -1964,10 +2665,99 @@
         "overrides": []
       },
       "gridPos": {
+        "h": 7,
+        "w": 7,
+        "x": 14,
+        "y": 43
+      },
+      "id": 62,
+      "options": {
+        "showHeader": true
+      },
+      "pluginVersion": "7.3.0",
+      "targets": [
+        {
+          "appInsights": {
+            "dimension": [],
+            "metricName": "select",
+            "timeGrain": "auto"
+          },
+          "azureLogAnalytics": {
+            "query": "ngsa_CL\r\n| where $__timeFilter(Date_t) \n    and k_container_s == \"app\" \r\n   and k_app_s == \"ngsa-java\" \r\n   and LogName_s == \"Ngsa.RequestLog\"\r\n\r\n   and StatusCode_d >= 400\n    and Zone_s has_any ($Zone)  \r\n| summarize count() by tostring(toint(StatusCode_d)), Path_s, Zone_s\r\n| project-rename StatusCode=StatusCode_d,RequestCount=count_,Path=Path_s, Zone=Zone_s",
+            "resultFormat": "time_series",
+            "workspace": "bf927982-70be-4146-9a9b-ef246b4dbdbc"
+          },
+          "azureMonitor": {
+            "aggOptions": [],
+            "dimensionFilter": "*",
+            "dimensionFilters": [],
+            "metricDefinition": "select",
+            "metricName": "select",
+            "metricNamespace": "select",
+            "resourceGroup": "select",
+            "resourceName": "select",
+            "timeGrain": "auto",
+            "timeGrains": [],
+            "top": "10"
+          },
+          "insightsAnalytics": {
+            "query": "",
+            "resultFormat": "time_series"
+          },
+          "queryType": "Azure Log Analytics",
+          "refId": "A",
+          "subscription": "648dcb5a-de1e-48b2-af6b-fe6ef28d355c"
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "Failed Requests (ngsa-java)",
+      "type": "table"
+    },
+    {
+      "collapsed": false,
+      "datasource": null,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 50
+      },
+      "id": 80,
+      "panels": [],
+      "title": "          Failed Client Requests",
+      "type": "row"
+    },
+    {
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": null,
+            "filterable": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
         "h": 8,
         "w": 21,
         "x": 0,
-        "y": 36
+        "y": 51
       },
       "id": 35,
       "options": {
@@ -1982,9 +2772,9 @@
             "timeGrain": "auto"
           },
           "azureLogAnalytics": {
-            "query": "loderunner_CL\r\n| where $__timeFilter(Date_t) and StatusCode_d > 200 and Zone_s has_any ($Zone)\r\n| extend AppType = iff(Server_s contains 'ngsa-memory', 'ngsa-memory','ngsa-cosmos')\r\n| summarize countif(StatusCode_d > 200) by AppType, Zone_s, StatusCode_d\r\n| project-rename FailureCount=countif_, Zone=Zone_s, StatusCode=StatusCode_d\r\n| order by AppType, Zone, StatusCode",
+            "query": "loderunner_CL\r\n| where $__timeFilter(Date_t) and StatusCode_d > 200 and Zone_s has_any ($Zone)\r\n| extend AppType = case(Server_s contains 'ngsa-memory', \"ngsa-memory\", \r\n                      Server_s contains 'ngsa-cosmos', \"ngsa-cosmos\", \r\n                      Server_s contains 'ngsa-java', \"ngsa-java\", \r\n                       \"unknown!\")\r\n| summarize countif(StatusCode_d > 200) by AppType, Zone_s, StatusCode_d\r\n| project-rename FailureCount=countif_, Zone=Zone_s, StatusCode=StatusCode_d\r\n| order by AppType, Zone, StatusCode",
             "resultFormat": "time_series",
-            "workspace": "3ef39291-0240-4a58-8e90-6c83497353e3"
+            "workspace": "bf927982-70be-4146-9a9b-ef246b4dbdbc"
           },
           "azureMonitor": {
             "aggOptions": [],
@@ -2020,11 +2810,25 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 44
+        "y": 59
       },
-      "id": 37,
+      "id": 88,
       "panels": [],
       "title": "Performance",
+      "type": "row"
+    },
+    {
+      "collapsed": false,
+      "datasource": null,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 60
+      },
+      "id": 82,
+      "panels": [],
+      "title": "          Server Response Time Percentile",
       "type": "row"
     },
     {
@@ -2055,9 +2859,9 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 11,
+        "w": 7,
         "x": 0,
-        "y": 45
+        "y": 61
       },
       "id": 39,
       "options": {
@@ -2074,7 +2878,7 @@
           "azureLogAnalytics": {
             "query": "ngsa_CL\r\n| where $__timeFilter(Date_t) \n   and k_container_s == 'app'\r\n   and k_app_s == 'ngsa-cosmos'\r\n   and LogName_s == \"Ngsa.RequestLog\" \n   and Zone_s has_any ($Zone)\n\r\n| summarize percentile(Duration_d, 75), percentile(Duration_d, 90), percentile(Duration_d, 95), percentile(Duration_d, 98) by Zone_s, k_app_s\r\n| extend Zone=Zone_s, 75th=round(percentile_Duration_d_75,2), 90th=round(percentile_Duration_d_90,2), 95th=round(percentile_Duration_d_95,2), 98th=round(percentile_Duration_d_98,2), AppType=k_app_s\r\n| project AppType, Zone, 75th, 90th, 95th, 98th\r\n| order by AppType, Zone asc",
             "resultFormat": "time_series",
-            "workspace": "3ef39291-0240-4a58-8e90-6c83497353e3"
+            "workspace": "bf927982-70be-4146-9a9b-ef246b4dbdbc"
           },
           "azureMonitor": {
             "aggOptions": [],
@@ -2131,9 +2935,9 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 10,
-        "x": 11,
-        "y": 45
+        "w": 7,
+        "x": 7,
+        "y": 61
       },
       "id": 40,
       "options": {
@@ -2150,7 +2954,7 @@
           "azureLogAnalytics": {
             "query": "ngsa_CL\r\n| where $__timeFilter(Date_t) \n   and k_container_s == 'app'\r\n   and k_app_s == 'ngsa-memory'\r\n   and LogName_s == \"Ngsa.RequestLog\"\n      and Zone_s has_any ($Zone)\n\r\n| summarize percentile(Duration_d, 75), percentile(Duration_d, 90), percentile(Duration_d, 95), percentile(Duration_d, 98) by Zone_s, k_app_s\r\n| extend Zone=Zone_s, 75th=round(percentile_Duration_d_75,2), 90th=round(percentile_Duration_d_90,2), 95th=round(percentile_Duration_d_95,2), 98th=round(percentile_Duration_d_98,2), AppType=k_app_s\r\n| project AppType, Zone, 75th, 90th, 95th, 98th\r\n| order by AppType, Zone asc",
             "resultFormat": "time_series",
-            "workspace": "3ef39291-0240-4a58-8e90-6c83497353e3"
+            "workspace": "bf927982-70be-4146-9a9b-ef246b4dbdbc"
           },
           "azureMonitor": {
             "aggOptions": [],
@@ -2176,7 +2980,83 @@
       ],
       "timeFrom": null,
       "timeShift": null,
-      "title": "Server Response Time (ngsa-cosmos)",
+      "title": "Server Response Time (ngsa-memory)",
+      "type": "table"
+    },
+    {
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": null,
+            "filterable": false
+          },
+          "decimals": 2,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 7,
+        "x": 14,
+        "y": 61
+      },
+      "id": 63,
+      "options": {
+        "showHeader": true
+      },
+      "pluginVersion": "7.3.0",
+      "targets": [
+        {
+          "appInsights": {
+            "dimension": [],
+            "metricName": "select",
+            "timeGrain": "auto"
+          },
+          "azureLogAnalytics": {
+            "query": "ngsa_CL\r\n| where $__timeFilter(Date_t) \n   and k_container_s == 'app'\r\n   and k_app_s == 'ngsa-java'\r\n   and LogName_s == \"Ngsa.RequestLog\"\n      and Zone_s has_any ($Zone)\n\r\n| summarize percentile(Duration_d, 75), percentile(Duration_d, 90), percentile(Duration_d, 95), percentile(Duration_d, 98) by Zone_s, k_app_s\r\n| extend Zone=Zone_s, 75th=round(percentile_Duration_d_75,2), 90th=round(percentile_Duration_d_90,2), 95th=round(percentile_Duration_d_95,2), 98th=round(percentile_Duration_d_98,2), AppType=k_app_s\r\n| project AppType, Zone, 75th, 90th, 95th, 98th\r\n| order by AppType, Zone asc",
+            "resultFormat": "time_series",
+            "workspace": "bf927982-70be-4146-9a9b-ef246b4dbdbc"
+          },
+          "azureMonitor": {
+            "aggOptions": [],
+            "dimensionFilter": "*",
+            "dimensionFilters": [],
+            "metricDefinition": "select",
+            "metricName": "select",
+            "metricNamespace": "select",
+            "resourceGroup": "select",
+            "resourceName": "select",
+            "timeGrain": "auto",
+            "timeGrains": [],
+            "top": "10"
+          },
+          "insightsAnalytics": {
+            "query": "",
+            "resultFormat": "time_series"
+          },
+          "queryType": "Azure Log Analytics",
+          "refId": "A",
+          "subscription": "648dcb5a-de1e-48b2-af6b-fe6ef28d355c"
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "Server Response Time (ngsa-java)",
       "type": "table"
     },
     {
@@ -2195,9 +3075,9 @@
       "fillGradient": 0,
       "gridPos": {
         "h": 8,
-        "w": 11,
+        "w": 7,
         "x": 0,
-        "y": 53
+        "y": 69
       },
       "hiddenSeries": false,
       "id": 42,
@@ -2235,7 +3115,7 @@
           "azureLogAnalytics": {
             "query": "ngsa_CL\r\n| where $__timeFilter(Date_t) and Zone_s has_any ($Zone)\n    and k_container_s == \"app\"\r\n   and k_app_s == 'ngsa-cosmos'\r\n\r\n   and LogName_s == \"Ngsa.RequestLog\"\r\n| summarize percentile(Duration_d, 75), percentile(Duration_d, 90), percentile(Duration_d, 95), percentile(Duration_d, 98) by bin_at(Date_t, 1m, datetime(00:00))\r\n| project-rename Date=Date_t, ResponseTime_75th=percentile_Duration_d_75, ResponseTime_90th=percentile_Duration_d_90,  ResponseTime_95th=percentile_Duration_d_95, ResponseTime_98th=percentile_Duration_d_98\r\n| order by Date asc",
             "resultFormat": "time_series",
-            "workspace": "3ef39291-0240-4a58-8e90-6c83497353e3"
+            "workspace": "bf927982-70be-4146-9a9b-ef246b4dbdbc"
           },
           "azureMonitor": {
             "aggOptions": [],
@@ -2316,9 +3196,9 @@
       "fillGradient": 0,
       "gridPos": {
         "h": 8,
-        "w": 10,
-        "x": 11,
-        "y": 53
+        "w": 7,
+        "x": 7,
+        "y": 69
       },
       "hiddenSeries": false,
       "id": 43,
@@ -2356,7 +3236,7 @@
           "azureLogAnalytics": {
             "query": "ngsa_CL\r\n| where $__timeFilter(Date_t) and Zone_s has_any ($Zone)\n    and k_container_s == \"app\"\r\n   and k_app_s == 'ngsa-memory'\r\n\r\n   and LogName_s == \"Ngsa.RequestLog\"\r\n| summarize percentile(Duration_d, 75), percentile(Duration_d, 90), percentile(Duration_d, 95), percentile(Duration_d, 98) by bin_at(Date_t, 1m, datetime(00:00))\r\n| project-rename Date=Date_t, ResponseTime_75th=percentile_Duration_d_75, ResponseTime_90th=percentile_Duration_d_90,  ResponseTime_95th=percentile_Duration_d_95, ResponseTime_98th=percentile_Duration_d_98\r\n| order by Date asc",
             "resultFormat": "time_series",
-            "workspace": "3ef39291-0240-4a58-8e90-6c83497353e3"
+            "workspace": "bf927982-70be-4146-9a9b-ef246b4dbdbc"
           },
           "azureMonitor": {
             "aggOptions": [],
@@ -2422,6 +3302,141 @@
       }
     },
     {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 8,
+        "w": 7,
+        "x": 14,
+        "y": 69
+      },
+      "hiddenSeries": false,
+      "id": 64,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": true,
+      "linewidth": 1,
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "7.3.0",
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "appInsights": {
+            "dimension": [],
+            "metricName": "select",
+            "timeGrain": "auto"
+          },
+          "azureLogAnalytics": {
+            "query": "ngsa_CL\r\n| where $__timeFilter(Date_t) and Zone_s has_any ($Zone)\n    and k_container_s == \"app\"\r\n   and k_app_s == 'ngsa-java'\r\n\r\n   and LogName_s == \"Ngsa.RequestLog\"\r\n| summarize percentile(Duration_d, 75), percentile(Duration_d, 90), percentile(Duration_d, 95), percentile(Duration_d, 98) by bin_at(Date_t, 1m, datetime(00:00))\r\n| project-rename Date=Date_t, ResponseTime_75th=percentile_Duration_d_75, ResponseTime_90th=percentile_Duration_d_90,  ResponseTime_95th=percentile_Duration_d_95, ResponseTime_98th=percentile_Duration_d_98\r\n| order by Date asc",
+            "resultFormat": "time_series",
+            "workspace": "bf927982-70be-4146-9a9b-ef246b4dbdbc"
+          },
+          "azureMonitor": {
+            "aggOptions": [],
+            "dimensionFilter": "*",
+            "dimensionFilters": [],
+            "metricDefinition": "select",
+            "metricName": "select",
+            "metricNamespace": "select",
+            "resourceGroup": "select",
+            "resourceName": "select",
+            "timeGrain": "auto",
+            "timeGrains": [],
+            "top": "10"
+          },
+          "insightsAnalytics": {
+            "query": "",
+            "resultFormat": "time_series"
+          },
+          "queryType": "Azure Log Analytics",
+          "refId": "A",
+          "subscription": "648dcb5a-de1e-48b2-af6b-fe6ef28d355c"
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "Server Response Time (ngsa-java)",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
+    },
+    {
+      "collapsed": false,
+      "datasource": null,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 77
+      },
+      "id": 84,
+      "panels": [],
+      "title": "          Client Response Time Percentile",
+      "type": "row"
+    },
+    {
       "datasource": null,
       "fieldConfig": {
         "defaults": {
@@ -2449,9 +3464,9 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 11,
+        "w": 7,
         "x": 0,
-        "y": 61
+        "y": 78
       },
       "id": 45,
       "options": {
@@ -2466,9 +3481,9 @@
             "timeGrain": "auto"
           },
           "azureLogAnalytics": {
-            "query": "loderunner_CL\r\n| where Server_s contains 'ngsa-cosmos' and $__timeFilter(Date_t) and Zone_s has_any($Zone)\r\n| extend AppType = iff(Server_s contains 'ngsa-memory','ngsa-memory','ngsa-cosmos')\r\n| summarize percentile(Duration_d, 75), percentile(Duration_d, 90), percentile(Duration_d, 95), percentile(Duration_d, 98) by Zone_s, AppType\r\n| extend Zone=Zone_s, 75th=round(percentile_Duration_d_75,2), 90th=round(percentile_Duration_d_90,2), 95th=round(percentile_Duration_d_95,2), 98th=round(percentile_Duration_d_98,2), AppType\r\n| project AppType, Zone, 75th, 90th, 95th, 98th\r\n| order by AppType, Zone asc",
+            "query": "loderunner_CL\r\n| where Server_s contains 'ngsa-cosmos' and $__timeFilter(Date_t) and Zone_s has_any($Zone)\r\n| extend AppType = 'ngsa-cosmos'\r\n| summarize percentile(Duration_d, 75), percentile(Duration_d, 90), percentile(Duration_d, 95), percentile(Duration_d, 98) by Zone_s, AppType\r\n| extend Zone=Zone_s, 75th=round(percentile_Duration_d_75,2), 90th=round(percentile_Duration_d_90,2), 95th=round(percentile_Duration_d_95,2), 98th=round(percentile_Duration_d_98,2), AppType\r\n| project AppType, Zone, 75th, 90th, 95th, 98th\r\n| order by AppType, Zone asc",
             "resultFormat": "time_series",
-            "workspace": "3ef39291-0240-4a58-8e90-6c83497353e3"
+            "workspace": "bf927982-70be-4146-9a9b-ef246b4dbdbc"
           },
           "azureMonitor": {
             "aggOptions": [],
@@ -2525,9 +3540,9 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 10,
-        "x": 11,
-        "y": 61
+        "w": 7,
+        "x": 7,
+        "y": 78
       },
       "id": 46,
       "options": {
@@ -2542,9 +3557,9 @@
             "timeGrain": "auto"
           },
           "azureLogAnalytics": {
-            "query": "loderunner_CL\r\n| where Server_s contains 'ngsa-memory' and $__timeFilter(Date_t) and Zone_s has_any($Zone)\r\n| extend AppType = iff(Server_s contains 'ngsa-memory','ngsa-memory','ngsa-cosmos')\r\n| summarize percentile(Duration_d, 75), percentile(Duration_d, 90), percentile(Duration_d, 95), percentile(Duration_d, 98) by Zone_s, AppType\r\n| extend Zone=Zone_s, 75th=round(percentile_Duration_d_75,2), 90th=round(percentile_Duration_d_90,2), 95th=round(percentile_Duration_d_95,2), 98th=round(percentile_Duration_d_98,2), AppType\r\n| project AppType, Zone, 75th, 90th, 95th, 98th\r\n| order by AppType, Zone asc",
+            "query": "loderunner_CL\r\n| where Server_s contains 'ngsa-memory' and $__timeFilter(Date_t) and Zone_s has_any($Zone)\r\n| extend AppType = 'ngsa-memory'\r\n| summarize percentile(Duration_d, 75), percentile(Duration_d, 90), percentile(Duration_d, 95), percentile(Duration_d, 98) by Zone_s, AppType\r\n| extend Zone=Zone_s, 75th=round(percentile_Duration_d_75,2), 90th=round(percentile_Duration_d_90,2), 95th=round(percentile_Duration_d_95,2), 98th=round(percentile_Duration_d_98,2), AppType\r\n| project AppType, Zone, 75th, 90th, 95th, 98th\r\n| order by AppType, Zone asc",
             "resultFormat": "time_series",
-            "workspace": "3ef39291-0240-4a58-8e90-6c83497353e3"
+            "workspace": "bf927982-70be-4146-9a9b-ef246b4dbdbc"
           },
           "azureMonitor": {
             "aggOptions": [],
@@ -2574,6 +3589,82 @@
       "type": "table"
     },
     {
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": null,
+            "filterable": false
+          },
+          "decimals": 2,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 7,
+        "x": 14,
+        "y": 78
+      },
+      "id": 65,
+      "options": {
+        "showHeader": true
+      },
+      "pluginVersion": "7.3.0",
+      "targets": [
+        {
+          "appInsights": {
+            "dimension": [],
+            "metricName": "select",
+            "timeGrain": "auto"
+          },
+          "azureLogAnalytics": {
+            "query": "loderunner_CL\r\n| where Server_s contains 'ngsa-java' and $__timeFilter(Date_t) and Zone_s has_any($Zone)\r\n| extend AppType = 'ngsa-java'\r\n| summarize percentile(Duration_d, 75), percentile(Duration_d, 90), percentile(Duration_d, 95), percentile(Duration_d, 98) by Zone_s, AppType\r\n| extend Zone=Zone_s, 75th=round(percentile_Duration_d_75,2), 90th=round(percentile_Duration_d_90,2), 95th=round(percentile_Duration_d_95,2), 98th=round(percentile_Duration_d_98,2), AppType\r\n| project AppType, Zone, 75th, 90th, 95th, 98th\r\n| order by AppType, Zone asc",
+            "resultFormat": "time_series",
+            "workspace": "bf927982-70be-4146-9a9b-ef246b4dbdbc"
+          },
+          "azureMonitor": {
+            "aggOptions": [],
+            "dimensionFilter": "*",
+            "dimensionFilters": [],
+            "metricDefinition": "select",
+            "metricName": "select",
+            "metricNamespace": "select",
+            "resourceGroup": "select",
+            "resourceName": "select",
+            "timeGrain": "auto",
+            "timeGrains": [],
+            "top": "10"
+          },
+          "insightsAnalytics": {
+            "query": "",
+            "resultFormat": "time_series"
+          },
+          "queryType": "Azure Log Analytics",
+          "refId": "A",
+          "subscription": "648dcb5a-de1e-48b2-af6b-fe6ef28d355c"
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "Client Response Time (ngsa-java)",
+      "type": "table"
+    },
+    {
       "aliasColors": {},
       "bars": false,
       "dashLength": 10,
@@ -2589,9 +3680,9 @@
       "fillGradient": 0,
       "gridPos": {
         "h": 8,
-        "w": 11,
+        "w": 7,
         "x": 0,
-        "y": 69
+        "y": 86
       },
       "hiddenSeries": false,
       "id": 48,
@@ -2629,7 +3720,7 @@
           "azureLogAnalytics": {
             "query": "loderunner_CL\r\n| where Server_s contains 'ngsa-cosmos' and $__timeFilter(Date_t) and Zone_s has_any($Zone)\r\n| summarize percentile(Duration_d, 75), percentile(Duration_d, 90), percentile(Duration_d, 95), percentile(Duration_d, 98) by bin_at(Date_t, 1m, datetime(00:00))\r\n| project-rename Date=Date_t, ResponseTime_75th=percentile_Duration_d_75, ResponseTime_90th=percentile_Duration_d_90, ResponseTime_95th=percentile_Duration_d_95, ResponseTime_98th=percentile_Duration_d_98\r\n| order by Date asc",
             "resultFormat": "time_series",
-            "workspace": "3ef39291-0240-4a58-8e90-6c83497353e3"
+            "workspace": "bf927982-70be-4146-9a9b-ef246b4dbdbc"
           },
           "azureMonitor": {
             "aggOptions": [],
@@ -2710,9 +3801,9 @@
       "fillGradient": 0,
       "gridPos": {
         "h": 8,
-        "w": 10,
-        "x": 11,
-        "y": 69
+        "w": 7,
+        "x": 7,
+        "y": 86
       },
       "hiddenSeries": false,
       "id": 49,
@@ -2750,7 +3841,7 @@
           "azureLogAnalytics": {
             "query": "loderunner_CL\r\n| where Server_s contains 'ngsa-memory' and $__timeFilter(Date_t) and Zone_s has_any($Zone)\r\n| summarize percentile(Duration_d, 75), percentile(Duration_d, 90), percentile(Duration_d, 95), percentile(Duration_d, 98) by bin_at(Date_t, 1m, datetime(00:00))\r\n| project-rename Date=Date_t, ResponseTime_75th=percentile_Duration_d_75, ResponseTime_90th=percentile_Duration_d_90, ResponseTime_95th=percentile_Duration_d_95, ResponseTime_98th=percentile_Duration_d_98\r\n| order by Date asc",
             "resultFormat": "time_series",
-            "workspace": "3ef39291-0240-4a58-8e90-6c83497353e3"
+            "workspace": "bf927982-70be-4146-9a9b-ef246b4dbdbc"
           },
           "azureMonitor": {
             "aggOptions": [],
@@ -2816,6 +3907,141 @@
       }
     },
     {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 8,
+        "w": 7,
+        "x": 14,
+        "y": 86
+      },
+      "hiddenSeries": false,
+      "id": 66,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": true,
+      "linewidth": 1,
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "7.3.0",
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "appInsights": {
+            "dimension": [],
+            "metricName": "select",
+            "timeGrain": "auto"
+          },
+          "azureLogAnalytics": {
+            "query": "loderunner_CL\r\n| where Server_s contains 'ngsa-java' and $__timeFilter(Date_t) and Zone_s has_any($Zone)\r\n| summarize percentile(Duration_d, 75), percentile(Duration_d, 90), percentile(Duration_d, 95), percentile(Duration_d, 98) by bin_at(Date_t, 1m, datetime(00:00))\r\n| project-rename Date=Date_t, ResponseTime_75th=percentile_Duration_d_75, ResponseTime_90th=percentile_Duration_d_90, ResponseTime_95th=percentile_Duration_d_95, ResponseTime_98th=percentile_Duration_d_98\r\n| order by Date asc",
+            "resultFormat": "time_series",
+            "workspace": "bf927982-70be-4146-9a9b-ef246b4dbdbc"
+          },
+          "azureMonitor": {
+            "aggOptions": [],
+            "dimensionFilter": "*",
+            "dimensionFilters": [],
+            "metricDefinition": "select",
+            "metricName": "select",
+            "metricNamespace": "select",
+            "resourceGroup": "select",
+            "resourceName": "select",
+            "timeGrain": "auto",
+            "timeGrains": [],
+            "top": "10"
+          },
+          "insightsAnalytics": {
+            "query": "",
+            "resultFormat": "time_series"
+          },
+          "queryType": "Azure Log Analytics",
+          "refId": "A",
+          "subscription": "648dcb5a-de1e-48b2-af6b-fe6ef28d355c"
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "Client Response Time (ngsa-java)",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
+    },
+    {
+      "collapsed": false,
+      "datasource": null,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 94
+      },
+      "id": 86,
+      "panels": [],
+      "title": "          Client Response Time by category",
+      "type": "row"
+    },
+    {
       "datasource": null,
       "fieldConfig": {
         "defaults": {
@@ -2843,9 +4069,9 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 11,
+        "w": 7,
         "x": 0,
-        "y": 77
+        "y": 95
       },
       "id": 51,
       "options": {
@@ -2860,9 +4086,9 @@
             "timeGrain": "auto"
           },
           "azureLogAnalytics": {
-            "query": "loderunner_CL\r\n| where Server_s contains 'ngsa-cosmos' and $__timeFilter(Date_t) and Zone_s has_any($Zone)\r\n| extend AppType = iff(Server_s contains 'ngsa-memory','ngsa-memory','ngsa-cosmos')\r\n| summarize percentile(Duration_d, 75), percentile(Duration_d, 90), percentile(Duration_d, 95), percentile(Duration_d, 98) by Category, AppType\r\n| extend 75th=round(percentile_Duration_d_75,2), 90th=round(percentile_Duration_d_90,2), 95th=round(percentile_Duration_d_95,2), 98th=round(percentile_Duration_d_98,2)\r\n| project AppType, Category, 75th, 90th, 95th, 98th\r\n| order by AppType, Category asc",
+            "query": "loderunner_CL\r\n| where Server_s contains 'ngsa-cosmos' and $__timeFilter(Date_t) and Zone_s has_any($Zone)\r\n| extend AppType = 'ngsa-cosmos'\r\n| summarize percentile(Duration_d, 75), percentile(Duration_d, 90), percentile(Duration_d, 95), percentile(Duration_d, 98) by Category, AppType\r\n| extend 75th=round(percentile_Duration_d_75,2), 90th=round(percentile_Duration_d_90,2), 95th=round(percentile_Duration_d_95,2), 98th=round(percentile_Duration_d_98,2)\r\n| project AppType, Category, 75th, 90th, 95th, 98th\r\n| order by AppType, Category asc",
             "resultFormat": "time_series",
-            "workspace": "3ef39291-0240-4a58-8e90-6c83497353e3"
+            "workspace": "bf927982-70be-4146-9a9b-ef246b4dbdbc"
           },
           "azureMonitor": {
             "aggOptions": [],
@@ -2919,9 +4145,9 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 10,
-        "x": 11,
-        "y": 77
+        "w": 7,
+        "x": 7,
+        "y": 95
       },
       "id": 52,
       "options": {
@@ -2936,9 +4162,9 @@
             "timeGrain": "auto"
           },
           "azureLogAnalytics": {
-            "query": "loderunner_CL\r\n| where Server_s contains 'ngsa-memory' and $__timeFilter(Date_t) and Zone_s has_any($Zone)\r\n| extend AppType = iff(Server_s contains 'ngsa-memory','ngsa-memory','ngsa-cosmos')\r\n| summarize percentile(Duration_d, 75), percentile(Duration_d, 90), percentile(Duration_d, 95), percentile(Duration_d, 98) by Category, AppType\r\n| extend 75th=round(percentile_Duration_d_75,2), 90th=round(percentile_Duration_d_90,2), 95th=round(percentile_Duration_d_95,2), 98th=round(percentile_Duration_d_98,2)\r\n| project AppType, Category, 75th, 90th, 95th, 98th\r\n| order by AppType, Category asc",
+            "query": "loderunner_CL\r\n| where Server_s contains 'ngsa-memory' and $__timeFilter(Date_t) and Zone_s has_any($Zone)\r\n| extend AppType = 'ngsa-memory'\r\n| summarize percentile(Duration_d, 75), percentile(Duration_d, 90), percentile(Duration_d, 95), percentile(Duration_d, 98) by Category, AppType\r\n| extend 75th=round(percentile_Duration_d_75,2), 90th=round(percentile_Duration_d_90,2), 95th=round(percentile_Duration_d_95,2), 98th=round(percentile_Duration_d_98,2)\r\n| project AppType, Category, 75th, 90th, 95th, 98th\r\n| order by AppType, Category asc",
             "resultFormat": "time_series",
-            "workspace": "3ef39291-0240-4a58-8e90-6c83497353e3"
+            "workspace": "bf927982-70be-4146-9a9b-ef246b4dbdbc"
           },
           "azureMonitor": {
             "aggOptions": [],
@@ -2968,6 +4194,82 @@
       "type": "table"
     },
     {
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": null,
+            "filterable": false
+          },
+          "decimals": 2,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 7,
+        "x": 14,
+        "y": 95
+      },
+      "id": 67,
+      "options": {
+        "showHeader": true
+      },
+      "pluginVersion": "7.3.0",
+      "targets": [
+        {
+          "appInsights": {
+            "dimension": [],
+            "metricName": "select",
+            "timeGrain": "auto"
+          },
+          "azureLogAnalytics": {
+            "query": "loderunner_CL\r\n| where Server_s contains 'ngsa-java' and $__timeFilter(Date_t) and Zone_s has_any($Zone)\r\n| extend AppType = 'ngsa-java'\r\n| summarize percentile(Duration_d, 75), percentile(Duration_d, 90), percentile(Duration_d, 95), percentile(Duration_d, 98) by Category, AppType\r\n| extend 75th=round(percentile_Duration_d_75,2), 90th=round(percentile_Duration_d_90,2), 95th=round(percentile_Duration_d_95,2), 98th=round(percentile_Duration_d_98,2)\r\n| project AppType, Category, 75th, 90th, 95th, 98th\r\n| order by AppType, Category asc",
+            "resultFormat": "time_series",
+            "workspace": "bf927982-70be-4146-9a9b-ef246b4dbdbc"
+          },
+          "azureMonitor": {
+            "aggOptions": [],
+            "dimensionFilter": "*",
+            "dimensionFilters": [],
+            "metricDefinition": "select",
+            "metricName": "select",
+            "metricNamespace": "select",
+            "resourceGroup": "select",
+            "resourceName": "select",
+            "timeGrain": "auto",
+            "timeGrains": [],
+            "top": "10"
+          },
+          "insightsAnalytics": {
+            "query": "",
+            "resultFormat": "time_series"
+          },
+          "queryType": "Azure Log Analytics",
+          "refId": "A",
+          "subscription": "648dcb5a-de1e-48b2-af6b-fe6ef28d355c"
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "Client Response Time by Category (ngsa-java)",
+      "type": "table"
+    },
+    {
       "aliasColors": {},
       "bars": false,
       "dashLength": 10,
@@ -2983,9 +4285,9 @@
       "fillGradient": 0,
       "gridPos": {
         "h": 8,
-        "w": 11,
+        "w": 7,
         "x": 0,
-        "y": 85
+        "y": 103
       },
       "hiddenSeries": false,
       "id": 54,
@@ -3023,7 +4325,7 @@
           "azureLogAnalytics": {
             "query": "loderunner_CL\r\n| where Server_s contains 'ngsa-cosmos' and $__timeFilter(Date_t) and Zone_s has_any($Zone)\r\n| sample 7000\r\n| project-rename ResponseTime=Duration_d, Date=Date_t\r\n| project ResponseTime, Category, Date\r\n| order by Date asc",
             "resultFormat": "time_series",
-            "workspace": "3ef39291-0240-4a58-8e90-6c83497353e3"
+            "workspace": "bf927982-70be-4146-9a9b-ef246b4dbdbc"
           },
           "azureMonitor": {
             "aggOptions": [],
@@ -3104,9 +4406,9 @@
       "fillGradient": 0,
       "gridPos": {
         "h": 8,
-        "w": 10,
-        "x": 11,
-        "y": 85
+        "w": 7,
+        "x": 7,
+        "y": 103
       },
       "hiddenSeries": false,
       "id": 55,
@@ -3144,7 +4446,7 @@
           "azureLogAnalytics": {
             "query": "loderunner_CL\r\n| where Server_s contains 'ngsa-memory' and $__timeFilter(Date_t) and Zone_s has_any($Zone)\r\n| sample 7000\r\n| project-rename ResponseTime=Duration_d, Date=Date_t\r\n| project ResponseTime, Category, Date\r\n| order by Date asc",
             "resultFormat": "time_series",
-            "workspace": "3ef39291-0240-4a58-8e90-6c83497353e3"
+            "workspace": "bf927982-70be-4146-9a9b-ef246b4dbdbc"
           },
           "azureMonitor": {
             "aggOptions": [],
@@ -3173,6 +4475,127 @@
       "timeRegions": [],
       "timeShift": null,
       "title": "Client Response Time by Category (ngsa-memory)",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 8,
+        "w": 7,
+        "x": 14,
+        "y": 103
+      },
+      "hiddenSeries": false,
+      "id": 68,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": true,
+      "linewidth": 1,
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "7.3.0",
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "appInsights": {
+            "dimension": [],
+            "metricName": "select",
+            "timeGrain": "auto"
+          },
+          "azureLogAnalytics": {
+            "query": "loderunner_CL\r\n| where Server_s contains 'ngsa-java' and $__timeFilter(Date_t) and Zone_s has_any($Zone)\r\n| sample 7000\r\n| project-rename ResponseTime=Duration_d, Date=Date_t\r\n| project ResponseTime, Category, Date\r\n| order by Date asc",
+            "resultFormat": "time_series",
+            "workspace": "bf927982-70be-4146-9a9b-ef246b4dbdbc"
+          },
+          "azureMonitor": {
+            "aggOptions": [],
+            "dimensionFilter": "*",
+            "dimensionFilters": [],
+            "metricDefinition": "select",
+            "metricName": "select",
+            "metricNamespace": "select",
+            "resourceGroup": "select",
+            "resourceName": "select",
+            "timeGrain": "auto",
+            "timeGrains": [],
+            "top": "10"
+          },
+          "insightsAnalytics": {
+            "query": "",
+            "resultFormat": "time_series"
+          },
+          "queryType": "Azure Log Analytics",
+          "refId": "A",
+          "subscription": "648dcb5a-de1e-48b2-af6b-fe6ef28d355c"
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "Client Response Time by Category (ngsa-java)",
       "tooltip": {
         "shared": true,
         "sort": 0,
@@ -3270,6 +4693,6 @@
   "timepicker": {},
   "timezone": "utc",
   "title": "NGSA Dev Dashboard",
-  "uid": "2IRD5FSnz",
-  "version": 156
+  "uid": "2IRD5FSny",
+  "version": 6
 }
