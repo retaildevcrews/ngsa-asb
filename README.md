@@ -172,7 +172,6 @@ export ASB_GIT_PATH=deploy/$ASB_DEPLOYMENT_NAME
 
 # set default domain name
 export ASB_DNS_ZONE=cse.ms
-
 export ASB_DOMAIN=${ASB_DNS_NAME}.${ASB_DNS_ZONE}
 
 # resource group names
@@ -227,7 +226,6 @@ az deployment group create \
      deploymentName=${ASB_DEPLOYMENT_NAME} \
      spokeIpPrefix=${ASB_SPOKE_IP_PREFIX} -c --query name
 
-
 export ASB_NODEPOOLS_SUBNET_ID=$(az deployment group show -g $ASB_RG_SPOKE -n spoke-$ASB_ORG_APP_ID_NAME --query properties.outputs.nodepoolSubnetResourceIds.value -o tsv)
 
 # create Region A hub network
@@ -235,7 +233,6 @@ az deployment group create -g $ASB_RG_HUB -f networking/hub-regionA.json -p loca
 export ASB_SPOKE_VNET_ID=$(az deployment group show -g $ASB_RG_SPOKE -n spoke-$ASB_ORG_APP_ID_NAME --query properties.outputs.clusterVnetResourceId.value -o tsv)
 
 ./saveenv.sh -y
-
 
 ```
 

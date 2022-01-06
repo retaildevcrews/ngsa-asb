@@ -16,7 +16,7 @@ cp networking/spoke-BU0001A0008.json networking/spoke-$ASB_ORG_APP_ID_NAME.json
 # Set spoke location
 export ASB_SPOKE_LOCATION=westus2
 
-# Ensure the following variables are set. Use the env file for reference.
+# Ensure the following variables are set. Source the env file for reference.
 
 echo $ASB_RG_SPOKE
 echo $ASB_HUB_LOCATION

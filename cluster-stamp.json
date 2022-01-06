@@ -410,7 +410,7 @@
                     "name": "default",
                     "location": "[parameters('location')]",
                     "dependsOn": [
-                        "[resourceId('Microsoft.Network/privateEndpoints', nodepools)]",
+                        "[resourceId('Microsoft.Network/privateEndpoints', 'nodepools-to-akv')]",
                         "[resourceId('Microsoft.Network/privateDnsZones', variables('akvPrivateDnsZonesName'))]"
                     ],
                     "properties": {
@@ -456,7 +456,7 @@
                     "name": "[concat('to_', variables('vnetName'))]",
                     "location": "global",
                     "dependsOn": [
-                        "[resourceId('Microsoft.Network/privateDnsZones', parameters('acrPrivateDnsZonesName'))]"
+                        "[resourceId('Microsoft.Network/privateDnsZones', variables('acrPrivateDnsZonesName'))]"
                     ],
                     "properties": {
                         "virtualNetwork": {
@@ -497,7 +497,7 @@
                     "name": "[concat('to_', variables('vnetName'))]",
                     "location": "global",
                     "dependsOn": [
-                        "[resourceId('Microsoft.Network/privateDnsZones', parameters('akvPrivateDnsZonesName'))]"
+                        "[resourceId('Microsoft.Network/privateDnsZones', variables('akvPrivateDnsZonesName'))]"
                     ],
                     "properties": {
                         "virtualNetwork": {
@@ -553,7 +553,7 @@
                     "location": "global",
                     "comments": "Enabling Azure Key Vault Private Link on cluster vnet.",
                     "dependsOn": [
-                        "[resourceId('Microsoft.Network/privateDnsZones', variables('asbDnsZone'))]"
+                        "[resourceId('Microsoft.Network/privateDnsZones', parameters('asbDnsZone'))]"
                     ],
                     "properties": {
                         "virtualNetwork": {
@@ -1124,7 +1124,7 @@
                     "name": "default",
                     "location": "[parameters('location')]",
                     "dependsOn": [
-                        "[resourceId('Microsoft.Network/privateEndpoints', nodepools-to-acr)]",
+                        "[resourceId('Microsoft.Network/privateEndpoints', 'nodepools-to-acr')]",
                         "[resourceId('Microsoft.Network/privateDnsZones', variables('acrPrivateDnsZonesName'))]"
                     ],
                     "properties": {
