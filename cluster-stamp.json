@@ -56,6 +56,13 @@
                 "description": "The regional network spoke VNet Resource ID that the cluster will be joined to"
             }
         },
+        "hubVnetResourceId":{
+            "type": "string",
+            "minLength": 79,
+            "metadata": {
+                "description": "The hub network VNet Resource ID"
+            }
+        },
         "clusterAdminAadGroupObjectId": {
             "type": "string",
             "metadata": {
@@ -179,7 +186,6 @@
         "nodeResourceGroupName": "[concat('rg-', parameters('nodepoolsRGName'), '-nodepools','-',parameters('location'))]",
         "baseName": "[concat('aks-',variables('subRgUniqueString'))]",
         "clusterName": "[concat(variables('baseName'),'-',parameters('location'))]",
-        "clusterNameTrunc": "[substring(variables('clusterName'), 0, 25)]",
         "laNewWorkspaceName" : "[concat('la-', variables('baseName'))]",
         "logAnalyticsWorkspaceName": "[if(and(empty(parameters('laWorkspaceName')),empty(parameters('laResourceGroup'))), variables('laNewWorkspaceName'),if(not(or(empty(parameters('laWorkspaceName')),empty(parameters('laResourceGroup')))),parameters('laWorkspaceName'),null()))]",
         "isNewLogAnalytics" : "[equals(variables('logAnalyticsWorkspaceName'), variables('laNewWorkspaceName'))]",
@@ -191,6 +197,8 @@
         "vnetName": "[split(parameters('targetVnetResourceId'),'/')[8]]",
         "vnetNodePoolSubnetResourceId": "[concat(parameters('targetVnetResourceId'), '/subnets/snet-clusternodes')]",
         "vnetIngressServicesSubnetResourceId": "[concat(parameters('targetVnetResourceId'), '/subnets/snet-cluster-ingressservices')]",
+        "vnetHubAcrSubnetResourceId": "[concat(parameters('hubVnetResourceId'), '/subnets/ACRSubnet')]",
+        "HubvnetName": "[split(parameters('hubVnetResourceId'),'/')[8]]",
 
         "agwName": "[concat('apw-', variables('baseName'))]",
         "apwResourceId": "[resourceId('Microsoft.Network/applicationGateways', variables('agwName'))]",
@@ -381,7 +389,7 @@
             ],
             "properties": {
                 "subnet": {
-                    "id": "[variables('vnetNodePoolSubnetResourceId')]"
+                    "id": "[variables('vnetHubAcrSubnetResourceId')]"
                 },
                 "privateLinkServiceConnections": [
                     {
@@ -402,7 +410,7 @@
                     "name": "default",
                     "location": "[parameters('location')]",
                     "dependsOn": [
-                        "[resourceId('Microsoft.Network/privateEndpoints', 'nodepools-to-akv')]",
+                        "[resourceId('Microsoft.Network/privateEndpoints', nodepools)]",
                         "[resourceId('Microsoft.Network/privateDnsZones', variables('akvPrivateDnsZonesName'))]"
                     ],
                     "properties": {
@@ -429,11 +437,26 @@
                 {
                     "type": "virtualNetworkLinks",
                     "apiVersion": "2020-06-01",
-                    "name": "[concat('to_', variables('vnetName'))]",
+                    "name": "[concat('to_', variables('HubvnetName'))]",
                     "location": "global",
                     "comments": "Enabling cluster vnet private zone DNS lookup - used by cluster vnet for direct DNS queries (ones not proxied via the hub).",
                     "dependsOn": [
                         "[resourceId('Microsoft.Network/privateDnsZones', variables('acrPrivateDnsZonesName'))]"
+                    ],
+                    "properties": {
+                        "virtualNetwork": {
+                            "id": "[parameters('hubVnetResourceId')]"
+                        },
+                        "registrationEnabled": false
+                    }
+                },
+                {
+                    "type": "virtualNetworkLinks",
+                    "apiVersion": "2020-06-01",
+                    "name": "[concat('to_', variables('vnetName'))]",
+                    "location": "global",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Network/privateDnsZones', parameters('acrPrivateDnsZonesName'))]"
                     ],
                     "properties": {
                         "virtualNetwork": {
@@ -455,11 +478,26 @@
                 {
                     "type": "virtualNetworkLinks",
                     "apiVersion": "2020-06-01",
-                    "name": "[concat('to_', variables('vnetName'))]",
+                    "name": "[concat('to_', variables('HubvnetName'))]",
                     "location": "global",
                     "comments": "Enabling Azure Key Vault Private Link on cluster vnet.",
                     "dependsOn": [
                         "[resourceId('Microsoft.Network/privateDnsZones', variables('akvPrivateDnsZonesName'))]"
+                    ],
+                    "properties": {
+                        "virtualNetwork": {
+                            "id": "[parameters('hubVnetResourceId')]"
+                        },
+                        "registrationEnabled": false
+                    }
+                },
+                {
+                    "type": "virtualNetworkLinks",
+                    "apiVersion": "2020-06-01",
+                    "name": "[concat('to_', variables('vnetName'))]",
+                    "location": "global",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Network/privateDnsZones', parameters('akvPrivateDnsZonesName'))]"
                     ],
                     "properties": {
                         "virtualNetwork": {
@@ -504,6 +542,22 @@
                     "properties": {
                         "virtualNetwork": {
                             "id": "[parameters('targetVnetResourceId')]"
+                        },
+                        "registrationEnabled": false
+                    }
+                },
+                {
+                    "type": "virtualNetworkLinks",
+                    "apiVersion": "2020-06-01",
+                    "name": "[concat('to_', variables('HubvnetName'))]",
+                    "location": "global",
+                    "comments": "Enabling Azure Key Vault Private Link on cluster vnet.",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Network/privateDnsZones', variables('asbDnsZone'))]"
+                    ],
+                    "properties": {
+                        "virtualNetwork": {
+                            "id": "[parameters('hubVnetResourceId')]"
                         },
                         "registrationEnabled": false
                     }
@@ -1042,14 +1096,14 @@
         {
             "type": "Microsoft.Network/privateEndpoints",
             "apiVersion": "2020-05-01",
-            "name": "[concat('nodepool-to-acr', parameters('location'))]",
+            "name": "nodepools-to-acr",
             "location": "[parameters('location')]",
             "dependsOn": [
                 "[resourceId('Microsoft.ContainerRegistry/registries/replications', variables('defaultAcrName'), parameters('geoRedundancyLocation'))]"
             ],
             "properties": {
                 "subnet": {
-                    "id": "[variables('vnetNodePoolSubnetResourceId')]"
+                    "id": "[variables('vnetHubAcrSubnetResourceId')]"
                 },
                 "privateLinkServiceConnections": [
                     {
@@ -1070,7 +1124,7 @@
                     "name": "default",
                     "location": "[parameters('location')]",
                     "dependsOn": [
-                        "[resourceId('Microsoft.Network/privateEndpoints', concat('nodepool-to-acr', parameters('location')))]",
+                        "[resourceId('Microsoft.Network/privateEndpoints', nodepools-to-acr)]",
                         "[resourceId('Microsoft.Network/privateDnsZones', variables('acrPrivateDnsZonesName'))]"
                     ],
                     "properties": {
@@ -1916,7 +1970,7 @@
             "name": "[variables('policyAssignmentNameAKSLinuxRestrictive')]",
             "comments": "Applying the 'AKS Linux Restrictive' policy to the resource group",
             "properties": {
-                "displayName": "[concat('[', variables('clusterNameTrunc'),'] ', reference(variables('policyResourceIdAKSLinuxRestrictive'), '2020-09-01').displayName)]",
+                "displayName": "[concat(reference(variables('policyResourceIdAKSLinuxRestrictive'), '2020-09-01').displayName)]",
                 "scope": "[subscriptionResourceId('Microsoft.Resources/resourceGroups', resourceGroup().name)]",
                 "policyDefinitionId": "[variables('policyResourceIdAKSLinuxRestrictive')]",
                 "parameters": {
@@ -1943,7 +1997,7 @@
             "name": "[variables('policyAssignmentNameEnforceHttpsIngress')]",
             "comments": "Applying the 'Enforce HTTPS ingress in Kubernetes cluster' policy to the resource group.",
             "properties": {
-                "displayName": "[concat('[', variables('clusterNameTrunc'),'] ', reference(variables('policyResourceIdEnforceHttpsIngress'), '2020-09-01').displayName)]",
+                "displayName": "[concat(reference(variables('policyResourceIdEnforceHttpsIngress'), '2020-09-01').displayName)]",
                 "scope": "[subscriptionResourceId('Microsoft.Resources/resourceGroups', resourceGroup().name)]",
                 "policyDefinitionId": "[variables('policyResourceIdEnforceHttpsIngress')]",
                 "parameters": {
@@ -1962,7 +2016,7 @@
             "name": "[variables('policyAssignmentNameEnforceInternalLoadBalancers')]",
             "comments": "Applying the 'Enforce internal load balancers in Kubernetes cluster' policy to the resource group.",
             "properties": {
-                "displayName": "[concat('[', variables('clusterNameTrunc'),'] ', reference(variables('policyResourceIdEnforceInternalLoadBalancers'), '2020-09-01').displayName)]",
+                "displayName": "[concat(reference(variables('policyResourceIdEnforceInternalLoadBalancers'), '2020-09-01').displayName)]",
                 "scope": "[subscriptionResourceId('Microsoft.Resources/resourceGroups', resourceGroup().name)]",
                 "policyDefinitionId": "[variables('policyResourceIdEnforceInternalLoadBalancers')]",
                 "parameters": {
@@ -1981,7 +2035,7 @@
             "name": "[variables('policyAssignmentNameRoRootFilesystem')]",
             "comments": "Applying the 'Kubernetes cluster containers should run with a read only root file system' policy to the resource group.",
             "properties": {
-                "displayName": "[concat('[', variables('clusterNameTrunc'),'] ', reference(variables('policyResourceIdRoRootFilesystem'), '2020-09-01').displayName)]",
+                "displayName": "[concat(reference(variables('policyResourceIdRoRootFilesystem'), '2020-09-01').displayName)]",
                 "scope": "[subscriptionResourceId('Microsoft.Resources/resourceGroups', resourceGroup().name)]",
                 "policyDefinitionId": "[variables('policyResourceIdRoRootFilesystem')]",
                 "parameters": {
@@ -2004,7 +2058,7 @@
             "name": "[variables('policyAssignmentNameEnforceResourceLimits')]",
             "comments": "Applying the 'Container Images Resource Limits' policy at the resource group level.",
             "properties": {
-                "displayName": "[concat('[', variables('clusterNameTrunc'),'] ', reference(variables('policyResourceIdEnforceResourceLimits'), '2020-09-01').displayName)]",
+                "displayName": "[concat(reference(variables('policyResourceIdEnforceResourceLimits'), '2020-09-01').displayName)]",
                 "scope": "[subscriptionResourceId('Microsoft.Resources/resourceGroups', resourceGroup().name)]",
                 "policyDefinitionId": "[variables('policyResourceIdEnforceResourceLimits')]",
                 "parameters": {
@@ -2037,7 +2091,7 @@
             "name": "[variables('policyAssignmentNameEnforceImageSource')]",
             "comments": "Applying the 'Allowed Container Images' regex policy at the resource group level. If all images are pull into your ARC instance as described in these instructions you can remove the docker.io entries.",
             "properties": {
-                "displayName": "[concat('[', variables('clusterNameTrunc'),'] ', reference(variables('policyResourceIdEnforceImageSource'), '2020-09-01').displayName)]",
+                "displayName": "[concat(reference(variables('policyResourceIdEnforceImageSource'), '2020-09-01').displayName)]",
                 "scope": "[subscriptionResourceId('Microsoft.Resources/resourceGroups', resourceGroup().name)]",
                 "policyDefinitionId": "[variables('policyResourceIdEnforceImageSource')]",
                 "parameters": {
