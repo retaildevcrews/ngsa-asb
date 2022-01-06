@@ -24,14 +24,6 @@
                 "description": "Resource group prefix used to create the nodepools resource group"
             }
         },
-        "orgAppId": {
-            "type": "string",
-            "minLength": 5,
-            "maxLength": 11,
-            "metadata": {
-                "description": "Organization App ID e.g Business Unit (BU0001A0008)"
-            }
-        },
         "targetVnetResourceId": {
             "type": "string",
             "minLength": 79,
@@ -49,24 +41,6 @@
             "type": "string",
             "metadata": {
                 "description": "Your AKS control plane Cluster API authentication tenant"
-            }
-        },
-        "appGatewayListenerCertificate": {
-            "type": "string",
-            "metadata": {
-                "description": "The certificate data for app gateway TLS termination. It is base64"
-            }
-        },
-        "aksIngressControllerCertificate": {
-            "type": "string",
-            "metadata": {
-                "description": "The AKS Ingress Controller public certificate (as .crt or .cer) to be stored in Azure Key Vault as secret and referenced by the AKS ingress controller."
-            }
-        },
-        "aksIngressControllerKey": {
-            "type": "string",
-            "metadata": {
-                "description": "The AKS Ingress Controller private certificate key to be stored in Azure Key Vault as secret and referenced by the AKS ingress controller."
             }
         },
         "clusterAuthorizedIPRanges": {
@@ -127,19 +101,7 @@
             "metadata": {
                 "description": "For Azure resources that support native geo-redunancy, provide the location the redundant service will have its secondary. Should be different than the location parameter and ideally should be a paired region - https://docs.microsoft.com/azure/best-practices-availability-paired-regions. This region does not need to support availability zones."
             }
-        },
-        "acrResourceId": {
-            "type": "string",
-            "metadata": {
-                "description": "Resource ID of Azure Container Registry"
-            }
-        },
-        "acrPrivateDnsResourceId": {
-            "type": "string",
-            "metadata": {
-                "description": "Resource ID of PrivateDNS Zone for ACR"
-            }
-        },        
+        },       
         "kubernetesVersion": {
             "defaultValue": "1.20.9",
             "type": "string"
@@ -150,14 +112,12 @@
         "monitoringMetricsPublisherRole": "[concat(subscription().Id, '/providers/Microsoft.Authorization/roleDefinitions/3913510d-42f4-4e42-8a64-420c390055eb')]",
         "managedIdentityOperatorRole": "[concat(subscription().Id, '/providers/Microsoft.Authorization/roleDefinitions/f1a07417-d97a-45cb-824c-7a7467783830')]",
         "virtualMachineContributorRole": "[concat(subscription().Id, '/providers/Microsoft.Authorization/roleDefinitions/9980e02c-c2be-4d73-94e8-173b1dc7cf3c')]",
-        "readerRole": "[concat(subscription().Id, '/providers/Microsoft.Authorization/roleDefinitions/acdd72a7-3385-48ef-bd42-f606fba81ae7')]",
 
         "subRgUniqueString": "[uniqueString('aks', subscription().subscriptionId, resourceGroup().id)]",
 
         "nodeResourceGroupName": "[concat('rg-', parameters('nodepoolsRGName'), '-nodepools','-',parameters('location'))]",
         "baseName": "[concat('aks-',variables('subRgUniqueString'))]",
         "clusterName": "[concat(variables('baseName'),'-',parameters('location'))]",
-        "clusterNameTrunc": "[substring(variables('clusterName'), 0, 25)]",
         "logAnalyticsWorkspaceName" : "[parameters('laWorkspaceName')]",
         "logAnalyticsResourceGroup": "[parameters('laResourceGroup')]",
         "defaultAcrName": "[concat('acraks', variables('subRgUniqueString'))]",
@@ -167,20 +127,7 @@
         "vnetNodePoolSubnetResourceId": "[concat(parameters('targetVnetResourceId'), '/subnets/snet-clusternodes')]",
         "vnetIngressServicesSubnetResourceId": "[concat(parameters('targetVnetResourceId'), '/subnets/snet-cluster-ingressservices')]",
 
-        "clusterControlPlaneIdentityName": "[concat('mi-', variables('clusterName'), '-controlplane')]",
-
-        "policyResourceIdAKSLinuxRestrictive": "/providers/Microsoft.Authorization/policySetDefinitions/42b8ef37-b724-4e24-bbc8-7a7708edfe00",
-        "policyResourceIdEnforceHttpsIngress": "/providers/Microsoft.Authorization/policyDefinitions/1a5b4dca-0b6f-4cf5-907c-56316bc1bf3d",
-        "policyResourceIdEnforceInternalLoadBalancers": "/providers/Microsoft.Authorization/policyDefinitions/3fc4dc25-5baf-40d8-9b05-7fe74c1bc64e",
-        "policyResourceIdRoRootFilesystem": "/providers/Microsoft.Authorization/policyDefinitions/df49d893-a74c-421d-bc95-c663042e5b80",
-        "policyResourceIdEnforceResourceLimits": "/providers/Microsoft.Authorization/policyDefinitions/e345eecc-fa47-480f-9e88-67dcc122b164",
-        "policyResourceIdEnforceImageSource": "/providers/Microsoft.Authorization/policyDefinitions/febd0533-8e55-448f-b837-bd0e06f16469",
-        "policyAssignmentNameAKSLinuxRestrictive": "[guid(variables('policyResourceIdAKSLinuxRestrictive'), resourceGroup().name, variables('clusterName'))]",
-        "policyAssignmentNameEnforceHttpsIngress": "[guid(variables('policyResourceIdEnforceHttpsIngress'), resourceGroup().name, variables('clusterName'))]",
-        "policyAssignmentNameEnforceInternalLoadBalancers": "[guid(variables('policyResourceIdEnforceInternalLoadBalancers'), resourceGroup().name, variables('clusterName'))]",
-        "policyAssignmentNameRoRootFilesystem": "[guid(variables('policyResourceIdRoRootFilesystem'), resourceGroup().name, variables('clusterName'))]",
-        "policyAssignmentNameEnforceResourceLimits": "[guid(variables('policyResourceIdEnforceResourceLimits'), resourceGroup().name, variables('clusterName'))]",
-        "policyAssignmentNameEnforceImageSource": "[guid(variables('policyResourceIdEnforceImageSource'), resourceGroup().name, variables('clusterName'))]"
+        "clusterControlPlaneIdentityName": "[concat('mi-', variables('clusterName'), '-controlplane')]"
     },
     "resources": [
         {
@@ -303,13 +250,7 @@
             "location": "[parameters('location')]",
             "dependsOn": [
                 "[resourceId(variables('vNetResourceGroup'), 'Microsoft.Resources/deployments', 'EnsureClusterIdentityHasRbacToSelfManagedResources')]",
-                "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('clusterControlPlaneIdentityName'))]",
-                "[resourceId('Microsoft.Authorization/policyAssignments', variables('policyAssignmentNameAKSLinuxRestrictive'))]",
-                "[resourceId('Microsoft.Authorization/policyAssignments', variables('policyAssignmentNameEnforceHttpsIngress'))]",
-                "[resourceId('Microsoft.Authorization/policyAssignments', variables('policyAssignmentNameEnforceImageSource'))]",
-                "[resourceId('Microsoft.Authorization/policyAssignments', variables('policyAssignmentNameEnforceInternalLoadBalancers'))]",
-                "[resourceId('Microsoft.Authorization/policyAssignments', variables('policyAssignmentNameEnforceResourceLimits'))]",
-                "[resourceId('Microsoft.Authorization/policyAssignments', variables('policyAssignmentNameRoRootFilesystem'))]"
+                "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('clusterControlPlaneIdentityName'))]"
             ],
             "properties": {
                 "kubernetesVersion": "[parameters('kubernetesVersion')]",
@@ -1041,49 +982,6 @@
             }
         },
         {
-            "type": "Microsoft.Network/privateEndpoints",
-            "apiVersion": "2020-05-01",
-            "name": "[concat('nodepool-to-acr', parameters('location'))]",
-            "location": "[parameters('location')]",
-            "properties": {
-                "subnet": {
-                    "id": "[variables('vnetNodePoolSubnetResourceId')]"
-                },
-                "privateLinkServiceConnections": [
-                    {
-                        "name": "nodepools",
-                        "properties": {
-                            "privateLinkServiceId": "[parameters('acrResourceId')]",
-                            "groupIds": [
-                                "registry"
-                            ]
-                        }
-                    }
-                ]
-            },
-            "resources": [
-                {
-                    "type": "privateDnsZoneGroups",
-                    "apiVersion": "2020-05-01",
-                    "name": "default",
-                    "location": "[parameters('location')]",
-                    "dependsOn": [
-                        "[resourceId('Microsoft.Network/privateEndpoints', concat('nodepool-to-acr', parameters('location')))]"
-                    ],
-                    "properties": {
-                        "privateDnsZoneConfigs": [
-                            {
-                                "name": "privatelink-azurecr-io",
-                                "properties": {
-                                    "privateDnsZoneId": "[parameters('acrPrivateDnsResourceId')]]"
-                                }
-                            }
-                        ]
-                    }
-                }
-            ]
-        },
-        {
             "type": "Microsoft.Insights/metricAlerts",
             "location": "global",
             "apiVersion": "2018-03-01",
@@ -1148,155 +1046,6 @@
                     "principalId": "[reference(resourceId('Microsoft.ContainerService/managedClusters', variables('clusterName')), '2020-11-01').identityProfile.kubeletidentity.objectId]",
                     "principalType": "ServicePrincipal"
                 }
-            },
-            {            
-                "type": "Microsoft.Authorization/policyAssignments",
-            "apiVersion": "2020-03-01",
-            "name": "[variables('policyAssignmentNameAKSLinuxRestrictive')]",
-            "comments": "Applying the 'AKS Linux Restrictive' policy to the resource group",
-            "properties": {
-                "displayName": "[concat('[', variables('clusterNameTrunc'),'] ', reference(variables('policyResourceIdAKSLinuxRestrictive'), '2020-09-01').displayName)]",
-                "scope": "[subscriptionResourceId('Microsoft.Resources/resourceGroups', resourceGroup().name)]",
-                "policyDefinitionId": "[variables('policyResourceIdAKSLinuxRestrictive')]",
-                "parameters": {
-                    "excludedNamespaces": {
-                        "value": [
-                            "kube-system",
-                            "gatekeeper-system",
-                            "azure-arc",
-                            "cluster-baseline-settings",
-                            "flux-cd",
-                            "ngsa",
-                            "tiny"
-                        ]
-                    },
-                    "effect": {
-                        "value": "audit"
-                    }
-                }
-            }
-        },
-        {
-            "type": "Microsoft.Authorization/policyAssignments",
-            "apiVersion": "2020-03-01",
-            "name": "[variables('policyAssignmentNameEnforceHttpsIngress')]",
-            "comments": "Applying the 'Enforce HTTPS ingress in Kubernetes cluster' policy to the resource group.",
-            "properties": {
-                "displayName": "[concat('[', variables('clusterNameTrunc'),'] ', reference(variables('policyResourceIdEnforceHttpsIngress'), '2020-09-01').displayName)]",
-                "scope": "[subscriptionResourceId('Microsoft.Resources/resourceGroups', resourceGroup().name)]",
-                "policyDefinitionId": "[variables('policyResourceIdEnforceHttpsIngress')]",
-                "parameters": {
-                    "excludedNamespaces": {
-                        "value": []
-                    },
-                    "effect": {
-                        "value": "deny"
-                    }
-                }
-            }
-        },
-        {
-            "type": "Microsoft.Authorization/policyAssignments",
-            "apiVersion": "2020-03-01",
-            "name": "[variables('policyAssignmentNameEnforceInternalLoadBalancers')]",
-            "comments": "Applying the 'Enforce internal load balancers in Kubernetes cluster' policy to the resource group.",
-            "properties": {
-                "displayName": "[concat('[', variables('clusterNameTrunc'),'] ', reference(variables('policyResourceIdEnforceInternalLoadBalancers'), '2020-09-01').displayName)]",
-                "scope": "[subscriptionResourceId('Microsoft.Resources/resourceGroups', resourceGroup().name)]",
-                "policyDefinitionId": "[variables('policyResourceIdEnforceInternalLoadBalancers')]",
-                "parameters": {
-                    "excludedNamespaces": {
-                        "value": []
-                    },
-                    "effect": {
-                        "value": "deny"
-                    }
-                }
-            }
-        },
-        {
-            "type": "Microsoft.Authorization/policyAssignments",
-            "apiVersion": "2020-03-01",
-            "name": "[variables('policyAssignmentNameRoRootFilesystem')]",
-            "comments": "Applying the 'Kubernetes cluster containers should run with a read only root file system' policy to the resource group.",
-            "properties": {
-                "displayName": "[concat('[', variables('clusterNameTrunc'),'] ', reference(variables('policyResourceIdRoRootFilesystem'), '2020-09-01').displayName)]",
-                "scope": "[subscriptionResourceId('Microsoft.Resources/resourceGroups', resourceGroup().name)]",
-                "policyDefinitionId": "[variables('policyResourceIdRoRootFilesystem')]",
-                "parameters": {
-                    "excludedNamespaces": {
-                        "value": [
-                            "kube-system",
-                            "gatekeeper-system",
-                            "azure-arc"
-                        ]
-                    },
-                    "effect": {
-                        "value": "audit"
-                    }
-                }
-            }
-        },
-        {
-            "type": "Microsoft.Authorization/policyAssignments",
-            "apiVersion": "2020-03-01",
-            "name": "[variables('policyAssignmentNameEnforceResourceLimits')]",
-            "comments": "Applying the 'Container Images Resource Limits' policy at the resource group level.",
-            "properties": {
-                "displayName": "[concat('[',variables('clusterNameTrunc'),']',reference(variables('policyResourceIdEnforceResourceLimits'),'2020-09-01').displayName)]",
-                "scope": "[subscriptionResourceId('Microsoft.Resources/resourceGroups', resourceGroup().name)]",
-                "policyDefinitionId": "[variables('policyResourceIdEnforceResourceLimits')]",
-                "parameters": {
-                    "cpuLimit": {
-                        "value": "1000m"
-                    },
-                    "memoryLimit": {
-                        "value": "512Mi"
-                    },
-                    "excludedNamespaces": {
-                        "value": [
-                            "kube-system",
-                            "gatekeeper-system",
-                            "azure-arc",
-                            "cluster-baseline-settings",
-                            "flux-cd",
-                            "ngsa",
-                            "tiny"
-                        ]
-                    },
-                    "effect": {
-                        "value": "deny"
-                    }
-                }
-            }
-        },
-        {
-            "type": "Microsoft.Authorization/policyAssignments",
-            "apiVersion": "2020-03-01",
-            "name": "[variables('policyAssignmentNameEnforceImageSource')]",
-            "comments": "Applying the 'Allowed Container Images' regex policy at the resource group level. If all images are pull into your ARC instance as described in these instructions you can remove the docker.io entries.",
-            "properties": {
-                "displayName": "[concat('[', variables('clusterNameTrunc'),'] ', reference(variables('policyResourceIdEnforceImageSource'), '2020-09-01').displayName)]",
-                "scope": "[subscriptionResourceId('Microsoft.Resources/resourceGroups', resourceGroup().name)]",
-                "policyDefinitionId": "[variables('policyResourceIdEnforceImageSource')]",
-                "parameters": {
-                    "allowedContainerImagesRegex": {
-                        "value": "[concat(variables('defaultAcrName'),'.azurecr.io/.+$|ghcr.io/retaildevcrews/.+$|mcr.microsoft.com/.+$|docker.io/fluxcd/flux.+$|docker.io/weaveworks/kured.+$|docker.io/retaildevcrew/.+$|docker.io/library/.+$')]"
-                    },
-                    "excludedNamespaces": {
-                        "value": [
-                            "kube-system",
-                            "gatekeeper-system",
-                            "azure-arc",
-                            "flux-cd",
-                            "ingress"
-                        ]
-                    },
-                    "effect": {
-                        "value": "deny"
-                    }
-                }
-            }
         }
     ],
     "outputs": {

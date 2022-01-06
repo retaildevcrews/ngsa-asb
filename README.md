@@ -254,6 +254,9 @@ export ASB_CLUSTER_GEO_LOCATION=westus
 
 ### this section takes 15-20 minutes
 
+# Set Kubernetes Version
+export ASB_K8S_VERSION=1.20.9
+
 # Create AKS
 az deployment group create -g $ASB_RG_CORE \
   -f cluster-stamp.json \
@@ -267,12 +270,14 @@ az deployment group create -g $ASB_RG_CORE \
      asbDomain=${ASB_DOMAIN} \
      asbDnsZone=${ASB_DNS_ZONE} \
      targetVnetResourceId=${ASB_SPOKE_VNET_ID} \
+     hubVnetResourceId=${ASB_VNET_HUB_ID} \
      clusterAdminAadGroupObjectId=${ASB_CLUSTER_ADMIN_ID} \
      k8sControlPlaneAuthorizationTenantId=${ASB_TENANT_ID} \
      appGatewayListenerCertificate=${APP_GW_CERT_CSMS} \
      aksIngressControllerCertificate="$(echo $INGRESS_CERT_CSMS | base64 -d)" \
      aksIngressControllerKey="$(echo $INGRESS_KEY_CSMS | base64 -d)" \
-     --query name -c
+     kubernetesVersion=${ASB_K8S_VERSION} \
+     -c --query name 
 ```
 
 #### Set AKS env vars

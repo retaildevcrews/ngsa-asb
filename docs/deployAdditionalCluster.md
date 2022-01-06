@@ -59,49 +59,35 @@ export ASB_LA_NAME=$(az deployment group show -g $ASB_RG_CORE -n cluster-${ASB_D
 export ASB_CLUSTER_LOCATION=${ASB_SPOKE_LOCATION}
 export ASB_CLUSTER_GEO_LOCATION=westcentralus
 
-# Add DNS Record to Private DNS zone
+# Add DNS A Record
 az network private-dns record-set a add-record -g ${ASB_RG_CORE} -z ${ASB_DNS_ZONE} -n ${ASB_RG_NAME}-${ASB_SPOKE_LOCATION} -a ${ASB_SPOKE_IP_PREFIX}.4.4
 
-# Add Virtual Network Link to Private DNS zone
+# Add Virtual Network Link to Private DNS zones
 az network private-dns link vnet create -n "to_vnet-spoke-$ASB_ORG_APP_ID_NAME-00" -e false -g ${ASB_RG_CORE} -v ${ASB_SPOKE_VNET_ID} -z ${ASB_DNS_ZONE}
-
-# Add Virtual Network link to ACR Private DNS Zone
 az network private-dns link vnet create -n "to_vnet-spoke-$ASB_ORG_APP_ID_NAME-00" -e false -g ${ASB_RG_CORE} -v ${ASB_SPOKE_VNET_ID} -z privatelink.azurecr.io
-
-# retrieve the resource id for azure container registry instance
-export ASB_ACR_RESOURCE_ID=$(az acr show -n $ASB_ACR_NAME -g $ASB_RG_CORE --query id -o tsv)
-
-# retrieve the resource id for acr private dns zone
-export ASB_ACR_DNS_ZONE_RESOURCE_ID=$(az network private-dns zone show -n privatelink.azurecr.io -g ${ASB_RG_CORE} --query id)
+az network private-dns link vnet create -n "to_vnet-spoke-$ASB_ORG_APP_ID_NAME-00" -e false -g ${ASB_RG_CORE} -v ${ASB_SPOKE_VNET_ID} -z privatelink.vaultcore.azure.net
 
 ### this section takes 15-20 minutes
 
 # Create AKS
-
 az deployment group create -g $ASB_RG_CORE \
   -f cluster-stamp-additional.json \
   -n cluster-${ASB_DEPLOYMENT_NAME}-$ASB_CLUSTER_LOCATION \
   -p location=${ASB_CLUSTER_LOCATION} \
      geoRedundancyLocation=${ASB_CLUSTER_GEO_LOCATION} \
-     orgAppId=${ASB_ORG_APP_ID_NAME} \
      nodepoolsRGName=${ASB_RG_NAME} \
      targetVnetResourceId=${ASB_SPOKE_VNET_ID} \
      clusterAdminAadGroupObjectId=${ASB_CLUSTER_ADMIN_ID} \
      k8sControlPlaneAuthorizationTenantId=${ASB_TENANT_ID} \
-     appGatewayListenerCertificate=${APP_GW_CERT_CSMS} \
-     aksIngressControllerCertificate="$(echo $INGRESS_CERT_CSMS | base64 -d)" \
-     aksIngressControllerKey="$(echo $INGRESS_KEY_CSMS | base64 -d)" \
      laWorkspaceName=${ASB_LA_NAME} \
      laResourceGroup=${ASB_RG_CORE} \
-     acrResourceId=${ASB_ACR_RESOURCE_ID} \
-     acrPrivateDnsResourceId=${ASB_ACR_DNS_ZONE_RESOURCE_ID} \
+     kubernetesVersion=${ASB_K8S_VERSION} \
      --query name -c
 
 # Grant PullFromACR permission
+export ASB_ACR_RESOURCE_ID=$(az acr show -n $ASB_ACR_NAME -g $ASB_RG_CORE --query id -o tsv)
 export ASB_CLUSTER_AGENTPOOL_NAME=$(az deployment group show -g $ASB_RG_CORE -n cluster-${ASB_DEPLOYMENT_NAME}-$ASB_CLUSTER_LOCATION --query properties.outputs.aksClusterName.value -o tsv)-agentpool
-
 export ASB_CLUSTER_AGENTPOOL_RESOURCE_ID=$(az identity show -n $ASB_CLUSTER_AGENTPOOL_NAME -g $ASB_RG_CORE-nodepools-$ASB_CLUSTER_LOCATION --query principalId -o tsv)
-
 az role assignment create --role "AcrPull" --assignee ${ASB_CLUSTER_AGENTPOOL_RESOURCE_ID} --scope ${ASB_ACR_RESOURCE_ID}
 
 
