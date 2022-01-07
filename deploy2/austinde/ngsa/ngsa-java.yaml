@@ -1,0 +1,104 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ngsa-java
+  namespace: ngsa
+  labels:
+    app.kubernetes.io/name: ngsa-java
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ngsa-java
+  template:
+    metadata:
+      labels:
+        app: ngsa-java
+        aadpodidbinding: austinde-ngsa-id
+      annotations:
+        prometheus.io/scrape: 'true'
+        prometheus.io/port: '8080'
+    spec:
+      containers:
+        - name: app
+          image: ghcr.io/retaildevcrews/ngsa-java:beta
+          imagePullPolicy: Always
+          env:
+          - name: PROMETHEUS
+            value: "true"
+          - name: ZONE
+            value: "centralus"
+          - name: REGION
+            value: "dev"
+          - name: URL_PREFIX
+            value: /java
+
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+
+          resources:
+            limits:
+              cpu: 500m
+              memory: 512Mi
+            requests:
+              cpu: 500m
+              memory: 512Mi
+
+          volumeMounts:
+            - name: secrets
+              mountPath: "/app/secrets"
+      volumes:
+        - name: secrets
+          csi:
+            driver: secrets-store.csi.k8s.io
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: ngsa-secrets
+
+      nodeSelector:
+        agentpool: npuser01
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: ngsa-java
+  namespace: ngsa
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8080
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app: ngsa-java
+
+---
+
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: ngsa-java-vs
+  namespace: ngsa
+spec:
+  gateways:
+  - istio-system/istio-gateway
+  hosts:
+  - austindev-asb-test.cse.ms
+  http:
+  - match:
+    - uri:
+        prefix: /java/
+    - uri:
+        exact: /java
+    rewrite:
+      uri: /
+    route:
+    - destination:
+        port:
+          number: 8080
+        host: ngsa-java
