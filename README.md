@@ -260,10 +260,10 @@ az deployment group create -g $ASB_RG_CORE \
   -n cluster-${ASB_DEPLOYMENT_NAME} \
   -p location=${ASB_CLUSTER_LOCATION} \
      geoRedundancyLocation=${ASB_CLUSTER_GEO_LOCATION} \
-     deploymentName=${ASB_DEPLOYMENT_NAME} \
+     deploymentName=${ASB_DEPLOYMENT_NAME}-${ASB_CLUSTER_LOCATION} \
      orgAppId=${ASB_ORG_APP_ID_NAME} \
      nodepoolsRGName=${ASB_RG_NAME} \
-     asbDnsName=${ASB_DNS_NAME} \
+     asbDnsName=${ASB_DNS_NAME}-${ASB_CLUSTER_LOCATION} \
      asbDomain=${ASB_DOMAIN} \
      asbDnsZone=${ASB_DNS_ZONE} \
      targetVnetResourceId=${ASB_SPOKE_VNET_ID} \
@@ -284,21 +284,21 @@ az deployment group create -g $ASB_RG_CORE \
 export ASB_PIP_NAME='pip-'$ASB_DEPLOYMENT_NAME'-'$ASB_ORG_APP_ID_NAME'-00'
 
 # get the name of the deployment key vault
-export ASB_KV_NAME=$(az deployment group show -g $ASB_RG_CORE -n cluster-${ASB_DEPLOYMENT_NAME} --query properties.outputs.keyVaultName.value -o tsv)
+export ASB_KV_NAME=$(az deployment group show -g $ASB_RG_CORE -n cluster-${ASB_DEPLOYMENT_NAME}-${ASB_CLUSTER_LOCATION} --query properties.outputs.keyVaultName.value -o tsv)
 
 # get cluster name
-export ASB_AKS_NAME=$(az deployment group show -g $ASB_RG_CORE -n cluster-${ASB_DEPLOYMENT_NAME} --query properties.outputs.aksClusterName.value -o tsv)
+export ASB_AKS_NAME=$(az deployment group show -g $ASB_RG_CORE -n cluster-${ASB_DEPLOYMENT_NAME}-${ASB_CLUSTER_LOCATION} --query properties.outputs.aksClusterName.value -o tsv)
 
 # Get the public IP of our App gateway
 export ASB_AKS_PIP=$(az network public-ip show -g $ASB_RG_SPOKE --name $ASB_PIP_NAME --query ipAddress -o tsv)
 
 # Get the AKS Ingress Controller Managed Identity details.
-export ASB_ISTIO_RESOURCE_ID=$(az deployment group show -g $ASB_RG_CORE -n cluster-${ASB_DEPLOYMENT_NAME} --query properties.outputs.aksIngressControllerPodManagedIdentityResourceId.value -o tsv)
-export ASB_ISTIO_CLIENT_ID=$(az deployment group show -g $ASB_RG_CORE -n cluster-${ASB_DEPLOYMENT_NAME} --query properties.outputs.aksIngressControllerPodManagedIdentityClientId.value -o tsv)
+export ASB_ISTIO_RESOURCE_ID=$(az deployment group show -g $ASB_RG_CORE -n cluster-${ASB_DEPLOYMENT_NAME}-${ASB_CLUSTER_LOCATION} --query properties.outputs.aksIngressControllerPodManagedIdentityResourceId.value -o tsv)
+export ASB_ISTIO_CLIENT_ID=$(az deployment group show -g $ASB_RG_CORE -n cluster-${ASB_DEPLOYMENT_NAME}-${ASB_CLUSTER_LOCATION} --query properties.outputs.aksIngressControllerPodManagedIdentityClientId.value -o tsv)
 export ASB_POD_MI_ID=$(az identity show -n podmi-ingress-controller -g $ASB_RG_CORE --query principalId -o tsv)
 
 # Get the name of Azure Container Registry
-export ASB_ACR_NAME=$(az deployment group show -g $ASB_RG_CORE -n cluster-${ASB_DEPLOYMENT_NAME}  --query properties.outputs.containerRegistryName.value -o tsv)
+export ASB_ACR_NAME=$(az deployment group show -g $ASB_RG_CORE -n cluster-${ASB_DEPLOYMENT_NAME}-${ASB_CLUSTER_LOCATION}  --query properties.outputs.containerRegistryName.value -o tsv)
 
 # config certs
 export ASB_INGRESS_CERT_NAME=appgw-ingress-internal-aks-ingress-tls
@@ -312,9 +312,7 @@ export ASB_INGRESS_KEY_NAME=appgw-ingress-internal-aks-ingress-key
 
 ```bash
 
-mkdir $ASB_GIT_PATH
-
-mkdir $ASB_GIT_PATH/istio
+mkdir -p $ASB_GIT_PATH/istio
 
 # istio pod identity config
 cat templates/istio-pod-identity.yaml | envsubst > $ASB_GIT_PATH/istio/istio-pod-identity-config.yaml
@@ -323,8 +321,8 @@ cat templates/istio-pod-identity.yaml | envsubst > $ASB_GIT_PATH/istio/istio-pod
 cat templates/istio-gateway.yaml | envsubst > $ASB_GIT_PATH/istio/istio-gateway.yaml
 
 # GitOps (flux)
-rm -f flux.yaml
-cat templates/flux.yaml | envsubst  > flux.yaml
+mkdir -p $ASB_GIT_PATH/flux
+cat templates/flux.yaml | envsubst  > $ASB_GIT_PATH/flux/flux.yaml
 
 ```
 
@@ -339,10 +337,7 @@ cat templates/flux.yaml | envsubst  > flux.yaml
 git status
 
 # push to your branch
-git add flux.yaml
-git add $ASB_GIT_PATH/istio/istio-pod-identity-config.yaml
-git add $ASB_GIT_PATH/istio/istio-gateway.yaml
-git add networking/spoke-*.json
+git add $ASB_GIT_PATH
 
 git commit -m "added cluster config"
 git push
@@ -355,10 +350,10 @@ git push
 # We are using 'dns-rg' for triplets
 
 # resource group of DNS Zone for deployment
-DNS_ZONE_RG=dns-rg 
+export ASB_DNS_ZONE_RG=dns-rg 
 
 # create the dns record
-az network dns record-set a add-record -g $DNS_ZONE_RG -z $ASB_DNS_ZONE -n $ASB_DNS_NAME -a $ASB_AKS_PIP --query fqdn
+az network dns record-set a add-record -g $ASB_DNS_ZONE_RG -z $ASB_DNS_ZONE -n $ASB_DNS_NAME-$ASB_SPOKE_LOCATION -a $ASB_AKS_PIP --query fqdn
 
 ```
 
@@ -390,13 +385,22 @@ kubectl get pods -A
 ```bash
 
 # setup flux
-kubectl apply -f flux.yaml
+kubectl apply -f $ASB_GIT_PATH/flux/flux.yaml
 
 # 🛑 check the pods until everything is running
 kubectl get pods -n flux-cd -l app.kubernetes.io/name=flux
 
 # check flux logs
 kubectl logs -n flux-cd -l app.kubernetes.io/name=flux
+
+# copy bootstrap files needed
+cp -r templates/bootstrap deploy
+
+# push to your branch
+git add deploy
+
+git commit -m "added cluster config"
+git push
 
 ```
 
@@ -408,25 +412,7 @@ There are two different options to choose from for deploying NGSA:
 - [Deploy using yaml with FluxCD](./docs/deployNgsaYaml.md)
 - [Deploy using AutoGitops with FluxCD](./docs/deployNgsaAgo.md)
 
-### Validate Istio Ingress
 
-```bash
-
-After NGSA has been deployed, verify that Istio ingress is working correctly
-
-kubectl get pods -n istio-system
-
-## Verify with http
-### this can take 1-2 minutes
-### if you get a 502 error retry until you get 200
-
-# test https
-http https://${ASB_DOMAIN}/memory/version
-http https://${ASB_DOMAIN}/cosmos/version
-
-### Congratulations! You have GitOps setup on ASB!
-
-```
 
 ### Deploy Fluent Bit
 

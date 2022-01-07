@@ -1,8 +1,7 @@
 # Cosmos DB in AKS secure baseline
 
 Prerequisites:
-
-- Follow setup instructions in [README.md](../README.md) to create an environment
+- A CosmosDB movie database is required, Follow setup instructions in [README.md](https://github.com/cse-labs/imdb) to create a new environment
 
 ## Set Cosmos env vars
 
@@ -27,12 +26,17 @@ export ASB_COSMOS_ID=$(az cosmosdb show -g $ASB_COSMOS_RG_NAME -n $ASB_IMDB_NAME
 # subnet for AKS cluster nodes
 export ASB_NODES_SUBNET_ID=$(az deployment group show -g $ASB_RG_CORE -n cluster-${ASB_DEPLOYMENT_NAME} --query properties.outputs.vnetNodePoolSubnetResourceId.value -o tsv)
 
+#TODO get ID from HUB instead 
+# export ASB_HUB_SUBNET_ID=/subscriptions/648dcb5a-de1e-48b2-af6b-fe6ef28d355c/resourceGroups/rg-austindev-asb-test-hub/providers/Microsoft.Network/virtualNetworks/vnet-centralus-hub/subnets/ACRSubnet
+#az network vnet subnet list --resource-group rg-austindev-asb-test-hub --vnet-name vnet-centralus-hub
+# az network vnet subnet show -g rg-austindev-asb-test-hub -n ACRSubnet --vnet-name vnet-centralus-hub
+
 # create private endpoint
 az network private-endpoint create \
   --name "nodepools-to-cosmos-endpoint" \
   --connection-name "nodepools-to-cosmos-connection" \
   --resource-group $ASB_RG_CORE \
-  --subnet $ASB_NODES_SUBNET_ID \
+  --subnet $ASB_HUB_SUBNET_ID \
   --private-connection-resource-id $ASB_COSMOS_ID \
   --group-id "Sql"
 
@@ -41,12 +45,12 @@ az network private-endpoint create \
 export ASB_COSMOS_ZONE="privatelink.documents.azure.com"
 az network private-dns zone create --resource-group $ASB_RG_CORE --name $ASB_COSMOS_ZONE
 
-# create vnet link between private zone and spoke vnet
+# create vnet link between private zone and hub vnet
 az network private-dns link vnet create \
   --resource-group $ASB_RG_CORE \
   --zone-name  $ASB_COSMOS_ZONE \
-  --name "nodepools-to-cosmos-link" \
-  --virtual-network $ASB_SPOKE_VNET_ID \
+  --name "to_vnet-${ASB_HUB_LOCATION}-hub" \
+  --virtual-network $ASB_VNET_HUB_ID \
   --registration-enabled false
 
 # create a DNS zone group to add cosmos dns records to private dns zone
@@ -56,6 +60,15 @@ az network private-endpoint dns-zone-group create \
   --name "nodepools-to-cosmos-zone-group" \
   --private-dns-zone $ASB_COSMOS_ZONE \
   --zone-name $ASB_DEPLOYMENT_NAME
+
+# create vnet link between private zone and spoke vnet
+az network private-dns link vnet create \
+  --resource-group $ASB_RG_CORE \
+  --zone-name  $ASB_COSMOS_ZONE \
+  --name "to_vnet-spoke-${ASB_ORG_APP_ID_NAME}-00" \
+  --virtual-network $ASB_SPOKE_VNET_ID \
+  --registration-enabled false
+
 
 # save env vars
 ./saveenv.sh -y

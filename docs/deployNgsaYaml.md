@@ -5,6 +5,7 @@
 ```bash
 export ASB_NGSA_MI_CLIENT_ID=$(az identity show -n $ASB_NGSA_MI_NAME -g $ASB_RG_CORE --query "clientId" -o tsv)
 
+mkdir -p $ASB_GIT_PATH/ngsa
 cat templates/ngsa-cosmos.yaml | envsubst > $ASB_GIT_PATH/ngsa/ngsa-cosmos.yaml
 cat templates/ngsa-memory.yaml | envsubst > $ASB_GIT_PATH/ngsa/ngsa-memory.yaml
 cat templates/ngsa-java.yaml | envsubst > $ASB_GIT_PATH/ngsa/ngsa-java.yaml
@@ -48,6 +49,7 @@ fluxctl sync --k8s-fwd-ns flux-cd
 # wait for ngsa-cosmos pods to start
 ### this can take 8-10 minutes as the cluster sets up pod identity, and secrets via the csi driver
 kubectl get pods -n ngsa
+kubectl get pods -n istio-system
 
 http https://${ASB_DOMAIN}/cosmos/version
 http https://${ASB_DOMAIN}/memory/version
