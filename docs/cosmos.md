@@ -24,19 +24,16 @@ export ASB_COSMOS_ID=$(az cosmosdb show -g $ASB_COSMOS_RG_NAME -n $ASB_IMDB_NAME
 ```bash
 
 # subnet for AKS cluster nodes
-export ASB_NODES_SUBNET_ID=$(az deployment group show -g $ASB_RG_CORE -n cluster-${ASB_DEPLOYMENT_NAME} --query properties.outputs.vnetNodePoolSubnetResourceId.value -o tsv)
+export ASB_NODES_SUBNET_ID=$(az deployment group show -g $ASB_RG_CORE -n cluster-${ASB_DEPLOYMENT_NAME}-${ASB_CLUSTER_LOCATION} --query properties.outputs.vnetNodePoolSubnetResourceId.value -o tsv)
 
-#TODO get ID from HUB instead 
-# export ASB_HUB_SUBNET_ID=/subscriptions/648dcb5a-de1e-48b2-af6b-fe6ef28d355c/resourceGroups/rg-austindev-asb-test-hub/providers/Microsoft.Network/virtualNetworks/vnet-centralus-hub/subnets/ACRSubnet
-#az network vnet subnet list --resource-group rg-austindev-asb-test-hub --vnet-name vnet-centralus-hub
-# az network vnet subnet show -g rg-austindev-asb-test-hub -n ACRSubnet --vnet-name vnet-centralus-hub
+export ASB_HUB_CS_SUBNET_ID=$(az network vnet subnet show -g $ASB_RG_HUB -n CommonServicesSubnet --vnet-name vnet-centralus-hub --query id -o tsv)
 
 # create private endpoint
 az network private-endpoint create \
   --name "nodepools-to-cosmos-endpoint" \
   --connection-name "nodepools-to-cosmos-connection" \
   --resource-group $ASB_RG_CORE \
-  --subnet $ASB_HUB_SUBNET_ID \
+  --subnet $ASB_HUB_CS_SUBNET_ID \
   --private-connection-resource-id $ASB_COSMOS_ID \
   --group-id "Sql"
 
