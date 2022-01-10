@@ -1,0 +1,7 @@
+{
+    "zone": "centralus",
+    "region": "dev",
+    "mi.name": "ngsadev-ngsa-id",
+    "domain" : "ngsa-pre-central-dev.cse.ms",
+    "environment" : "dev"
+}
