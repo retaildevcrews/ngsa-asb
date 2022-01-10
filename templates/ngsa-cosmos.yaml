@@ -88,7 +88,7 @@ spec:
   gateways:
   - istio-system/istio-gateway
   hosts:
-  - ${ASB_DOMAIN}
+  - ${ASB_DOMAIN}-${ASB_SPOKE_LOCATION}
   http:
   - match:
     - uri:
