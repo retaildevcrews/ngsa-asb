@@ -257,13 +257,13 @@ export ASB_K8S_VERSION=1.20.9
 # Create AKS
 az deployment group create -g $ASB_RG_CORE \
   -f cluster-stamp.json \
-  -n cluster-${ASB_DEPLOYMENT_NAME} \
+  -n cluster-${ASB_DEPLOYMENT_NAME}-${ASB_CLUSTER_LOCATION} \
   -p location=${ASB_CLUSTER_LOCATION} \
      geoRedundancyLocation=${ASB_CLUSTER_GEO_LOCATION} \
-     deploymentName=${ASB_DEPLOYMENT_NAME}-${ASB_CLUSTER_LOCATION} \
+     deploymentName=${ASB_DEPLOYMENT_NAME} \
      orgAppId=${ASB_ORG_APP_ID_NAME} \
      nodepoolsRGName=${ASB_RG_NAME} \
-     asbDnsName=${ASB_DNS_NAME}-${ASB_CLUSTER_LOCATION} \
+     asbDnsName=${ASB_DNS_NAME} \
      asbDomain=${ASB_DOMAIN} \
      asbDnsZone=${ASB_DNS_ZONE} \
      targetVnetResourceId=${ASB_SPOKE_VNET_ID} \
@@ -353,7 +353,7 @@ git push
 export ASB_DNS_ZONE_RG=dns-rg 
 
 # create the dns record
-az network dns record-set a add-record -g $ASB_DNS_ZONE_RG -z $ASB_DNS_ZONE -n $ASB_DNS_NAME-$ASB_SPOKE_LOCATION -a $ASB_AKS_PIP --query fqdn
+az network dns record-set a add-record -g $ASB_DNS_ZONE_RG -z $ASB_DNS_ZONE -n $ASB_DNS_NAME -a $ASB_AKS_PIP --query fqdn
 
 ```
 
@@ -365,7 +365,7 @@ az network dns record-set a add-record -g $ASB_DNS_ZONE_RG -z $ASB_DNS_ZONE -n $
 az aks get-credentials -g $ASB_RG_CORE -n $ASB_AKS_NAME
 
 # rename context for simplicity
-kubectl config rename-context $ASB_AKS_NAME $ASB_DEPLOYMENT_NAME
+kubectl config rename-context $ASB_AKS_NAME $ASB_DEPLOYMENT_NAME-${ASB_CLUSTER_LOCATION}
 
 # check the nodes
 # requires Azure login

@@ -19,7 +19,8 @@ spec:
     spec:
       containers:
         - name: app
-          image: acraksepkgeej2a4ijc.azurecr.io/retaildevcrews/ngsa-lr:beta
+          #image: acraksepkgeej2a4ijc.azurecr.io/retaildevcrews/ngsa-lr:beta
+          image: ghcr.io/retaildevcrews/ngsa-lr:beta
           imagePullPolicy: Always
           ports:
             - name: http

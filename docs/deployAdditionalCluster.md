@@ -52,7 +52,7 @@ echo $ASB_SPOKE_VNET_ID
 echo $ASB_ORG_APP_ID_NAME
 
 # Set Log Analytics name
-export ASB_LA_NAME=$(az deployment group show -g $ASB_RG_CORE -n cluster-${ASB_DEPLOYMENT_NAME} --query properties.outputs.logAnalyticsName.value -o tsv)
+export ASB_LA_NAME=$(az deployment group show -g $ASB_RG_CORE -n cluster-${ASB_DEPLOYMENT_NAME}-${ASB_HUB_LOCATION} --query properties.outputs.logAnalyticsName.value -o tsv)
 
 ### Set cluster locations by choosing the closest pair - not all regions support ASB. Make sure there has not been a cluster to this region before.
 # Note: cluster location must be the same as spoke location
@@ -69,6 +69,9 @@ az network private-dns link vnet create -n "to_vnet-spoke-$ASB_ORG_APP_ID_NAME-0
 az network private-dns link vnet create -n "to_vnet-spoke-$ASB_ORG_APP_ID_NAME-00" -e false -g ${ASB_RG_CORE} -v ${ASB_SPOKE_VNET_ID} -z privatelink.documents.azure.com
 
 
+# Get App Gateway frontend MI ID
+export ASB_FRONTEND_MI_ID=$(az identity show -n mi-appgateway-frontend -g $ASB_RG_CORE --query id -o tsv)
+
 
 ### this section takes 15-20 minutes
 
@@ -84,6 +87,7 @@ az deployment group create -g $ASB_RG_CORE \
      k8sControlPlaneAuthorizationTenantId=${ASB_TENANT_ID} \
      laWorkspaceName=${ASB_LA_NAME} \
      laResourceGroup=${ASB_RG_CORE} \
+     frontEndMiResourceId=${ASB_FRONTEND_MI_ID} \
      kubernetesVersion=${ASB_K8S_VERSION} \
      --query name -c
 

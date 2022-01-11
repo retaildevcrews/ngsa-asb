@@ -197,10 +197,10 @@
         "vnetName": "[split(parameters('targetVnetResourceId'),'/')[8]]",
         "vnetNodePoolSubnetResourceId": "[concat(parameters('targetVnetResourceId'), '/subnets/snet-clusternodes')]",
         "vnetIngressServicesSubnetResourceId": "[concat(parameters('targetVnetResourceId'), '/subnets/snet-cluster-ingressservices')]",
-        "vnetHubAcrSubnetResourceId": "[concat(parameters('hubVnetResourceId'), '/subnets/ACRSubnet')]",
+        "vnetHubCommonServicesSubnetResourceId": "[concat(parameters('hubVnetResourceId'), '/subnets/CommonServicesSubnet')]",
         "HubvnetName": "[split(parameters('hubVnetResourceId'),'/')[8]]",
 
-        "agwName": "[concat('apw-', variables('baseName'))]",
+        "agwName": "[concat('apw-', variables('clusterName'))]",
         "apwResourceId": "[resourceId('Microsoft.Network/applicationGateways', variables('agwName'))]",
 
         "acrPrivateDnsZonesName": "privatelink.azurecr.io",
@@ -389,7 +389,7 @@
             ],
             "properties": {
                 "subnet": {
-                    "id": "[variables('vnetHubAcrSubnetResourceId')]"
+                    "id": "[variables('vnetHubCommonServicesSubnetResourceId')]"
                 },
                 "privateLinkServiceConnections": [
                     {
@@ -1103,7 +1103,7 @@
             ],
             "properties": {
                 "subnet": {
-                    "id": "[variables('vnetHubAcrSubnetResourceId')]"
+                    "id": "[variables('vnetHubCommonServicesSubnetResourceId')]"
                 },
                 "privateLinkServiceConnections": [
                     {

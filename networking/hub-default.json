@@ -61,7 +61,7 @@
                 "description": "A /27 under the VNet Address Space for regional Azure Bastion"
             }
         },
-        "azureContainerRegistrySubnetAddressSpace": {
+        "azureCommonServicesSubnetAddressSpace": {
             "defaultValue": "10.200.0.128/28",
             "type": "string",
             "maxLength": 18,
@@ -333,9 +333,9 @@
                         }
                     },
                     {
-                        "name": "ACRSubnet",
+                        "name": "CommonServicesSubnet",
                         "properties": {
-                            "addressPrefix": "[parameters('azureContainerRegistrySubnetAddressSpace')]",
+                            "addressPrefix": "[parameters('azureCommonServicesSubnetAddressSpace')]",
                             "privateEndpointNetworkPolicies": "Disabled" 
                         }
                     }

@@ -50,6 +50,13 @@
                 "description": "IP ranges authorized to contact the Kubernetes API server. Passing an empty array will result in no IP restrictions. If any are provided, remember to also provide the public IP of the egress Azure Firewall otherwise your nodes will not be able to talk to the API server (e.g. Flux)."
             }
         },
+        "frontEndMiResourceId": {
+            "type": "string",
+            "minLength": 79,
+            "metadata": {
+                "description": "The resource id for the frontend managed identity"
+            }
+        }
         "location": {
             "type": "string",
             "allowedValues": [
@@ -127,7 +134,9 @@
         "vnetNodePoolSubnetResourceId": "[concat(parameters('targetVnetResourceId'), '/subnets/snet-clusternodes')]",
         "vnetIngressServicesSubnetResourceId": "[concat(parameters('targetVnetResourceId'), '/subnets/snet-cluster-ingressservices')]",
 
-        "clusterControlPlaneIdentityName": "[concat('mi-', variables('clusterName'), '-controlplane')]"
+        "clusterControlPlaneIdentityName": "[concat('mi-', variables('clusterName'), '-controlplane')]",
+
+        "agwName": "[concat('apw-', variables('clusterName'))]"
     },
     "resources": [
         {
@@ -1046,6 +1055,203 @@
                     "principalId": "[reference(resourceId('Microsoft.ContainerService/managedClusters', variables('clusterName')), '2020-11-01').identityProfile.kubeletidentity.objectId]",
                     "principalType": "ServicePrincipal"
                 }
+        },
+        {
+            "type": "Microsoft.Network/applicationGateways",
+            "apiVersion": "2020-05-01",
+            "name": "[variables('agwName')]",
+            "location": "[parameters('location')]",
+            "identity": {
+                "type": "UserAssigned",
+                "userAssignedIdentities": {
+                    "[parameters('frontEndMiResourceId)]": {}
+                }
+            },
+            "zones": [
+                "1",
+                "2",
+                "3"
+            ],
+            "properties": {
+                "sku": {
+                    "name": "WAF_v2",
+                    "tier": "WAF_v2"
+                },
+                "sslPolicy": {
+                    "policyType": "Custom",
+                    "cipherSuites": [
+                        "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384",
+                        "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256"
+                    ],
+                    "minProtocolVersion": "TLSv1_2"
+                },
+                "gatewayIPConfigurations": [
+                    {
+                        "name": "apw-ip-configuration",
+                        "properties": {
+                            "subnet": {
+                                "id": "[concat(parameters('targetVnetResourceId'), '/subnets/snet-applicationgateway')]"
+                            }
+                        }
+                    }
+                ],
+                "frontendIPConfigurations": [
+                    {
+                        "name": "apw-frontend-ip-configuration",
+                        "properties": {
+                            "PublicIPAddress": {
+                                "id": "[resourceId(subscription().subscriptionId, variables('vNetResourceGroup'), 'Microsoft.Network/publicIpAddresses', concat('pip-', parameters('deploymentName'), '-', parameters('orgAppId'), '-00'))]"
+                            }
+                        }
+                    }
+                ],
+                "frontendPorts": [
+                    {
+                        "name": "apw-frontend-ports",
+                        "properties": {
+                            "port": 443
+                        }
+                    }
+                ],
+                "autoscaleConfiguration": {
+                    "minCapacity": 0,
+                    "maxCapacity": 10
+                },
+                "webApplicationFirewallConfiguration": {
+                    "enabled": true,
+                    "firewallMode": "Prevention",
+                    "ruleSetType": "OWASP",
+                    "ruleSetVersion": "3.0",
+                    "disabledRuleGroups": [
+                        {
+                            "ruleGroupName": "REQUEST-942-APPLICATION-ATTACK-SQLI",
+                            "rules": [
+                                942150,
+                                942410
+                            ]
+                        }
+                    ]
+                },
+                "enableHttp2": false,
+                "sslCertificates": [
+                    {
+                        "name": "[concat(variables('agwName'), '-ssl-certificate')]",
+                        "properties": {
+                            "keyVaultSecretId": "[concat(reference(variables('keyVaultName')).vaultUri,'secrets/sslcert')]"
+                        }
+                    }
+                ],
+                "probes": [
+                    {
+                        "name": "[concat('probe-', parameters('asbDomain'))]",
+                        "properties": {
+                            "protocol": "Https",
+                            "path": "/memory/healthz",
+                            "interval": 30,
+                            "timeout": 30,
+                            "unhealthyThreshold": 3,
+                            "pickHostNameFromBackendHttpSettings": true,
+                            "minServers": 0,
+                            "match": {
+                            }
+                        }
+                    }
+                ],
+                "backendAddressPools": [
+                    {
+                        "name": "[parameters('asbDomain')]",
+                        "properties": {
+                            "backendAddresses": [
+                                {
+                                    "fqdn": "[parameters('asbDomain')]"
+                                }
+                            ]
+                        }
+                    }
+                ],
+                "backendHttpSettingsCollection": [
+                    {
+                        "name": "aks-ingress-backendpool-httpsettings",
+                        "properties": {
+                            "port": 443,
+                            "protocol": "Https",
+                            "cookieBasedAffinity": "Disabled",
+                            "pickHostNameFromBackendAddress": true,
+                            "requestTimeout": 20,
+                            "probe": {
+                                "id": "[concat(resourceId('Microsoft.Network/applicationGateways', variables('agwName')), concat('/probes/probe-', parameters('asbDomain')))]"
+                            }
+                        }
+                    }
+                ],
+                "httpListeners": [
+                    {
+                        "name": "listener-https",
+                        "properties": {
+                            "frontendIPConfiguration": {
+                                "id": "[concat(variables('apwResourceId'), '/frontendIPConfigurations/apw-frontend-ip-configuration')]"
+                            },
+                            "frontendPort": {
+                                "id": "[concat(variables('apwResourceId'), '/frontendPorts/apw-frontend-ports')]"
+                            },
+                            "protocol": "Https",
+                            "sslCertificate": {
+                                "id": "[concat(variables('apwResourceId'), '/sslCertificates/', variables('agwName'), '-ssl-certificate')]"
+                            },
+                            "hostName": "[parameters('asbDomain')]",
+                            "hostNames": [
+                            ],
+                            "requireServerNameIndication": true
+                        }
+                    }
+                ],
+                "requestRoutingRules": [
+                    {
+                        "Name": "apw-routing-rules",
+                        "properties": {
+                            "RuleType": "Basic",
+                            "httpListener": {
+                                "id": "[concat(variables('apwResourceId'), '/httpListeners/listener-https')]"
+                            },
+                            "backendAddressPool": {
+                                "id": "[concat(variables('apwResourceId'), '/backendAddressPools/', parameters('asbDomain'))]"
+                            },
+                            "backendHttpSettings": {
+                                "id": "[concat(variables('apwResourceId'), '/backendHttpSettingsCollection/aks-ingress-backendpool-httpsettings')]"
+                            }
+                        }
+                    }
+                ]
+            },
+            
+            "resources": [
+                {
+                    "type": "providers/diagnosticSettings",
+                    "apiVersion": "2017-05-01-preview",
+                    "name": "/Microsoft.Insights/default",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Network/applicationGateways', variables('agwName'))]",
+                        "[resourceId('Microsoft.OperationalInsights/workspaces', variables('laNewWorkspaceName'))]"
+                    ],
+                    "properties": {
+                        "workspaceId": "[resourceId(variables('logAnalyticsResourceGroup'), 'Microsoft.OperationalInsights/workspaces', variables('logAnalyticsWorkspaceName'))]",
+                        "logs": [
+                            {
+                                "category": "ApplicationGatewayAccessLog",
+                                "enabled": true
+                            },
+                            {
+                                "category": "ApplicationGatewayPerformanceLog",
+                                "enabled": true
+                            },
+                            {
+                                "category": "ApplicationGatewayFirewallLog",
+                                "enabled": true
+                            }
+                        ]
+                    }
+                }
+            ]
         }
     ],
     "outputs": {
