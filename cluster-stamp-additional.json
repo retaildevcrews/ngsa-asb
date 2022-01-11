@@ -2,6 +2,22 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "0.0.0.5",
     "parameters": {
+        "deploymentName": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 8,
+            "metadata": {
+                "description": "Deployment name used in naming"
+            }
+        },
+        "orgAppId": {
+            "type": "string",
+            "minLength": 5,
+            "maxLength": 11,
+            "metadata": {
+                "description": "Organization App ID e.g Business Unit (BU0001A0008)"
+            }
+        },
         "laWorkspaceName":{
             "type": "string",
             "minLength": 0,
@@ -10,12 +26,12 @@
                 "description": "Log Analytics Workspace Name to Use"
             }
         },
-        "laResourceGroup":{
+        "coreResourceGroup":{
             "type": "string",
             "minLength": 0,
             "maxLength": 40,
             "metadata": {
-                "description": "Resource Group where Log Analytics is"
+                "description": "Resource Group where common components are"
             }
         },
         "nodepoolsRGName": {
@@ -50,13 +66,14 @@
                 "description": "IP ranges authorized to contact the Kubernetes API server. Passing an empty array will result in no IP restrictions. If any are provided, remember to also provide the public IP of the egress Azure Firewall otherwise your nodes will not be able to talk to the API server (e.g. Flux)."
             }
         },
-        "frontEndMiResourceId": {
+        "asbDomain": {
             "type": "string",
-            "minLength": 79,
+            "minLength": 3,
+            "maxLength": 128,
             "metadata": {
-                "description": "The resource id for the frontend managed identity"
+                "description": "Top level domain"
             }
-        }
+        },
         "location": {
             "type": "string",
             "allowedValues": [
@@ -126,7 +143,7 @@
         "baseName": "[concat('aks-',variables('subRgUniqueString'))]",
         "clusterName": "[concat(variables('baseName'),'-',parameters('location'))]",
         "logAnalyticsWorkspaceName" : "[parameters('laWorkspaceName')]",
-        "logAnalyticsResourceGroup": "[parameters('laResourceGroup')]",
+        "coreResourceGroup": "[parameters('coreResourceGroup')]",
         "defaultAcrName": "[concat('acraks', variables('subRgUniqueString'))]",
 
         "vNetResourceGroup": "[split(parameters('targetVnetResourceId'),'/')[4]]",
@@ -135,8 +152,9 @@
         "vnetIngressServicesSubnetResourceId": "[concat(parameters('targetVnetResourceId'), '/subnets/snet-cluster-ingressservices')]",
 
         "clusterControlPlaneIdentityName": "[concat('mi-', variables('clusterName'), '-controlplane')]",
-
-        "agwName": "[concat('apw-', variables('clusterName'))]"
+        "keyVaultName": "[concat('kv-', concat('aks-', variables('subRgUniqueString')))]",
+        "agwName": "[concat('apw-', variables('clusterName'))]",
+        "apwResourceId": "[resourceId('Microsoft.Network/applicationGateways', variables('agwName'))]"
     },
     "resources": [
         {
@@ -230,7 +248,7 @@
                 "enabled": "true",
                 "source": {
                     "query": "[concat('//https://docs.microsoft.com/azure/azure-monitor/insights/container-insights-alerts \r\n let endDateTime = now(); let startDateTime = ago(1h); let trendBinSize = 1m; let clusterName = \"',variables('clusterName'),'\"; KubePodInventory | where TimeGenerated < endDateTime | where TimeGenerated >= startDateTime | where ClusterName == clusterName | distinct ClusterName, TimeGenerated | summarize ClusterSnapshotCount = count() by bin(TimeGenerated, trendBinSize), ClusterName | join hint.strategy=broadcast ( KubePodInventory | where TimeGenerated < endDateTime | where TimeGenerated >= startDateTime | distinct ClusterName, Computer, PodUid, TimeGenerated, PodStatus | summarize TotalCount = count(), PendingCount = sumif(1, PodStatus =~ \"Pending\"), RunningCount = sumif(1, PodStatus =~ \"Running\"), SucceededCount = sumif(1, PodStatus =~ \"Succeeded\"), FailedCount = sumif(1, PodStatus =~ \"Failed\") by ClusterName, bin(TimeGenerated, trendBinSize) ) on ClusterName, TimeGenerated | extend UnknownCount = TotalCount - PendingCount - RunningCount - SucceededCount - FailedCount | project TimeGenerated, TotalCount = todouble(TotalCount) / ClusterSnapshotCount, PendingCount = todouble(PendingCount) / ClusterSnapshotCount, RunningCount = todouble(RunningCount) / ClusterSnapshotCount, SucceededCount = todouble(SucceededCount) / ClusterSnapshotCount, FailedCount = todouble(FailedCount) / ClusterSnapshotCount, UnknownCount = todouble(UnknownCount) / ClusterSnapshotCount| summarize AggregatedValue = avg(FailedCount) by bin(TimeGenerated, trendBinSize)')]",
-                    "dataSourceId": "[resourceId(variables('logAnalyticsResourceGroup'), 'Microsoft.OperationalInsights/workspaces', variables('logAnalyticsWorkspaceName'))]",
+                    "dataSourceId": "[resourceId(variables('coreResourceGroup'), 'Microsoft.OperationalInsights/workspaces', variables('logAnalyticsWorkspaceName'))]",
                     "queryType": "ResultCount"
                 },
                 "schedule": {
@@ -330,7 +348,7 @@
                     "omsagent": {
                         "enabled": true,
                         "config": {
-                            "logAnalyticsWorkspaceResourceId": "[resourceId(variables('logAnalyticsResourceGroup'), 'Microsoft.OperationalInsights/workspaces', variables('logAnalyticsWorkspaceName'))]"
+                            "logAnalyticsWorkspaceResourceId": "[resourceId(variables('coreResourceGroup'), 'Microsoft.OperationalInsights/workspaces', variables('logAnalyticsWorkspaceName'))]"
                         }
                     },
                     "aciConnectorLinux": {
@@ -423,7 +441,7 @@
                         "[resourceId('Microsoft.ContainerService/managedClusters', variables('clusterName'))]"
                     ],
                     "properties": {
-                        "workspaceId": "[resourceId(variables('logAnalyticsResourceGroup'), 'Microsoft.OperationalInsights/workspaces', variables('logAnalyticsWorkspaceName'))]",
+                        "workspaceId": "[resourceId(variables('coreResourceGroup'), 'Microsoft.OperationalInsights/workspaces', variables('logAnalyticsWorkspaceName'))]",
                         "logs": [
                             {
                                 "category": "cluster-autoscaler",
@@ -1064,7 +1082,7 @@
             "identity": {
                 "type": "UserAssigned",
                 "userAssignedIdentities": {
-                    "[parameters('frontEndMiResourceId)]": {}
+                    "[resourceId(subscription().subscriptionId, variables('coreResourceGroup'), 'Microsoft.ManagedIdentity/userAssignedIdentities/','mi-appgateway-frontend')]": {}
                 }
             },
             "zones": [
@@ -1137,7 +1155,7 @@
                     {
                         "name": "[concat(variables('agwName'), '-ssl-certificate')]",
                         "properties": {
-                            "keyVaultSecretId": "[concat(reference(variables('keyVaultName')).vaultUri,'secrets/sslcert')]"
+                            "keyVaultSecretId": "[concat('https://',variables('keyVaultName'),'.vault.azure.net/secrets/sslcert')]"
                         }
                     }
                 ],
@@ -1222,19 +1240,17 @@
                         }
                     }
                 ]
-            },
-            
+            }, 
             "resources": [
                 {
                     "type": "providers/diagnosticSettings",
                     "apiVersion": "2017-05-01-preview",
                     "name": "/Microsoft.Insights/default",
                     "dependsOn": [
-                        "[resourceId('Microsoft.Network/applicationGateways', variables('agwName'))]",
-                        "[resourceId('Microsoft.OperationalInsights/workspaces', variables('laNewWorkspaceName'))]"
+                        "[resourceId('Microsoft.Network/applicationGateways', variables('agwName'))]"
                     ],
                     "properties": {
-                        "workspaceId": "[resourceId(variables('logAnalyticsResourceGroup'), 'Microsoft.OperationalInsights/workspaces', variables('logAnalyticsWorkspaceName'))]",
+                        "workspaceId": "[resourceId(variables('coreResourceGroup'), 'Microsoft.OperationalInsights/workspaces', variables('logAnalyticsWorkspaceName'))]",
                         "logs": [
                             {
                                 "category": "ApplicationGatewayAccessLog",

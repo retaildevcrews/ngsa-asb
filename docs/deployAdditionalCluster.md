@@ -59,18 +59,18 @@ export ASB_LA_NAME=$(az deployment group show -g $ASB_RG_CORE -n cluster-${ASB_D
 export ASB_CLUSTER_LOCATION=${ASB_SPOKE_LOCATION}
 export ASB_CLUSTER_GEO_LOCATION=westcentralus
 
+
+#Set top level domain
+export ASB_DOMAIN=${ASB_RG_NAME}-${ASB_SPOKE_LOCATION}
+
 # Add DNS A Record
-az network private-dns record-set a add-record -g ${ASB_RG_CORE} -z ${ASB_DNS_ZONE} -n ${ASB_RG_NAME}-${ASB_SPOKE_LOCATION} -a ${ASB_SPOKE_IP_PREFIX}.4.4
+az network private-dns record-set a add-record -g ${ASB_RG_CORE} -z ${ASB_DNS_ZONE} -n ${ASB_DOMAIN} -a ${ASB_SPOKE_IP_PREFIX}.4.4
 
 # Add Virtual Network Link to Private DNS zones
 az network private-dns link vnet create -n "to_vnet-spoke-$ASB_ORG_APP_ID_NAME-00" -e false -g ${ASB_RG_CORE} -v ${ASB_SPOKE_VNET_ID} -z ${ASB_DNS_ZONE}
 az network private-dns link vnet create -n "to_vnet-spoke-$ASB_ORG_APP_ID_NAME-00" -e false -g ${ASB_RG_CORE} -v ${ASB_SPOKE_VNET_ID} -z privatelink.azurecr.io
 az network private-dns link vnet create -n "to_vnet-spoke-$ASB_ORG_APP_ID_NAME-00" -e false -g ${ASB_RG_CORE} -v ${ASB_SPOKE_VNET_ID} -z privatelink.vaultcore.azure.net
 az network private-dns link vnet create -n "to_vnet-spoke-$ASB_ORG_APP_ID_NAME-00" -e false -g ${ASB_RG_CORE} -v ${ASB_SPOKE_VNET_ID} -z privatelink.documents.azure.com
-
-
-# Get App Gateway frontend MI ID
-export ASB_FRONTEND_MI_ID=$(az identity show -n mi-appgateway-frontend -g $ASB_RG_CORE --query id -o tsv)
 
 
 ### this section takes 15-20 minutes
@@ -80,14 +80,16 @@ az deployment group create -g $ASB_RG_CORE \
   -f cluster-stamp-additional.json \
   -n cluster-${ASB_DEPLOYMENT_NAME}-$ASB_CLUSTER_LOCATION \
   -p location=${ASB_CLUSTER_LOCATION} \
+     asbDomain=${ASB_DOMAIN} \
+     orgAppId=${ASB_ORG_APP_ID_NAME} \
+     deploymentName=${ASB_DEPLOYMENT_NAME} \
      geoRedundancyLocation=${ASB_CLUSTER_GEO_LOCATION} \
      nodepoolsRGName=${ASB_RG_NAME} \
      targetVnetResourceId=${ASB_SPOKE_VNET_ID} \
      clusterAdminAadGroupObjectId=${ASB_CLUSTER_ADMIN_ID} \
      k8sControlPlaneAuthorizationTenantId=${ASB_TENANT_ID} \
      laWorkspaceName=${ASB_LA_NAME} \
-     laResourceGroup=${ASB_RG_CORE} \
-     frontEndMiResourceId=${ASB_FRONTEND_MI_ID} \
+     coreResourceGroup=${ASB_RG_CORE} \
      kubernetesVersion=${ASB_K8S_VERSION} \
      --query name -c
 
@@ -97,5 +99,52 @@ export ASB_CLUSTER_AGENTPOOL_NAME=$(az deployment group show -g $ASB_RG_CORE -n 
 export ASB_CLUSTER_AGENTPOOL_RESOURCE_ID=$(az identity show -n $ASB_CLUSTER_AGENTPOOL_NAME -g $ASB_RG_CORE-nodepools-$ASB_CLUSTER_LOCATION --query principalId -o tsv)
 az role assignment create --role "AcrPull" --assignee ${ASB_CLUSTER_AGENTPOOL_RESOURCE_ID} --scope ${ASB_ACR_RESOURCE_ID}
 
+# set public ip address resource name
+export ASB_PIP_NAME='pip-'$ASB_DEPLOYMENT_NAME'-'$ASB_ORG_APP_ID_NAME'-00'
+
+# get cluster name
+export ASB_AKS_NAME=$(az deployment group show -g $ASB_RG_CORE -n cluster-${ASB_DEPLOYMENT_NAME}-${ASB_CLUSTER_LOCATION} --query properties.outputs.aksClusterName.value -o tsv)
+
+# Get the public IP of our App gateway
+export ASB_AKS_PIP=$(az network public-ip show -g $ASB_RG_SPOKE --name $ASB_PIP_NAME --query ipAddress -o tsv)
+
+# Get the AKS Ingress Controller Managed Identity details.
+export ASB_ISTIO_RESOURCE_ID=$(az deployment group show -g $ASB_RG_CORE -n cluster-${ASB_DEPLOYMENT_NAME}-${ASB_CLUSTER_LOCATION} --query properties.outputs.aksIngressControllerPodManagedIdentityResourceId.value -o tsv)
+export ASB_ISTIO_CLIENT_ID=$(az deployment group show -g $ASB_RG_CORE -n cluster-${ASB_DEPLOYMENT_NAME}-${ASB_CLUSTER_LOCATION} --query properties.outputs.aksIngressControllerPodManagedIdentityClientId.value -o tsv)
+export ASB_POD_MI_ID=$(az identity show -n podmi-ingress-controller -g $ASB_RG_CORE --query principalId -o tsv)
+
+./saveenv.sh -y
+
+```
+### Create setup files
+
+```bash
+
+export ASB_GIT_PATH=deploy/$ASB_DEPLOYMENT_NAME-$ASB_CLUSTER_LOCATION 
+
+
+mkdir -p $ASB_GIT_PATH/istio
+
+# istio pod identity config
+cat templates/istio-pod-identity.yaml | envsubst > $ASB_GIT_PATH/istio/istio-pod-identity-config.yaml
+
+# istio gateway config
+cat templates/istio-gateway.yaml | envsubst > $ASB_GIT_PATH/istio/istio-gateway.yaml
+
+# GitOps (flux)
+mkdir -p $ASB_GIT_PATH/flux
+cat templates/flux.yaml | envsubst  > $ASB_GIT_PATH/flux/flux.yaml
+
+```
+### Create a DNS A record
+
+```bash
+# We are using 'dns-rg' for triplets
+
+# resource group of DNS Zone for deployment
+export ASB_DNS_ZONE_RG=dns-rg 
+
+# create the dns record
+az network dns record-set a add-record -g $ASB_DNS_ZONE_RG -z $ASB_DNS_ZONE -n $ASB_DNS_NAME-$ASB_CLUSTER_LOCATION -a $ASB_AKS_PIP --query fqdn
 
 ```
