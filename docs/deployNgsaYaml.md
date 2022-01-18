@@ -39,10 +39,10 @@ az keyvault set-policy -n $ASB_KV_NAME --object-id $ASB_NGSA_MI_PRINCIPAL_ID --s
 export ASB_NGSA_MI_CLIENT_ID=$(az identity show -n $ASB_NGSA_MI_NAME -g $ASB_RG_CORE --query "clientId" -o tsv)
 
 mkdir -p $ASB_GIT_PATH/ngsa
-cat templates/ngsa-cosmos.yaml | envsubst > $ASB_GIT_PATH/ngsa/ngsa-cosmos.yaml
-cat templates/ngsa-memory.yaml | envsubst > $ASB_GIT_PATH/ngsa/ngsa-memory.yaml
-cat templates/ngsa-java.yaml | envsubst > $ASB_GIT_PATH/ngsa/ngsa-java.yaml
-cat templates/ngsa-pod-identity.yaml | envsubst > $ASB_GIT_PATH/ngsa/ngsa-pod-identity.yaml
+cat templates/ngsa/ngsa-cosmos.yaml | envsubst > $ASB_GIT_PATH/ngsa/ngsa-cosmos.yaml
+cat templates/ngsa/ngsa-memory.yaml | envsubst > $ASB_GIT_PATH/ngsa/ngsa-memory.yaml
+cat templates/ngsa/ngsa-java.yaml | envsubst > $ASB_GIT_PATH/ngsa/ngsa-java.yaml
+cat templates/ngsa/ngsa-pod-identity.yaml | envsubst > $ASB_GIT_PATH/ngsa/ngsa-pod-identity.yaml
 
 # save env vars
 ./saveenv.sh -y
@@ -61,7 +61,7 @@ git add $ASB_GIT_PATH/ngsa/ngsa-cosmos.yaml
 git add $ASB_GIT_PATH/ngsa/ngsa-memory.yaml
 git add $ASB_GIT_PATH/ngsa/ngsa-java.yaml
 git add $ASB_GIT_PATH/ngsa/ngsa-pod-identity.yaml
-git commit -m "added ngsa-cosmos config"
+git commit -m "added ngsa config"
 git push
 
 ```
