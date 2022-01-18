@@ -314,10 +314,10 @@ export ASB_INGRESS_KEY_NAME=appgw-ingress-internal-aks-ingress-key
 ```bash
 # We are using 'dns-rg' for triplets
 
-# resource group of DNS Zone for deployment
-export ASB_DNS_ZONE_RG=dns-rg 
+# Resource group of DNS Zone for deployment
+export ASB_DNS_ZONE_RG=dns-rg
 
-# create the dns record
+# Create the dns record
 az network dns record-set a add-record -g $ASB_DNS_ZONE_RG -z $ASB_DNS_ZONE -n $ASB_DNS_NAME-$ASB_CLUSTER_LOCATION -a $ASB_AKS_PIP --query fqdn
 ```
 
@@ -373,6 +373,8 @@ kubectl get pods -n flux-cd -l app.kubernetes.io/name=flux
 
 # Check flux logs
 kubectl logs -n flux-cd -l app.kubernetes.io/name=flux
+
+# Note: Flux will automatically deploy everything in your $ASB_GIT_PATH path as well as everything in the deploy/bootstrap folder
 ```
 
 ## Deploying NGSA Applications
