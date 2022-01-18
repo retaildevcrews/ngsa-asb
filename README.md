@@ -59,8 +59,8 @@ az ad group member list -g $ASB_CLUSTER_ADMIN_GROUP  --query [].displayName -o t
 # export ASB_DEPLOYMENT_NAME=[starts with a-z, [a-z,0-9], max length 8]
 
 export ASB_DEPLOYMENT_NAME=[e.g 'ngsatest']
-export ASB_DNS_NAME=[e.g 'ngsa-pre-central-asb-test']
-export ASB_RG_NAME=[e.g 'ngsa-pre-central-asb-test']
+export ASB_DNS_NAME=[e.g 'ngsa-pre-asb']
+export ASB_RG_NAME=[e.g 'ngsa-pre-asb']
 ```
 
 ```bash
