@@ -4,7 +4,7 @@
 
 ```bash
 
-# create managed identity for ngsa-app
+# Create managed identity for ngsa-app
 export ASB_NGSA_MI_NAME="${ASB_DEPLOYMENT_NAME}-ngsa-id"
 
 export ASB_NGSA_MI_RESOURCE_ID=$(az identity create -g $ASB_RG_CORE -n $ASB_NGSA_MI_NAME --query "id" -o tsv)
@@ -33,7 +33,6 @@ az keyvault set-policy -n $ASB_KV_NAME --object-id $ASB_NGSA_MI_PRINCIPAL_ID --s
 
 ### Create ngsa deployment files
 
-```bash
 export ASB_NGSA_MI_CLIENT_ID=$(az identity show -n $ASB_NGSA_MI_NAME -g $ASB_RG_CORE --query "clientId" -o tsv)
 
 mkdir -p $ASB_GIT_PATH/ngsa
