@@ -16,5 +16,5 @@ spec:
       serverCertificate: /etc/istio/ingressgateway-certs/tls.crt
       privateKey: /etc/istio/ingressgateway-certs/tls.key
     hosts:
-    - "ngsa/ngsa-jrod-asb-westus2"
-    - "monitoring/ngsa-jrod-asb-westus2"
+    - "ngsa/ngsa-jrod-asb-westus2.cse.ms"
+    - "monitoring/ngsa-jrod-asb-westus2.cse.ms"

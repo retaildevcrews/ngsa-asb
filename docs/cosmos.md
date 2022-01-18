@@ -1,9 +1,10 @@
 # Cosmos DB in AKS secure baseline
 
 Prerequisites:
-- A CosmosDB movie database is required, Follow setup instructions in [README.md](https://github.com/cse-labs/imdb) to create a new environment
 
-## Set Cosmos env vars
+* A CosmosDB movie database is required, Follow setup instructions in [README.md](https://github.com/cse-labs/imdb) to create a new environment
+
+## Set Cosmos environment variabless
 
 ```bash
 
@@ -23,14 +24,14 @@ export ASB_COSMOS_ID=$(az cosmosdb show -g $ASB_COSMOS_RG_NAME -n $ASB_IMDB_NAME
 
 ```bash
 
-# subnet for AKS cluster nodes
+# Subnet for AKS cluster nodes
 export ASB_NODES_SUBNET_ID=$(az deployment group show -g $ASB_RG_CORE -n cluster-${ASB_DEPLOYMENT_NAME}-${ASB_CLUSTER_LOCATION} --query properties.outputs.vnetNodePoolSubnetResourceId.value -o tsv)
 
 export ASB_HUB_CS_SUBNET_ID=$(az network vnet subnet show -g $ASB_RG_HUB -n CommonServicesSubnet --vnet-name vnet-centralus-hub --query id -o tsv)
 
 # create private endpoint
 az network private-endpoint create \
-  --name "nodepools-to-cosmos-endpoint" \
+  --name "nodepools-to-cosmos" \
   --connection-name "nodepools-to-cosmos-connection" \
   --resource-group $ASB_RG_CORE \
   --subnet $ASB_HUB_CS_SUBNET_ID \
@@ -42,7 +43,7 @@ az network private-endpoint create \
 export ASB_COSMOS_ZONE="privatelink.documents.azure.com"
 az network private-dns zone create --resource-group $ASB_RG_CORE --name $ASB_COSMOS_ZONE
 
-# create vnet link between private zone and hub vnet
+# Create vnet link between private zone and hub vnet
 az network private-dns link vnet create \
   --resource-group $ASB_RG_CORE \
   --zone-name  $ASB_COSMOS_ZONE \
@@ -50,15 +51,15 @@ az network private-dns link vnet create \
   --virtual-network $ASB_VNET_HUB_ID \
   --registration-enabled false
 
-# create a DNS zone group to add cosmos dns records to private dns zone
+# Create a DNS zone group to add cosmos dns records to private dns zone
 az network private-endpoint dns-zone-group create \
   --resource-group $ASB_RG_CORE \
-  --endpoint-name "nodepools-to-cosmos-endpoint" \
+  --endpoint-name "nodepools-to-cosmos" \
   --name "nodepools-to-cosmos-zone-group" \
   --private-dns-zone $ASB_COSMOS_ZONE \
   --zone-name $ASB_DEPLOYMENT_NAME
 
-# create vnet link between private zone and spoke vnet
+# Create vnet link between private zone and spoke vnet
 az network private-dns link vnet create \
   --resource-group $ASB_RG_CORE \
   --zone-name  $ASB_COSMOS_ZONE \
@@ -66,8 +67,7 @@ az network private-dns link vnet create \
   --virtual-network $ASB_SPOKE_VNET_ID \
   --registration-enabled false
 
-
-# save env vars
+# Save environment variables
 ./saveenv.sh -y
 
 ```
@@ -99,23 +99,6 @@ az keyvault delete-policy --object-id $(az ad signed-in-user show --query object
 export ASB_NGSA_MI_NAME="${ASB_DEPLOYMENT_NAME}-ngsa-id"
 
 export ASB_NGSA_MI_RESOURCE_ID=$(az identity create -g $ASB_RG_CORE -n $ASB_NGSA_MI_NAME --query "id" -o tsv)
-
-# save env vars
-./saveenv.sh -y
-
-```
-
-## AAD pod identity setup for app
-
-```bash
-
-# allow cluster to manage app identity for aad pod identity
-export ASB_AKS_IDENTITY_ID=$(az aks show -g $ASB_RG_CORE -n $ASB_AKS_NAME --query "identityProfile.kubeletidentity.objectId" -o tsv)
-az role assignment create --role "Managed Identity Operator" --assignee $ASB_AKS_IDENTITY_ID --scope $ASB_NGSA_MI_RESOURCE_ID
-
-# give app identity read access to secrets in keyvault
-export ASB_NGSA_MI_PRINCIPAL_ID=$(az identity show -n $ASB_NGSA_MI_NAME -g $ASB_RG_CORE --query "principalId" -o tsv)
-az keyvault set-policy -n $ASB_KV_NAME --object-id $ASB_NGSA_MI_PRINCIPAL_ID --secret-permissions get
 
 # save env vars
 ./saveenv.sh -y

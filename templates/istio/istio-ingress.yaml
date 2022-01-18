@@ -32,7 +32,7 @@ spec:
           agentpool: npuser01
         service:
           type: LoadBalancer
-          loadBalancerIP: 10.240.4.4
+          loadBalancerIP: ${ASB_SPOKE_IP_PREFIX}.4.4
           externalTrafficPolicy: Local
         serviceAnnotations:
           service.beta.kubernetes.io/azure-load-balancer-internal: "true"
