@@ -1,4 +1,4 @@
-# NGSA AKS Secure Baseline Pre-Prod deployment
+# NGSA AKS Secure Baseline
 
 * [Introduction](#introduction)
 * [Setting up Infrastructure](#setting-up-infrastructure)
