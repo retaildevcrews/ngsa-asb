@@ -95,7 +95,7 @@ git push -u origin $ASB_DEPLOYMENT_NAME
 ```bash
 🛑 Only choose one pair from the below block
 
-### Set for deployment of resources. Cluster region will be set in a different step
+# Set for deployment of resources. Cluster region will be set in a different step
 export ASB_HUB_LOCATION=centralus
 export ASB_SPOKE_LOCATION=centralus
 ```
@@ -188,16 +188,17 @@ az deployment group create \
 
 export ASB_VNET_HUB_ID=$(az deployment group show -g $ASB_RG_HUB -n hub-default --query properties.outputs.hubVnetId.value -o tsv)
 
-# Set Spoke IP address prefix
+# Set spoke ip address prefix
 export ASB_SPOKE_IP_PREFIX="10.240"
 
-# create spoke network
+# Create spoke network
 az deployment group create \
+  -n spoke-$ASB_ORG_APP_ID_NAME 
   -g $ASB_RG_SPOKE \
   -f networking/spoke-default.json \
   -p deploymentName=${ASB_DEPLOYMENT_NAME} \
      hubLocation=${ASB_HUB_LOCATION} \
-     hubVnetResourceId="${ASB_VNET_HUB_ID}" \
+     hubVnetResourceId=${ASB_VNET_HUB_ID} \
      orgAppId=${ASB_ORG_APP_ID_NAME} \
      spokeIpPrefix=${ASB_SPOKE_IP_PREFIX} \
      spokeLocation=${ASB_SPOKE_LOCATION} \
