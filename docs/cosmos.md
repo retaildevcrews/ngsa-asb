@@ -91,16 +91,3 @@ az keyvault delete-policy --object-id $(az ad signed-in-user show --query object
 
 ```
 
-## Create managed identity for app
-
-```bash
-
-# create managed identity for ngsa-app
-export ASB_NGSA_MI_NAME="${ASB_DEPLOYMENT_NAME}-ngsa-id"
-
-export ASB_NGSA_MI_RESOURCE_ID=$(az identity create -g $ASB_RG_CORE -n $ASB_NGSA_MI_NAME --query "id" -o tsv)
-
-# save env vars
-./saveenv.sh -y
-
-```
