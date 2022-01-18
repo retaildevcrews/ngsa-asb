@@ -92,22 +92,23 @@ http https://${ASB_DOMAIN}/java/version
 ### Deploy Loderunner
 
 ```bash
+mkdir -p $ASB_GIT_PATH/loderunner 
 
-cp templates/load-test.yaml $ASB_GIT_PATH/ngsa/load-test.yaml
+cp templates/loderunner.yaml $ASB_GIT_PATH/loderunner/loderunner.yaml
 
-git add $ASB_GIT_PATH/ngsa/load-test.yaml
-git commit -m "added ngsa-lr "
+git add $ASB_GIT_PATH/loderunner/loderunner.yaml
+git commit -m "added loderunner "
 git push
 
-# force flux to sync changes
+# Force flux to sync changes
 fluxctl sync --k8s-fwd-ns flux-cd
 
-# Check loderunner pod l8r-load-1 until is running
+# Check loderunner pod loderunner until is running
 
-kubectl get pods -n ngsa
+kubectl get pods -n loderunner
 
 # Check loderunner logs and make sure 200 status code entries do exist for both ngsa-cosmos and ngsa-memory
 
-kubectl logs l8r-load-1 -n ngsa
+kubectl logs deployment/loderunner -n loderunner
 
 ```
