@@ -24,6 +24,7 @@ echo $ASB_DEPLOYMENT_NAME
 
 # create spoke network
 az deployment group create \
+  -n spoke-$ASB_ORG_APP_ID_NAME \
   -g $ASB_RG_SPOKE \
   -f networking/spoke-default.json \
   -p spokeLocation=${ASB_SPOKE_LOCATION} \
