@@ -243,7 +243,7 @@ az deployment group create -g $ASB_RG_CORE \
   -n cluster-${ASB_DEPLOYMENT_NAME}-${ASB_CLUSTER_LOCATION} \
   -p appGatewayListenerCertificate=${APP_GW_CERT_CSMS} \
      asbDomain=${ASB_DOMAIN} \
-     asbDnsName=${ASB_DNS_NAME} \
+     asbDnsName=${ASB_DNS_NAME}-${ASB_CLUSTER_LOCATION} \
      asbDnsZone=${ASB_DNS_ZONE} \
      aksIngressControllerCertificate="$(echo $INGRESS_CERT_CSMS | base64 -d)" \
      aksIngressControllerKey="$(echo $INGRESS_KEY_CSMS | base64 -d)" \
