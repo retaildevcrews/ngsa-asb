@@ -19,7 +19,7 @@ export ASB_SPOKE_LOCATION=westus2
 
 echo $ASB_RG_SPOKE
 echo $ASB_HUB_LOCATION
-echo $ASB_VNET_HUB_ID
+echo $ASB_HUB_VNET_ID
 echo $ASB_DEPLOYMENT_NAME
 
 # create spoke network
@@ -30,7 +30,7 @@ az deployment group create \
   -p spokeLocation=${ASB_SPOKE_LOCATION} \
      hubLocation=${ASB_HUB_LOCATION} \
      orgAppId=${ASB_ORG_APP_ID_NAME} \
-     hubVnetResourceId=${ASB_VNET_HUB_ID} \
+     hubVnetResourceId=${ASB_HUB_VNET_ID} \
      deploymentName=${ASB_DEPLOYMENT_NAME} \
      spokeIpPrefix=${ASB_SPOKE_IP_PREFIX} -c --query name
 

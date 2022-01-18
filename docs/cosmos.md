@@ -48,7 +48,7 @@ az network private-dns link vnet create \
   --resource-group $ASB_RG_CORE \
   --zone-name  $ASB_COSMOS_ZONE \
   --name "to_vnet-${ASB_HUB_LOCATION}-hub" \
-  --virtual-network $ASB_VNET_HUB_ID \
+  --virtual-network $ASB_HUB_VNET_ID \
   --registration-enabled false
 
 # Create a DNS zone group to add cosmos dns records to private dns zone

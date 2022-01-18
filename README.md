@@ -186,7 +186,7 @@ az deployment group create \
   -p location=${ASB_HUB_LOCATION} \
   -c --query name
 
-export ASB_VNET_HUB_ID=$(az deployment group show -g $ASB_RG_HUB -n hub-default --query properties.outputs.hubVnetId.value -o tsv)
+export ASB_HUB_VNET_ID=$(az deployment group show -g $ASB_RG_HUB -n hub-default --query properties.outputs.hubVnetId.value -o tsv)
 
 # Set spoke ip address prefix
 export ASB_SPOKE_IP_PREFIX="10.240"
@@ -198,7 +198,7 @@ az deployment group create \
   -f networking/spoke-default.json \
   -p deploymentName=${ASB_DEPLOYMENT_NAME} \
      hubLocation=${ASB_HUB_LOCATION} \
-     hubVnetResourceId=${ASB_VNET_HUB_ID} \
+     hubVnetResourceId=${ASB_HUB_VNET_ID} \
      orgAppId=${ASB_ORG_APP_ID_NAME} \
      spokeIpPrefix=${ASB_SPOKE_IP_PREFIX} \
      spokeLocation=${ASB_SPOKE_LOCATION} \
@@ -250,7 +250,7 @@ az deployment group create -g $ASB_RG_CORE \
      clusterAdminAadGroupObjectId=${ASB_CLUSTER_ADMIN_ID} \
      deploymentName=${ASB_DEPLOYMENT_NAME} \
      geoRedundancyLocation=${ASB_CLUSTER_GEO_LOCATION} \
-     hubVnetResourceId=${ASB_VNET_HUB_ID} \
+     hubVnetResourceId=${ASB_HUB_VNET_ID} \
      k8sControlPlaneAuthorizationTenantId=${ASB_TENANT_ID} \
      kubernetesVersion=${ASB_K8S_VERSION} \
      location=${ASB_CLUSTER_LOCATION} \
