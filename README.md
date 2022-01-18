@@ -7,6 +7,7 @@
 * [Create Deployment Files](#create-deployment-files)
 * [Deploy Flux](#deploy-flux)
 * [Deploying NGSA Applications](#deploying-ngsa-applications)
+* [Deploy Fluent Bit](#deploy-fluent-bit)
 
 ## Introduction
 
@@ -395,10 +396,10 @@ az acr import --source docker.io/fluent/fluent-bit:1.5 -n $ASB_ACR_NAME
 # Create namespace
 kubectl create ns fluentbit
 
-export ASB_LA_WORKSPACE_NAME=la-$ASB_AKS_NAME
+export ASB_LA_NAME=$(az deployment group show -g $ASB_RG_CORE -n cluster-${ASB_DEPLOYMENT_NAME}-${ASB_HUB_LOCATION} --query properties.outputs.logAnalyticsName.value -o tsv)
 
 # Create secrets to authenticate with log analytics
-kubectl create secret generic fluentbit-secrets --from-literal=WorkspaceId=$(az monitor log-analytics workspace show -g $ASB_RG_CORE -n $ASB_LA_WORKSPACE_NAME --query customerId -o tsv)   --from-literal=SharedKey=$(az monitor log-analytics workspace get-shared-keys -g $ASB_RG_CORE -n $ASB_LA_WORKSPACE_NAME --query primarySharedKey -o tsv) -n fluentbit
+kubectl create secret generic fluentbit-secrets --from-literal=WorkspaceId=$(az monitor log-analytics workspace show -g $ASB_RG_CORE -n $ASB_LA_NAME --query customerId -o tsv)   --from-literal=SharedKey=$(az monitor log-analytics workspace get-shared-keys -g $ASB_RG_CORE -n $ASB_LA_NAME --query primarySharedKey -o tsv) -n fluentbit
 
 # Load required yaml
 
