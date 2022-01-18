@@ -263,6 +263,9 @@ az deployment group create -g $ASB_RG_CORE \
 ### AKS Validation
 
 ```bash
+# Get cluster name
+export ASB_AKS_NAME=$(az deployment group show -g $ASB_RG_CORE -n cluster-${ASB_DEPLOYMENT_NAME}-${ASB_CLUSTER_LOCATION} --query properties.outputs.aksClusterName.value -o tsv)
+
 # Get AKS credentials
 az aks get-credentials -g $ASB_RG_CORE -n $ASB_AKS_NAME
 
@@ -280,8 +283,6 @@ kubectl get pods -A
 ### Set AKS environment variables
 
 ```bash
-# Get cluster name
-export ASB_AKS_NAME=$(az deployment group show -g $ASB_RG_CORE -n cluster-${ASB_DEPLOYMENT_NAME}-${ASB_CLUSTER_LOCATION} --query properties.outputs.aksClusterName.value -o tsv)
 
 # Set public ip address resource name
 export ASB_PIP_NAME='pip-'$ASB_DEPLOYMENT_NAME'-'$ASB_ORG_APP_ID_NAME'-00'
