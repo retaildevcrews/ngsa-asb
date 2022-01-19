@@ -60,7 +60,6 @@ echo $ASB_LA_NAME
 export ASB_CLUSTER_LOCATION=${ASB_SPOKE_LOCATION}
 export ASB_CLUSTER_GEO_LOCATION=westcentralus
 
-
 # Set top level domain
 export ASB_DOMAIN=${ASB_DNS_NAME}-${ASB_SPOKE_LOCATION}.${ASB_DNS_ZONE}
 
@@ -72,8 +71,6 @@ az network private-dns link vnet create -n "to_vnet-spoke-$ASB_ORG_APP_ID_NAME-0
 az network private-dns link vnet create -n "to_vnet-spoke-$ASB_ORG_APP_ID_NAME-00" -e false -g ${ASB_RG_CORE} -v ${ASB_SPOKE_VNET_ID} -z privatelink.azurecr.io
 az network private-dns link vnet create -n "to_vnet-spoke-$ASB_ORG_APP_ID_NAME-00" -e false -g ${ASB_RG_CORE} -v ${ASB_SPOKE_VNET_ID} -z privatelink.vaultcore.azure.net
 az network private-dns link vnet create -n "to_vnet-spoke-$ASB_ORG_APP_ID_NAME-00" -e false -g ${ASB_RG_CORE} -v ${ASB_SPOKE_VNET_ID} -z privatelink.documents.azure.com
-
-
 
 # This section takes 15-20 minutes
 
@@ -141,4 +138,4 @@ az network dns record-set a add-record -g $ASB_DNS_ZONE_RG -z $ASB_DNS_ZONE -n $
 
 ## Create Deployment Files
 
-Follow deployment instructions in the readme located [here](../README.md#create-deployment-files)
+Follow deployment instructions in the main README located [here](../README.md#create-deployment-files)
