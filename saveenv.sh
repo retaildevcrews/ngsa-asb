@@ -7,7 +7,7 @@ if [ -z "$ASB_DEPLOYMENT_NAME" ]
 then
   echo "Please set ASB_DEPLOYMENT_NAME before running this script"
 else
-  if [ -f ${ASB_DEPLOYMENT_NAME}.asb.env ]
+  if [ -f ${ASB_DEPLOYMENT_NAME}.${ASB_SPOKE_LOCATION}.asb.env ]
   then
     if [ "$#" = 0 ] || [ $1 != "-y" ]
     then
@@ -21,15 +21,15 @@ else
     fi
   fi
 
-  echo '#!/bin/bash' > ${ASB_DEPLOYMENT_NAME}.asb.env
-  echo '' >> ${ASB_DEPLOYMENT_NAME}.asb.env
+  echo '#!/bin/bash' > ${ASB_DEPLOYMENT_NAME}.${ASB_SPOKE_LOCATION}.asb.env
+  echo '' >> ${ASB_DEPLOYMENT_NAME}.${ASB_SPOKE_LOCATION}.asb.env
 
   IFS=$'\n'
 
   for var in $(env | grep -E 'ASB_' | sort | sed "s/=/='/g")
   do
-    echo "export ${var}'" >> ${ASB_DEPLOYMENT_NAME}.asb.env
+    echo "export ${var}'" >> ${ASB_DEPLOYMENT_NAME}.${ASB_SPOKE_LOCATION}.asb.env
   done
 
-  cat ${ASB_DEPLOYMENT_NAME}.asb.env
+  cat ${ASB_DEPLOYMENT_NAME}.${ASB_SPOKE_LOCATION}.asb.env
 fi
