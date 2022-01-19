@@ -382,6 +382,9 @@ kubectl get pods -n flux-cd -l app.kubernetes.io/name=flux
 # Check flux logs
 kubectl logs -n flux-cd -l app.kubernetes.io/name=flux
 
+# Sync Flux
+fluxctl sync --k8s-fwd-ns flux-cd
+
 # Note: Flux will automatically deploy everything in your $ASB_GIT_PATH path as well as everything in the deploy/bootstrap folder
 ```
 
@@ -427,6 +430,7 @@ git push
 # Sync Flux
 fluxctl sync --k8s-fwd-ns flux-cd
 ```
+
 ## Deploy Grafana and Prometheus
 
 Please see Instructions to deploy Grafana and Prometheus [here](./monitoring/README.md)
