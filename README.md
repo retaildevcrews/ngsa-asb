@@ -237,7 +237,7 @@ echo $ASB_ORG_APP_ID_NAME
 export ASB_CLUSTER_LOCATION=${ASB_SPOKE_LOCATION}
 export ASB_CLUSTER_GEO_LOCATION=westus
 
-### this section takes 15-20 minutes
+# This section takes 15-20 minutes
 
 # Set Kubernetes Version
 export ASB_K8S_VERSION=1.21.7
