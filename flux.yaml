@@ -108,7 +108,7 @@ spec:
         args:
         - --git-url=https://github.com/retaildevcrews/ngsa-asb
         - --git-branch=joaqasb
-        - --git-path=deploy/ngsaxrod-centralus,deploy/bootstrap
+        - --git-path=deploy/ngsaxrod-westus2,deploy/bootstrap
         - --git-readonly
         - --sync-state=secret
         - --listen-metrics=:3031
