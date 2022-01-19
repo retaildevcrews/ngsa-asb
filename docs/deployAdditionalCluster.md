@@ -1,6 +1,6 @@
-# Deploy Additional clusters
+# Deploy an Additional cluster
 
-## Create  Spoke Network
+## Create Spoke Network
 
 ```bash
 # Set Org App ID for additional spoke (this must be unique per spoke)
@@ -60,11 +60,11 @@ echo $ASB_LA_NAME
 export ASB_CLUSTER_LOCATION=${ASB_SPOKE_LOCATION}
 export ASB_CLUSTER_GEO_LOCATION=westcentralus
 
-# Set top level domain
-export ASB_DOMAIN=${ASB_DNS_NAME}-${ASB_SPOKE_LOCATION}.${ASB_DNS_ZONE}
+# Set domain suffix
+export ASB_DOMAIN_SUFFIX=${ASB_SPOKE_LOCATION}-${ASB_ENV}.${ASB_DNS_ZONE}
 
-# Add DNS A Record
-az network private-dns record-set a add-record -g ${ASB_RG_CORE} -z ${ASB_DNS_ZONE} -n ${ASB_DNS_NAME}-${ASB_SPOKE_LOCATION} -a ${ASB_SPOKE_IP_PREFIX}.4.4
+# Add private DNS A Record for ngsa-memory
+az network private-dns record-set a add-record -g ${ASB_RG_CORE} -z ${ASB_DNS_ZONE} -n ngsa-memory-${ASB_DNS_NAME}-${ASB_SPOKE_LOCATION} -a ${ASB_SPOKE_IP_PREFIX}.4.4
 
 # Add Virtual Network Link to Private DNS zones
 az network private-dns link vnet create -n "to_vnet-spoke-$ASB_ORG_APP_ID_NAME-00" -e false -g ${ASB_RG_CORE} -v ${ASB_SPOKE_VNET_ID} -z ${ASB_DNS_ZONE}
@@ -79,7 +79,9 @@ az deployment group create -g $ASB_RG_CORE \
   -f cluster/cluster-stamp-additional.json \
   -n cluster-${ASB_DEPLOYMENT_NAME}-$ASB_CLUSTER_LOCATION \
   -p location=${ASB_CLUSTER_LOCATION} \
-     asbDomain=${ASB_DOMAIN} \
+     hubLocation=${ASB_HUB_LOCATION} \
+     asbDomainSuffix=${ASB_DOMAIN_SUFFIX} \
+     asbDnsName=${ASB_SPOKE_LOCATION}-${ASB_ENV} \
      clusterAdminAadGroupObjectId=${ASB_CLUSTER_ADMIN_ID} \
      coreResourceGroup=${ASB_RG_CORE} \
      deploymentName=${ASB_DEPLOYMENT_NAME} \
@@ -133,7 +135,8 @@ kubectl get pods -A
 ## Create DNS A record
 
 ```bash
-az network dns record-set a add-record -g $ASB_DNS_ZONE_RG -z $ASB_DNS_ZONE -n $ASB_DNS_NAME-$ASB_CLUSTER_LOCATION -a $ASB_AKS_PIP --query fqdn
+# Create public DNS record for ngsa-memory
+az network dns record-set a add-record -g $ASB_DNS_ZONE_RG -z $ASB_DNS_ZONE -n "ngsa-memory-${ASB_SPOKE_LOCATION}-${ASB_ENV}" -a $ASB_AKS_PIP --query fqdn
 ```
 
 ## Create Deployment Files

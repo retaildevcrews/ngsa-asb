@@ -15,7 +15,7 @@ else
 
       if ! [[ $response =~ [yY] ]]
       then
-        echo "Please move or delete ${ASB_DEPLOYMENT_NAME}.asb.env and rerun the script."
+        echo "Please move or delete ${ASB_DEPLOYMENT_NAME}.${ASB_SPOKE_LOCATION}.asb.env and rerun the script."
         exit 1;
       fi
     fi

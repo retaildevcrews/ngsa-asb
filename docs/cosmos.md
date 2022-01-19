@@ -4,16 +4,16 @@ Prerequisites:
 
 * A CosmosDB movie database is required, Follow setup instructions in [README.md](https://github.com/cse-labs/imdb) to create a new environment
 
-## Set Cosmos environment variabless
+## Set Cosmos environment variables
 
 ```bash
 
 export ASB_COSMOS_RG_NAME="[Cosmos resource group name]" # e.g rg-ngsa-asb-shared
-export ASB_IMDB_NAME="[Cosmos account name]" # e.g ngsa-asb-cosmos
+export ASB_COSMOS_DB_NAME="[Cosmos account name]" # e.g ngsa-asb-cosmos
 export ASB_IMDB_DB="imdb"
 export ASB_IMDB_COL="movies"
-export ASB_IMDB_RW_KEY="az cosmosdb keys list -n $ASB_IMDB_NAME -g $ASB_COSMOS_RG_NAME --query primaryMasterKey -o tsv"
-export ASB_COSMOS_ID=$(az cosmosdb show -g $ASB_COSMOS_RG_NAME -n $ASB_IMDB_NAME --query id -o tsv)
+export ASB_IMDB_RW_KEY="az cosmosdb keys list -n $ASB_COSMOS_DB_NAME -g $ASB_COSMOS_RG_NAME --query primaryMasterKey -o tsv"
+export ASB_COSMOS_ID=$(az cosmosdb show -g $ASB_COSMOS_RG_NAME -n $ASB_COSMOS_DB_NAME --query id -o tsv)
 
 # save env vars
 ./saveenv.sh -y
@@ -27,7 +27,7 @@ export ASB_COSMOS_ID=$(az cosmosdb show -g $ASB_COSMOS_RG_NAME -n $ASB_IMDB_NAME
 # Subnet for AKS cluster nodes
 export ASB_NODES_SUBNET_ID=$(az deployment group show -g $ASB_RG_CORE -n cluster-${ASB_DEPLOYMENT_NAME}-${ASB_CLUSTER_LOCATION} --query properties.outputs.vnetNodePoolSubnetResourceId.value -o tsv)
 
-export ASB_HUB_CS_SUBNET_ID=$(az network vnet subnet show -g $ASB_RG_HUB -n CommonServicesSubnet --vnet-name vnet-centralus-hub --query id -o tsv)
+export ASB_HUB_CS_SUBNET_ID=$(az network vnet subnet show -g $ASB_RG_HUB -n CommonServicesSubnet --vnet-name vnet-${ASB_HUB_LOCATION}-hub --query id -o tsv)
 
 # create private endpoint
 az network private-endpoint create \
@@ -83,8 +83,8 @@ az keyvault set-policy --secret-permissions set --object-id $(az ad signed-in-us
 az keyvault secret set -o table --vault-name $ASB_KV_NAME --name "CosmosDatabase" --value $ASB_IMDB_DB
 az keyvault secret set -o table --vault-name $ASB_KV_NAME --name "CosmosCollection" --value $ASB_IMDB_COL
 az keyvault secret set -o table --vault-name $ASB_KV_NAME --name "CosmosKey" \
-  --value $(az cosmosdb keys list -n $ASB_IMDB_NAME -g $ASB_COSMOS_RG_NAME --query primaryMasterKey -o tsv)
-az keyvault secret set -o table --vault-name $ASB_KV_NAME --name "CosmosUrl" --value "https://${ASB_IMDB_NAME}.documents.azure.com:443/"
+  --value $(az cosmosdb keys list -n $ASB_COSMOS_DB_NAME -g $ASB_COSMOS_RG_NAME --query primaryMasterKey -o tsv)
+az keyvault secret set -o table --vault-name $ASB_KV_NAME --name "CosmosUrl" --value "https://${ASB_COSMOS_DB_NAME}.documents.azure.com:443/"
 
 # remove logged in user's access to key vault
 az keyvault delete-policy --object-id $(az ad signed-in-user show --query objectId -o tsv) -n $ASB_KV_NAME -g $ASB_RG_CORE

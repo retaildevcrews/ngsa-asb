@@ -16,5 +16,7 @@ spec:
       serverCertificate: /etc/istio/ingressgateway-certs/tls.crt
       privateKey: /etc/istio/ingressgateway-certs/tls.key
     hosts:
-    - "ngsa/ngsa-pre-central-dev.cse.ms"
-    - "monitoring/ngsa-pre-central-dev.cse.ms"
+    - "ngsa/ngsa-cosmos-central-dev.cse.ms"
+    - "ngsa/ngsa-memory-central-dev.cse.ms"
+    - "ngsa/ngsa-java-central-dev.cse.ms"
+    - "monitoring/grafana-central-dev.cse.ms"

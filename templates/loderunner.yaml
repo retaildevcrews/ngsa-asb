@@ -49,6 +49,10 @@ spec:
           - -f
           - benchmark.json
           - -p
+          - --zone
+          - az-${ASB_SPOKE_LOCATION}-${ASB_ENV}
+          - --region
+          - ${ASB_SPOKE_LOCATION}
 ---
 
 apiVersion: v1

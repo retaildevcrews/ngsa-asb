@@ -100,12 +100,12 @@
                 "description": "IP ranges authorized to contact the Kubernetes API server. Passing an empty array will result in no IP restrictions. If any are provided, remember to also provide the public IP of the egress Azure Firewall otherwise your nodes will not be able to talk to the API server (e.g. Flux)."
             }
         },
-        "asbDomain": {
+        "asbDomainSuffix": {
             "type": "string",
             "minLength": 3,
             "maxLength": 128,
             "metadata": {
-                "description": "Top level domain"
+                "description": "Top level domain suffix"
             }
         },
         "asbDnsZone": {
@@ -518,7 +518,7 @@
                 {
                     "type": "A",
                     "apiVersion": "2018-09-01",
-                    "name": "[parameters('asbDnsName')]",
+                    "name": "[concat('ngsa-memory-', parameters('asbDnsName'))]",
                     "dependsOn": [
                         "[resourceId('Microsoft.Network/privateDnsZones', parameters('asbDnsZone'))]"
                     ],
@@ -622,6 +622,12 @@
                         "properties": {
                             "port": 443
                         }
+                    },
+                    {
+                        "name": "apw-frontend-ports-http",
+                        "properties": {
+                            "port": 80
+                        }
                     }
                 ],
                 "autoscaleConfiguration": {
@@ -654,10 +660,10 @@
                 ],
                 "probes": [
                     {
-                        "name": "[concat('probe-', parameters('asbDomain'))]",
+                        "name": "[concat('probe-ngsa-memory-', parameters('asbDnsName'))]",
                         "properties": {
                             "protocol": "Https",
-                            "path": "/memory/healthz",
+                            "path": "/healthz",
                             "interval": 30,
                             "timeout": 30,
                             "unhealthyThreshold": 3,
@@ -670,11 +676,11 @@
                 ],
                 "backendAddressPools": [
                     {
-                        "name": "[parameters('asbDomain')]",
+                        "name": "[concat('ngsa-memory-', parameters('asbDomainSuffix'))]",
                         "properties": {
                             "backendAddresses": [
                                 {
-                                    "fqdn": "[parameters('asbDomain')]"
+                                    "fqdn": "[concat('ngsa-memory-', parameters('asbDomainSuffix'))]"
                                 }
                             ]
                         }
@@ -682,7 +688,7 @@
                 ],
                 "backendHttpSettingsCollection": [
                     {
-                        "name": "aks-ingress-backendpool-httpsettings",
+                        "name": "[concat('ngsa-memory-', parameters('asbDnsName'), '-httpsettings')]",
                         "properties": {
                             "port": 443,
                             "protocol": "Https",
@@ -690,14 +696,14 @@
                             "pickHostNameFromBackendAddress": true,
                             "requestTimeout": 20,
                             "probe": {
-                                "id": "[concat(resourceId('Microsoft.Network/applicationGateways', variables('agwName')), concat('/probes/probe-', parameters('asbDomain')))]"
+                                "id": "[concat(resourceId('Microsoft.Network/applicationGateways', variables('agwName')), concat('/probes/probe-ngsa-memory-', parameters('asbDnsName')))]"
                             }
                         }
                     }
                 ],
                 "httpListeners": [
                     {
-                        "name": "listener-https",
+                        "name": "[concat('listener-ngsa-memory-', parameters('asbDnsName'))]",
                         "properties": {
                             "frontendIPConfiguration": {
                                 "id": "[concat(variables('apwResourceId'), '/frontendIPConfigurations/apw-frontend-ip-configuration')]"
@@ -709,26 +715,66 @@
                             "sslCertificate": {
                                 "id": "[concat(variables('apwResourceId'), '/sslCertificates/', variables('agwName'), '-ssl-certificate')]"
                             },
-                            "hostName": "[parameters('asbDomain')]",
+                            "hostName": "[concat('ngsa-memory-', parameters('asbDomainSuffix'))]",
                             "hostNames": [
                             ],
                             "requireServerNameIndication": true
+                        }
+                    },
+                    {
+                        "name": "[concat('http-listener-ngsa-memory-', parameters('asbDnsName'))]",
+                        "properties": {
+                            "frontendIPConfiguration": {
+                                "id": "[concat(variables('apwResourceId'), '/frontendIPConfigurations/apw-frontend-ip-configuration')]"
+                            },
+                            "frontendPort": {
+                                "id": "[concat(variables('apwResourceId'), '/frontendPorts/apw-frontend-ports-http')]"
+                            },
+                            "protocol": "Http",
+                            "hostName": "[concat('ngsa-memory-', parameters('asbDomainSuffix'))]",
+                            "hostNames": [
+                            ]
+                        }
+                    }
+                ],
+                "redirectConfigurations": [
+                    {
+                        "name": "[concat('https-redirect-config-ngsa-memory-', parameters('asbDnsName'))]",
+                        "properties": {
+                            "redirectType": "Permanent",
+                            "targetListener": {
+                                "id": "[concat(variables('apwResourceId'), '/httpListeners/', 'listener-ngsa-memory-', parameters('asbDnsName'))]"
+                            },
+                            "includePath": "true",
+                            "includeQueryString": "true"
                         }
                     }
                 ],
                 "requestRoutingRules": [
                     {
-                        "Name": "apw-routing-rules",
+                        "Name": "[concat('ngsa-memory-', parameters('asbDnsName'), '-routing-rule')]",
                         "properties": {
                             "RuleType": "Basic",
                             "httpListener": {
-                                "id": "[concat(variables('apwResourceId'), '/httpListeners/listener-https')]"
+                                "id": "[concat(variables('apwResourceId'), '/httpListeners/', 'listener-ngsa-memory-', parameters('asbDnsName'))]"
                             },
                             "backendAddressPool": {
-                                "id": "[concat(variables('apwResourceId'), '/backendAddressPools/', parameters('asbDomain'))]"
+                                "id": "[concat(variables('apwResourceId'), '/backendAddressPools/', 'ngsa-memory-', parameters('asbDomainSuffix'))]"
                             },
                             "backendHttpSettings": {
-                                "id": "[concat(variables('apwResourceId'), '/backendHttpSettingsCollection/aks-ingress-backendpool-httpsettings')]"
+                                "id": "[concat(variables('apwResourceId'), '/backendHttpSettingsCollection/', 'ngsa-memory-', parameters('asbDnsName'), '-httpsettings')]"
+                            }
+                        }
+                    },
+                    {
+                        "Name": "[concat('https-redirect-ngsa-memory-', parameters('asbDnsName'), '-routing-rule')]",
+                        "properties": {
+                            "RuleType": "Basic",
+                            "httpListener": {
+                                "id": "[concat(variables('apwResourceId'), '/httpListeners/', 'http-listener-ngsa-memory-', parameters('asbDnsName'))]"
+                            },
+                            "redirectConfiguration": {
+                                "id": "[concat(variables('apwResourceId'), '/redirectConfigurations/', 'https-redirect-config-ngsa-memory-', parameters('asbDnsName'))]"
                             }
                         }
                     }

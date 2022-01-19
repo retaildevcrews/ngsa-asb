@@ -26,12 +26,10 @@ spec:
           args: 
           - --in-memory
           - --prometheus
-          - --url-prefix
-          - /memory
           - --zone
-          - az-eastus2
+          - az-${ASB_SPOKE_LOCATION}-${ASB_ENV}
           - --region
-          - East
+          - ${ASB_SPOKE_LOCATION}
 
           ports:
             - name: http
@@ -76,16 +74,9 @@ spec:
   gateways:
   - istio-system/istio-gateway
   hosts:
-  - ${ASB_DOMAIN}
+  - ngsa-memory-${ASB_DOMAIN_SUFFIX}
   http:
-  - match:
-    - uri:
-        prefix: /memory/
-    - uri:
-        exact: /memory
-    rewrite:
-      uri: /
-    route:
+  - route:
     - destination:
         port:
           number: 8080

@@ -75,6 +75,10 @@ fluxctl sync --k8s-fwd-ns flux-cd
 
 ```
 
+### Configure App Subdomain Endpoints
+
+By default, ASB will setup the subdomain endpoint for the NGSA memory application. You will need to manually setup the endpoints for the `ngsa-cosmos` and `ngsa-java` apps. Follow the steps in the [subdomain setup guide](../README.md#create-a-subdomain-endpoint) for each application endpoint to setup.
+
 ### Validate
 
 ```bash
@@ -84,9 +88,9 @@ fluxctl sync --k8s-fwd-ns flux-cd
 kubectl get pods -n ngsa
 kubectl get pods -n istio-system
 
-http https://${ASB_DOMAIN}/cosmos/version
-http https://${ASB_DOMAIN}/memory/version
-http https://${ASB_DOMAIN}/java/version
+http https://ngsa-cosmos-${ASB_DOMAIN_SUFFIX}/version
+http https://ngsa-memory-${ASB_DOMAIN_SUFFIX}/version
+http https://ngsa-java-${ASB_DOMAIN_SUFFIX}/version
 ```
 
 ### Deploy Loderunner
