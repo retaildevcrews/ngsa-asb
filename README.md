@@ -8,6 +8,10 @@
 * [Deploy Flux](#deploy-flux)
 * [Deploying NGSA Applications](#deploying-ngsa-applications)
 * [Deploy Fluent Bit](#deploy-fluent-bit)
+* [Deploy Grafana and Prometheus](#deploy-grafana-and-prometheus)
+* [Deploying Multiple Clusters Using Existing Network](#deploying-multiple-clusters-using-existing-network)
+* [Resetting the Cluster](#resetting-the-cluster)
+* [Delete Azure Resources](#delete-azure-resources)
 
 ## Introduction
 
@@ -299,6 +303,9 @@ export ASB_POD_MI_ID=$(az identity show -n podmi-ingress-controller -g $ASB_RG_C
 # Get the name of Azure Container Registry
 export ASB_ACR_NAME=$(az deployment group show -g $ASB_RG_CORE -n cluster-${ASB_DEPLOYMENT_NAME}-${ASB_CLUSTER_LOCATION}  --query properties.outputs.containerRegistryName.value -o tsv)
 
+# Get Log Analytics Name
+export ASB_LA_NAME=$(az deployment group show -g $ASB_RG_CORE -n cluster-${ASB_DEPLOYMENT_NAME}-${ASB_HUB_LOCATION} --query properties.outputs.logAnalyticsName.value -o tsv)
+
 # Get the name of KeyVault
 export ASB_KV_NAME=$(az deployment group show -g $ASB_RG_CORE -n cluster-${ASB_DEPLOYMENT_NAME}-${ASB_CLUSTER_LOCATION} --query properties.outputs.keyVaultName.value -o tsv)
 
@@ -396,8 +403,6 @@ az acr import --source docker.io/fluent/fluent-bit:1.5 -n $ASB_ACR_NAME
 # Create namespace
 kubectl create ns fluentbit
 
-export ASB_LA_NAME=$(az deployment group show -g $ASB_RG_CORE -n cluster-${ASB_DEPLOYMENT_NAME}-${ASB_HUB_LOCATION} --query properties.outputs.logAnalyticsName.value -o tsv)
-
 # Create secrets to authenticate with log analytics
 kubectl create secret generic fluentbit-secrets --from-literal=WorkspaceId=$(az monitor log-analytics workspace show -g $ASB_RG_CORE -n $ASB_LA_NAME --query customerId -o tsv)   --from-literal=SharedKey=$(az monitor log-analytics workspace get-shared-keys -g $ASB_RG_CORE -n $ASB_LA_NAME --query primarySharedKey -o tsv) -n fluentbit
 
@@ -422,7 +427,6 @@ git push
 # Sync Flux
 fluxctl sync --k8s-fwd-ns flux-cd
 ```
-
 ## Deploy Grafana and Prometheus
 
 Please see Instructions to deploy Grafana and Prometheus [here](./monitoring/README.md)
@@ -447,6 +451,7 @@ kubectl delete ns istio-system
 kubectl delete ns istio-operator
 kubectl delete ns monitoring
 kubectl delete ns cluster-baseline-settings
+kubectl delete ns fluentbit
 
 # check the namespaces
 kubectl get ns
@@ -472,8 +477,8 @@ export ASB_RG_CORE=rg-${ASB_RG_NAME}
 export ASB_RG_HUB=rg-${ASB_RG_NAME}-hub
 export ASB_RG_SPOKE=rg-${ASB_RG_NAME}-spoke
 
-export ASB_AKS_NAME=$(az deployment group show -g $ASB_RG_CORE -n cluster-${ASB_DEPLOYMENT_NAME} --query properties.outputs.aksClusterName.value -o tsv)
-export ASB_KEYVAULT_NAME=$(az deployment group show -g $ASB_RG_CORE -n cluster-${ASB_DEPLOYMENT_NAME} --query properties.outputs.keyVaultName.value -o tsv)
+export ASB_AKS_NAME=$(az deployment group show -g $ASB_RG_CORE -n cluster-${ASB_DEPLOYMENT_NAME}-${ASB_CLUSTER_LOCATION} --query properties.outputs.aksClusterName.value -o tsv)
+export ASB_KEYVAULT_NAME=$(az deployment group show -g $ASB_RG_CORE -n cluster-${ASB_DEPLOYMENT_NAME}-${ASB_CLUSTER_LOCATION} --query properties.outputs.keyVaultName.value -o tsv)
 export ASB_LA_HUB=$(az monitor log-analytics workspace list -g $ASB_RG_HUB --query [0].name -o tsv)
 
 # delete and purge the key vault
@@ -481,7 +486,7 @@ az keyvault delete -n $ASB_KEYVAULT_NAME
 az keyvault purge -n $ASB_KEYVAULT_NAME
 
 # hard delete Log Analytics
-az monitor log-analytics workspace delete -y --force true -g $ASB_RG_CORE -n la-${ASB_AKS_NAME}
+az monitor log-analytics workspace delete -y --force true -g $ASB_RG_CORE -n $ASB_LA_NAME
 az monitor log-analytics workspace delete -y --force true -g $ASB_RG_HUB -n $ASB_LA_HUB
 
 # delete the resource groups
