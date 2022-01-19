@@ -56,6 +56,13 @@
                 "description": "The regional network spoke VNet Resource ID that the cluster will be joined to"
             }
         },
+        "hubVnetResourceId":{
+            "type": "string",
+            "minLength": 79,
+            "metadata": {
+                "description": "The hub network VNet Resource ID"
+            }
+        },
         "clusterAdminAadGroupObjectId": {
             "type": "string",
             "metadata": {
@@ -176,9 +183,10 @@
 
         "subRgUniqueString": "[uniqueString('aks', subscription().subscriptionId, resourceGroup().id)]",
 
-        "nodeResourceGroupName": "[concat('rg-', parameters('nodepoolsRGName'), '-nodepools')]",
-        "clusterName": "[concat('aks-', variables('subRgUniqueString'))]",
-        "laNewWorkspaceName" : "[concat('la-', variables('clusterName'))]",
+        "nodeResourceGroupName": "[concat('rg-', parameters('nodepoolsRGName'), '-nodepools','-',parameters('location'))]",
+        "baseName": "[concat('aks-',variables('subRgUniqueString'))]",
+        "clusterName": "[concat(variables('baseName'),'-',parameters('location'))]",
+        "laNewWorkspaceName" : "[concat('la-', variables('baseName'))]",
         "logAnalyticsWorkspaceName": "[if(and(empty(parameters('laWorkspaceName')),empty(parameters('laResourceGroup'))), variables('laNewWorkspaceName'),if(not(or(empty(parameters('laWorkspaceName')),empty(parameters('laResourceGroup')))),parameters('laWorkspaceName'),null()))]",
         "isNewLogAnalytics" : "[equals(variables('logAnalyticsWorkspaceName'), variables('laNewWorkspaceName'))]",
         "logAnalyticsResourceGroup": "[if(variables('isNewLogAnalytics'), resourceGroup().name, parameters('laResourceGroup'))]",
@@ -189,6 +197,8 @@
         "vnetName": "[split(parameters('targetVnetResourceId'),'/')[8]]",
         "vnetNodePoolSubnetResourceId": "[concat(parameters('targetVnetResourceId'), '/subnets/snet-clusternodes')]",
         "vnetIngressServicesSubnetResourceId": "[concat(parameters('targetVnetResourceId'), '/subnets/snet-cluster-ingressservices')]",
+        "vnetHubCommonServicesSubnetResourceId": "[concat(parameters('hubVnetResourceId'), '/subnets/CommonServicesSubnet')]",
+        "HubvnetName": "[split(parameters('hubVnetResourceId'),'/')[8]]",
 
         "agwName": "[concat('apw-', variables('clusterName'))]",
         "apwResourceId": "[resourceId('Microsoft.Network/applicationGateways', variables('agwName'))]",
@@ -198,7 +208,7 @@
 
         "clusterControlPlaneIdentityName": "[concat('mi-', variables('clusterName'), '-controlplane')]",
 
-        "keyVaultName": "[concat('kv-', variables('clusterName'))]",
+        "keyVaultName": "[concat('kv-', variables('baseName'))]",
 
         "policyResourceIdAKSLinuxRestrictive": "/providers/Microsoft.Authorization/policySetDefinitions/42b8ef37-b724-4e24-bbc8-7a7708edfe00",
         "policyResourceIdEnforceHttpsIngress": "/providers/Microsoft.Authorization/policyDefinitions/1a5b4dca-0b6f-4cf5-907c-56316bc1bf3d",
@@ -379,7 +389,7 @@
             ],
             "properties": {
                 "subnet": {
-                    "id": "[variables('vnetNodePoolSubnetResourceId')]"
+                    "id": "[variables('vnetHubCommonServicesSubnetResourceId')]"
                 },
                 "privateLinkServiceConnections": [
                     {
@@ -427,9 +437,24 @@
                 {
                     "type": "virtualNetworkLinks",
                     "apiVersion": "2020-06-01",
-                    "name": "[concat('to_', variables('vnetName'))]",
+                    "name": "[concat('to_', variables('HubvnetName'))]",
                     "location": "global",
                     "comments": "Enabling cluster vnet private zone DNS lookup - used by cluster vnet for direct DNS queries (ones not proxied via the hub).",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Network/privateDnsZones', variables('acrPrivateDnsZonesName'))]"
+                    ],
+                    "properties": {
+                        "virtualNetwork": {
+                            "id": "[parameters('hubVnetResourceId')]"
+                        },
+                        "registrationEnabled": false
+                    }
+                },
+                {
+                    "type": "virtualNetworkLinks",
+                    "apiVersion": "2020-06-01",
+                    "name": "[concat('to_', variables('vnetName'))]",
+                    "location": "global",
                     "dependsOn": [
                         "[resourceId('Microsoft.Network/privateDnsZones', variables('acrPrivateDnsZonesName'))]"
                     ],
@@ -453,9 +478,24 @@
                 {
                     "type": "virtualNetworkLinks",
                     "apiVersion": "2020-06-01",
-                    "name": "[concat('to_', variables('vnetName'))]",
+                    "name": "[concat('to_', variables('HubvnetName'))]",
                     "location": "global",
                     "comments": "Enabling Azure Key Vault Private Link on cluster vnet.",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Network/privateDnsZones', variables('akvPrivateDnsZonesName'))]"
+                    ],
+                    "properties": {
+                        "virtualNetwork": {
+                            "id": "[parameters('hubVnetResourceId')]"
+                        },
+                        "registrationEnabled": false
+                    }
+                },
+                {
+                    "type": "virtualNetworkLinks",
+                    "apiVersion": "2020-06-01",
+                    "name": "[concat('to_', variables('vnetName'))]",
+                    "location": "global",
                     "dependsOn": [
                         "[resourceId('Microsoft.Network/privateDnsZones', variables('akvPrivateDnsZonesName'))]"
                     ],
@@ -502,6 +542,22 @@
                     "properties": {
                         "virtualNetwork": {
                             "id": "[parameters('targetVnetResourceId')]"
+                        },
+                        "registrationEnabled": false
+                    }
+                },
+                {
+                    "type": "virtualNetworkLinks",
+                    "apiVersion": "2020-06-01",
+                    "name": "[concat('to_', variables('HubvnetName'))]",
+                    "location": "global",
+                    "comments": "Enabling Azure Key Vault Private Link on cluster vnet.",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Network/privateDnsZones', parameters('asbDnsZone'))]"
+                    ],
+                    "properties": {
+                        "virtualNetwork": {
+                            "id": "[parameters('hubVnetResourceId')]"
                         },
                         "registrationEnabled": false
                     }
@@ -766,7 +822,7 @@
                         {
                             "type": "Microsoft.Authorization/roleAssignments",
                             "apiVersion": "2018-09-01-preview",
-                            "name": "[guid(resourceGroup().id)]",
+                            "name": "[guid(resourceGroup().id,deployment().name,parameters('location'))]",
                             "comments": "It is required to grant the AKS cluster with Virtual Machine Contributor role permissions over the cluster infrastructure resource group to work with Managed Identities and aad-pod-identity. Otherwise MIC component fails while attempting to update MSI on VMSS cluster nodes",
                             "properties": {
                                 "roleDefinitionId": "[variables('virtualMachineContributorRole')]",
@@ -843,12 +899,13 @@
         },
         {
             "condition":"[variables('isNewLogAnalytics')]",
-            "name": "PodFailedScheduledQuery",
+            "name": "[concat('PodFailedScheduledQuery-', variables('clusterName'))]",
             "type": "Microsoft.Insights/scheduledQueryRules",
             "apiVersion": "2018-04-16",
             "location": "[parameters('location')]",
             "dependsOn": [
-                "[resourceId('Microsoft.OperationsManagement/solutions',variables('containerInsightsSolutionName'))]"
+                "[resourceId('Microsoft.OperationsManagement/solutions',variables('containerInsightsSolutionName'))]",
+                "[resourceId('Microsoft.ContainerService/managedClusters', variables('clusterName'))]"
             ],
             "properties": {
                 "description": "Alert on pod Failed phase.",
@@ -1039,14 +1096,14 @@
         {
             "type": "Microsoft.Network/privateEndpoints",
             "apiVersion": "2020-05-01",
-            "name": "nodepool-to-acr",
+            "name": "nodepools-to-acr",
             "location": "[parameters('location')]",
             "dependsOn": [
                 "[resourceId('Microsoft.ContainerRegistry/registries/replications', variables('defaultAcrName'), parameters('geoRedundancyLocation'))]"
             ],
             "properties": {
                 "subnet": {
-                    "id": "[variables('vnetNodePoolSubnetResourceId')]"
+                    "id": "[variables('vnetHubCommonServicesSubnetResourceId')]"
                 },
                 "privateLinkServiceConnections": [
                     {
@@ -1067,7 +1124,7 @@
                     "name": "default",
                     "location": "[parameters('location')]",
                     "dependsOn": [
-                        "[resourceId('Microsoft.Network/privateEndpoints', 'nodepool-to-acr')]",
+                        "[resourceId('Microsoft.Network/privateEndpoints', 'nodepools-to-acr')]",
                         "[resourceId('Microsoft.Network/privateDnsZones', variables('acrPrivateDnsZonesName'))]"
                     ],
                     "properties": {
@@ -1895,7 +1952,7 @@
         },
         {
             "type": "Microsoft.ManagedIdentity/userAssignedIdentities/providers/roleAssignments",
-            "name": "[concat('podmi-ingress-controller', '/Microsoft.Authorization/', guid(concat(resourceGroup().id), variables('managedIdentityOperatorRole')))]",
+            "name": "[concat('podmi-ingress-controller', '/Microsoft.Authorization/', guid(concat(resourceGroup().id), variables('managedIdentityOperatorRole'),variables('clusterName')))]",
             "apiVersion": "2018-09-01-preview",
             "comments": "Grant the AKS cluster with Manage Identity Operator role permissions over the managed identity used for the ingress controller.  Allows it to be assigned to the underlying VMSS.",
             "dependsOn": [
@@ -1913,7 +1970,7 @@
             "name": "[variables('policyAssignmentNameAKSLinuxRestrictive')]",
             "comments": "Applying the 'AKS Linux Restrictive' policy to the resource group",
             "properties": {
-                "displayName": "[concat('[', variables('clusterName'),'] ', reference(variables('policyResourceIdAKSLinuxRestrictive'), '2020-09-01').displayName)]",
+                "displayName": "[concat(reference(variables('policyResourceIdAKSLinuxRestrictive'), '2020-09-01').displayName)]",
                 "scope": "[subscriptionResourceId('Microsoft.Resources/resourceGroups', resourceGroup().name)]",
                 "policyDefinitionId": "[variables('policyResourceIdAKSLinuxRestrictive')]",
                 "parameters": {
@@ -1940,7 +1997,7 @@
             "name": "[variables('policyAssignmentNameEnforceHttpsIngress')]",
             "comments": "Applying the 'Enforce HTTPS ingress in Kubernetes cluster' policy to the resource group.",
             "properties": {
-                "displayName": "[concat('[', variables('clusterName'),'] ', reference(variables('policyResourceIdEnforceHttpsIngress'), '2020-09-01').displayName)]",
+                "displayName": "[concat(reference(variables('policyResourceIdEnforceHttpsIngress'), '2020-09-01').displayName)]",
                 "scope": "[subscriptionResourceId('Microsoft.Resources/resourceGroups', resourceGroup().name)]",
                 "policyDefinitionId": "[variables('policyResourceIdEnforceHttpsIngress')]",
                 "parameters": {
@@ -1959,7 +2016,7 @@
             "name": "[variables('policyAssignmentNameEnforceInternalLoadBalancers')]",
             "comments": "Applying the 'Enforce internal load balancers in Kubernetes cluster' policy to the resource group.",
             "properties": {
-                "displayName": "[concat('[', variables('clusterName'),'] ', reference(variables('policyResourceIdEnforceInternalLoadBalancers'), '2020-09-01').displayName)]",
+                "displayName": "[concat(reference(variables('policyResourceIdEnforceInternalLoadBalancers'), '2020-09-01').displayName)]",
                 "scope": "[subscriptionResourceId('Microsoft.Resources/resourceGroups', resourceGroup().name)]",
                 "policyDefinitionId": "[variables('policyResourceIdEnforceInternalLoadBalancers')]",
                 "parameters": {
@@ -1978,7 +2035,7 @@
             "name": "[variables('policyAssignmentNameRoRootFilesystem')]",
             "comments": "Applying the 'Kubernetes cluster containers should run with a read only root file system' policy to the resource group.",
             "properties": {
-                "displayName": "[concat('[', variables('clusterName'),'] ', reference(variables('policyResourceIdRoRootFilesystem'), '2020-09-01').displayName)]",
+                "displayName": "[concat(reference(variables('policyResourceIdRoRootFilesystem'), '2020-09-01').displayName)]",
                 "scope": "[subscriptionResourceId('Microsoft.Resources/resourceGroups', resourceGroup().name)]",
                 "policyDefinitionId": "[variables('policyResourceIdRoRootFilesystem')]",
                 "parameters": {
@@ -2001,7 +2058,7 @@
             "name": "[variables('policyAssignmentNameEnforceResourceLimits')]",
             "comments": "Applying the 'Container Images Resource Limits' policy at the resource group level.",
             "properties": {
-                "displayName": "[concat('[', variables('clusterName'),'] ', reference(variables('policyResourceIdEnforceResourceLimits'), '2020-09-01').displayName)]",
+                "displayName": "[concat(reference(variables('policyResourceIdEnforceResourceLimits'), '2020-09-01').displayName)]",
                 "scope": "[subscriptionResourceId('Microsoft.Resources/resourceGroups', resourceGroup().name)]",
                 "policyDefinitionId": "[variables('policyResourceIdEnforceResourceLimits')]",
                 "parameters": {
@@ -2034,7 +2091,7 @@
             "name": "[variables('policyAssignmentNameEnforceImageSource')]",
             "comments": "Applying the 'Allowed Container Images' regex policy at the resource group level. If all images are pull into your ARC instance as described in these instructions you can remove the docker.io entries.",
             "properties": {
-                "displayName": "[concat('[', variables('clusterName'),'] ', reference(variables('policyResourceIdEnforceImageSource'), '2020-09-01').displayName)]",
+                "displayName": "[concat(reference(variables('policyResourceIdEnforceImageSource'), '2020-09-01').displayName)]",
                 "scope": "[subscriptionResourceId('Microsoft.Resources/resourceGroups', resourceGroup().name)]",
                 "policyDefinitionId": "[variables('policyResourceIdEnforceImageSource')]",
                 "parameters": {
@@ -2077,6 +2134,10 @@
         "keyVaultName": {
             "type": "string",
             "value": "[variables('keyVaultName')]"
+        },
+        "logAnalyticsName": {
+            "type": "string",
+            "value": "[variables('logAnalyticsWorkspaceName')]"
         },
         "containerRegistryName": {
             "type": "string",

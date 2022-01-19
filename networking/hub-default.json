@@ -60,7 +60,17 @@
             "metadata": {
                 "description": "A /27 under the VNet Address Space for regional Azure Bastion"
             }
+        },
+        "azureCommonServicesSubnetAddressSpace": {
+            "defaultValue": "10.200.0.128/28",
+            "type": "string",
+            "maxLength": 18,
+            "minLength": 10,
+            "metadata": {
+                "description": "A /28 under the VNet Address Space for ACR"
+            }
         }
+        
     },
     "variables": {
         "baseFwPipName": "[concat('pip-fw-', parameters('location'))]",
@@ -320,6 +330,13 @@
                             "networkSecurityGroup": {
                                 "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('bastionNetworkNsgName'))]"
                             }
+                        }
+                    },
+                    {
+                        "name": "CommonServicesSubnet",
+                        "properties": {
+                            "addressPrefix": "[parameters('azureCommonServicesSubnetAddressSpace')]",
+                            "privateEndpointNetworkPolicies": "Disabled" 
                         }
                     }
                 ]
