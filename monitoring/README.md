@@ -16,7 +16,7 @@ The following instructions deploy Prometheus and add an Azure Monitor data sourc
 
 ```bash
 
-export ASB_ACR_NAME=$(az deployment group show -g $ASB_RG_CORE -n cluster-${ASB_DEPLOYMENT_NAME}  --query properties.outputs.containerRegistryName.value -o tsv)
+export ASB_ACR_NAME=$(az deployment group show -g $ASB_RG_CORE -n cluster-${ASB_DEPLOYMENT_NAME}-${ASB_CLUSTER_LOCATION}  --query properties.outputs.containerRegistryName.value -o tsv)
 
 # import Prometheus into ACR
 az acr import --source docker.io/prom/prometheus:v2.30.0 -n $ASB_ACR_NAME
