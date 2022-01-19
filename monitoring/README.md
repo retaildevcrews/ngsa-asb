@@ -123,10 +123,10 @@ az network application-gateway waf-policy custom-rule create \
   --action Allow --priority $ASB_WAF_POLICY_RULE_PRIORITY --rule-type MatchRule
 
 # add allow rule conditions for AAD redirect request
-# add condition to check whether the redirectURI is going to /grafana/login/azuread 
+# add condition to check whether the redirectURI is going to /login/azuread 
 az network application-gateway waf-policy custom-rule match-condition add \
   -n $ASB_WAF_POLICY_RULE --policy-name $ASB_WAF_POLICY_NAME -g $ASB_RG_CORE \
-  --match-variables RequestUri --operator Contains --values "/grafana/login/azuread" \
+  --match-variables RequestUri --operator Contains --values "/login/azuread" \
   --transforms UrlDecode Lowercase
 
 # use prevention mode and enable waf policy

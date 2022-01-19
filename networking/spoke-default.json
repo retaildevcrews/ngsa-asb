@@ -232,6 +232,20 @@
                         }
                     },
                     {
+                        "name": "Allow80InBound",
+                        "properties": {
+                            "description": "Allow ALL web traffic into 80, mainly to allow HTTPS redirection. (If you wanted to allow-list specific IPs, this is where you'd list them.)",
+                            "protocol": "Tcp",
+                            "sourcePortRange": "*",
+                            "sourceAddressPrefix": "Internet",
+                            "destinationPortRange": "80",
+                            "destinationAddressPrefix": "VirtualNetwork",
+                            "access": "Allow",
+                            "priority": 130,
+                            "direction": "Inbound"
+                        }
+                    },
+                    {
                         "name": "DenyAllInBound",
                         "properties": {
                             "protocol": "*",

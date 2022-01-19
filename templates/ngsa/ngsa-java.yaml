@@ -27,11 +27,9 @@ spec:
           - name: PROMETHEUS
             value: "true"
           - name: ZONE
-            value: "centralus"
+            value: "az-${ASB_SPOKE_LOCATION}-${ASB_ENV}"
           - name: REGION
-            value: "dev"
-          - name: URL_PREFIX
-            value: /java
+            value: "${ASB_SPOKE_LOCATION}"
 
           ports:
             - name: http
@@ -88,16 +86,9 @@ spec:
   gateways:
   - istio-system/istio-gateway
   hosts:
-  - ${ASB_DOMAIN}
+  - ngsa-java-${ASB_DOMAIN_SUFFIX}
   http:
-  - match:
-    - uri:
-        prefix: /java/
-    - uri:
-        exact: /java
-    rewrite:
-      uri: /
-    route:
+  - route:
     - destination:
         port:
           number: 8080

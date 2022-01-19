@@ -9,6 +9,7 @@
 * [Deploying NGSA Applications](#deploying-ngsa-applications)
 * [Deploy Fluent Bit](#deploy-fluent-bit)
 * [Deploy Grafana and Prometheus](#deploy-grafana-and-prometheus)
+* [Leveraging Subdomains for App Endpoints](#leveraging-subdomains-for-app-endpoints)
 * [Deploying Multiple Clusters Using Existing Network](#deploying-multiple-clusters-using-existing-network)
 * [Resetting the Cluster](#resetting-the-cluster)
 * [Delete Azure Resources](#delete-azure-resources)
@@ -62,10 +63,12 @@ az ad group member list -g $ASB_CLUSTER_ADMIN_GROUP  --query [].displayName -o t
 
 # Set the deployment name
 # export ASB_DEPLOYMENT_NAME=[starts with a-z, [a-z,0-9], max length 8]
-
 export ASB_DEPLOYMENT_NAME=[e.g 'ngsatest']
-export ASB_DNS_NAME=[e.g 'ngsa-pre-asb']
-export ASB_RG_NAME=[e.g 'ngsa-pre-asb']
+
+# examples: pre, test, stage, prod, and dev
+export ASB_ENV=[eg: 'dev']
+export ASB_RG_NAME=${ASB_DEPLOYMENT_NAME}-${ASB_ENV}
+
 ```
 
 ```bash
@@ -103,6 +106,17 @@ git push -u origin $ASB_DEPLOYMENT_NAME
 # Set for deployment of resources. Cluster region will be set in a different step
 export ASB_HUB_LOCATION=centralus
 export ASB_SPOKE_LOCATION=centralus
+```
+
+```bash
+# We are using 'dns-rg' for triplets
+export ASB_DNS_ZONE_RG=dns-rg
+export ASB_DNS_ZONE=cse.ms
+
+# Make sure the resource group does not exist
+az network dns record-set a list -g $ASB_DNS_ZONE_RG -z $ASB_DNS_ZONE -o table | grep "$ASB_SPOKE_LOCATION-$ASB_ENV"
+
+# If any records exist, choose a different deployment region and try again
 ```
 
 ### Save your work in-progress
@@ -158,9 +172,9 @@ export ASB_GIT_REPO=$(git remote get-url origin)
 export ASB_GIT_BRANCH=$ASB_DEPLOYMENT_NAME
 export ASB_GIT_PATH=deploy/$ASB_DEPLOYMENT_NAME-$ASB_SPOKE_LOCATION
 
-# Set default domain name
-export ASB_DNS_ZONE=cse.ms
-export ASB_DOMAIN=${ASB_DNS_NAME}-${ASB_SPOKE_LOCATION}.${ASB_DNS_ZONE}
+# Set default domain suffix
+# app endpoints will use subdomain from this domain suffix
+export ASB_DOMAIN_SUFFIX=${ASB_SPOKE_LOCATION}-${ASB_ENV}.${ASB_DNS_ZONE}
 
 # Resource group names
 export ASB_RG_CORE=rg-${ASB_RG_NAME}
@@ -198,7 +212,7 @@ export ASB_SPOKE_IP_PREFIX="10.240"
 
 # Create spoke network
 az deployment group create \
-  -n spoke-$ASB_ORG_APP_ID_NAME 
+  -n spoke-$ASB_ORG_APP_ID_NAME \
   -g $ASB_RG_SPOKE \
   -f networking/spoke-default.json \
   -p deploymentName=${ASB_DEPLOYMENT_NAME} \
@@ -247,8 +261,8 @@ az deployment group create -g $ASB_RG_CORE \
   -f cluster/cluster-stamp.json \
   -n cluster-${ASB_DEPLOYMENT_NAME}-${ASB_CLUSTER_LOCATION} \
   -p appGatewayListenerCertificate=${APP_GW_CERT_CSMS} \
-     asbDomain=${ASB_DOMAIN} \
-     asbDnsName=${ASB_DNS_NAME}-${ASB_CLUSTER_LOCATION} \
+     asbDomainSuffix=${ASB_DOMAIN_SUFFIX} \
+     asbDnsName=${ASB_SPOKE_LOCATION}-${ASB_ENV} \
      asbDnsZone=${ASB_DNS_ZONE} \
      aksIngressControllerCertificate="$(echo $INGRESS_CERT_CSMS | base64 -d)" \
      aksIngressControllerKey="$(echo $INGRESS_KEY_CSMS | base64 -d)" \
@@ -317,16 +331,11 @@ export ASB_INGRESS_KEY_NAME=appgw-ingress-internal-aks-ingress-key
 ./saveenv.sh -y
 ```
 
-### Create public DNS A record
+### Create Public DNS A record
 
 ```bash
-# We are using 'dns-rg' for triplets
-
-# Resource group of DNS Zone for deployment
-export ASB_DNS_ZONE_RG=dns-rg
-
-# Create the dns record
-az network dns record-set a add-record -g $ASB_DNS_ZONE_RG -z $ASB_DNS_ZONE -n $ASB_DNS_NAME-$ASB_CLUSTER_LOCATION -a $ASB_AKS_PIP --query fqdn
+# Create public DNS record for ngsa-memory
+az network dns record-set a add-record -g $ASB_DNS_ZONE_RG -z $ASB_DNS_ZONE -n "ngsa-memory-${ASB_SPOKE_LOCATION}-${ASB_ENV}" -a $ASB_AKS_PIP --query fqdn
 ```
 
 ## Create Deployment Files
@@ -434,6 +443,71 @@ fluxctl sync --k8s-fwd-ns flux-cd
 ## Deploy Grafana and Prometheus
 
 Please see Instructions to deploy Grafana and Prometheus [here](./monitoring/README.md)
+
+## Leveraging Subdomains for App Endpoints
+
+### Motivation
+
+It's common to expose various public facing applications through different paths on the same endpoint (eg: `my-asb.cse.ms/cosmos`, `my-asb.cse.ms/grafana` and etc). A notable problem with this approach is that within the App Gateway, we can only configure a single health probe for all apps in the cluster. This can bring down the entire endpoint if the health probe fails, when only a single app was affected.
+
+A better approach would be to use a unique subdomain for each app instance. The subdomain format is `[app].[region]-[env].cse.ms`, where the order is in decreasing specificity. Ideally, grafana in the central dev region can be accessed as `grafana.central-dev.cse.ms`. However, adding a second level subdomain means that we will need to purchase an additional cert. We currently own the `*.cse.ms` wildcard cert but we cannot use the same cert for a a secondary level such as `*.central-dev.cse.ms` ([more info](https://serverfault.com/questions/104160/wildcard-ssl-certificate-for-second-level-subdomain/658109#658109)). Therefore, for our ASB installation, we will use a workaround by modifying the subdomain format to `[app]-[region]-[env].cse.ms`, which still maintains the same specificity order and each app can still have its own unique endpoint.
+
+### Create a subdomain endpoint
+
+```bash
+# TODO: convert this into a script
+
+# app DNS name, in subdomain format
+# format [app]-[region]-[env].cse.ms
+export ASB_APP_NAME=ngsa-cosmos
+export ASB_APP_DNS_NAME=${ASB_APP_NAME}-${ASB_SPOKE_LOCATION}-${ASB_ENV}
+export ASB_APP_DNS_FULL_NAME=${ASB_APP_DNS_NAME}.${ASB_DNS_ZONE}
+export ASB_APP_HEALTH_ENDPOINT="/healthz"
+
+# create record for public facing DNS
+az network dns record-set a add-record -g $ASB_DNS_ZONE_RG -z $ASB_DNS_ZONE -n $ASB_APP_DNS_NAME -a $ASB_AKS_PIP --query fqdn
+
+# create record for private DNS zone
+export ASB_AKS_PRIVATE_IP="$ASB_SPOKE_IP_PREFIX".4.4
+az network private-dns record-set a add-record -g $ASB_RG_CORE -z $ASB_DNS_ZONE -n $ASB_APP_DNS_NAME -a $ASB_AKS_PRIVATE_IP --query fqdn
+
+# create app gateway resources 
+# backend pool, HTTPS listener (443), health probe, http setting and routing rule
+export ASB_APP_GW_NAME="apw-$ASB_AKS_NAME"
+
+az network application-gateway address-pool create -g $ASB_RG_CORE --gateway-name $ASB_APP_GW_NAME \
+  -n $ASB_APP_DNS_FULL_NAME --servers $ASB_APP_DNS_FULL_NAME
+
+az network application-gateway http-listener create -g $ASB_RG_CORE --gateway-name $ASB_APP_GW_NAME \
+  -n "listener-$ASB_APP_DNS_NAME" --frontend-port "apw-frontend-ports" --ssl-cert "$ASB_APP_GW_NAME-ssl-certificate" \
+  --host-name $ASB_APP_DNS_FULL_NAME
+
+az network application-gateway probe create -g $ASB_RG_CORE --gateway-name $ASB_APP_GW_NAME \
+  -n "probe-$ASB_APP_DNS_NAME" --protocol https --path $ASB_APP_HEALTH_ENDPOINT \
+  --host-name-from-http-settings true --interval 30 --timeout 30 --threshold 3 \
+  --match-status-codes "200-399"
+
+az network application-gateway http-settings create -g $ASB_RG_CORE --gateway-name $ASB_APP_GW_NAME \
+  -n "$ASB_APP_DNS_NAME-httpsettings" --port 443 --protocol Https --cookie-based-affinity Disabled --connection-draining-timeout 0 \
+  --timeout 20 --host-name-from-backend-pool true --enable-probe --probe "probe-$ASB_APP_DNS_NAME"
+
+az network application-gateway rule create -g $ASB_RG_CORE --gateway-name $ASB_APP_GW_NAME \
+  -n "$ASB_APP_DNS_NAME-routing-rule" --address-pool $ASB_APP_DNS_FULL_NAME \
+  --http-settings "$ASB_APP_DNS_NAME-httpsettings" --http-listener "listener-$ASB_APP_DNS_NAME"
+
+# set http redirection
+# create listener for HTTP (80), HTTPS redirect config and HTTPS redirect routing rule
+az network application-gateway http-listener create -g $ASB_RG_CORE --gateway-name $ASB_APP_GW_NAME \
+  -n "http-listener-$ASB_APP_DNS_NAME" --frontend-port "apw-frontend-ports-http" --host-name $ASB_APP_DNS_FULL_NAME
+
+az network application-gateway redirect-config create -g $ASB_RG_CORE --gateway-name $ASB_APP_GW_NAME \
+  -n "https-redirect-config-$ASB_APP_DNS_NAME" -t "Permanent" --include-path true \
+  --include-query-string true --target-listener "listener-$ASB_APP_DNS_NAME"
+
+az network application-gateway rule create -g $ASB_RG_CORE --gateway-name $ASB_APP_GW_NAME \
+  -n "https-redirect-$ASB_APP_DNS_NAME-routing-rule" --http-listener "http-listener-$ASB_APP_DNS_NAME" \
+  --redirect-config "https-redirect-config-$ASB_APP_DNS_NAME"
+```
 
 ## Deploying Multiple Clusters Using Existing Network
 
