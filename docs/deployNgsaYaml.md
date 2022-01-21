@@ -98,7 +98,7 @@ http https://ngsa-java-${ASB_DOMAIN_SUFFIX}/version
 ```bash
 mkdir -p $ASB_GIT_PATH/loderunner 
 
-cp templates/loderunner.yaml $ASB_GIT_PATH/loderunner/loderunner.yaml
+cat templates/loderunner.yaml | envsubst > $ASB_GIT_PATH/loderunner/loderunner.yaml
 
 git add $ASB_GIT_PATH/loderunner/loderunner.yaml
 git commit -m "added loderunner"
