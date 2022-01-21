@@ -101,7 +101,7 @@ mkdir -p $ASB_GIT_PATH/loderunner
 cp templates/loderunner.yaml $ASB_GIT_PATH/loderunner/loderunner.yaml
 
 git add $ASB_GIT_PATH/loderunner/loderunner.yaml
-git commit -m "added loderunner "
+git commit -m "added loderunner"
 git push
 
 # Force flux to sync changes

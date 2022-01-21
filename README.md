@@ -170,7 +170,7 @@ echo $ASB_CLUSTER_ADMIN_ID
 # Set GitOps repo
 export ASB_GIT_REPO=$(git remote get-url origin)
 export ASB_GIT_BRANCH=$ASB_RG_NAME
-export ASB_GIT_PATH=deploy/$ASB_DEPLOYMENT_NAME-$ASB_SPOKE_LOCATION
+export ASB_GIT_PATH=deploy/$ASB_ENV-$ASB_DEPLOYMENT_NAME-$ASB_SPOKE_LOCATION
 
 # Set default domain suffix
 # app endpoints will use subdomain from this domain suffix

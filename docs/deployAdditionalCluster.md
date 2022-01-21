@@ -64,7 +64,7 @@ export ASB_CLUSTER_GEO_LOCATION=westcentralus
 export ASB_DOMAIN_SUFFIX=${ASB_SPOKE_LOCATION}-${ASB_ENV}.${ASB_DNS_ZONE}
 
 # Add private DNS A Record for ngsa-memory
-az network private-dns record-set a add-record -g ${ASB_RG_CORE} -z ${ASB_DNS_ZONE} -n ngsa-memory-${ASB_DNS_NAME}-${ASB_SPOKE_LOCATION} -a ${ASB_SPOKE_IP_PREFIX}.4.4
+az network private-dns record-set a add-record -g ${ASB_RG_CORE} -z ${ASB_DNS_ZONE} -n ngsa-memory-${ASB_SPOKE_LOCATION}-${ASB_ENV} -a ${ASB_SPOKE_IP_PREFIX}.4.4
 
 # Add Virtual Network Link to Private DNS zones
 az network private-dns link vnet create -n "to_vnet-spoke-$ASB_ORG_APP_ID_NAME-00" -e false -g ${ASB_RG_CORE} -v ${ASB_SPOKE_VNET_ID} -z ${ASB_DNS_ZONE}
@@ -140,5 +140,10 @@ az network dns record-set a add-record -g $ASB_DNS_ZONE_RG -z $ASB_DNS_ZONE -n "
 ```
 
 ## Create Deployment Files
+
+```bash
+# Set ASB_GIT_PATH for new cluster 
+export ASB_GIT_PATH=deploy/$ASB_ENV-$ASB_DEPLOYMENT_NAME-$ASB_SPOKE_LOCATION
+```
 
 Follow deployment instructions in the main README located [here](../README.md#create-deployment-files)
