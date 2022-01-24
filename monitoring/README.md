@@ -35,26 +35,15 @@ az acr import --source docker.io/grafana/grafana:7.3.0 -n $ASB_ACR_NAME
 
 mkdir $ASB_GIT_PATH/monitoring
 # create monitoring namespace deployment file
-cat templates/monitoring.yaml | envsubst  > $ASB_GIT_PATH/monitoring/01-namespace.yaml
+cp templates/monitoring/01-namespace.yaml $ASB_GIT_PATH/monitoring/01-namespace.yaml
 # create prometheus deployment file
-cat templates/prometheus.yaml | envsubst  > $ASB_GIT_PATH/monitoring/02-prometheus.yaml
+cat templates/monitoring/02-prometheus.yaml | envsubst  > $ASB_GIT_PATH/monitoring/02-prometheus.yaml
 
 ```
 
-#### Option 1: Prepare Grafana deployment for basic auth
+### Prepare Grafana deployment for Azure Active Directory (AAD)
 
-Deploy the standard version of Grafana using basic auth, essentially providing username and password for login.
-
-```bash
-
-# create grafana deployment file
-cat templates/grafana.yaml | envsubst  > $ASB_GIT_PATH/monitoring/03-grafana.yaml
-
-```
-
-#### Option 2: Prepare Grafana deployment for Azure Active Directory (AAD)
-
-Deploy Grafana that uses AAD as the authentication mechanism. This process is a bit more involved as you will need to configure a Service Principal.
+Deploy Grafana that uses AAD as the authentication mechanism.
 
 First, follow the steps detailed in the [Grafana documentation](https://grafana.com/docs/grafana/latest/auth/azuread/#create-the-azure-ad-application) to create the AAD Service Principal. Use the `ASB_DOMAIN` value as the `grafana domain` for the redirect URLs. Note the `TENANT_ID`, `CLIENT_ID` and `CLIENT_SECRET` values as you'll be needing these for the deployment template.
 
@@ -70,10 +59,10 @@ You'll need to run a few more steps to completely setup the AAD Service Principa
 # Optional: Add client secret using AZ CLI
 # You can also add it manually using the Azure portal with the secret name "grafana-aad-client-secret" [Recommended]
 
-# Optional: give logged in user access to key vault
+# Give logged in user access to key vault
 az keyvault set-policy --secret-permissions set --object-id $(az ad signed-in-user show --query objectId -o tsv) -n $ASB_KV_NAME -g $ASB_RG_CORE
 
-# Optional: set grafana AAD client secrets
+# Set grafana AAD client secrets
 az keyvault secret set -o table --vault-name $ASB_KV_NAME --name "grafana-aad-client-secret" --value [insert CLIENT_SECRET]
 
 # set grafana AAD ids
@@ -82,10 +71,10 @@ export ASB_GRAFANA_SP_TENANT_ID=[insert TENANT_ID]
 export ASB_GRAFANA_MI_NAME=grafana-id
 
 # create grafana deployment file
-cat templates/grafana-aad.yaml | envsubst  > $ASB_GIT_PATH/monitoring/03-grafana.yaml
+cat templates/monitoring/03-grafana-aad.yaml | envsubst  > $ASB_GIT_PATH/monitoring/03-grafana.yaml
 
 # create grafana pod identity deployment file
-cat templates/grafana-pod-identity.yaml | envsubst  > $ASB_GIT_PATH/monitoring/04-grafana-pod-identity.yaml
+cat templates/monitoring/04-grafana-pod-identity.yaml | envsubst  > $ASB_GIT_PATH/monitoring/04-grafana-pod-identity.yaml
 
 ```
 
@@ -101,18 +90,74 @@ Add, commit and push the modified files using git to your working branch.
   
   ```
 
+### Add Grafana Listener to application gateway
+
+```bash
+# app DNS name, in subdomain format
+# format [app]-[region]-[env].cse.ms
+export ASB_APP_NAME=grafana
+export ASB_APP_DNS_NAME=${ASB_APP_NAME}-${ASB_SPOKE_LOCATION}-${ASB_ENV}
+export ASB_APP_DNS_FULL_NAME=${ASB_APP_DNS_NAME}.${ASB_DNS_ZONE}
+export ASB_APP_HEALTH_ENDPOINT="/api/health"
+
+# create record for public facing DNS
+az network dns record-set a add-record -g $ASB_DNS_ZONE_RG -z $ASB_DNS_ZONE -n $ASB_APP_DNS_NAME -a $ASB_AKS_PIP --query fqdn
+
+# create record for private DNS zone
+export ASB_AKS_PRIVATE_IP="$ASB_SPOKE_IP_PREFIX".4.4
+az network private-dns record-set a add-record -g $ASB_RG_CORE -z $ASB_DNS_ZONE -n $ASB_APP_DNS_NAME -a $ASB_AKS_PRIVATE_IP --query fqdn
+
+# create app gateway resources 
+# backend pool, HTTPS listener (443), health probe, http setting and routing rule
+export ASB_APP_GW_NAME="apw-$ASB_AKS_NAME"
+
+az network application-gateway address-pool create -g $ASB_RG_CORE --gateway-name $ASB_APP_GW_NAME \
+  -n $ASB_APP_DNS_FULL_NAME --servers $ASB_APP_DNS_FULL_NAME
+
+az network application-gateway http-listener create -g $ASB_RG_CORE --gateway-name $ASB_APP_GW_NAME \
+  -n "listener-$ASB_APP_DNS_NAME" --frontend-port "apw-frontend-ports" --ssl-cert "$ASB_APP_GW_NAME-ssl-certificate" \
+  --host-name $ASB_APP_DNS_FULL_NAME
+
+az network application-gateway probe create -g $ASB_RG_CORE --gateway-name $ASB_APP_GW_NAME \
+  -n "probe-$ASB_APP_DNS_NAME" --protocol https --path $ASB_APP_HEALTH_ENDPOINT \
+  --host-name-from-http-settings true --interval 30 --timeout 30 --threshold 3 \
+  --match-status-codes "200-399"
+
+az network application-gateway http-settings create -g $ASB_RG_CORE --gateway-name $ASB_APP_GW_NAME \
+  -n "$ASB_APP_DNS_NAME-httpsettings" --port 443 --protocol Https --cookie-based-affinity Disabled --connection-draining-timeout 0 \
+  --timeout 20 --host-name-from-backend-pool true --enable-probe --probe "probe-$ASB_APP_DNS_NAME"
+
+az network application-gateway rule create -g $ASB_RG_CORE --gateway-name $ASB_APP_GW_NAME \
+  -n "$ASB_APP_DNS_NAME-routing-rule" --address-pool $ASB_APP_DNS_FULL_NAME \
+  --http-settings "$ASB_APP_DNS_NAME-httpsettings" --http-listener "listener-$ASB_APP_DNS_NAME"
+
+# set http redirection
+# create listener for HTTP (80), HTTPS redirect config and HTTPS redirect routing rule
+az network application-gateway http-listener create -g $ASB_RG_CORE --gateway-name $ASB_APP_GW_NAME \
+  -n "http-listener-$ASB_APP_DNS_NAME" --frontend-port "apw-frontend-ports-http" --host-name $ASB_APP_DNS_FULL_NAME
+
+az network application-gateway redirect-config create -g $ASB_RG_CORE --gateway-name $ASB_APP_GW_NAME \
+  -n "https-redirect-config-$ASB_APP_DNS_NAME" -t "Permanent" --include-path true \
+  --include-query-string true --target-listener "listener-$ASB_APP_DNS_NAME"
+
+az network application-gateway rule create -g $ASB_RG_CORE --gateway-name $ASB_APP_GW_NAME \
+  -n "https-redirect-$ASB_APP_DNS_NAME-routing-rule" --http-listener "http-listener-$ASB_APP_DNS_NAME" \
+  --redirect-config "https-redirect-config-$ASB_APP_DNS_NAME"
+
+```
+
 ### Configure Grafana using AAD
 
-Ensure that you have added the proper users/groups in the Grafana's AAD service principal, the proper role mappings in the Manifest and [configured the `groupMembershipClaims`](https://grafana.com/docs/grafana/latest/auth/azuread/#configure-allowed-groups). If the pods are running, verify that you can access the grafana endpoint at `https://{ASB_DOMAIN}/grafana`. You should only see an option to sign in with Microsoft.
+Ensure that you have added the proper users/groups in the Grafana's AAD service principal, the proper role mappings in the Manifest and [configured the `groupMembershipClaims`](https://grafana.com/docs/grafana/latest/auth/azuread/#configure-allowed-groups). If the pods are running, verify that you can access the grafana endpoint at `https://{ASB_APP_DNS_FULL_NAME}`. You should only see an option to sign in with Microsoft.
 
 The login step may not work just yet, because the WAF can block the redirect requests from AAD to the grafana endpoint. If this is the case, add a firewall exclusion policy to avoid flagging these specific requests from AAD.
 
 ```bash
 
 # create waf policy
-export ASB_WAF_POLICY_NAME="${ASB_DEPLOYMENT_NAME}-waf-policy"
+export ASB_WAF_POLICY_NAME="${ASB_DEPLOYMENT_NAME}-waf-policy-${ASB_SPOKE_LOCATION}"
 
-az network application-gateway waf-policy create -n $ASB_WAF_POLICY_NAME -g $ASB_RG_CORE
+az network application-gateway waf-policy create -n $ASB_WAF_POLICY_NAME -g $ASB_RG_CORE -l $ASB_SPOKE_LOCATION
 
 # create custom rule in waf policy
 export ASB_WAF_POLICY_RULE="grafanaAADAuth"
@@ -138,7 +183,7 @@ az network application-gateway list -g $ASB_RG_CORE --query "[].{Name:name}" -o 
 
 ```
 
-**IMPORTANT**: With the WAF policy now created, you will need to associate this policy with the application gateway. Unfortunately, there currently isn't a way to do this using the AZ CLI. You can do this through the Azure portal by accessing the Application Gateway WAF policy in the core resource group, select `Associated application gateways` in the sidebar and `Add association` to the gateway name as you've noted in the last step above.
+**IMPORTANT**: With the WAF policy now created, you will need to associate this policy with the application gateway's http listener. Unfortunately, there currently isn't a way to do this using the AZ CLI. You can do this through the Azure portal by accessing the Application Gateway WAF policy in the core resource group, select `Associated application gateways` in the sidebar and `Add association` to the gateway name as you've noted in the last step above. Add both grafana's HTTP and HTTPS listeners
 
 ### Verify Prometheus Service
 
@@ -185,9 +230,6 @@ Goto a browser to access grafana and perform the following steps:
   - Under Azure Monitor Details
     - Put in Directory (Tenant) ID, Application (Client) ID (service principal `<your-service-principal-name>` ID) and Client Secret from [Add a secret to the service principal](#add-a-secret-to-the-service-principal)
     - Click on "Load Subscription" --> After loading, select proper subscription from drop-down
-  - Under Application Insights
-    - Put in "API Key" and "Application ID" from [this step](#add-api-key-to-app-insights)
-  - Click "Save & Test"
 - Click on "Explore" from Grafana side bar
 - Try out different metrics and services
 
