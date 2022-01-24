@@ -48,7 +48,7 @@ spec:
     metadata:
       labels:
         app: grafana
-        aadpodidbinding: $ASB_GRAFANA_MI_NAME
+        aadpodidbinding: ${ASB_GRAFANA_MI_NAME}
     spec:
       securityContext:
         fsGroup: 472

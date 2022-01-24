@@ -5,8 +5,8 @@ metadata:
   namespace: monitoring
 spec:
   type: 0
-  resourceID: $ASB_NGSA_MI_RESOURCE_ID
-  clientID: $ASB_NGSA_MI_CLIENT_ID
+  resourceID: ${ASB_NGSA_MI_RESOURCE_ID}
+  clientID: ${ASB_NGSA_MI_CLIENT_ID}
 
 ---
 
@@ -36,10 +36,10 @@ spec:
         key: clientSecret
   parameters:
     usePodIdentity: "true"
-    keyvaultName: "$ASB_KV_NAME"
+    keyvaultName: "${ASB_KV_NAME}"
     objects: |
       array:
         - |
           objectName: grafana-aad-client-secret
           objectType: secret
-    tenantId: "$ASB_TENANT_ID"
+    tenantId: "${ASB_TENANT_ID}"
