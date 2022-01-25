@@ -24,9 +24,7 @@ export ASB_COSMOS_ID=$(az cosmosdb show -g $ASB_COSMOS_RG_NAME -n $ASB_COSMOS_DB
 
 ```bash
 
-# Subnet for AKS cluster nodes
-export ASB_NODES_SUBNET_ID=$(az deployment group show -g $ASB_RG_CORE -n cluster-${ASB_DEPLOYMENT_NAME}-${ASB_CLUSTER_LOCATION} --query properties.outputs.vnetNodePoolSubnetResourceId.value -o tsv)
-
+# get id for common services subnet
 export ASB_HUB_CS_SUBNET_ID=$(az network vnet subnet show -g $ASB_RG_HUB -n CommonServicesSubnet --vnet-name vnet-${ASB_HUB_LOCATION}-hub --query id -o tsv)
 
 # create private endpoint

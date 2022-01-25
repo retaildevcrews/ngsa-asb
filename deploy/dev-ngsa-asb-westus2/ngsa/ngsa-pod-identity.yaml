@@ -1,0 +1,48 @@
+apiVersion: aadpodidentity.k8s.io/v1
+kind: AzureIdentity
+metadata:
+  name: ngsa-asb-ngsa-id
+  namespace: ngsa
+spec:
+  type: 0
+  resourceID: /subscriptions/648dcb5a-de1e-48b2-af6b-fe6ef28d355c/resourcegroups/rg-ngsa-asb-dev/providers/Microsoft.ManagedIdentity/userAssignedIdentities/ngsa-asb-ngsa-id
+  clientID: b8d1820f-82a9-44ad-95c3-a1874dffe426
+
+---
+
+apiVersion: aadpodidentity.k8s.io/v1
+kind: AzureIdentityBinding
+metadata:
+  name: ngsa-asb-ngsa-id-binding
+  namespace: ngsa
+spec:
+  azureIdentity: ngsa-asb-ngsa-id
+  selector: ngsa-asb-ngsa-id
+
+---
+
+apiVersion: secrets-store.csi.x-k8s.io/v1alpha1
+kind: SecretProviderClass
+metadata:
+  name: ngsa-secrets
+  namespace: ngsa
+spec:
+  provider: azure
+  parameters:
+    usePodIdentity: "true"
+    keyvaultName: "kv-aks-3i2qzkkxofr7c"
+    objects: |
+      array:
+        - |
+          objectName: CosmosDatabase
+          objectType: secret
+        - |
+          objectName: CosmosCollection
+          objectType: secret
+        - |
+          objectName: CosmosKey
+          objectType: secret
+        - |
+          objectName: CosmosUrl
+          objectType: secret
+    tenantId: "72f988bf-86f1-41af-91ab-2d7cd011db47"

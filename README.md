@@ -76,7 +76,7 @@ export ASB_RG_NAME=${ASB_DEPLOYMENT_NAME}-${ASB_ENV}
 az group list -o table | grep $ASB_DEPLOYMENT_NAME
 
 # Make sure the branch does not exist
-git branch -a | grep $ASB_DEPLOYMENT_NAME
+git branch -a | grep $ASB_RG_NAME
 
 # If either exists, choose a different deployment name and try again
 ```
@@ -93,9 +93,9 @@ export ASB_ORG_APP_ID_NAME="BU0001G0001"
 
 ```bash
 # Create a branch for your cluster
-# Do not change the branch name from $ASB_DEPLOYMENT_NAME
-git checkout -b $ASB_DEPLOYMENT_NAME
-git push -u origin $ASB_DEPLOYMENT_NAME
+# Do not change the branch name from $ASB_RG_NAME
+git checkout -b $ASB_RG_NAME
+git push -u origin $ASB_RG_NAME
 ```
 
 ### Choose your deployment region
@@ -169,8 +169,8 @@ echo $ASB_CLUSTER_ADMIN_ID
 ```bash
 # Set GitOps repo
 export ASB_GIT_REPO=$(git remote get-url origin)
-export ASB_GIT_BRANCH=$ASB_DEPLOYMENT_NAME
-export ASB_GIT_PATH=deploy/$ASB_DEPLOYMENT_NAME-$ASB_SPOKE_LOCATION
+export ASB_GIT_BRANCH=$ASB_RG_NAME
+export ASB_GIT_PATH=deploy/$ASB_ENV-$ASB_DEPLOYMENT_NAME-$ASB_SPOKE_LOCATION
 
 # Set default domain suffix
 # app endpoints will use subdomain from this domain suffix
@@ -367,8 +367,7 @@ cat templates/flux.yaml | envsubst  > flux.yaml
 # Check deltas - there should be 4 new files
 git status
 
-# Push to your branch
-git add flux.yaml
+# Push to your branch istio changes
 git add $ASB_GIT_PATH/istio/istio-pod-identity-config.yaml
 git add $ASB_GIT_PATH/istio/istio-gateway.yaml
 git add $ASB_GIT_PATH/istio/istio-ingress.yaml
@@ -422,13 +421,15 @@ kubectl create secret generic fluentbit-secrets --from-literal=WorkspaceId=$(az 
 
 mkdir $ASB_GIT_PATH/fluentbit
 
-cat templates/fluentbit/config-log.yaml | envsubst > $ASB_GIT_PATH/fluentbit/config-log.yaml
+cp templates/fluentbit/namespace.yaml $ASB_GIT_PATH/fluentbit/01-namespace.yaml
 
-cat templates/fluentbit/daemonset.yaml | envsubst > $ASB_GIT_PATH/fluentbit/daemonset.yaml
+cp templates/fluentbit/config.yaml $ASB_GIT_PATH/fluentbit/02-config.yaml
 
-cp templates/fluentbit/config.yaml $ASB_GIT_PATH/fluentbit
+cat templates/fluentbit/config-log.yaml | envsubst > $ASB_GIT_PATH/fluentbit/03-config-log.yaml
 
-cp templates/fluentbit/role.yaml  $ASB_GIT_PATH/fluentbit
+cp templates/fluentbit/role.yaml  $ASB_GIT_PATH/fluentbit/04-role.yaml  
+
+cat templates/fluentbit/daemonset.yaml | envsubst > $ASB_GIT_PATH/fluentbit/05-daemonset.yaml
 
 git add $ASB_GIT_PATH/fluentbit
 
