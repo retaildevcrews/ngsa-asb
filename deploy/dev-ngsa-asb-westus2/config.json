@@ -1,0 +1,7 @@
+{
+    "zone": "westus2",
+    "region": "dev",
+    "mi.name": "ngsadev-ngsa-id",
+    "domain" : "cse.ms",
+    "environment" : "dev"
+}
