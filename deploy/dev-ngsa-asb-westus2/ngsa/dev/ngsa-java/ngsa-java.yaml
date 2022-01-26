@@ -15,8 +15,8 @@ spec:
       labels:
         aadpodidbinding: ngsadev-ngsa-id
         app: ngsa-java
-        deploy: 22-01-26-04-32-53
-        version: beta-0126-0432
+        deploy: 22-01-26-16-29-56
+        version: beta-0126-1629
     spec:
       containers:
         - name: app
@@ -26,9 +26,9 @@ spec:
           - name: PROMETHEUS
             value: "true"
           - name: ZONE
-            value: "westus2"
+            value: "az-westus2-dev"
           - name: REGION
-            value: "dev"
+            value: "westus2"
 
           ports:
             - name: http
