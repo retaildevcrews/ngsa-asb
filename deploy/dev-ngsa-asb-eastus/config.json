@@ -1,0 +1,7 @@
+{
+    "zone": "eastus",
+    "region": "dev",
+    "mi.name": "ngsadev-ngsa-id",
+    "domain" : "cse.ms",
+    "environment" : "dev"
+}
