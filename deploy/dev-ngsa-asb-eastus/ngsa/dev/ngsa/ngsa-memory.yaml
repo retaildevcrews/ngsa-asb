@@ -1,36 +1,33 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ngsa-cosmos
+  name: ngsa-memory
   namespace: ngsa
   labels:
-    app.kubernetes.io/name: ngsa-cosmos
+    app.kubernetes.io/name: ngsa-memory
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: ngsa-cosmos
+      app: ngsa-memory
   template:
     metadata:
       labels:
-        aadpodidbinding: ngsaprec-ngsa-id
-        app: ngsa-cosmos
-        deploy: 22-01-26-16-41-34
+        app: ngsa-memory
         version: beta-0126-1641
+        deploy: 22-01-26-16-41-34
     spec:
       containers:
         - name: app
           image: ghcr.io/retaildevcrews/ngsa-app:beta
           imagePullPolicy: Always
-          args:
+          args: 
+          - --in-memory
           - --prometheus
-          - --no-cache
-          - --url-prefix
-          - /cosmos
           - --zone
-          - centralus
+          - az-eastus-dev
           - --region
-          - westus
+          - eastus
           ports:
             - name: http
               containerPort: 8080
@@ -42,25 +39,14 @@ spec:
             requests:
               cpu: 500m
               memory: 512Mi
-          volumeMounts:
-            - name: secrets
-              mountPath: "/app/secrets"
-      volumes:
-        - name: secrets
-          csi:
-            driver: secrets-store.csi.k8s.io
-            readOnly: true
-            volumeAttributes:
-              secretProviderClass: ngsa-secrets
       nodeSelector:
         agentpool: npuser01
 
 ---
-
 apiVersion: v1
 kind: Service
 metadata:
-  name: ngsa-cosmos
+  name: ngsa-memory
   namespace: ngsa
 spec:
   type: ClusterIP
@@ -70,30 +56,23 @@ spec:
       protocol: TCP
       name: http
   selector:
-    app: ngsa-cosmos
+    app: ngsa-memory
 
 ---
 
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
 metadata:
-  name: ngsa-cosmos-vs
+  name: ngsa-memory-vs
   namespace: ngsa
 spec:
   gateways:
   - istio-system/istio-gateway
   hosts:
-  - ngsa-pre-central.cse.ms
+  - ngsa-eastus-dev.cse.ms
   http:
-  - match:
-    - uri:
-        prefix: /cosmos/
-    - uri:
-        exact: /cosmos
-    rewrite:
-      uri: /
-    route:
+  - route:
     - destination:
         port:
           number: 8080
-        host: ngsa-cosmos
+        host: ngsa-memory
