@@ -15,8 +15,8 @@ spec:
       labels:
         aadpodidbinding: ngsadev-ngsa-id
         app: ngsa-java
-        deploy: 22-01-25-22-30-45
-        version: beta-0125-2230
+        deploy: 22-01-26-01-50-22
+        version: beta-0126-0150
     spec:
       containers:
         - name: app
@@ -29,8 +29,6 @@ spec:
             value: "centralus"
           - name: REGION
             value: "dev"
-          - name: URL_PREFIX
-            value: /java
 
           ports:
             - name: http
@@ -87,16 +85,9 @@ spec:
   gateways:
   - istio-system/istio-gateway
   hosts:
-  - ngsa-pre-central-dev.cse.ms
+  - ngsa-java-dev-dev.ngsa-pre-central-dev.cse.ms
   http:
-  - match:
-    - uri:
-        prefix: /java/
-    - uri:
-        exact: /java
-    rewrite:
-      uri: /
-    route:
+  - route:
     - destination:
         port:
           number: 8080
