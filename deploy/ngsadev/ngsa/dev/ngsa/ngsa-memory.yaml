@@ -14,8 +14,8 @@ spec:
     metadata:
       labels:
         app: ngsa-memory
-        version: beta-0102-0607
-        deploy: 22-01-02-06-07-42
+        version: beta-0126-1629
+        deploy: 22-01-26-16-29-19
     spec:
       containers:
         - name: app
@@ -24,8 +24,6 @@ spec:
           args: 
           - --in-memory
           - --prometheus
-          - --url-prefix
-          - /memory
           - --zone
           - centralus
           - --region
@@ -71,16 +69,9 @@ spec:
   gateways:
   - istio-system/istio-gateway
   hosts:
-  - ngsa-pre-central-dev.cse.ms
+  - ngsa-dev-dev.ngsa-pre-central-dev.cse.ms
   http:
-  - match:
-    - uri:
-        prefix: /memory/
-    - uri:
-        exact: /memory
-    rewrite:
-      uri: /
-    route:
+  - route:
     - destination:
         port:
           number: 8080

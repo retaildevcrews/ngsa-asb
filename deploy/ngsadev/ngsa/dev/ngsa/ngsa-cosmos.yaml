@@ -15,8 +15,8 @@ spec:
       labels:
         aadpodidbinding: ngsadev-ngsa-id
         app: ngsa-cosmos
-        deploy: 22-01-02-06-07-42
-        version: beta-0102-0607
+        deploy: 22-01-26-16-29-19
+        version: beta-0126-1629
     spec:
       containers:
         - name: app
@@ -25,8 +25,6 @@ spec:
           args:
           - --prometheus
           - --no-cache
-          - --url-prefix
-          - /cosmos
           - --zone
           - centralus
           - --region
@@ -83,16 +81,9 @@ spec:
   gateways:
   - istio-system/istio-gateway
   hosts:
-  - ngsa-pre-central-dev.cse.ms
+  - ngsa-dev-dev.ngsa-pre-central-dev.cse.ms
   http:
-  - match:
-    - uri:
-        prefix: /cosmos/
-    - uri:
-        exact: /cosmos
-    rewrite:
-      uri: /
-    route:
+    - route:
     - destination:
         port:
           number: 8080
