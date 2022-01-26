@@ -1,6 +1,6 @@
 {
-    "zone": "eastus",
-    "region": "dev",
+    "zone": "az-eastus-dev",
+    "region": "eastus",
     "mi.name": "ngsadev-ngsa-id",
     "domain" : "cse.ms",
     "environment" : "dev"

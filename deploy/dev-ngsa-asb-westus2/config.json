@@ -1,6 +1,6 @@
 {
-    "zone": "westus2",
-    "region": "dev",
+    "zone": "az-westus2-dev",
+    "region": "westus2",
     "mi.name": "ngsadev-ngsa-id",
     "domain" : "cse.ms",
     "environment" : "dev"
