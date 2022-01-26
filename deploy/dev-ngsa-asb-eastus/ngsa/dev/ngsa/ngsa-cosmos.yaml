@@ -15,8 +15,8 @@ spec:
       labels:
         aadpodidbinding: ngsa-asb-ngsa-id
         app: ngsa-cosmos
-        deploy: 22-01-26-17-24-04
-        version: beta-0126-1724
+        deploy: 22-01-26-17-50-40
+        version: beta-0126-1750
     spec:
       containers:
         - name: app
@@ -83,7 +83,7 @@ spec:
   hosts:
   - ngsa-cosmos-eastus-dev.cse.ms
   http:
-    - route:
+  - route:
     - destination:
         port:
           number: 8080
