@@ -1,0 +1,31 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: istio-gateway
+  namespace: istio-system
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+  - port:
+      number: 443
+      name: https
+      protocol: HTTPS
+    tls:
+      mode: SIMPLE
+      serverCertificate: /etc/istio/ingressgateway-certs/tls.crt
+      privateKey: /etc/istio/ingressgateway-certs/tls.key
+    hosts:
+    - "ngsa/ngsa-memory-eastus-pre.cse.ms"
+    - "ngsa/ngsa-cosmos-eastus-pre.cse.ms"
+    - "ngsa/ngsa-java-eastus-pre.cse.ms"
+    - "monitoring/grafana-eastus-pre.cse.ms"
+---
+apiVersion: telemetry.istio.io/v1alpha1
+kind: Telemetry
+metadata:
+  name: mesh-default
+  namespace: istio-system
+spec:
+  accessLogging:
+  - {}
