@@ -42,7 +42,45 @@ az network ip-group update --name ipg-$ASB_HUB_LOCATION-AksNodepools --resource-
 # Get spoke vnet id
 export ASB_SPOKE_VNET_ID=$(az deployment group show -g $ASB_RG_SPOKE -n spoke-$ASB_ORG_APP_ID_NAME --query properties.outputs.clusterVnetResourceId.value -o tsv)
 
-# TODO Add instructions to update Hub Firewall Policy Network Rules to allow AzureCloud.{location} - for now set them manually on Azure Portal 
+# Set the spoke Address Location
+export ASB_SPOKE_ADDRESS_LOCATION_NAME="AzureCloud.${ASB_SPOKE_LOCATION}"
+
+# Set the Hub Policy Name
+export ASB_HUB_POLICY_NAME="fw-policies-${ASB_HUB_LOCATION}"
+
+# Set the Hub Rule Collection Group Name
+export ASB_HUB_RULE_COLLECTION_GROUP_NAME=DefaultNetworkRuleCollectionGroup
+
+# Set the Hub Collection Name
+export ASB_HUB_COLLECTION_NAME=AKS-Global-Requirements
+
+# Set the "Tunnel Front TCP" Rule Name
+export ASB_HUB_TUNNEL_FRONT_TCP_RULE_NAME=tunnelfront-pod-tcp
+
+# Set the "Tunnel Front UDP" Rule Name
+export ASB_HUB_TUNNEL_FRONT_UDP_RULE_NAME=tunnelfront-pod-udp
+
+# Set the "Pod to API Server" Rule Name
+export ASB_HUB_POD_TO_API_SERVER_RULE_NAME=pod-to-api-server
+
+# Get current Rules from the Hub Policy
+export currenRules=$(az network firewall policy rule-collection-group collection list -g $ASB_RG_HUB --policy-name $ASB_HUB_POLICY_NAME --rule-collection-group-name  $ASB_HUB_RULE_COLLECTION_GROUP_NAME)
+
+# Parse and get current Destination Addresses space-separated from "Tunnel Front TCP" rule. All three current Rules should have same destination Addresses.
+export currentDestinationAddresses=$(echo $currenRules | jq -r --arg ASB_HUB_TUNNEL_FRONT_TCP_RULE_NAME "$ASB_HUB_TUNNEL_FRONT_TCP_RULE_NAME" '.[].rules[]  | objects | select(.name == $ASB_HUB_TUNNEL_FRONT_TCP_RULE_NAME) | .destinationAddresses | join(" ")' )
+
+# Add the spoke Address Location to current Destination Addresses space-separated list
+export newDestinationAddresses="${currentDestinationAddresses} ${ASB_SPOKE_ADDRESS_LOCATION_NAME}"
+
+# Update Hub Firewall Policy Network "Tunnel Front TCP" rule to the new Destination Addresses list.
+az network firewall policy rule-collection-group collection rule update -g $ASB_RG_HUB --policy-name $ASB_HUB_POLICY_NAME --rule-collection-group-name $ASB_HUB_RULE_COLLECTION_GROUP_NAME --collection-name $ASB_HUB_COLLECTION_NAME -n $ASB_HUB_TUNNEL_FRONT_TCP_RULE_NAME --destination-addresses $newDestinationAddresses
+
+# Update Hub Firewall Policy Network "Tunnel Front UDP" rule to the new Destination Addresses list.
+az network firewall policy rule-collection-group collection rule update -g $ASB_RG_HUB --policy-name $ASB_HUB_POLICY_NAME --rule-collection-group-name $ASB_HUB_RULE_COLLECTION_GROUP_NAME --collection-name $ASB_HUB_COLLECTION_NAME -n $ASB_HUB_TUNNEL_FRONT_UDP_RULE_NAME --destination-addresses $newDestinationAddresses
+
+# Update Hub Firewall Policy Network "Pod to API Server" rule to the new Destination Addresses list.
+az network firewall policy rule-collection-group collection rule update -g $ASB_RG_HUB --policy-name $ASB_HUB_POLICY_NAME --rule-collection-group-name $ASB_HUB_RULE_COLLECTION_GROUP_NAME --collection-name $ASB_HUB_COLLECTION_NAME -n $ASB_HUB_POD_TO_API_SERVER_RULE_NAME --destination-addresses $newDestinationAddresses
+
 ```
 
 ## Deploy Azure Kubernetes Service
