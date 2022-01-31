@@ -221,7 +221,7 @@ spec:
       serviceAccountName: istio-operator
       containers:
         - name: istio-operator
-          image: ghcr.io/retaildevcrews/istio/operator:1.11.3
+          image: ghcr.io/retaildevcrews/istio/operator:1.10.4
           command:
           - operator
           - server
