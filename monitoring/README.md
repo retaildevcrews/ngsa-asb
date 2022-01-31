@@ -206,7 +206,7 @@ az network application-gateway list -g $ASB_RG_CORE --query "[].{Name:name}" -o 
 
 Select a descriptive name when creating the service principal `<your-service-principal-name>` e.g  `grafana-reader`
 
-- Goto Azure Active Directory --> App Registration
+- Go to Azure Active Directory --> App Registration
 - Click New Registration and enter `<your-service-principal-name>`
   - Select option "Accounts in this organizational directory only (Microsoft only - Single tenant)"
   - Click Register, this will open up the App registrations settings screen.
@@ -222,9 +222,9 @@ Select a descriptive name when creating the service principal `<your-service-pri
 
 Get access to Grafana dashboard
 
-Goto a browser to access grafana and perform the following steps:
+Go to a browser to access grafana and perform the following steps:
 
-- Goto Configuration --> Data Sources
+- Go to Configuration --> Data Sources
 - "Add data source" --> Select "Azure Monitor"
 - Inside "Azure Monitor" Source
   - Under Azure Monitor Details
