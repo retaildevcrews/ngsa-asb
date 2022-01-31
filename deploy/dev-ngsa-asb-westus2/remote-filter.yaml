@@ -67,7 +67,7 @@ spec:
                       uri: https://raw.githubusercontent.com/retaildevcrews/ngsa-asb/joaquinrz-deploy-wasm/wasm/burst_header.wasm
                       cluster: burstcluster
                       timeout: 10s
-                    sha256: 0d84c57e2e7c50019a473bec937c7bbca1b1184d193b0f5d1d4c845888e54b84       
+                    sha256: 7c9c86c1820ca189cf604c1379f62190cef9094f14462044bef437dde14f9c88       
 
   # The  patch adds the cluster that is referenced by the WebAssembly
   - applyTo: CLUSTER
