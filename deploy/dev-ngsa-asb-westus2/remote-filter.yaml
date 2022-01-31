@@ -2,7 +2,7 @@ apiVersion: networking.istio.io/v1alpha3
 kind: EnvoyFilter
 metadata:
   name: burst-wasm-remote
-  namespace: istio
+  namespace: istio-system
 spec:
   workloadSelector:
     labels:
