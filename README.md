@@ -513,8 +513,9 @@ az network application-gateway rule create -g $ASB_RG_CORE --gateway-name $ASB_A
 
 ## Deploy WASM sidecar filter
 
-The following instructions will help you get started on how to deploy a sidecar filter for an application.
-*Optional* The WASM Filter source code can be referenced here[here](https://github.com/retaildevcrews/istio)
+The following instructions will help you get started to deploy a sidecar filter for ngsa-cosmos
+
+*Optional* The WASM Filter source code can be referenced [here](https://github.com/retaildevcrews/istio)
 
 ```bash
 # Set target app
