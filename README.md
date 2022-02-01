@@ -10,6 +10,7 @@
 * [Deploy Fluent Bit](#deploy-fluent-bit)
 * [Deploy Grafana and Prometheus](#deploy-grafana-and-prometheus)
 * [Leveraging Subdomains for App Endpoints](#leveraging-subdomains-for-app-endpoints)
+* [Deploy WASM sidecar filter](#deploy-wasm-sidecar-filter)
 * [Deploying Multiple Clusters Using Existing Network](#deploying-multiple-clusters-using-existing-network)
 * [Resetting the Cluster](#resetting-the-cluster)
 * [Delete Azure Resources](#delete-azure-resources)
@@ -508,6 +509,41 @@ az network application-gateway redirect-config create -g $ASB_RG_CORE --gateway-
 az network application-gateway rule create -g $ASB_RG_CORE --gateway-name $ASB_APP_GW_NAME \
   -n "https-redirect-$ASB_APP_DNS_NAME-routing-rule" --http-listener "http-listener-$ASB_APP_DNS_NAME" \
   --redirect-config "https-redirect-config-$ASB_APP_DNS_NAME"
+```
+
+## Deploy WASM sidecar filter
+
+The following instructions will help you get started on how to deploy a sidecar filter for an application.
+*Optional* The WASM Filter source code can be referenced here[here](https://github.com/retaildevcrews/istio)
+
+```bash
+# Set target app
+export WASM_TARGET_APP=ngsa-cosmos
+
+# Enable istio-injection on ngsa namespace
+kubectl label namespace ngsa istio-injection=enabled
+
+# Copy yaml files to cluster deployment directory
+mkdir $ASB_GIT_PATH/burst
+cp templates/burst/burst-metrics-service.yaml $ASB_GIT_PATH/burst
+cat templates/burst/remote-filter.yaml | envsubst > $ASB_GIT_PATH/burst/remote-filter-$WASM_TARGET_APP.yaml
+
+# Commit changes
+git add $ASB_GIT_PATH/burst
+git commit -m "added burst for ${WASM_TARGET_APP}"
+git push
+
+# Sync Flux
+fluxctl sync --k8s-fwd-ns flux-cd
+
+# Note: It may be required to re-create the ngsa-cosmos and istio operator pods for changes to take effect
+kubectl delete pod -n istio-operator -l name=istio-operator
+kubectl delete pod -n ngsa -l app=ngsa-cosmos
+
+
+# Test changes (you should now see the x-load-feedback headers)
+http https://ngsa-cosmos-${ASB_DOMAIN_SUFFIX}/healthz
+
 ```
 
 ## Deploying Multiple Clusters Using Existing Network

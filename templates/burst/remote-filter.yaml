@@ -6,7 +6,7 @@ metadata:
 spec:
   workloadSelector:
     labels:
-      app: ngsa-cosmos
+      app: $WASM_TARGET_APP
   configPatches:
   # The patch adds the WebAssembly to the listener/http connection manager
   - applyTo: HTTP_FILTER
@@ -54,7 +54,7 @@ spec:
                     "burst_header": "HTTP WebAssembly time!",
                     "cache_seconds": 3,
                     "namespace": "ngsa",
-                    "deployment": "ngsa-cosmos"
+                    "deployment": "$WASM_TARGET_APP"
                   }    
               root_id: burst-wasm-root-id
               vm_config:
