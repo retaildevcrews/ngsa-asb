@@ -212,8 +212,11 @@ Select a descriptive name when creating the service principal `<your-service-pri
   - Click Register, this will open up the App registrations settings screen.
 - From App registrations settings --> Certificates and Secrets
   - Create a new Client secret, this will be use later to configure Azure Monitor in grafana
+  - Save the secret to key vault for later use
 
 ### Assign a role to the application (Portal)
+
+The Grafana service principal needs read access to Log Analytics and Cosmos. Add the Reader permission for the core resource group and the Cosmos resource group.
 
 - Go to resource group `<your-resource-group>` --> Access Control (IAM) --> Role Assignments
 - Look for and add the service principal created `<your-service-principal-name>` as "Reader"
@@ -230,6 +233,9 @@ Go to a browser to access grafana and perform the following steps:
   - Under Azure Monitor Details
     - Put in Directory (Tenant) ID, Application (Client) ID (service principal `<your-service-principal-name>` ID) and Client Secret from [Add a secret to the service principal](#add-a-secret-to-the-service-principal)
     - Click on "Load Subscription" --> After loading, select proper subscription from drop-down
+    - Click Load Workspaces
+    - Select the Log analytics for environment you want to monitor
+    - Click Save & Test
 - Click on "Explore" from Grafana side bar
 - Try out different metrics and services
 
