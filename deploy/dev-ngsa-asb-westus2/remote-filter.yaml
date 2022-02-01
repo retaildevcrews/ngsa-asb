@@ -89,5 +89,5 @@ spec:
                 address:
                   socket_address:
                     protocol: TCP
-                    address: burst
+                    address: burst.burstservice
                     port_value: 8080
