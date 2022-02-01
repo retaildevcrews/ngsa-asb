@@ -541,7 +541,6 @@ fluxctl sync --k8s-fwd-ns flux-cd
 kubectl delete pod -n istio-operator -l name=istio-operator
 kubectl delete pod -n ngsa -l app=ngsa-cosmos
 
-
 # Test changes (you should now see the x-load-feedback headers)
 http https://ngsa-cosmos-$ASB_DOMAIN_SUFFIX/healthz
 
