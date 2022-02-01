@@ -542,7 +542,7 @@ kubectl delete pod -n ngsa -l app=ngsa-cosmos
 
 
 # Test changes (you should now see the x-load-feedback headers)
-http https://ngsa-cosmos-${ASB_DOMAIN_SUFFIX}/healthz
+http https://ngsa-cosmos-$ASB_DOMAIN_SUFFIX/healthz
 
 ```
 
