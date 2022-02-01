@@ -48,13 +48,13 @@ spec:
                 value: |
                   { 
                     "service_cluster": "burstcluster",
-                    "service_authority": "burst",
+                    "service_authority": "burst.burstservice",
                     "service_path": "/burstmetrics",
                     "path": "/healthz",
                     "burst_header": "HTTP WebAssembly time!",
                     "cache_seconds": 3,
-                    "namespace": "default",
-                    "deployment": "ngsa"
+                    "namespace": "ngsa",
+                    "deployment": "ngsa-cosmos"
                   }    
               root_id: burst-wasm-root-id
               vm_config:
