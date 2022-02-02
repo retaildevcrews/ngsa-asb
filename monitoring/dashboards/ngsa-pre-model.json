@@ -16,7 +16,7 @@
   "gnetId": null,
   "graphTooltip": 0,
   "id": 3,
-  "iteration": 1643751120038,
+  "iteration": 1643829285533,
   "links": [],
   "panels": [
     {
@@ -85,7 +85,7 @@
             "timeGrain": "auto"
           },
           "azureLogAnalytics": {
-            "query": "AzureDiagnostics\n| where ResourceProvider==\"MICROSOFT.DOCUMENTDB\" and Category == \"DataPlaneRequests\" and Resource == \"NGSA-ASB-PRE-COSMOS\"\n| where databaseName_s == \"imdb\"\n| where statusCode_s == 429\n| count",
+            "query": "AzureDiagnostics\n| where ResourceProvider==\"MICROSOFT.DOCUMENTDB\" and Category == \"DataPlaneRequests\" and Resource == \"NGSA-ASB-PRE-COSMOS2\"\n| where databaseName_s == \"imdb\"\n| where statusCode_s == 429\n| count",
             "resultFormat": "time_series",
             "workspace": "b51964b6-4a46-46f2-80b9-01f0649e63f5"
           },
@@ -4679,5 +4679,5 @@
   "timezone": "utc",
   "title": "NGSA Pre Dashboard",
   "uid": "2IRD5FSnz",
-  "version": 3
+  "version": 4
 }

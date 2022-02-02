@@ -5,8 +5,8 @@ metadata:
   name: fluentbit-log-config
   namespace: fluentbit
 data:
-  zone: $ASB_CLUSTER_LOCATION
-  region: $ASB_CLUSTER_GEO_LOCATION
+  zone: az-${ASB_SPOKE_LOCATION}-${ASB_ENV}
+  region: ${ASB_SPOKE_LOCATION}
   lodeLog: loderunner
   ngsaLog: ngsa
   istioLog: ingress
