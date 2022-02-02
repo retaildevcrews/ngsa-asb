@@ -22,6 +22,10 @@ NGSA AKS Secure Base line uses the Patterns and Practices AKS Secure Baseline re
 * Please refer to the PnP repo as the `upstream repo`
 * Please use Codespaces
 
+## Prerequisites
+
+* Access to a subscription with Contributor role and User Access Administrator role
+
 ## Setting up Infrastructure
 
 ```bash
@@ -114,7 +118,7 @@ export ASB_SPOKE_LOCATION=centralus
 export ASB_DNS_ZONE_RG=dns-rg
 export ASB_DNS_ZONE=cse.ms
 
-# Make sure the resource group does not exist
+# Make sure the DNS record does not exist
 az network dns record-set a list -g $ASB_DNS_ZONE_RG -z $ASB_DNS_ZONE -o table | grep "$ASB_SPOKE_LOCATION-$ASB_ENV"
 
 # If any records exist, choose a different deployment region and try again

@@ -36,6 +36,9 @@ az keyvault set-policy -n $ASB_KV_NAME --object-id $ASB_NGSA_MI_PRINCIPAL_ID --s
 
 ```bash
 
+# create the ngsa namespace
+kubectl create ns ngsa
+
 export ASB_NGSA_MI_CLIENT_ID=$(az identity show -n $ASB_NGSA_MI_NAME -g $ASB_RG_CORE --query "clientId" -o tsv)
 
 mkdir -p $ASB_GIT_PATH/ngsa

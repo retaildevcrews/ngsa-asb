@@ -1,0 +1,41 @@
+apiVersion: aadpodidentity.k8s.io/v1
+kind: AzureIdentity
+metadata:
+  name: istio-ingress-id
+  namespace: istio-system
+spec:
+  type: 0
+  resourceID: /subscriptions/648dcb5a-de1e-48b2-af6b-fe6ef28d355c/resourceGroups/rg-ngsa-asb-pre/providers/Microsoft.ManagedIdentity/userAssignedIdentities/podmi-ingress-controller
+  clientID: 056ce182-3da5-4ab8-afff-a90deb2b9a84
+---
+apiVersion: aadpodidentity.k8s.io/v1
+kind: AzureIdentityBinding
+metadata:
+  name: istio-ingress-id-binding
+  namespace: istio-system
+spec:
+  azureIdentity: istio-ingress-id
+  selector: podmi-ingress-controller
+---
+
+apiVersion: secrets-store.csi.x-k8s.io/v1alpha1
+kind: SecretProviderClass
+metadata:
+  name: istio-ingress-tls-secret-csi-akv
+  namespace: istio-system
+spec:
+  provider: azure
+  parameters:
+    usePodIdentity: "true"
+    keyvaultName: kv-aks-fykg5bqasutle 
+    objects:  |
+      array:
+        - |
+          objectName: appgw-ingress-internal-aks-ingress-tls
+          objectAlias: tls.crt
+          objectType: secret
+        - |
+          objectName: appgw-ingress-internal-aks-ingress-key
+          objectAlias: tls.key
+          objectType: secret
+    tenantId: 72f988bf-86f1-41af-91ab-2d7cd011db47

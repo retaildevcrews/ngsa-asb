@@ -89,3 +89,18 @@ az keyvault delete-policy --object-id $(az ad signed-in-user show --query object
 
 ```
 
+## Monitoring
+
+Enable Azure Diagnostics for Cosmos to send logs and metrics to Log Analytics.
+
+* Go to the Cosmos database in the portal
+* Click on Diagnostic settings in the sidebar under the Monitoring section
+* Click Add diagnostic setting link
+* Fill in the setting details
+  * choose a name
+  * choose DataPlaneRequests under Logs > Categories
+  * choose Request under Metrics
+  * choose Send to Log Analytics workspace under Destination details
+  * choose the appropriate log subscription and log analytics
+  * choose AzureDiagnostics under Destination Table
+* Click save
