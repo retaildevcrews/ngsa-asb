@@ -1,34 +1,33 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ngsa-cosmos
+  name: ngsa-memory
   namespace: ngsa
   labels:
-    app.kubernetes.io/name: ngsa-cosmos
+    app.kubernetes.io/name: ngsa-memory
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: ngsa-cosmos
+      app: ngsa-memory
   template:
     metadata:
       labels:
-        aadpodidbinding: ngsaprec-ngsa-id
-        app: ngsa-cosmos
-        deploy: 22-02-08-18-26-09
+        app: ngsa-memory
         version: beta-0208-1826
+        deploy: 22-02-08-18-26-09
     spec:
       containers:
         - name: app
           image: ghcr.io/retaildevcrews/ngsa-app:beta
           imagePullPolicy: Always
-          args:
+          args: 
+          - --in-memory
           - --prometheus
-          - --no-cache
           - --zone
-          - centralus
+          - az-centralus-pre
           - --region
-          - westus
+          - centralus
           ports:
             - name: http
               containerPort: 8080
@@ -40,25 +39,14 @@ spec:
             requests:
               cpu: 500m
               memory: 512Mi
-          volumeMounts:
-            - name: secrets
-              mountPath: "/app/secrets"
-      volumes:
-        - name: secrets
-          csi:
-            driver: secrets-store.csi.k8s.io
-            readOnly: true
-            volumeAttributes:
-              secretProviderClass: ngsa-secrets
       nodeSelector:
         agentpool: npuser01
 
 ---
-
 apiVersion: v1
 kind: Service
 metadata:
-  name: ngsa-cosmos
+  name: ngsa-memory
   namespace: ngsa
 spec:
   type: ClusterIP
@@ -68,23 +56,23 @@ spec:
       protocol: TCP
       name: http
   selector:
-    app: ngsa-cosmos
+    app: ngsa-memory
 
 ---
 
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
 metadata:
-  name: ngsa-cosmos-vs
+  name: ngsa-memory-vs
   namespace: ngsa
 spec:
   gateways:
   - istio-system/istio-gateway
   hosts:
-  - ngsa-cosmos-westus-preprod.ngsa-pre-central.cse.ms
+  - ngsa-memory-centralus-preprod.cse.ms
   http:
   - route:
     - destination:
         port:
           number: 8080
-        host: ngsa-cosmos
+        host: ngsa-memory
