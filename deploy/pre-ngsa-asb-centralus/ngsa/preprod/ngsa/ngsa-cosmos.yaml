@@ -15,8 +15,8 @@ spec:
       labels:
         aadpodidbinding: ngsa-asb-ngsa-id
         app: ngsa-cosmos
-        deploy: 22-02-08-18-26-09
-        version: beta-0208-1826
+        deploy: 22-02-08-18-57-31
+        version: beta-0208-1857
     spec:
       containers:
         - name: app
@@ -81,7 +81,7 @@ spec:
   gateways:
   - istio-system/istio-gateway
   hosts:
-  - ngsa-cosmos-centralus-preprod.cse.ms
+  - ngsa-cosmos-centralus-pre.cse.ms
   http:
   - route:
     - destination:
