@@ -1,0 +1,7 @@
+{
+    "zone": "az-westus2-pre",
+    "region": "westus2",
+    "mi.name": "ngsa-asb-ngsa-id",
+    "domain" : "cse.ms",
+    "environment" : "preprod"
+}

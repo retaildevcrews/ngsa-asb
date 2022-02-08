@@ -1,0 +1,7 @@
+{
+    "zone": "az-centralus-pre",
+    "region": "centralus",
+    "mi.name": "ngsa-asb-ngsa-id",
+    "domain" : "cse.ms",
+    "environment" : "preprod"
+}

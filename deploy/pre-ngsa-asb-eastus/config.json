@@ -1,0 +1,7 @@
+{
+    "zone": "az-eastus-pre",
+    "region": "eastus",
+    "mi.name": "ngsa-asb-ngsa-id",
+    "domain" : "cse.ms",
+    "environment" : "preprod"
+}
