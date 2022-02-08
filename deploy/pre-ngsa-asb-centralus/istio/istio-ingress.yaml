@@ -1,0 +1,52 @@
+apiVersion: install.istio.io/v1alpha1
+kind: IstioOperator
+metadata:
+  namespace: istio-system
+  name: istio-default
+spec:
+  profile: default
+  hub: ghcr.io/retaildevcrews/istio
+  components:
+    pilot:
+      k8s:
+        resources:
+          limits:
+            cpu: 1000m
+            memory: 512M
+          requests:
+            cpu: 500m
+            memory: 256M
+    ingressGateways:
+    - name: istio-ingressgateway
+      label:
+        aadpodidbinding: podmi-ingress-controller
+      k8s:
+        resources:
+          limits:
+            cpu: 1000m
+            memory: 512M
+          requests:
+            cpu: 500m
+            memory: 256M
+        nodeSelector:
+          agentpool: npuser01
+        service:
+          type: LoadBalancer
+          loadBalancerIP: 10.242.4.4
+          externalTrafficPolicy: Local
+        serviceAnnotations:
+          service.beta.kubernetes.io/azure-load-balancer-internal: "true"
+          service.beta.kubernetes.io/azure-load-balancer-internal-subnet: "snet-clusteringressservices"
+        overlays:
+        - apiVersion: apps/v1
+          kind: Deployment
+          name: istio-ingressgateway
+          patches:
+          - path: spec.template.spec.volumes[name:ingressgateway-certs]
+            value:
+              name: ingressgateway-certs
+              csi:
+                driver: secrets-store.csi.k8s.io
+                readOnly: true
+                volumeAttributes:
+                  secretProviderClass: istio-ingress-tls-secret-csi-akv

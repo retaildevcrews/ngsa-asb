@@ -64,10 +64,10 @@ export ASB_HUB_TUNNEL_FRONT_UDP_RULE_NAME=tunnelfront-pod-udp
 export ASB_HUB_POD_TO_API_SERVER_RULE_NAME=pod-to-api-server
 
 # Get current Rules from the Hub Policy
-export currenRules=$(az network firewall policy rule-collection-group collection list -g $ASB_RG_HUB --policy-name $ASB_HUB_POLICY_NAME --rule-collection-group-name  $ASB_HUB_RULE_COLLECTION_GROUP_NAME)
+export currentRules=$(az network firewall policy rule-collection-group collection list -g $ASB_RG_HUB --policy-name $ASB_HUB_POLICY_NAME --rule-collection-group-name  $ASB_HUB_RULE_COLLECTION_GROUP_NAME)
 
 # Parse and get current Destination Addresses space-separated from "Tunnel Front TCP" rule. All three current Rules should have same destination Addresses.
-export currentDestinationAddresses=$(echo $currenRules | jq -r --arg ASB_HUB_TUNNEL_FRONT_TCP_RULE_NAME "$ASB_HUB_TUNNEL_FRONT_TCP_RULE_NAME" '.[].rules[]  | objects | select(.name == $ASB_HUB_TUNNEL_FRONT_TCP_RULE_NAME) | .destinationAddresses | join(" ")' )
+export currentDestinationAddresses=$(echo $currentRules | jq -r --arg ASB_HUB_TUNNEL_FRONT_TCP_RULE_NAME "$ASB_HUB_TUNNEL_FRONT_TCP_RULE_NAME" '.[].rules[]  | objects | select(.name == $ASB_HUB_TUNNEL_FRONT_TCP_RULE_NAME) | .destinationAddresses | join(" ")' )
 
 # Add the spoke Address Location to current Destination Addresses space-separated list
 export newDestinationAddresses="${currentDestinationAddresses} ${ASB_SPOKE_ADDRESS_LOCATION_NAME}"
@@ -123,7 +123,6 @@ az deployment group create -g $ASB_RG_CORE \
      clusterAdminAadGroupObjectId=${ASB_CLUSTER_ADMIN_ID} \
      coreResourceGroup=${ASB_RG_CORE} \
      deploymentName=${ASB_DEPLOYMENT_NAME} \
-     geoRedundancyLocation=${ASB_CLUSTER_GEO_LOCATION} \
      k8sControlPlaneAuthorizationTenantId=${ASB_TENANT_ID} \
      kubernetesVersion=${ASB_K8S_VERSION} \
      laWorkspaceName=${ASB_LA_NAME} \
