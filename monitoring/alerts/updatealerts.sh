@@ -66,4 +66,5 @@ else
     deploy_alert $filename $metricQueryApi
   done
   popd
+
 fi
