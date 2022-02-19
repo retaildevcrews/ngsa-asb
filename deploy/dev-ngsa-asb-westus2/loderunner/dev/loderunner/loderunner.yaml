@@ -14,8 +14,8 @@ spec:
     metadata:
       labels:
         app: loderunner
-        deploy: 22-02-18-15-48-39
-        version: beta-2202-18-15
+        deploy: 22-02-19-06-02-16
+        version: beta-2202-19-06
     spec:
       containers:
         - name: app
