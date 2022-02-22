@@ -6,7 +6,7 @@
         "severity": 0,
         "enabled": true,
         "scopes": [
-            "/subscriptions/648dcb5a-de1e-48b2-af6b-fe6ef28d355c/resourceGroups/rg-ngsa-asb-pre/providers/Microsoft.Network/applicationGateways/apw-aks-fykg5bqasutle-westus2"
+            "/subscriptions/${Ngsa_Subscription_Guid}/resourceGroups/${Ngsa_Common_Services_RG}/providers/Microsoft.Network/applicationGateways/apw-aks-fykg5bqasutle-westus2"
         ],
         "evaluationFrequency": "PT30M",
         "windowSize": "PT1H",
@@ -40,7 +40,7 @@
         "targetResourceType": "Microsoft.Network/applicationGateways",
         "actions": [
             {
-                "actionGroupId": "/subscriptions/648dcb5a-de1e-48b2-af6b-fe6ef28d355c/resourceGroups/rg-ngsa-asb-pre/providers/microsoft.insights/actionGroups/ngsa-ag",
+                "actionGroupId": "/subscriptions/${Ngsa_Subscription_Guid}/resourceGroups/${Ngsa_Common_Services_RG}/providers/microsoft.insights/actionGroups/${Ngsa_Action_Group_Name}",
                 "webHookProperties": {}
             }
         ]

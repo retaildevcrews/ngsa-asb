@@ -1,12 +1,12 @@
 {
-    "name": "asb-pre-centralus-AppGatewayDown",
+    "name": "asb-dev-eastus-AppGatewayDown",
     "location": "global",
     "properties": {
-        "description": "The application gateway for ngsa-pre-central is down",
+        "description": "The application gateway for ngsa-dev-eastus is down",
         "severity": 0,
         "enabled": true,
         "scopes": [
-            "/subscriptions/648dcb5a-de1e-48b2-af6b-fe6ef28d355c/resourceGroups/rg-ngsa-asb-pre/providers/Microsoft.Network/applicationGateways/apw-aks-fykg5bqasutle-centralus"
+            "/subscriptions/${Ngsa_Subscription_Guid}/resourceGroups/${Ngsa_Common_Services_RG}/providers/Microsoft.Network/applicationGateways/apw-aks-3i2qzkkxofr7c-eastus"
         ],
         "evaluationFrequency": "PT30M",
         "windowSize": "PT1H",
@@ -22,10 +22,10 @@
                             "name": "BackendSettingsPool",
                             "operator": "Include",
                             "values": [
-                                "grafana-centralus-pre.cse.ms~grafana-centralus-pre-httpsettings",
-                                "ngsa-cosmos-centralus-pre.cse.ms~ngsa-cosmos-centralus-pre-httpsettings",
-                                "ngsa-java-centralus-pre.cse.ms~ngsa-java-centralus-pre-httpsettings",
-                                "ngsa-memory-centralus-pre.cse.ms~ngsa-memory-centralus-pre-httpsettings"
+                                "grafana-eastus-dev.cse.ms~grafana-eastus-dev-httpsettings",
+                                "ngsa-cosmos-eastus-dev.cse.ms~ngsa-cosmos-eastus-dev-httpsettings",
+                                "ngsa-java-eastus-dev.cse.ms~ngsa-java-eastus-dev-httpsettings",
+                                "ngsa-memory-eastus-dev.cse.ms~ngsa-memory-eastus-dev-httpsettings"
                             ]
                         }
                     ],
@@ -40,7 +40,7 @@
         "targetResourceType": "Microsoft.Network/applicationGateways",
         "actions": [
             {
-                "actionGroupId": "/subscriptions/648dcb5a-de1e-48b2-af6b-fe6ef28d355c/resourceGroups/rg-ngsa-asb-pre/providers/microsoft.insights/actionGroups/ngsa-ag",
+                "actionGroupId": "/subscriptions/${Ngsa_Subscription_Guid}/resourceGroups/${Ngsa_Common_Services_RG}/providers/microsoft.insights/actionGroups/${Ngsa_Action_Group_Name}",
                 "webHookProperties": {}
             }
         ]

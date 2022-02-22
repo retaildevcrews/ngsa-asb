@@ -13,13 +13,16 @@ The JSON files in this directory contain the properties for the alerts described
 az account show -o table
 
 # get subscription id
-export SUBSCRIPTION_GUID=$(eval az account show -o tsv --query id)
+export Ngsa_Subscription_Guid=$(eval az account show -o tsv --query id)
 
 # set name of existing resource group containing log analytics
-export Ngsa_Log_Analytics_RG="${ASB_RG_CORE}"
+export Ngsa_Common_Services_RG="${ASB_RG_CORE}"
 
 # set name of existing log analytics instance
 export Ngsa_Log_Analytics_Name="${ASB_LA_NAME}"
+
+#set the location of the alert resource
+export Ngsa_Alert_Location="${ASB_HUB_LOCATION}"
 
 ```
 
@@ -32,14 +35,11 @@ export Ngsa_Action_Group_Name="ngsa-ag"
 export Ngsa_Alert_Email_Name="NGSA-Alert"
 export Ngsa_Alert_Email_Address="CSENextGenK8s@microsoft.com"
 
-# verify hub location is set, adjust as necessary
-echo $ASB_HUB_LOCATION
-
 # create the action group (if it doesnt exist already)
-az monitor action-group create --name $Ngsa_Action_Group_Name --resource-group $Ngsa_Log_Analytics_RG --action email $Ngsa_Alert_Email_Name $Ngsa_Alert_Email_Address
+az monitor action-group create --name $Ngsa_Action_Group_Name --resource-group $Ngsa_Common_Services_RG --action email $Ngsa_Alert_Email_Name $Ngsa_Alert_Email_Address
 
 # update the group with as many email addresses as required (optional)
-az monitor action-group update -n $Ngsa_Action_Group_Name -g $Ngsa_Log_Analytics_RG --add-action email {Name} {email address}
+az monitor action-group update -n $Ngsa_Action_Group_Name -g $Ngsa_Common_Services_RG --add-action email {Name} {email address}
 
 ```
 
@@ -64,8 +64,8 @@ Common properties that may need updating:
 
 # make sure you are in the /docs/alerts folder
 
-# run script to update or create alerts
-./updatealerts.sh
+# run script to update or create alerts while passing environment argument
+./updatealerts.sh [dev | pre]
 
 
 ```
