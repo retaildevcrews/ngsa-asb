@@ -15,8 +15,8 @@ spec:
       labels:
         aadpodidbinding: ngsa-asb-ngsa-id
         app: ngsa-java
-        deploy: 22-02-20-06-12-10
-        version: beta-2202-20-06
+        deploy: 22-02-23-21-05-57
+        version: beta-2202-23-21
     spec:
       containers:
         - name: app
@@ -29,12 +29,21 @@ spec:
             value: "az-centralus-pre"
           - name: REGION
             value: "centralus"
-
           ports:
             - name: http
               containerPort: 8080
               protocol: TCP
-
+          readinessProbe:
+            initialDelaySeconds: 5
+            httpGet:
+              path: /version
+              port: 8080
+          livenessProbe:
+            initialDelaySeconds: 60
+            periodSeconds: 300
+            httpGet:
+              path: /healthz
+              port: 8080              
           resources:
             limits:
               cpu: 500m
@@ -42,7 +51,6 @@ spec:
             requests:
               cpu: 500m
               memory: 512Mi
-
           volumeMounts:
             - name: secrets
               mountPath: "/app/secrets"
@@ -53,7 +61,6 @@ spec:
             readOnly: true
             volumeAttributes:
               secretProviderClass: ngsa-secrets
-
       nodeSelector:
         agentpool: npuser01
 
