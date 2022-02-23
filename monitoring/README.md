@@ -50,6 +50,7 @@ First, follow the steps detailed in the [Grafana documentation](https://grafana.
 **Note**: The `CLIENT_SECRET` will be mounted from Key Vault and into the Grafana pod using Pod Identity. Rather than creating a whole new Managed Identity, Grafana makes use of NGSA's managed identity to grab the secret from Key Vault. Ensure that you have it setup by following the [Cosmos pod identity setup guide](../docs/cosmos.md#aad-pod-identity-setup-for-app).
 
 You'll need to run a few more steps to completely setup the AAD Service Principal.
+
 1. Navigate to the Service Principal you created in AAD -> Enterprise Applications. Search for your application and click on it.
 2. If you haven't added the users already, go ahead and add them in the "Users and groups" menu from the sidebar.
 3. Go to "Properties", select "Yes" for the "Assignment required?" option and save. This ensures users only assigned to the Service Principal can access Grafana.
@@ -245,6 +246,10 @@ Go to a browser to access grafana and perform the following steps:
 - Go to `Dashboards` > `Manage` page from left menu
 - Click `Import`
 - Upload dashboard file [ngsa-dev-model.json](../monitoring/dashboards/ngsa-dev-model.json)
+
+## Setup Alerts
+
+- Please reference the [alerts documentation](./alerts/README.md) for instructions on setting up alerts.
 
 ## Prometheus Design Notes
 
