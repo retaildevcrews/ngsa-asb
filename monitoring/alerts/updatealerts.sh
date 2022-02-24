@@ -3,10 +3,9 @@
 # exit when any command fails
 set -e
 
-if [ -z "$1" ]
-  then
+if [[ -z "$1" ]] || grep -vqE 'pre|dev' <<< $1; then
     echo "No target evironment argument supplied. Please provide target environment (e.g. pre, dev)"
-    exit;
+    exit 1
 fi
 
 env=$1
