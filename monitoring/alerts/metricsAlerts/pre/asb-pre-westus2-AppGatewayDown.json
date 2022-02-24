@@ -1,0 +1,48 @@
+{
+    "name": "asb-pre-westus2-AppGatewayDown",
+    "location": "global",
+    "properties": {
+        "description": "The application gateway for ngsa-pre-westus2 is down",
+        "severity": 0,
+        "enabled": true,
+        "scopes": [
+            "/subscriptions/${Ngsa_Subscription_Guid}/resourceGroups/${Ngsa_Common_Services_RG}/providers/Microsoft.Network/applicationGateways/apw-aks-fykg5bqasutle-westus2"
+        ],
+        "evaluationFrequency": "PT30M",
+        "windowSize": "PT1H",
+        "criteria": {
+            "allOf": [
+                {
+                    "threshold": 1,
+                    "name": "Metric1",
+                    "metricNamespace": "Microsoft.Network/applicationGateways",
+                    "metricName": "HealthyHostCount",
+                    "dimensions": [
+                        {
+                            "name": "BackendSettingsPool",
+                            "operator": "Include",
+                            "values": [
+                                "grafana-westus2-pre.cse.ms~grafana-westus2-pre-httpsettings",
+                                "ngsa-cosmos-westus2-pre.cse.ms~ngsa-cosmos-westus2-pre-httpsettings",
+                                "ngsa-java-westus2-pre.cse.ms~ngsa-java-westus2-pre-httpsettings",
+                                "ngsa-memory-westus2-pre.cse.ms~ngsa-memory-westus2-pre-httpsettings"
+                            ]
+                        }
+                    ],
+                    "operator": "LessThan",
+                    "timeAggregation": "Average",
+                    "criterionType": "StaticThresholdCriterion"
+                }
+            ],
+            "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria"
+        },
+        "autoMitigate": true,
+        "targetResourceType": "Microsoft.Network/applicationGateways",
+        "actions": [
+            {
+                "actionGroupId": "/subscriptions/${Ngsa_Subscription_Guid}/resourceGroups/${Ngsa_Common_Services_RG}/providers/microsoft.insights/actionGroups/${Ngsa_Action_Group_Name}",
+                "webHookProperties": {}
+            }
+        ]
+    }
+}

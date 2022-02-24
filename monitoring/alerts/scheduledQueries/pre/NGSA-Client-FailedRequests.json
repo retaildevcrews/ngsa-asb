@@ -1,0 +1,53 @@
+{
+    "name": "NGSA-Client-FailedRequests",
+    "location": "${Ngsa_Alert_Location}",
+    "properties": {
+        "displayName": "NGSA-Client-FailedRequests",
+        "description": "LodeRunner (client) had > 20 failed requests to an ngsa instance",
+        "severity": 3,
+        "enabled": true,
+        "evaluationFrequency": "PT10M",
+        "windowSize": "PT15M",
+        "autoMitigate": false,
+        "scopes": [
+            "/subscriptions/${Ngsa_Subscription_Guid}/resourceGroups/${Ngsa_Common_Services_RG}/providers/Microsoft.OperationalInsights/workspaces/${Ngsa_Log_Analytics_Name}"
+        ],
+        "criteria": {
+            "allOf": [
+                {
+                    "query": "loderunner_CL | where StatusCode_d >= 400 | summarize FailedRequests=count() by bin(TimeGenerated, 5m), Zone_s, Server_s | project-rename AggregatedValue=FailedRequests",
+                    "timeAggregation": "Average",
+                    "metricMeasureColumn": "AggregatedValue",
+                    "dimensions": [
+                        {
+                            "name": "Zone_s",
+                            "operator": "Include",
+                            "values": [
+                                "*"
+                            ]
+                        },
+                        {
+                            "name": "Server_s",
+                            "operator": "Include",
+                            "values": [
+                                "*"
+                            ]
+                        }
+                    ],
+                    "operator": "GreaterThan",
+                    "threshold": 20,
+                    "failingPeriods": {
+                        "minFailingPeriodsToAlert": 1,
+                        "numberOfEvaluationPeriods": 1
+                    }
+                }
+            ]
+        },
+        "muteActionsDuration": "PT30M",
+        "actions": {
+            "actionGroups": [
+                "/subscriptions/${Ngsa_Subscription_Guid}/resourceGroups/${Ngsa_Common_Services_RG}/providers/microsoft.insights/actionGroups/${Ngsa_Action_Group_Name}"
+            ]
+        }
+    }
+}

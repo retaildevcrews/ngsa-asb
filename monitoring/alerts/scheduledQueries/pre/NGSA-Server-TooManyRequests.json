@@ -1,0 +1,53 @@
+{
+    "name": "NGSA-Server-TooManyRequests",
+    "location": "${Ngsa_Alert_Location}",
+    "properties": {
+        "displayName": "NGSA-Server-TooManyRequests",
+        "description": "An ngsa instance is receiving > 225 requests per minute",
+        "severity": 3,
+        "enabled": true,
+        "windowSize": "PT10M",
+        "evaluationFrequency": "PT10M",
+        "autoMitigate": false,
+        "scopes": [
+            "/subscriptions/${Ngsa_Subscription_Guid}/resourceGroups/${Ngsa_Common_Services_RG}/providers/Microsoft.OperationalInsights/workspaces/${Ngsa_Log_Analytics_Name}"
+        ],
+        "criteria": {
+            "allOf": [
+                {
+                    "query": "ngsa_CL | where k_container_s == 'app' | summarize AggregatedValue=count() by bin(TimeGenerated, 1m), Zone_s,k_app_s",
+                    "timeAggregation": "Average",
+                    "metricMeasureColumn": "AggregatedValue",
+                    "dimensions": [
+                        {
+                            "name": "Zone_s",
+                            "operator": "Include",
+                            "values": [
+                                "*"
+                            ]
+                        },
+                        {
+                            "name": "k_app_s",
+                            "operator": "Include",
+                            "values": [
+                                "*"
+                            ]
+                        }
+                    ],
+                    "operator": "GreaterThan",
+                    "threshold": 225,
+                    "failingPeriods": {
+                        "minFailingPeriodsToAlert": 5,
+                        "numberOfEvaluationPeriods": 5
+                    }
+                }
+            ]
+        },
+        "muteActionsDuration": "PT30M",
+        "actions": {
+            "actionGroups": [
+                "/subscriptions/${Ngsa_Subscription_Guid}/resourceGroups/${Ngsa_Common_Services_RG}/providers/microsoft.insights/actionGroups/${Ngsa_Action_Group_Name}"
+            ]
+        }
+    }
+}
