@@ -254,3 +254,5 @@ Go to a browser to access grafana and perform the following steps:
 ## Prometheus Design Notes
 
 - The Prometheus container runs as a non-root user and requires write permissions on a mounted volume. We used initContainers to change the ownership of the datastore directory.
+
+- In our experience, Prometheus pods have occasionally run out of memory. To reduce the memory footprint, we enforced a metrics retention size of 3900MB and period of 3 days. In addition, we increased the metrics scrape interval to 15s. However, now we can only access a lower granularity of metrics for a maximum of 3 days within Prometheus/Grafana. We will look to integrate Thanos to resolve this issue, since it flushes the Prometheus metrisc into a long running Azure block storage container.
