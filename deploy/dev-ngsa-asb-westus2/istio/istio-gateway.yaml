@@ -20,6 +20,7 @@ spec:
     - "ngsa/ngsa-cosmos-westus2-dev.cse.ms"
     - "ngsa/ngsa-java-westus2-dev.cse.ms"
     - "monitoring/grafana-westus2-dev.cse.ms"
+    - "loderunner/loderunner-westus2-dev.cse.ms"
 ---
 apiVersion: telemetry.istio.io/v1alpha1
 kind: Telemetry
