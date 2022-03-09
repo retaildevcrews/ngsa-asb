@@ -73,8 +73,8 @@ metadata:
 data:
   prometheus.yml: |-
     global:
-      scrape_interval: 5s
-      evaluation_interval: 5s
+      scrape_interval: 15s
+      evaluation_interval: 15s
     scrape_configs:
       - job_name: 'kubernetes-apiservers'
         kubernetes_sd_configs:
@@ -216,6 +216,7 @@ spec:
             - "--config.file=/etc/prometheus/prometheus.yml"
             - "--storage.tsdb.path=/prometheus/"
             - "--storage.tsdb.retention.size=3900MB"
+            - "--storage.tsdb.retention.time=3d"
           ports:
             - containerPort: 9090
           volumeMounts:
