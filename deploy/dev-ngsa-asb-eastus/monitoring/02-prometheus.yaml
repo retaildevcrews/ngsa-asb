@@ -263,7 +263,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: prometheus-service
+  name: prometheus-server
   namespace: monitoring
   annotations:
       prometheus.io/scrape: 'true'
