@@ -10,43 +10,6 @@ spec:
     requests:
       storage: 1Gi
 ---
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: grafana-config
-  namespace: monitoring
-data:
-  grafana.ini:  |
-    [auth]
-    disable_login_form = true
-
-    [auth.basic]
-    enabled = false
-
-    [auth.azuread]
-    name = Azure AD
-    enabled = true
-    allow_sign_up = true
-    client_id = d26fa2ad-c0c1-42ce-8989-6a8c5d207e06
-    scopes = openid email profile
-    auth_url = https://login.microsoftonline.com/72f988bf-86f1-41af-91ab-2d7cd011db47/oauth2/v2.0/authorize
-    token_url = https://login.microsoftonline.com/72f988bf-86f1-41af-91ab-2d7cd011db47/oauth2/v2.0/token
-  provisioning/datasources/prometheus.yaml: |-
-      {
-        "apiVersion": 1,
-        "datasources": [
-            {
-              "access":"proxy",
-              "editable": true,
-              "name": "prometheus",
-              "orgId": 1,
-              "type": "prometheus",
-              "url": "http://prometheus-server.monitoring.svc:9090",
-              "version": 1
-            }
-        ]
-      }
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -115,11 +78,14 @@ spec:
           volumeMounts:
             - mountPath: /var/lib/grafana
               name: grafana-pv
-            - mountPath: /etc/grafana
-              name: grafana-config
-            - mountPath: /mnt/secrets
+            - name: grafana-config
+              mountPath: /etc/grafana/grafana.ini
+              subPath: grafana.ini
+            - name: grafana-datasources
+              mountPath: /etc/grafana/provisioning/datasources
+            - name: grafana-aad-auth-secret
+              mountPath: /mnt/secrets
               readOnly: true
-              name: grafana-aad-auth-secret
       volumes:
         - name: grafana-pv
           persistentVolumeClaim:
@@ -127,6 +93,9 @@ spec:
         - name: grafana-config
           configMap:
             name: grafana-config
+        - name: grafana-datasources
+          configMap:
+            name: grafana-datasources            
         - name: grafana-aad-auth-secret
           csi:
             driver: secrets-store.csi.k8s.io
@@ -166,4 +135,3 @@ spec:
         port:
           number: 3000
         host: grafana
-  
