@@ -12,7 +12,7 @@ data:
             {
               "id": 1,
               "orgId": 1,
-              "name": "Azure Monitor Test",
+              "name": "Azure Monitor",
               "type": "grafana-azure-monitor-datasource",
               "typeLogoUrl": "public/app/plugins/datasource/grafana-azure-monitor-datasource/img/logo.jpg",
               "access": "proxy",
@@ -34,7 +34,7 @@ data:
             {
               "id": 2,
               "orgId": 1,
-              "name": "Prometheus Test",
+              "name": "Prometheus",
               "access":"proxy",
               "editable": true,   
               "type": "prometheus",
