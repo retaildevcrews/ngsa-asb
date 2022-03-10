@@ -274,4 +274,5 @@ spec:
   type: ClusterIP  
   ports:
     - port: 9090
+      protocol: TCP
       targetPort: 9090
