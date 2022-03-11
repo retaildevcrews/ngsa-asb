@@ -39,6 +39,6 @@ data:
               "editable": true,   
               "type": "prometheus",
               "url": "http://prometheus-server.monitoring.svc:9090"
-            },
+            }
         ]
     }

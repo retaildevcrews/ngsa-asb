@@ -83,6 +83,8 @@ spec:
               subPath: grafana.ini
             - name: grafana-datasources
               mountPath: /etc/grafana/provisioning/datasources
+            - name: grafana-dashboards
+              mountPath: /etc/grafana/provisioning/dashboards
             - name: grafana-aad-auth-secret
               mountPath: /mnt/secrets
               readOnly: true
@@ -95,7 +97,10 @@ spec:
             name: grafana-config
         - name: grafana-datasources
           configMap:
-            name: grafana-datasources            
+            name: grafana-datasources
+        - name: grafana-dashboards
+          configMap:
+            name: grafana-dashboards
         - name: grafana-aad-auth-secret
           csi:
             driver: secrets-store.csi.k8s.io
