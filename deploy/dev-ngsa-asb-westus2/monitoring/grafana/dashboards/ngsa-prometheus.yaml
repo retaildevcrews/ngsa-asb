@@ -686,8 +686,8 @@ data:
               "allValue": null,
               "current": {
                 "selected": true,
-                "text": "eastus",
-                "value": "eastus"
+                "text": "westus2",
+                "value": "westus2"
               },
               "description": null,
               "error": null,
@@ -699,11 +699,11 @@ data:
               "options": [
                 {
                   "selected": true,
-                  "text": "eastus",
-                  "value": "eastus"
+                  "text": "westus2",
+                  "value": "westus2"
                 }
               ],
-              "query": "eastus",
+              "query": "westus2",
               "queryValue": "",
               "skipUrlSync": false,
               "type": "custom"
@@ -796,5 +796,5 @@ data:
         "timezone": "",
         "title": "NGSA Dev - Prometheus",
         "uid": "J20-83NHf",
-        "version": 1
+        "version": 3 
         }

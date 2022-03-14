@@ -88,6 +88,8 @@ spec:
               subPath: dashboardproviders.yaml
             - name: dashboards-ngsa-prometheus
               mountPath: /var/lib/grafana/dashboards/ngsa-prometheus
+            - name: dashboards-ngsa-az-monitor
+              mountPath: /var/lib/grafana/dashboards/ngsa-az-monitor              
             - name: grafana-aad-auth-secret
               mountPath: /mnt/secrets
               readOnly: true
@@ -107,6 +109,9 @@ spec:
         - name: dashboards-ngsa-prometheus
           configMap:
             name: grafana-dashboards-ngsa-prometheus
+        - name: dashboards-ngsa-az-monitor
+          configMap:
+            name: grafana-dashboards-ngsa-az-monitor            
         - name: grafana-aad-auth-secret
           csi:
             driver: secrets-store.csi.k8s.io
