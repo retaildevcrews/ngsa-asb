@@ -1,0 +1,44 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-datasources
+  namespace: monitoring
+data:
+  datasources.yaml: |-
+    {
+        "apiVersion": 1,
+        "datasources": [
+            {
+              "id": 1,
+              "orgId": 1,
+              "name": "Azure Monitor",
+              "type": "grafana-azure-monitor-datasource",
+              "typeLogoUrl": "public/app/plugins/datasource/grafana-azure-monitor-datasource/img/logo.jpg",
+              "access": "proxy",
+              "url": "/api/datasources/proxy/1",
+              "basicAuth": false,
+              "isDefault": true,
+              "jsonData": {
+                  "azureLogAnalyticsSameAs": true,
+                  "clientId": "d26fa2ad-c0c1-42ce-8989-6a8c5d207e06",
+                  "cloudName": "azuremonitor",
+                  "logAnalyticsClientId": "d26fa2ad-c0c1-42ce-8989-6a8c5d207e06",
+                  "logAnalyticsDefaultWorkspace": "b51964b6-4a46-46f2-80b9-01f0649e63f5",
+                  "logAnalyticsTenantId": "72f988bf-86f1-41af-91ab-2d7cd011db47",
+                  "subscriptionId": "648dcb5a-de1e-48b2-af6b-fe6ef28d355c",
+                  "tenantId": "72f988bf-86f1-41af-91ab-2d7cd011db47"
+              },
+              "editable": true
+            },
+            {
+              "id": 2,
+              "orgId": 1,
+              "name": "Prometheus",
+              "access":"proxy",
+              "editable": true,   
+              "type": "prometheus",
+              "url": "http://prometheus-server.monitoring.svc:9090"
+            }
+        ]
+    }
