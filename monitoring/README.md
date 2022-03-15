@@ -188,7 +188,7 @@ az network application-gateway list -g $ASB_RG_CORE --query "[].{Name:name}" -o 
 
 ### Verify Prometheus Service
 
-- Check that it worked by running: `kubectl port-forward service/prometheus-service 9090:8080 -n monitoring`
+- Check that it worked by running: `kubectl port-forward service/prometheus-server 9090:9090 -n monitoring`
 - Navigate to localhost:9090 in your browser. You should see a Prometheus query page.
 
 ### Verify Grafana Service

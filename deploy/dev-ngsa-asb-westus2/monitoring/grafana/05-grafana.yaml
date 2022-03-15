@@ -10,28 +10,6 @@ spec:
     requests:
       storage: 1Gi
 ---
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: grafana-config
-  namespace: monitoring
-data:
-  grafana.ini:  |
-    [auth]
-    disable_login_form = true
-
-    [auth.basic]
-    enabled = false
-
-    [auth.azuread]
-    name = Azure AD
-    enabled = true
-    allow_sign_up = true
-    client_id = d26fa2ad-c0c1-42ce-8989-6a8c5d207e06
-    scopes = openid email profile
-    auth_url = https://login.microsoftonline.com/72f988bf-86f1-41af-91ab-2d7cd011db47/oauth2/v2.0/authorize
-    token_url = https://login.microsoftonline.com/72f988bf-86f1-41af-91ab-2d7cd011db47/oauth2/v2.0/token
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -100,11 +78,21 @@ spec:
           volumeMounts:
             - mountPath: /var/lib/grafana
               name: grafana-pv
-            - mountPath: /etc/grafana
-              name: grafana-config
-            - mountPath: /mnt/secrets
+            - name: grafana-config
+              mountPath: /etc/grafana/grafana.ini
+              subPath: grafana.ini
+            - name: grafana-datasources
+              mountPath: /etc/grafana/provisioning/datasources
+            - name: grafana-dashboard-providers
+              mountPath: /etc/grafana/provisioning/dashboards/dashboardproviders.yaml
+              subPath: dashboardproviders.yaml
+            - name: dashboards-ngsa-prometheus
+              mountPath: /var/lib/grafana/dashboards/ngsa-prometheus
+            - name: dashboards-ngsa-az-monitor
+              mountPath: /var/lib/grafana/dashboards/ngsa-az-monitor              
+            - name: grafana-aad-auth-secret
+              mountPath: /mnt/secrets
               readOnly: true
-              name: grafana-aad-auth-secret
       volumes:
         - name: grafana-pv
           persistentVolumeClaim:
@@ -112,6 +100,18 @@ spec:
         - name: grafana-config
           configMap:
             name: grafana-config
+        - name: grafana-datasources
+          configMap:
+            name: grafana-datasources
+        - name: grafana-dashboard-providers
+          configMap:
+            name: grafana-dashboard-providers
+        - name: dashboards-ngsa-prometheus
+          configMap:
+            name: grafana-dashboards-ngsa-prometheus
+        - name: dashboards-ngsa-az-monitor
+          configMap:
+            name: grafana-dashboards-ngsa-az-monitor              
         - name: grafana-aad-auth-secret
           csi:
             driver: secrets-store.csi.k8s.io

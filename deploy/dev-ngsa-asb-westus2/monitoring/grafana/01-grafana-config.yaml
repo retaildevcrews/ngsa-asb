@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-config
+  namespace: monitoring
+data:
+  grafana.ini:  |
+    [auth]
+    disable_login_form = true
+
+    [auth.basic]
+    enabled = false
+
+    [auth.azuread]
+    name = Azure AD
+    enabled = true
+    allow_sign_up = true
+    client_id = d26fa2ad-c0c1-42ce-8989-6a8c5d207e06
+    scopes = openid email profile
+    auth_url = https://login.microsoftonline.com/72f988bf-86f1-41af-91ab-2d7cd011db47/oauth2/v2.0/authorize
+    token_url = https://login.microsoftonline.com/72f988bf-86f1-41af-91ab-2d7cd011db47/oauth2/v2.0/token
