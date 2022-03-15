@@ -401,6 +401,12 @@ fluxctl sync --k8s-fwd-ns flux-cd
 # Note: Flux will automatically deploy everything in your $ASB_GIT_PATH path as well as everything in the deploy/bootstrap folder
 ```
 
+> Note: `fluxctl` CLI has a default timeout of 60s, if the above `fluxctl sync`
+> command times out it means `fluxcd` is still working on it
+>
+> If you want to wait longer add `--timeout 180s` to your `fluxctl` command.
+> Or upon timeout you can check `fluxcd` logs in the cluster.
+
 ## Deploying NGSA Applications
 
 ### 🛑 Prerequisite - [Setup Cosmos DB in secure baseline](./docs/cosmos.md)
@@ -444,6 +450,8 @@ git push
 
 # Sync Flux
 fluxctl sync --k8s-fwd-ns flux-cd
+# Note: `fluxctl` CLI has a default timeout of 60s, if the above `fluxctl sync` command times out it means `fluxcd` is still working on it
+
 ```
 
 ## Deploy Grafana and Prometheus
@@ -540,6 +548,7 @@ git push
 
 # Sync Flux
 fluxctl sync --k8s-fwd-ns flux-cd
+# Note: `fluxctl` CLI has a default timeout of 60s, if the above `fluxctl sync` command times out it means `fluxcd` is still working on it
 
 # Note: It may be required to re-create the ngsa-cosmos and istio operator pods for changes to take effect
 kubectl delete pod -n istio-operator -l name=istio-operator
