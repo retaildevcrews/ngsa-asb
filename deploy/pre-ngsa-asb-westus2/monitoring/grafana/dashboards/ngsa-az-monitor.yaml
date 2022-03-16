@@ -4655,10 +4655,10 @@ data:
                   "selected": true,
                   "tags": [],
                   "text": [
-                    "EastUS"
+                    "WestUS2"
                   ],
                   "value": [
-                    "az-eastus-pre"
+                    "az-westus2-pre"
                   ]
                 },
                 "error": null,
@@ -4670,11 +4670,11 @@ data:
                 "options": [
                   {
                     "selected": true,
-                    "text": "EastUS",
-                    "value": "az-eastus-pre"
+                    "text": "WestUS2",
+                    "value": "az-westus2-pre"
                   }
                 ],
-                "query": "az-eastus-pre",
+                "query": "az-westus2-pre",
                 "queryValue": "",
                 "skipUrlSync": false,
                 "type": "custom"
