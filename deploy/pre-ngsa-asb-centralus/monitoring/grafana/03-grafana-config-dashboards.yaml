@@ -1,0 +1,26 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-dashboard-providers
+  namespace: monitoring
+  labels:
+    app: grafana
+data:
+  dashboardproviders.yaml: |
+    apiVersion: 1
+    providers:
+    - name: ngsa-prometheus
+      folder: NGSA
+      options:
+        path: /var/lib/grafana/dashboards/ngsa-prometheus 
+      orgId: 1
+      type: file
+      disableDeletion: false
+    - name: ngsa-azure-monitor
+      folder: NGSA
+      options:
+        path: /var/lib/grafana/dashboards/ngsa-az-monitor 
+      orgId: 1
+      type: file
+      disableDeletion: false

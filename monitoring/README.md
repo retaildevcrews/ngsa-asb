@@ -160,20 +160,36 @@ export ASB_WAF_POLICY_NAME="${ASB_DEPLOYMENT_NAME}-waf-policy-${ASB_SPOKE_LOCATI
 
 az network application-gateway waf-policy create -n $ASB_WAF_POLICY_NAME -g $ASB_RG_CORE -l $ASB_SPOKE_LOCATION
 
-# create custom rule in waf policy
-export ASB_WAF_POLICY_RULE="grafanaAADAuth"
-export ASB_WAF_POLICY_RULE_PRIORITY="2"
+# create custom rule in waf policy for grafana AAD
+export ASB_WAF_POLICY_RULE_AAD="grafanaAADAuth"
+export ASB_WAF_POLICY_RULE_PRIORITY_AAD="2"
 
 az network application-gateway waf-policy custom-rule create \
-  -n $ASB_WAF_POLICY_RULE --policy-name $ASB_WAF_POLICY_NAME -g $ASB_RG_CORE \
-  --action Allow --priority $ASB_WAF_POLICY_RULE_PRIORITY --rule-type MatchRule
+  -n $ASB_WAF_POLICY_RULE_AAD --policy-name $ASB_WAF_POLICY_NAME -g $ASB_RG_CORE \
+  --action Allow --priority $ASB_WAF_POLICY_RULE_PRIORITY_AAD --rule-type MatchRule
 
 # add allow rule conditions for AAD redirect request
 # add condition to check whether the redirectURI is going to /login/azuread 
 az network application-gateway waf-policy custom-rule match-condition add \
-  -n $ASB_WAF_POLICY_RULE --policy-name $ASB_WAF_POLICY_NAME -g $ASB_RG_CORE \
+  -n $ASB_WAF_POLICY_RULE_AAD --policy-name $ASB_WAF_POLICY_NAME -g $ASB_RG_CORE \
   --match-variables RequestUri --operator Contains --values "/login/azuread" \
   --transforms UrlDecode Lowercase
+
+# create custom rule in waf policy for grafana to read from prometheus
+export ASB_WAF_POLICY_RULE_PROM="prometheusQuery"
+export ASB_WAF_POLICY_RULE_PRIORITY_PROM="4"
+
+az network application-gateway waf-policy custom-rule create \
+  -n $ASB_WAF_POLICY_RULE_PROM --policy-name $ASB_WAF_POLICY_NAME -g $ASB_RG_CORE \
+  --action Allow --priority $ASB_WAF_POLICY_RULE_PRIORITY_PROM --rule-type MatchRule
+
+# add allow rule conditions for AAD redirect request
+# add condition to check whether the redirectURI is going to /api/datasources
+az network application-gateway waf-policy custom-rule match-condition add \
+  -n $ASB_WAF_POLICY_RULE_PROM --policy-name $ASB_WAF_POLICY_NAME -g $ASB_RG_CORE \
+  --match-variables RequestUri --operator Contains --values "/api/datasources" \
+  --transforms UrlDecode Lowercase
+
 
 # use prevention mode and enable waf policy
 az network application-gateway waf-policy policy-setting update \
