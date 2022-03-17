@@ -1,26 +1,26 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: loderunner-api
+  name: loderunner-clientmode
   namespace: loderunner
   labels:
-    app.kubernetes.io/name: loderunner-api
+    app.kubernetes.io/name: loderunner-clientmode
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: loderunner-api
+      app: loderunner-clientmode
   template:
     metadata:
       labels:
-        app: loderunner-api
+        app: loderunner-clientmode
         aadpodidbinding: ngsa-asb-loderunner-id
         deploy: 22-03-17-19-46-28
         version: beta-2203-17-19
     spec:
       containers:
         - name: app
-          image: ghcr.io/retaildevcrews/lr-api:beta
+          image: ghcr.io/retaildevcrews/ngsa-lr:beta
           imagePullPolicy: Always
           ports:
             - name: http
@@ -33,23 +33,19 @@ spec:
             requests:
               memory: "512Mi"
               cpu: "500m"
-          env:
-          - name: "ASPNETCORE_ENVIRONMENT"
-            value: "Production"
+          args: 
+          - --mode 
+          - Client
+          - --secrets-volume
+          - /app/secrets
+          - --prometheus
+          - --zone
+          - az-westus2-dev
+          - --region
+          - westus2
           volumeMounts:
             - name: secrets
               mountPath: "/app/secrets"
-          readinessProbe:
-            initialDelaySeconds: 5
-            httpGet:
-              path: /version
-              port: 8080
-          livenessProbe:
-            initialDelaySeconds: 60
-            periodSeconds: 300
-            httpGet:
-              path: /healthz
-              port: 8080
       volumes:
         - name: secrets
           csi:
@@ -65,14 +61,14 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: loderunner-api
+  name: loderunner-clientmode
   namespace: loderunner
 spec:
   type: ClusterIP
   ports:
     - port: 8080
-      targetPort: http
+      targetPort: http 
       protocol: TCP
       name: http
   selector:
-    app: loderunner-api
+    app: loderunner-clientmode
