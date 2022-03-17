@@ -20,3 +20,4 @@ spec:
     - "ngsa/ngsa-cosmos-${ASB_DOMAIN_SUFFIX}"
     - "ngsa/ngsa-java-${ASB_DOMAIN_SUFFIX}"
     - "monitoring/grafana-${ASB_DOMAIN_SUFFIX}"
+    - "loderunner/loderunner-${ASB_DOMAIN_SUFFIX}"
