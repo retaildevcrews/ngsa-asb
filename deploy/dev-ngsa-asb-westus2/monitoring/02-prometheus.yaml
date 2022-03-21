@@ -115,7 +115,6 @@ spec:
             - "--config.file=/etc/prometheus/prometheus.yml"
             - "--storage.tsdb.path=/prometheus/"
             - "--storage.tsdb.retention.size=3900MB"
-            - "--storage.tsdb.retention.time=3d"
           ports:
             - containerPort: 9090
           volumeMounts:
