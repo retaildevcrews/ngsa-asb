@@ -1,12 +1,12 @@
 {
-    "name": "asb-pre-westus2-AppGatewayDown",
+    "name": "asb-dev-eastus-AppEndpointDown",
     "location": "global",
     "properties": {
-        "description": "The application gateway for ngsa-pre-westus2 is down",
+        "description": "One or more application endpoints are down",
         "severity": 0,
         "enabled": true,
         "scopes": [
-            "/subscriptions/${Ngsa_Subscription_Guid}/resourceGroups/${Ngsa_Common_Services_RG}/providers/Microsoft.Network/applicationGateways/apw-aks-fykg5bqasutle-westus2"
+            "/subscriptions/${Ngsa_Subscription_Guid}/resourceGroups/${Ngsa_Common_Services_RG}/providers/Microsoft.Network/applicationGateways/apw-aks-3i2qzkkxofr7c-eastus"
         ],
         "evaluationFrequency": "PT30M",
         "windowSize": "PT1H",
@@ -22,10 +22,11 @@
                             "name": "BackendSettingsPool",
                             "operator": "Include",
                             "values": [
-                                "grafana-westus2-pre.cse.ms~grafana-westus2-pre-httpsettings",
-                                "ngsa-cosmos-westus2-pre.cse.ms~ngsa-cosmos-westus2-pre-httpsettings",
-                                "ngsa-java-westus2-pre.cse.ms~ngsa-java-westus2-pre-httpsettings",
-                                "ngsa-memory-westus2-pre.cse.ms~ngsa-memory-westus2-pre-httpsettings"
+                                "grafana-eastus-dev.cse.ms~grafana-eastus-dev-httpsettings",
+                                "ngsa-cosmos-eastus-dev.cse.ms~ngsa-cosmos-eastus-dev-httpsettings",
+                                "ngsa-java-eastus-dev.cse.ms~ngsa-java-eastus-dev-httpsettings",
+                                "ngsa-memory-eastus-dev.cse.ms~ngsa-memory-eastus-dev-httpsettings",
+                                "loderunner-eastus-dev.cse.ms~loderunner-eastus-dev-httpsettings"
                             ]
                         }
                     ],

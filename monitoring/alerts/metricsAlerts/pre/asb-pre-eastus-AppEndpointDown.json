@@ -1,8 +1,8 @@
 {
-    "name": "asb-pre-eastus-AppGatewayDown",
+    "name": "asb-pre-eastus-AppEndpointDown",
     "location": "global",
     "properties": {
-        "description": "The application gateway for ngsa-pre-eastus is down",
+        "description": "One or more application endpoints are down",
         "severity": 0,
         "enabled": true,
         "scopes": [
