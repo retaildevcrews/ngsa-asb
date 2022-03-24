@@ -1,8 +1,8 @@
 {
-    "name": "asb-dev-westus2-AppGatewayDown",
+    "name": "asb-dev-westus2-AppEndpointDown",
     "location": "global",
     "properties": {
-        "description": "The application gateway for ngsa-dev-westus2 is down",
+        "description": "One or more application endpoints are down",
         "severity": 0,
         "enabled": true,
         "scopes": [
@@ -25,7 +25,8 @@
                                 "grafana-westus2-dev.cse.ms~grafana-westus2-dev-httpsettings",
                                 "ngsa-cosmos-westus2-dev.cse.ms~ngsa-cosmos-westus2-dev-httpsettings",
                                 "ngsa-java-westus2-dev.cse.ms~ngsa-java-westus2-dev-httpsettings",
-                                "ngsa-memory-westus2-dev.cse.ms~ngsa-memory-westus2-dev-httpsettings"
+                                "ngsa-memory-westus2-dev.cse.ms~ngsa-memory-westus2-dev-httpsettings",
+                                "loderunner-westus2-dev.cse.ms~loderunner-westus2-dev-httpsettings"
                             ]
                         }
                     ],
