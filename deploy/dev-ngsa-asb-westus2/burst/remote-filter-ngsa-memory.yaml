@@ -1,12 +1,12 @@
 apiVersion: networking.istio.io/v1alpha3
 kind: EnvoyFilter
 metadata:
-  name: burst-wasm-remote
+  name: burst-wasm-remote-memory
   namespace: ngsa
 spec:
   workloadSelector:
     labels:
-      app: ngsa-cosmos
+      app: ngsa-memory
   configPatches:
   # The patch adds the WebAssembly to the listener/http connection manager
   - applyTo: HTTP_FILTER
