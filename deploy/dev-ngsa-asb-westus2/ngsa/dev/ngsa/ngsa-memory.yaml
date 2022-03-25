@@ -19,8 +19,8 @@ spec:
     metadata:
       labels:
         app: ngsa-memory
-        version: beta-2203-24-21
-        deploy: 22-03-24-21-16-34
+        version: beta-2203-25-15
+        deploy: 22-03-25-15-04-12
     spec:
       containers:
         - name: app
@@ -92,3 +92,26 @@ spec:
         port:
           number: 8080
         host: ngsa-memory
+
+---
+
+apiVersion: autoscaling/v2beta1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: ngsa-memory
+  namespace: ngsa
+  labels:
+    app: ngsa-memory
+    version: v1
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: ngsa-memory
+  minReplicas: 3
+  maxReplicas: 5
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      targetAverageUtilization: 50

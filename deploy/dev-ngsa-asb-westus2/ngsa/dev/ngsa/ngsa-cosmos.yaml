@@ -15,8 +15,8 @@ spec:
       labels:
         aadpodidbinding: ngsa-asb-ngsa-id
         app: ngsa-cosmos
-        deploy: 22-03-24-21-16-34
-        version: beta-2203-24-21
+        deploy: 22-03-25-15-04-12
+        version: beta-2203-25-15
     spec:
       containers:
         - name: app
@@ -99,3 +99,26 @@ spec:
         port:
           number: 8080
         host: ngsa-cosmos
+
+---
+
+apiVersion: autoscaling/v2beta1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: ngsa-cosmos
+  namespace: ngsa
+  labels:
+    app: ngsa-cosmos
+    version: v1
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: ngsa-cosmos
+  minReplicas: 1
+  maxReplicas: 3
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      targetAverageUtilization: 50
