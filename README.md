@@ -411,10 +411,45 @@ fluxctl sync --k8s-fwd-ns flux-cd
 
 ### 🛑 Prerequisite - [Setup Cosmos DB in secure baseline](./docs/cosmos.md)
 
-There are two different options to choose from for deploying NGSA:
+### Create managed identity for NGSA app
+
+```bash
+
+# Create managed identity for ngsa-app
+export ASB_NGSA_MI_NAME="${ASB_DEPLOYMENT_NAME}-ngsa-id"
+
+export ASB_NGSA_MI_RESOURCE_ID=$(az identity create -g $ASB_RG_CORE -n $ASB_NGSA_MI_NAME --query "id" -o tsv)
+
+# save env vars
+./saveenv.sh -y
+
+```
+
+### AAD pod identity setup for ngsa-app
+
+```bash
+
+# allow cluster to manage app identity for aad pod identity
+export ASB_AKS_IDENTITY_ID=$(az aks show -g $ASB_RG_CORE -n $ASB_AKS_NAME --query "identityProfile.kubeletidentity.objectId" -o tsv)
+
+az role assignment create --role "Managed Identity Operator" --assignee $ASB_AKS_IDENTITY_ID --scope $ASB_NGSA_MI_RESOURCE_ID
+
+# give app identity read access to secrets in keyvault
+export ASB_NGSA_MI_PRINCIPAL_ID=$(az identity show -n $ASB_NGSA_MI_NAME -g $ASB_RG_CORE --query "principalId" -o tsv)
+
+az keyvault set-policy -n $ASB_KV_NAME --object-id $ASB_NGSA_MI_PRINCIPAL_ID --secret-permissions get
+
+# save env vars
+./saveenv.sh -y
+```
+
+NGSA Application can be deployed into the cluster using two different approaches:
 
 * [Deploy using yaml with FluxCD](./docs/deployNgsaYaml.md)
+
 * [Deploy using AutoGitops with FluxCD](https://github.com/bartr/autogitops)
+
+  * AutoGitOps is reccomended for a full CI/CD integration. For this approach the application repository must be autogitops enabled.
 
 ## Deploy Fluent Bit
 
@@ -469,7 +504,6 @@ A better approach would be to use a unique subdomain for each app instance. The 
 ### Create a subdomain endpoint
 
 ```bash
-# TODO: convert this into a script
 
 # app DNS name, in subdomain format
 # format [app]-[region]-[env].cse.ms
@@ -658,6 +692,5 @@ az aks show -n $ASB_AKS_NAME -g $ASB_RG_CORE --query provisioningState -o tsv
 az aks disable-addons --addons azure-policy -g $ASB_RG_CORE -n $ASB_AKS_NAME
 
 # delete your AKS cluster (keep your network)
-### TODO - this doesn't work completely
 az deployment group delete -g $ASB_RG_CORE -n cluster-${ASB_DEPLOYMENT_NAME}
 ```
