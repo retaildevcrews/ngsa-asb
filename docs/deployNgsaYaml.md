@@ -1,37 +1,5 @@
 # Deploy NGSA using YAML and FluxCD
 
-## Create managed identity for app
-
-```bash
-
-# Create managed identity for ngsa-app
-export ASB_NGSA_MI_NAME="${ASB_DEPLOYMENT_NAME}-ngsa-id"
-
-export ASB_NGSA_MI_RESOURCE_ID=$(az identity create -g $ASB_RG_CORE -n $ASB_NGSA_MI_NAME --query "id" -o tsv)
-
-# save env vars
-./saveenv.sh -y
-
-```
-
-## AAD pod identity setup for app
-
-```bash
-
-# allow cluster to manage app identity for aad pod identity
-export ASB_AKS_IDENTITY_ID=$(az aks show -g $ASB_RG_CORE -n $ASB_AKS_NAME --query "identityProfile.kubeletidentity.objectId" -o tsv)
-
-az role assignment create --role "Managed Identity Operator" --assignee $ASB_AKS_IDENTITY_ID --scope $ASB_NGSA_MI_RESOURCE_ID
-
-# give app identity read access to secrets in keyvault
-export ASB_NGSA_MI_PRINCIPAL_ID=$(az identity show -n $ASB_NGSA_MI_NAME -g $ASB_RG_CORE --query "principalId" -o tsv)
-
-az keyvault set-policy -n $ASB_KV_NAME --object-id $ASB_NGSA_MI_PRINCIPAL_ID --secret-permissions get
-
-# save env vars
-./saveenv.sh -y
-```
-
 ## Create NGSA deployment files
 
 ```bash
