@@ -414,7 +414,7 @@ fluxctl sync --k8s-fwd-ns flux-cd
 There are two different options to choose from for deploying NGSA:
 
 * [Deploy using yaml with FluxCD](./docs/deployNgsaYaml.md)
-* [Deploy using AutoGitops with FluxCD](./docs/deployNgsaAgo.md)
+* [Deploy using AutoGitops with FluxCD](https://github.com/bartr/autogitops)
 
 ## Deploy Fluent Bit
 
