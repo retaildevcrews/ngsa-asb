@@ -891,6 +891,28 @@
                                         "destinationPorts": [
                                             "443"
                                         ]
+                                    },
+                                    {
+                                        "ruleType": "ApplicationRule",
+                                        "name": "LR-NGSA-rule",
+                                        "protocols": [
+                                            {
+                                                "protocolType": "Https",
+                                                "port": 443
+                                            }
+                                        ],
+                                        "fqdnTags": [],
+                                        "webCategories": [],
+                                        "targetFqdns": [
+                                            "*-dev.cse.ms"
+                                        ],
+                                        "targetUrls": [],
+                                        "terminateTLS": false,
+                                        "sourceAddresses": [],
+                                        "destinationAddresses": [],
+                                        "sourceIpGroups": [
+                                            "[resourceId('Microsoft.Network/ipGroups', variables('aksIpGroupName'))]"
+                                        ]
                                     }
                                 ],
                                 "name": "AKS-Global-Requirements",
