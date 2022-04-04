@@ -26,9 +26,9 @@ spec:
           - name: PROMETHEUS
             value: "true"
           - name: ZONE
-            value: "az-centralus-pre"
+            value: "az-eastus-dev"
           - name: REGION
-            value: "centralus"
+            value: "eastus"
           ports:
             - name: http
               containerPort: 8080
@@ -43,7 +43,7 @@ spec:
             periodSeconds: 300
             httpGet:
               path: /healthz
-              port: 8080              
+              port: 8080
           resources:
             limits:
               cpu: 500m
@@ -92,7 +92,7 @@ spec:
   gateways:
   - istio-system/istio-gateway
   hosts:
-  - ngsa-java-centralus-pre.cse.ms
+  - ngsa-java-eastus-dev.cse.ms
   http:
   - route:
     - destination:
