@@ -84,11 +84,11 @@ Add, commit and push the modified files using git to your working branch.
 ### Deploy Prometheus and Grafana
 
 - Flux will pick up the latest changes. Use the command below to force flux to sync.
-  
+
   ```bash
-  
+
   fluxctl sync --k8s-fwd-ns flux-cd
-  
+
   ```
 
 ### Add Grafana Listener to application gateway
@@ -108,7 +108,7 @@ az network dns record-set a add-record -g $ASB_DNS_ZONE_RG -z $ASB_DNS_ZONE -n $
 export ASB_AKS_PRIVATE_IP="$ASB_SPOKE_IP_PREFIX".4.4
 az network private-dns record-set a add-record -g $ASB_RG_CORE -z $ASB_DNS_ZONE -n $ASB_APP_DNS_NAME -a $ASB_AKS_PRIVATE_IP --query fqdn
 
-# create app gateway resources 
+# create app gateway resources
 # backend pool, HTTPS listener (443), health probe, http setting and routing rule
 export ASB_APP_GW_NAME="apw-$ASB_AKS_NAME"
 
@@ -169,7 +169,7 @@ az network application-gateway waf-policy custom-rule create \
   --action Allow --priority $ASB_WAF_POLICY_RULE_PRIORITY_AAD --rule-type MatchRule
 
 # add allow rule conditions for AAD redirect request
-# add condition to check whether the redirectURI is going to /login/azuread 
+# add condition to check whether the redirectURI is going to /login/azuread
 az network application-gateway waf-policy custom-rule match-condition add \
   -n $ASB_WAF_POLICY_RULE_AAD --policy-name $ASB_WAF_POLICY_NAME -g $ASB_RG_CORE \
   --match-variables RequestUri --operator Contains --values "/login/azuread" \
@@ -233,7 +233,7 @@ Select a descriptive name when creating the service principal `<your-service-pri
 
 ### Assign a role to the application (Portal)
 
-The Grafana service principal needs read access to Log Analytics and Cosmos. Add the Reader permission for the core resource group and the Cosmos resource group.
+The Grafana service principal needs read access to Log Analytics and Cosmos. Add the Reader permission for the core resource group, hub resource group, and the Cosmos resource group.
 
 - Go to resource group `<your-resource-group>` --> Access Control (IAM) --> Role Assignments
 - Look for and add the service principal created `<your-service-principal-name>` as "Reader"
