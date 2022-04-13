@@ -65,44 +65,7 @@ data:
                     ]
                   }
                 },
-                "overrides": [
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "count_"
-                    },
-                    "properties": [
-                      {
-                        "id": "custom.width",
-                        "value": 64
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Resource"
-                    },
-                    "properties": [
-                      {
-                        "id": "custom.width",
-                        "value": 142
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Protocol"
-                    },
-                    "properties": [
-                      {
-                        "id": "custom.width",
-                        "value": 106
-                      }
-                    ]
-                  }
-                ]
+                "overrides": []
               },
               "gridPos": {
                 "h": 7,
@@ -152,7 +115,7 @@ data:
               ],
               "timeFrom": null,
               "timeShift": null,
-              "title": "Panel Title",
+              "title": "",
               "type": "table"
             },
             {
@@ -239,7 +202,7 @@ data:
               "timeFrom": null,
               "timeRegions": [],
               "timeShift": null,
-              "title": "Panel Title",
+              "title": "",
               "tooltip": {
                 "shared": true,
                 "sort": 0,
@@ -313,56 +276,7 @@ data:
                     ]
                   }
                 },
-                "overrides": [
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Resource"
-                    },
-                    "properties": [
-                      {
-                        "id": "custom.width",
-                        "value": 99
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "SourceIP"
-                    },
-                    "properties": [
-                      {
-                        "id": "custom.width",
-                        "value": 99
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Reason"
-                    },
-                    "properties": [
-                      {
-                        "id": "custom.width",
-                        "value": 354
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "count_"
-                    },
-                    "properties": [
-                      {
-                        "id": "custom.width",
-                        "value": 66
-                      }
-                    ]
-                  }
-                ]
+                "overrides": []
               },
               "gridPos": {
                 "h": 7,
@@ -412,7 +326,7 @@ data:
               ],
               "timeFrom": null,
               "timeShift": null,
-              "title": "Panel Title",
+              "title": "",
               "type": "table"
             },
             {
@@ -499,7 +413,7 @@ data:
               "timeFrom": null,
               "timeRegions": [],
               "timeShift": null,
-              "title": "Panel Title",
+              "title": "",
               "tooltip": {
                 "shared": true,
                 "sort": 0,
@@ -573,68 +487,7 @@ data:
                     ]
                   }
                 },
-                "overrides": [
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Resource"
-                    },
-                    "properties": [
-                      {
-                        "id": "custom.width",
-                        "value": 198
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "direction_s"
-                    },
-                    "properties": [
-                      {
-                        "id": "custom.width",
-                        "value": 88
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "primaryIPv4Address_s"
-                    },
-                    "properties": [
-                      {
-                        "id": "custom.width",
-                        "value": 140
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "count_"
-                    },
-                    "properties": [
-                      {
-                        "id": "custom.width",
-                        "value": 63
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "ruleName_s"
-                    },
-                    "properties": [
-                      {
-                        "id": "custom.width",
-                        "value": 228
-                      }
-                    ]
-                  }
-                ]
+                "overrides": []
               },
               "gridPos": {
                 "h": 7,
@@ -684,7 +537,7 @@ data:
               ],
               "timeFrom": null,
               "timeShift": null,
-              "title": "Panel Title",
+              "title": "",
               "type": "table"
             },
             {
@@ -771,7 +624,7 @@ data:
               "timeFrom": null,
               "timeRegions": [],
               "timeShift": null,
-              "title": "Panel Title",
+              "title": "",
               "tooltip": {
                 "shared": true,
                 "sort": 0,
@@ -845,32 +698,7 @@ data:
                     ]
                   }
                 },
-                "overrides": [
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Message"
-                    },
-                    "properties": [
-                      {
-                        "id": "custom.width",
-                        "value": 1312
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "count_"
-                    },
-                    "properties": [
-                      {
-                        "id": "custom.width",
-                        "value": 61
-                      }
-                    ]
-                  }
-                ]
+                "overrides": []
               },
               "gridPos": {
                 "h": 7,
@@ -920,7 +748,7 @@ data:
               ],
               "timeFrom": null,
               "timeShift": null,
-              "title": "Panel Title",
+              "title": "",
               "type": "table"
             },
             {
@@ -1060,5 +888,5 @@ data:
           "timezone": "",
           "title": "NGSA Pre - Blocked Traffic",
           "uid": "PpsPzW8nk",
-          "version": 3
+          "version": 4
         }
