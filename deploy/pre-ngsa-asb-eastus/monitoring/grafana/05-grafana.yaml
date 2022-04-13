@@ -72,7 +72,7 @@ spec:
             limits:
               memory: "512Mi"
               cpu: "1000m"
-            requests: 
+            requests:
               memory: "512Mi"
               cpu: "500m"
           volumeMounts:
@@ -89,7 +89,9 @@ spec:
             - name: dashboards-ngsa-prometheus
               mountPath: /var/lib/grafana/dashboards/ngsa-prometheus
             - name: dashboards-ngsa-az-monitor
-              mountPath: /var/lib/grafana/dashboards/ngsa-az-monitor              
+              mountPath: /var/lib/grafana/dashboards/ngsa-az-monitor
+            - name: dashboards-ngsa-az-blocked-traffic
+              mountPath: /var/lib/grafana/dashboards/ngsa-az-blocked-traffic
             - name: grafana-aad-auth-secret
               mountPath: /mnt/secrets
               readOnly: true
@@ -111,7 +113,10 @@ spec:
             name: grafana-dashboards-ngsa-prometheus
         - name: dashboards-ngsa-az-monitor
           configMap:
-            name: grafana-dashboards-ngsa-az-monitor 
+            name: grafana-dashboards-ngsa-az-monitor
+        - name: dashboards-ngsa-az-blocked-traffic
+          configMap:
+            name: grafana-dashboards-ngsa-az-blocked-traffic
         - name: grafana-aad-auth-secret
           csi:
             driver: secrets-store.csi.k8s.io
