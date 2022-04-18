@@ -88,8 +88,10 @@ spec:
               subPath: dashboardproviders.yaml
             - name: dashboards-ngsa-prometheus
               mountPath: /var/lib/grafana/dashboards/ngsa-prometheus
-            - name: dashboards-ngsa-az-monitor
-              mountPath: /var/lib/grafana/dashboards/ngsa-az-monitor
+            - name: dashboards-ngsa-az-monitor-rel
+              mountPath: /var/lib/grafana/dashboards/ngsa-az-monitor-rel
+            - name: dashboards-ngsa-az-monitor-perf
+              mountPath: /var/lib/grafana/dashboards/ngsa-az-monitor-perf
             - name: dashboards-ngsa-az-blocked-traffic
               mountPath: /var/lib/grafana/dashboards/ngsa-az-blocked-traffic
             - name: grafana-aad-auth-secret
@@ -111,9 +113,12 @@ spec:
         - name: dashboards-ngsa-prometheus
           configMap:
             name: grafana-dashboards-ngsa-prometheus
-        - name: dashboards-ngsa-az-monitor
+        - name: dashboards-ngsa-az-monitor-rel
           configMap:
-            name: grafana-dashboards-ngsa-az-monitor
+            name: grafana-dashboards-ngsa-az-monitor-rel
+        - name: dashboards-ngsa-az-monitor-perf
+          configMap:
+            name: grafana-dashboards-ngsa-az-monitor-perf
         - name: dashboards-ngsa-az-blocked-traffic
           configMap:
             name: grafana-dashboards-ngsa-az-blocked-traffic
