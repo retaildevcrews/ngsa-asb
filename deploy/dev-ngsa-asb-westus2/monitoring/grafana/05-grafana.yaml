@@ -13,8 +13,6 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  annotations:
-    checkov.io/skip1: CKV_K8S_35=Grafana container requires env var for secret value
   labels:
     app: grafana
   name: grafana
