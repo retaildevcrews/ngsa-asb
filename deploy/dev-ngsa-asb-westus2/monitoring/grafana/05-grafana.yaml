@@ -28,8 +28,11 @@ spec:
         app: grafana
         aadpodidbinding: grafana-id
     spec:
+      automountServiceAccountToken: false
       securityContext:
         fsGroup: 472
+        seccompProfile:
+          type: RuntimeDefault
         supplementalGroups:
           - 0
       containers:
@@ -75,6 +78,14 @@ spec:
             requests: 
               memory: "512Mi"
               cpu: "500m"
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 10001
           volumeMounts:
             - mountPath: /var/lib/grafana
               name: grafana-pv
