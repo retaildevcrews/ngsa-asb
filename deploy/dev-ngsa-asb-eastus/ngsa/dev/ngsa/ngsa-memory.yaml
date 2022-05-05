@@ -19,8 +19,8 @@ spec:
     metadata:
       labels:
         app: ngsa-memory
-        version: beta-2205-01-06
-        deploy: 22-05-01-06-05-37
+        version: beta-2205-05-17
+        deploy: 22-05-05-17-28-46
     spec:
       containers:
         - name: app
@@ -55,6 +55,18 @@ spec:
             requests:
               cpu: 250m
               memory: 256Mi
+          securityContext:
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            runAsNonRoot: true
+            runAsUser: 10001
+      automountServiceAccountToken: false
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
       nodeSelector:
         agentpool: npuser01
 
