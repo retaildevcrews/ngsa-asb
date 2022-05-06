@@ -15,13 +15,25 @@ spec:
       labels:
         aadpodidbinding: ngsa-asb-ngsa-id
         app: ngsa-java
-        deploy: 22-05-01-06-14-56
-        version: beta-2205-01-06
+        deploy: 22-05-06-16-56-20
+        version: beta-2205-06-16
     spec:
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: app
           image: ghcr.io/retaildevcrews/ngsa-java:beta
           imagePullPolicy: Always
+          securityContext:
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
           env:
           - name: PROMETHEUS
             value: "true"
