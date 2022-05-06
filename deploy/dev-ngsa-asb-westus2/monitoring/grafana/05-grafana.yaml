@@ -78,6 +78,8 @@ spec:
             requests: 
               memory: "512Mi"
               cpu: "500m"
+          securityContext:
+            allowPrivilegeEscalation: false
           volumeMounts:
             - mountPath: /var/lib/grafana
               name: grafana-pv
