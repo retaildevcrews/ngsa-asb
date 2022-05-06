@@ -80,6 +80,9 @@ spec:
               cpu: "500m"
           securityContext:
             allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
           volumeMounts:
             - mountPath: /var/lib/grafana
               name: grafana-pv
