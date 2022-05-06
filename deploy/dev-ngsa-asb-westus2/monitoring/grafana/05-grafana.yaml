@@ -28,6 +28,7 @@ spec:
         app: grafana
         aadpodidbinding: grafana-id
     spec:
+      automountServiceAccountToken: false
       securityContext:
         fsGroup: 472
         supplementalGroups:
