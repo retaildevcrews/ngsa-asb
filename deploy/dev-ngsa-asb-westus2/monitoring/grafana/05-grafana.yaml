@@ -83,6 +83,7 @@ spec:
             capabilities:
               drop:
                 - ALL
+            readOnlyRootFilesystem: true
           volumeMounts:
             - mountPath: /var/lib/grafana
               name: grafana-pv
