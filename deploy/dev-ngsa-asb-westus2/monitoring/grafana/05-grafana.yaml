@@ -84,6 +84,8 @@ spec:
               drop:
                 - ALL
             readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 10001
           volumeMounts:
             - mountPath: /var/lib/grafana
               name: grafana-pv
