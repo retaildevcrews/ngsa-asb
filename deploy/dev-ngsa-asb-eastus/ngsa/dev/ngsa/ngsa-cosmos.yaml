@@ -15,8 +15,8 @@ spec:
       labels:
         aadpodidbinding: ngsa-asb-ngsa-id
         app: ngsa-cosmos
-        deploy: 22-05-11-18-16-13
-        version: beta-2205-11-18
+        deploy: 22-05-11-20-41-35
+        version: beta-2205-11-20
     spec:
       containers:
         - name: app
@@ -69,14 +69,14 @@ spec:
         seccompProfile:
           type: RuntimeDefault
       volumes:
-        - emptyDir: {}
-          name: tmp
         - name: secrets
           csi:
             driver: secrets-store.csi.k8s.io
             readOnly: true
             volumeAttributes:
               secretProviderClass: ngsa-secrets
+        - emptyDir: {}
+          name: tmp
       nodeSelector:
         agentpool: npuser01
 
