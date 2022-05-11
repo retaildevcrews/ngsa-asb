@@ -19,8 +19,8 @@ spec:
     metadata:
       labels:
         app: ngsa-memory
-        version: beta-2205-08-06
-        deploy: 22-05-08-06-03-24
+        version: beta-2205-11-18
+        deploy: 22-05-11-18-16-13
     spec:
       containers:
         - name: app
@@ -63,6 +63,12 @@ spec:
                 - ALL
             runAsNonRoot: true
             runAsUser: 10001
+          volumeMounts:
+            - mountPath: /tmp
+              name: tmp
+      volumes:
+        - emptyDir: {}
+          name: tmp
       automountServiceAccountToken: false
       securityContext:
         seccompProfile:
