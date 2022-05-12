@@ -61,6 +61,11 @@ kind: ClusterRole
 metadata:
   creationTimestamp: null
   name: istio-operator
+  annotations:
+    checkov.io/skip1: CKV_K8S_155=Istio operator needs to install custom Istio CRDs
+    checkov.io/skip2: CKV_K8S_157=Istio operator requires elevated permissions to manage Istio
+    checkov.io/skip3: CKV_K8S_158=Istio operator requires elevated permissions to manage Istio
+    checkov.io/skip4: CKV_K8S_49=Istio operator requires elevated permissions to manage Istio
 rules:
 # istio groups
 - apiGroups:
@@ -208,6 +213,11 @@ kind: Deployment
 metadata:
   namespace: istio-operator
   name: istio-operator
+  annotations:
+    checkov.io/skip1: CKV_K8S_8=Istio operator only supports metrics endpoints
+    checkov.io/skip2: CKV_K8S_9=Istio operator only supports metrics endpoints
+    checkov.io/skip3: CKV_K8S_40=Istio operator has user UID baked into the docker image
+    checkov.io/skip4: CKV_K8S_38=Service account token needs to be mounted to gather HPA metrics
 spec:
   replicas: 1
   selector:
@@ -235,7 +245,7 @@ spec:
             runAsGroup: 1337
             runAsUser: 1337
             runAsNonRoot: true
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           resources:
             limits:
               cpu: 200m
@@ -258,3 +268,6 @@ spec:
               value: "300s"
             - name: REVISION
               value: ""
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault

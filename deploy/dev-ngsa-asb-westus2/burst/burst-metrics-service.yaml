@@ -38,12 +38,26 @@ metadata:
   namespace: burstservice
 rules:
 - apiGroups:
-  - autoscaling
+    - autoscaling
   resources:
-  - "*"
+    - horizontalpodautoscalers
   verbs:
-  - list
-  - get
+    - list
+    - get
+- apiGroups:
+    - apps
+  resources:
+    - deployments
+  verbs:
+    - list
+    - get
+- apiGroups:
+    - ""
+  resources:
+    - services
+  verbs:
+    - list
+    - get
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
@@ -67,6 +81,10 @@ metadata:
   labels:
     app: burst
     version: v1
+  annotations:
+    checkov.io/skip1: CKV_K8S_8=Burst service only supports metrics endpoints
+    checkov.io/skip2: CKV_K8S_9=Burst service only supports metrics endpoints
+    checkov.io/skip3: CKV_K8S_38=Service account token needs to be mounted to gather HPA metrics
 spec:
   replicas: 1
   selector:
@@ -86,8 +104,6 @@ spec:
         imagePullPolicy: Always
         ports:
         - containerPort: 8080 
-        securityContext:
-          runAsUser: 1000
         resources:
           limits:
             cpu: 500m
@@ -95,3 +111,20 @@ spec:
           requests:
             cpu: 500m
             memory: 256Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+          runAsUser: 10001
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+        volumeMounts:
+          - mountPath: /tmp
+            name: tmp
+      volumes:
+        - emptyDir: {}
+          name: tmp
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
