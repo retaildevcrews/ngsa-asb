@@ -88,6 +88,8 @@ metadata:
     app.kubernetes.io/name: aad-pod-identity
     app.kubernetes.io/instance: aad-pod-identity
     app.kubernetes.io/component: mic
+  annotations:
+    checkov.io/skip1: CKV_K8S_49=AAD Pod Identity requires elevated permissions
 rules:
 - apiGroups: ["apiextensions.k8s.io"]
   resources: ["customresourcedefinitions"]
@@ -185,6 +187,15 @@ metadata:
     tier: node
   annotations:
     description: Deploy components for aad-pod-identity
+    checkov.io/skip1: CKV_K8S_19=NMI Driver requires host network space
+    checkov.io/skip2: CKV_K8S_25=NMI Driver requires NET_ADMIN permission
+    checkov.io/skip3: CKV_K8S_37=NMI Driver requires capabilities assigned
+    checkov.io/skip4: CKV_K8S_20=NMI Driver requires privileged execution
+    checkov.io/skip5: CKV_K8S_40=NMI Driver must run as user 0
+    checkov.io/skip6: CKV_K8S_22=NMI Driver writes to disk
+    checkov.io/skip7: CKV_K8S_28=NMI Driver requires NET capability
+    checkov.io/skip8: CKV_K8S_38=NMI Driver requires auto-mounted service account tokens
+    checkov.io/skip9: CKV_K8S_23=NMI Driver needs to run with root permissions
 spec:
   updateStrategy:
     type: RollingUpdate
@@ -229,7 +240,7 @@ spec:
           runAsUser: 0
           capabilities:
             add:
-            - NET_ADMIN
+              - NET_ADMIN
         volumeMounts:
         - mountPath: /run/xtables.lock
           name: iptableslock
@@ -242,6 +253,12 @@ spec:
             port: 8085
           initialDelaySeconds: 10
           periodSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 8085
+          initialDelaySeconds: 10
+          periodSeconds: 5
         resources:
           limits:
             cpu: 200m
@@ -249,6 +266,9 @@ spec:
           requests:
             cpu: 100m
             memory: 256Mi
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
       nodeSelector:
         kubernetes.io/os: linux
         agentpool: npuser01
@@ -264,6 +284,10 @@ metadata:
     app.kubernetes.io/component: mic
   annotations:
     description: Deploy components for aad-pod-identity
+    checkov.io/skip1: CKV_K8S_20=MIC Driver requires privileged execution
+    checkov.io/skip2: CKV_K8S_40=MIC Driver must run as user 0
+    checkov.io/skip3: CKV_K8S_38=MIC Driver requires auto-mounted service account tokens
+    checkov.io/skip4: CKV_K8S_23=MIC Driver needs to run with root permissions
 spec:
   replicas: 2
   selector:
@@ -288,6 +312,10 @@ spec:
           - "--logtostderr"
         securityContext:
           runAsUser: 0
+          capabilities:
+            drop:
+              - ALL
+          readOnlyRootFilesystem: true
         env:
         - name: MIC_POD_NAMESPACE
           valueFrom:
@@ -303,6 +331,12 @@ spec:
             port: 8080
           initialDelaySeconds: 10
           periodSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 5
         resources:
           limits:
             cpu: 200m
@@ -310,6 +344,9 @@ spec:
           requests:
             cpu: 100m
             memory: 256Mi
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
       volumes:
       - name: k8s-azure-file
         hostPath:
