@@ -24,7 +24,7 @@ spec:
 apiVersion: secrets-store.csi.x-k8s.io/v1alpha1
 kind: SecretProviderClass
 metadata:
-  name: grafana-aad-auth-secret
+  name: grafana-secrets
   namespace: monitoring
 spec:
   provider: azure
@@ -34,6 +34,11 @@ spec:
     data:
       - objectName: grafana-aad-client-secret
         key: clientSecret
+  - secretName: grafana-azure-monitor-client-secret
+    type: Opaque
+    data:
+      - objectName: grafana-azure-monitor-client-secret
+        key: clientSecret
   parameters:
     usePodIdentity: "true"
     keyvaultName: "${ASB_KV_NAME}"
@@ -41,5 +46,8 @@ spec:
       array:
         - |
           objectName: grafana-aad-client-secret
+          objectType: secret
+        - |
+          objectName: grafana-azure-monitor-client-secret
           objectType: secret
     tenantId: "${ASB_TENANT_ID}"
