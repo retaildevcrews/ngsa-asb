@@ -20,8 +20,11 @@ spec:
     spec:
       containers:
         - name: app
-          image: ghcr.io/retaildevcrews/lr-api:beta
+          image: ghcr.io/retaildevcrews/lr-api:temp
           imagePullPolicy: Always
+          args:
+          - --url-prefix
+          - /api
           ports:
             - name: http
               containerPort: 8080
