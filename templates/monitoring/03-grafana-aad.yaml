@@ -1,16 +1,4 @@
 apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: grafana-pvc
-  namespace: monitoring
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 1Gi
----
-apiVersion: v1
 kind: ConfigMap
 metadata:
   name: grafana-config
@@ -73,6 +61,11 @@ spec:
               secretKeyRef:
                 name: grafana-aad-client-secret
                 key: clientSecret
+          - name: AZURE_MONITOR_CLIENT_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: grafana-azure-monitor-client-secret
+                key: clientSecret
           ports:
             - containerPort: 3000
               name: http-grafana
@@ -111,26 +104,21 @@ spec:
             runAsNonRoot: true
             runAsUser: 10001
           volumeMounts:
-            - mountPath: /var/lib/grafana
-              name: grafana-pv
             - mountPath: /etc/grafana
               name: grafana-config
             - mountPath: /mnt/secrets
               readOnly: true
-              name: grafana-aad-auth-secret
+              name: grafana-secrets
       volumes:
-        - name: grafana-pv
-          persistentVolumeClaim:
-            claimName: grafana-pvc
         - name: grafana-config
           configMap:
             name: grafana-config
-        - name: grafana-aad-auth-secret
+        - name: grafana-secrets
           csi:
             driver: secrets-store.csi.k8s.io
             readOnly: true
             volumeAttributes:
-              secretProviderClass: grafana-aad-auth-secret
+              secretProviderClass: grafana-secrets
       nodeSelector:
         agentpool: npuser01
 ---

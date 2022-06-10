@@ -256,6 +256,8 @@ Go to a browser to access grafana and perform the following steps:
 - Click on "Explore" from Grafana side bar
 - Try out different metrics and services
 
+In our installation of Grafana, we have removed the persistent volume and import the dashboards, data sources by mounting configmaps. To ensure that the Azure Monitor data source plugin persists through restarts, you will need to add the client secret in Key Vault and import the secret using the CSI Driver.
+
 ## Import Grafana dashboard JSON file into Grafana
 
 - Navigate to localhost:3000 in your browser to get Grafana login page
