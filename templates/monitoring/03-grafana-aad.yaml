@@ -49,7 +49,7 @@ spec:
           - 0
       containers:
         - name: grafana
-          image: ${ASB_ACR_NAME}.azurecr.io/grafana/grafana:7.3.0
+          image: ${ASB_ACR_NAME}.azurecr.io/grafana/grafana:8.5.5
           imagePullPolicy: Always
           env:
           - name: GF_SERVER_ROOT_URL
