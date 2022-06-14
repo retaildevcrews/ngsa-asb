@@ -73,6 +73,15 @@ kind: DaemonSet
 metadata:
   name: kured                           # Must match `--ds-name`
   namespace: cluster-baseline-settings  # Must match `--ds-namespace`
+  annotations:
+    checkov.io/skip1: CKV_K8S_8=Kured doesn't support liveness probe
+    checkov.io/skip2: CKV_K8S_9=Kured doesn't support readiness probe
+    checkov.io/skip3: CKV_K8S_16=Kured requires privileged permissions
+    checkov.io/skip4: CKV_K8S_20=Kured requires privileged permissions
+    checkov.io/skip5: CKV_K8S_40=Kured requires privileged permissions
+    checkov.io/skip6: CKV_K8S_17=Kured requires host PID
+    checkov.io/skip7: CKV_K8S_38=Kured requires automount service account token
+    checkov.io/skip8: CKV_K8S_23=Kured needs to run as root
 spec:
   selector:
     matchLabels:
@@ -110,7 +119,7 @@ spec:
           # and then set this to
           # image: <your-acr-instance-name>.azurecr.io/weaveworks/kured:1.6.1
           image: docker.io/weaveworks/kured:1.6.1
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           resources:
             limits:
               cpu: 500m
@@ -120,6 +129,10 @@ spec:
               memory: 16Mi
           securityContext:
             privileged: true # Give permission to nsenter /proc/1/ns/mnt
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
           env:
             - name: KURED_NODE_ID
               valueFrom:
@@ -128,3 +141,6 @@ spec:
           command:
             - /usr/bin/kured
             - --ds-namespace=cluster-baseline-settings
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
