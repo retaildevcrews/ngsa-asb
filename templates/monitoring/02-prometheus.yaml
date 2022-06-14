@@ -12,6 +12,14 @@ spec:
 
 ---
 
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: prometheus
+  namespace: monitoring
+
+---
+
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
@@ -58,7 +66,7 @@ roleRef:
 
 subjects:
 - kind: ServiceAccount
-  name: default
+  name: prometheus
   namespace: monitoring
 
 ---
@@ -98,6 +106,16 @@ metadata:
   namespace: monitoring
   labels:
     app: prometheus-server
+  annotations:
+    checkov.io/skip1: CKV_K8S_38=Need service account token for Prometheus
+    checkov.io/skip2: CKV_K8S_14=Allow latest image for jumpbox
+    checkov.io/skip3: CKV_K8S_37=Jumpbox and Prometheus need to run as root
+    checkov.io/skip4: CKV_K8S_20=Jumpbox and Prometheus need to run as root
+    checkov.io/skip5: CKV_K8S_22=Jumpbox and Prometheus need write permissions
+    checkov.io/skip6: CKV_K8S_28=Jumpbox needs network capabilities
+    checkov.io/skip7: CKV_K8S_30=Jumpbox needs to run as root
+    checkov.io/skip8: CKV_K8S_40=Jumpbox and Prometheus needs to run as root
+    checkov.io/skip9: CKV_K8S_23=Jumpbox and Prometheus needs to run as root
 spec:
   replicas: 1
   selector:
@@ -111,6 +129,7 @@ spec:
       containers:
         - name: prometheus
           image: ${ASB_ACR_NAME}.azurecr.io/prom/prometheus:v2.30.0
+          imagePullPolicy: Always
           args:
             - "--config.file=/etc/prometheus/prometheus.yml"
             - "--storage.tsdb.path=/prometheus/"
@@ -130,6 +149,33 @@ spec:
             requests:
               memory: "512Mi"
               cpu: "500m"
+          readinessProbe:
+            failureThreshold: 3
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            successThreshold: 1
+            tcpSocket:
+              port: 9090
+            timeoutSeconds: 1
+          livenessProbe:
+            failureThreshold: 3
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            successThreshold: 1
+            tcpSocket:
+              port: 9090
+            timeoutSeconds: 1
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            runAsUser: 10001
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
       initContainers:
       - name: prometheus-data-permission
         image: ${ASB_ACR_NAME}.azurecr.io/cse-labs/jumpbox:latest
@@ -148,6 +194,14 @@ spec:
           requests:
             memory: "512Mi"
             cpu: "500m"
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+              - ALL
+          runAsUser: 10001
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
       volumes:
         - name: prometheus-config-volume
           configMap:
