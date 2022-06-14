@@ -25,7 +25,7 @@ az acr import --source docker.io/prom/prometheus:v2.30.0 -n $ASB_ACR_NAME
 az acr import --source ghcr.io/cse-labs/jumpbox -n $ASB_ACR_NAME
 
 # import Grafana into ACR
-az acr import --source docker.io/grafana/grafana:7.3.0 -n $ASB_ACR_NAME
+az acr import --source docker.io/grafana/grafana:8.5.5 -n $ASB_ACR_NAME
 
 ```
 
