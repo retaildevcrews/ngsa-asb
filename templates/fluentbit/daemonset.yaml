@@ -6,7 +6,13 @@ metadata:
   namespace: fluentbit
   labels:
     app.kubernetes.io/component: fluentbit
-    app.kubernetes.io/name: fluentbit    
+    app.kubernetes.io/name: fluentbit
+  annotations:
+    checkov.io/skip1: CKV_K8S_35=fluentbit needs secrets as env variables
+    checkov.io/skip2: CKV_K8S_20=fluentbit needs to run as root
+    checkov.io/skip3: CKV_K8S_22=fluentbit needs to write to fs
+    checkov.io/skip4: CKV_K8S_23=fluentbit needs to run as root
+    checkov.io/skip5: CKV_K8S_40=fluentbit needs to run as root
 spec:
   selector:
     matchLabels:
@@ -27,7 +33,9 @@ spec:
           image: $ASB_ACR_NAME.azurecr.io/fluent/fluent-bit:1.5
           imagePullPolicy: Always
           ports:
-            - containerPort: 2020
+            - name: http
+              containerPort: 2020
+              protocol: TCP
           resources:
             limits:
               memory: "512Mi"
@@ -35,6 +43,14 @@ spec:
             requests: 
               memory: "512Mi"
               cpu: "500m"
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /api/v1/health
+              port: http
           env:
             - name: WORKSPACE_ID
               valueFrom:
@@ -79,6 +95,14 @@ spec:
               readOnly: true
             - name: fluent-bit-config
               mountPath: /fluent-bit/etc/
+          securityContext:
+            capabilities:
+              drop:
+                - ALL
+      automountServiceAccountToken: false
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
       volumes:
         - name: varlog
           hostPath:
