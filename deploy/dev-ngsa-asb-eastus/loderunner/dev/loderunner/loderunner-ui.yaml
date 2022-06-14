@@ -5,6 +5,14 @@ metadata:
   namespace: loderunner
   labels:
     app.kubernetes.io/name: loderunner-ui
+  annotations:
+    checkov.io/skip1: CKV_K8S_37=LR UI requires privileged permissions
+    checkov.io/skip2: CKV_K8S_20=LR UI requires privileged permissions
+    checkov.io/skip3: CKV_K8S_40=LR UI requires privileged permissions
+    checkov.io/skip4: CKV_K8S_22=LR UI requires writing to fs
+    checkov.io/skip6: CKV_K8S_28=LR UI needs NET_RAW
+    checkov.io/skip7: CKV_K8S_30=LR UI requires privileged permissions
+    checkov.io/skip8: CKV_K8S_23=LR UI requires privileged permissions
 spec:
   replicas: 1
   selector:
@@ -14,8 +22,8 @@ spec:
     metadata:
       labels:
         app: loderunner-ui
-        deploy: 22-06-13-19-02-27
-        version: beta-2206-13-19
+        deploy: 22-06-14-18-44-19
+        version: beta-2206-14-18
     spec:
       containers:
         - name: app
@@ -46,6 +54,10 @@ spec:
             httpGet:
               path: /
               port: 80
+      automountServiceAccountToken: false
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
       nodeSelector:
         agentpool: npuser01
         
