@@ -1,0 +1,21 @@
+name: Checkov k8s Lint
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2      
+      - name: Run Checkov
+        id: checkov
+        uses: bridgecrewio/checkov-action@master
+        with:
+          directory: deploy/
+          framework: kubernetes
+          skip_check: CKV_K8S_43 # optional: skip a specific check_id. can be comma separated list
+          quiet: true
+          output_format: github_failed_only
+          soft_fail: false
