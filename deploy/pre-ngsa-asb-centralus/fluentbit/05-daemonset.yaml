@@ -13,6 +13,7 @@ metadata:
     checkov.io/skip3: CKV_K8S_22=fluentbit needs to write to fs
     checkov.io/skip4: CKV_K8S_23=fluentbit needs to run as root
     checkov.io/skip5: CKV_K8S_40=fluentbit needs to run as root
+    checkov.io/skip6: CKV_K8S_38=fluentbit needs automounted service account token
 spec:
   selector:
     matchLabels:
@@ -99,7 +100,6 @@ spec:
             capabilities:
               drop:
                 - ALL
-      automountServiceAccountToken: false
       securityContext:
         seccompProfile:
           type: RuntimeDefault
