@@ -21,3 +21,4 @@ spec:
     - "ngsa/ngsa-java-westus2-dev.cse.ms"
     - "monitoring/grafana-westus2-dev.cse.ms"
     - "loderunner/loderunner-westus2-dev.cse.ms"
+    - "azure-arc/harbor-core-westus2-dev.cse.ms"
