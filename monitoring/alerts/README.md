@@ -32,7 +32,7 @@ export Ngsa_Alert_Location="${ASB_HUB_LOCATION}"
 
 ```bash
 # Set name of action group for alerts
-export Ngsa_Action_Group_Name="ngsa-ag"
+export Ngsa_Action_Group_Name="ngsa-ag-dev"
 export Ngsa_Alert_Email_Name="NGSA-Alert"
 export Ngsa_Alert_Email_Address="CSENextGenK8s@microsoft.com"
 
