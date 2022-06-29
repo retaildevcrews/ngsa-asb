@@ -27,7 +27,6 @@ spec:
         "request_id": "%REQ(X-REQUEST-ID)%",
         "x_b3_traceid": "%REQ(X-B3-TRACEID)%",
         "x_b3_spanid": "%REQ(X-B3-SPANID)%",
-        "x-load-feedback": "%RESP(X-LOAD-FEEDBACK)%",
         "request_authority": "%REQ(:AUTHORITY)%",
         "host": "%UPSTREAM_HOST%",
         "upstream_cluster": "%UPSTREAM_CLUSTER%",
