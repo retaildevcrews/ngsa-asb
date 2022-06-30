@@ -18,6 +18,7 @@ data:
         storage.sync  normal
         storage.backlog.mem_limit 32MB
     @INCLUDE input-kubernetes.conf
+    @INCLUDE filter-kubernetes.conf
     @INCLUDE output.conf
   output.conf: |
     [OUTPUT]
@@ -59,6 +60,40 @@ data:
         Skip_Long_Lines   Off
         Refresh_Interval  10
         storage.type      filesystem
+  filter-kubernetes.conf: |
+    [FILTER]
+        Name                kubernetes
+        Match               kube.*
+        Kube_URL            https://kubernetes.default.svc:443
+        Kube_CA_File        /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+        Kube_Token_File     /var/run/secrets/kubernetes.io/serviceaccount/token
+        Kube_Tag_Prefix     kube.var.log.containers.
+        Merge_Log           On
+        Merge_Log_Trim      On
+        Keep_Log            Off
+        K8S-Logging.Parser  On
+        K8S-Logging.Exclude Off
+        Annotations         Off
+        Labels              On
+    [FILTER]
+        Name                nest
+        Match               kube.*
+        Operation           lift
+        Nested_under        kubernetes
+        Add_prefix          kubernetes_
+    [FILTER]
+        Name                nest
+        Match               kube.*
+        Operation           lift
+        Nested_under        kubernetes_labels
+        Add_prefix          kubernetes_labels_
+    [FILTER]
+        Name    modify
+        Match   kube.*
+        Add     Zone                                           ${ZONE}
+        Add     Region                                         ${REGION}
+        Copy    kubernetes_labels_app                          k_app
+        Copy    kubernetes_container_name                      k_container
   parsers.conf: |
     [PARSER]
         Name         json
