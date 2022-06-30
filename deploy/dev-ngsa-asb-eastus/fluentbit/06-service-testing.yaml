@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: fluentbit-service-testing
+  namespace: fluentbit
+spec:
+  selector:
+    app.kubernetes.io/name: fluentbit-testing
+  ports:
+  - port: 2020
+    targetPort: 2020
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ak-jumpbox
+  namespace: fluentbit
+  labels:
+    name: ak-jumpbox
+spec:
+  containers:
+  - name: jumpbox
+    image: acraks3i2qzkkxofr7c.azurecr.io/cse-labs/jumpbox:latest
+    resources:
+      limits:
+        memory: "128Mi"
+        cpu: "500m"
