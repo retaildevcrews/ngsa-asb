@@ -489,6 +489,9 @@ fluxctl sync --k8s-fwd-ns flux-cd
 
 ```
 
+🛑 Known issue: Fluentbit is sending random duplicate logs to Log Analytics
+As mitigation action we recommend filtering out duplicates when performing queries against ingesss_CL and ngsa_CL logs.
+
 ## Deploy Grafana and Prometheus
 
 Please see Instructions to deploy Grafana and Prometheus [here](./monitoring/README.md)
