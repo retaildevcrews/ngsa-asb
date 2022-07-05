@@ -31,7 +31,7 @@ spec:
       terminationGracePeriodSeconds: 10
       containers:
         - name: fluentbit
-          image: acraks3i2qzkkxofr7c.azurecr.io/fluent/fluent-bit:1.5
+          image: acraks3i2qzkkxofr7c.azurecr.io/fluent/fluent-bit:1.9.5
           imagePullPolicy: Always
           ports:
             - name: http
@@ -41,7 +41,7 @@ spec:
             limits:
               memory: "512Mi"
               cpu: "1000m"
-            requests: 
+            requests:
               memory: "512Mi"
               cpu: "500m"
           livenessProbe:
