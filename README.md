@@ -36,7 +36,7 @@ az login --use-device-code
 
 # Verify you are in the correct subscription and you are the owner
 # Use az account set -s <sub> to change the sub if required
-# Tenant ID should be 72f988bf-86f1-41af-91ab-2d7cd011db47 
+# Tenant ID should be 72f988bf-86f1-41af-91ab-2d7cd011db47
 az account show -o table
 ```
 
@@ -47,7 +47,7 @@ az account show -o table
 export ASB_CLUSTER_ADMIN_GROUP=4-co
 
 # Verify you are a member of the security group
-# Might need to execute this line if nested groups exist. 
+# Might need to execute this line if nested groups exist.
 az ad group member list -g $ASB_CLUSTER_ADMIN_GROUP  --query [].displayName -o table
 ```
 
@@ -228,7 +228,7 @@ az deployment group create \
      spokeLocation=${ASB_SPOKE_LOCATION} \
   -c --query name
 
-# Get nodepools subnet id from spoke     
+# Get nodepools subnet id from spoke
 export ASB_NODEPOOLS_SUBNET_ID=$(az deployment group show -g $ASB_RG_SPOKE -n spoke-$ASB_ORG_APP_ID_NAME --query properties.outputs.nodepoolSubnetResourceIds.value -o tsv)
 
 # Create Region A hub network
@@ -281,7 +281,7 @@ az deployment group create -g $ASB_RG_CORE \
      nodepoolsRGName=${ASB_RG_NAME} \
      orgAppId=${ASB_ORG_APP_ID_NAME} \
      targetVnetResourceId=${ASB_SPOKE_VNET_ID} \
-     -c --query name 
+     -c --query name
 ```
 
 ### AKS Validation
@@ -455,7 +455,7 @@ NGSA Application can be deployed into the cluster using two different approaches
 
 ```bash
 # Import image into ACR
-az acr import --source docker.io/fluent/fluent-bit:1.5 -n $ASB_ACR_NAME
+az acr import --source docker.io/fluent/fluent-bit:1.9.5 -n $ASB_ACR_NAME
 
 # Create namespace
 kubectl create ns fluentbit
@@ -473,7 +473,7 @@ cp templates/fluentbit/config.yaml $ASB_GIT_PATH/fluentbit/02-config.yaml
 
 cat templates/fluentbit/config-log.yaml | envsubst > $ASB_GIT_PATH/fluentbit/03-config-log.yaml
 
-cp templates/fluentbit/role.yaml  $ASB_GIT_PATH/fluentbit/04-role.yaml  
+cp templates/fluentbit/role.yaml  $ASB_GIT_PATH/fluentbit/04-role.yaml
 
 cat templates/fluentbit/daemonset.yaml | envsubst > $ASB_GIT_PATH/fluentbit/05-daemonset.yaml
 
@@ -534,7 +534,7 @@ az network dns record-set a add-record -g $ASB_DNS_ZONE_RG -z $ASB_DNS_ZONE -n $
 export ASB_AKS_PRIVATE_IP="$ASB_SPOKE_IP_PREFIX".4.4
 az network private-dns record-set a add-record -g $ASB_RG_CORE -z $ASB_DNS_ZONE -n $ASB_APP_DNS_NAME -a $ASB_AKS_PRIVATE_IP --query fqdn
 
-# create app gateway resources 
+# create app gateway resources
 # backend pool, HTTPS listener (443), health probe, http setting and routing rule
 export ASB_APP_GW_NAME="apw-$ASB_AKS_NAME"
 
