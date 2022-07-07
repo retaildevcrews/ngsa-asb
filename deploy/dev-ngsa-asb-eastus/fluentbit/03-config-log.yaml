@@ -5,8 +5,8 @@ metadata:
   name: fluentbit-log-config
   namespace: fluentbit
 data:
-  zone: eastus
-  region: westus
+  zone: az-eastus-dev
+  region: eastus
   lodeLog: loderunner
   ngsaLog: ngsa
   istioLog: ingress
