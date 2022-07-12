@@ -48,7 +48,7 @@ data:
         Customer_ID     ${WORKSPACE_ID}
         Shared_Key      ${SHARED_KEY}
         Log_Type        ${ISTIO_LOG}
-        storage.total_limit_size  15M        
+        storage.total_limit_size  15M
   input-kubernetes.conf: |
     [INPUT]
         Name              tail

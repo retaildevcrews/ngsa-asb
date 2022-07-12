@@ -467,15 +467,15 @@ kubectl create secret generic fluentbit-secrets --from-literal=WorkspaceId=$(az 
 
 mkdir $ASB_GIT_PATH/fluentbit
 
-cp templates/fluentbit/namespace.yaml $ASB_GIT_PATH/fluentbit/01-namespace.yaml
+cp templates/fluentbit/01-namespace.yaml $ASB_GIT_PATH/fluentbit/01-namespace.yaml
 
-cp templates/fluentbit/config.yaml $ASB_GIT_PATH/fluentbit/02-config.yaml
+cp templates/fluentbit/02-config.yaml $ASB_GIT_PATH/fluentbit/02-config.yaml
 
-cat templates/fluentbit/config-log.yaml | envsubst > $ASB_GIT_PATH/fluentbit/03-config-log.yaml
+cat templates/fluentbit/03-config-log.yaml | envsubst > $ASB_GIT_PATH/fluentbit/03-config-log.yaml
 
-cp templates/fluentbit/role.yaml  $ASB_GIT_PATH/fluentbit/04-role.yaml
+cp templates/fluentbit/04-role.yaml  $ASB_GIT_PATH/fluentbit/04-role.yaml
 
-cat templates/fluentbit/daemonset.yaml | envsubst > $ASB_GIT_PATH/fluentbit/05-daemonset.yaml
+cat templates/fluentbit/05-daemonset.yaml | envsubst > $ASB_GIT_PATH/fluentbit/05-daemonset.yaml
 
 git add $ASB_GIT_PATH/fluentbit
 
