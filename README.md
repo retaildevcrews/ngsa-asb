@@ -349,7 +349,7 @@ az network dns record-set a add-record -g $ASB_DNS_ZONE_RG -z $ASB_DNS_ZONE -n "
 mkdir -p $ASB_GIT_PATH/istio
 
 # istio pod identity config
-cat templates/istio/istio-pod-identity.yaml | envsubst > $ASB_GIT_PATH/istio/istio-pod-identity-config.yaml
+cat templates/istio/istio-pod-identity-config.yaml | envsubst > $ASB_GIT_PATH/istio/istio-pod-identity-config.yaml
 
 # istio gateway config
 cat templates/istio/istio-gateway.yaml | envsubst > $ASB_GIT_PATH/istio/istio-gateway.yaml
