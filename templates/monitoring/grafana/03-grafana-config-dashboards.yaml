@@ -1,0 +1,39 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-dashboard-providers
+  namespace: monitoring
+  labels:
+    app: grafana
+data:
+  dashboardproviders.yaml: |
+    apiVersion: 1
+    providers:
+    - name: ngsa-prometheus
+      folder: NGSA
+      options:
+        path: /var/lib/grafana/dashboards/ngsa-prometheus
+      orgId: 1
+      type: file
+      disableDeletion: false
+    - name: ngsa-azure-monitor-rel
+      folder: NGSA
+      options:
+        path: /var/lib/grafana/dashboards/ngsa-az-monitor-rel
+      orgId: 1
+      type: file
+      disableDeletion: false
+    - name: ngsa-azure-monitor-perf
+      folder: NGSA
+      options:
+        path: /var/lib/grafana/dashboards/ngsa-az-monitor-perf
+      orgId: 1
+      type: file
+      disableDeletion: false      
+    - name: ngsa-azure-blocked-traffic
+      folder: NGSA
+      options:
+        path: /var/lib/grafana/dashboards/ngsa-az-blocked-traffic
+      orgId: 1
+      type: file
+      disableDeletion: false
