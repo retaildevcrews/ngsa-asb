@@ -158,6 +158,9 @@ if [ -z $INGRESS_KEY_CSMS ]; then echo "Ingress key not set correctly"; fi
 ### AAD
 
 ```bash
+# Export Subscription ID
+export ASB_SUBSCRIPTION_ID=$(az account show --query id -o tsv)
+
 # Export AAD env vars
 export ASB_TENANT_ID=$(az account show --query tenantId -o tsv)
 
@@ -324,6 +327,9 @@ export ASB_ACR_NAME=$(az deployment group show -g $ASB_RG_CORE -n cluster-${ASB_
 
 # Get Log Analytics Name
 export ASB_LA_NAME=$(az deployment group show -g $ASB_RG_CORE -n cluster-${ASB_DEPLOYMENT_NAME}-${ASB_HUB_LOCATION} --query properties.outputs.logAnalyticsName.value -o tsv)
+
+# Get Log Analytics Workspace ID
+export ASB_LA_WORKSPACE_ID=$(az monitor log-analytics workspace show -g $ASB_RG_CORE -n $ASB_LA_NAME --query customerId -o tsv)
 
 # Get the name of KeyVault
 export ASB_KV_NAME=$(az deployment group show -g $ASB_RG_CORE -n cluster-${ASB_DEPLOYMENT_NAME}-${ASB_CLUSTER_LOCATION} --query properties.outputs.keyVaultName.value -o tsv)
