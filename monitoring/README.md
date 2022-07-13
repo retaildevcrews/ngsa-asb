@@ -83,6 +83,9 @@ cat templates/monitoring/grafana/03-grafana-config-dashboards.yaml | envsubst  >
 # create AzureIdentity, AzureIdentityBinding, SecretProviderClass file
 cat templates/monitoring/grafana/04-grafana-pod-identity.yaml | envsubst  > $ASB_GIT_PATH/monitoring/grafana/04-grafana-pod-identity.yaml
 
+# IMPORTANT: dashboard yaml files are not in templates
+# create manually and place in $ASB_GIT_PATH/monitoring/grafana/dashboards
+
 # create Deployment, Service, VirtualService file
 cat templates/monitoring/grafana/05-grafana.yaml | envsubst  > $ASB_GIT_PATH/monitoring/grafana/05-grafana.yaml
 
