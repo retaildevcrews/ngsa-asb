@@ -7,11 +7,6 @@ metadata:
     app.kubernetes.io/name: ngsa-memory
 spec:
   replicas: 1
-  strategy:
-    type: RollingUpdate
-    rollingUpdate:
-      maxSurge: 1
-      maxUnavailable: 0
   selector:
     matchLabels:
       app: ngsa-memory
@@ -30,7 +25,7 @@ spec:
           - --in-memory
           - --prometheus
           - --zone
-          - az-eastus-dev
+          - az-eastus-pre
           - --region
           - eastus
           ports:
@@ -53,8 +48,8 @@ spec:
               cpu: 500m
               memory: 512Mi
             requests:
-              cpu: 250m
-              memory: 256Mi
+              cpu: 500m
+              memory: 512Mi
           securityContext:
             readOnlyRootFilesystem: true
             allowPrivilegeEscalation: false
@@ -103,7 +98,7 @@ spec:
   gateways:
   - istio-system/istio-gateway
   hosts:
-  - ngsa-memory-eastus-dev.cse.ms
+  - ngsa-memory-eastus-pre.cse.ms
   http:
   - route:
     - destination:
