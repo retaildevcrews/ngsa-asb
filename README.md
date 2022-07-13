@@ -158,6 +158,9 @@ if [ -z $INGRESS_KEY_CSMS ]; then echo "Ingress key not set correctly"; fi
 ### AAD
 
 ```bash
+# Export Subscription ID
+export ASB_SUBSCRIPTION_ID=$(az account show --query id -o tsv)
+
 # Export AAD env vars
 export ASB_TENANT_ID=$(az account show --query tenantId -o tsv)
 
@@ -325,6 +328,9 @@ export ASB_ACR_NAME=$(az deployment group show -g $ASB_RG_CORE -n cluster-${ASB_
 # Get Log Analytics Name
 export ASB_LA_NAME=$(az deployment group show -g $ASB_RG_CORE -n cluster-${ASB_DEPLOYMENT_NAME}-${ASB_HUB_LOCATION} --query properties.outputs.logAnalyticsName.value -o tsv)
 
+# Get Log Analytics Workspace ID
+export ASB_LA_WORKSPACE_ID=$(az monitor log-analytics workspace show -g $ASB_RG_CORE -n $ASB_LA_NAME --query customerId -o tsv)
+
 # Get the name of KeyVault
 export ASB_KV_NAME=$(az deployment group show -g $ASB_RG_CORE -n cluster-${ASB_DEPLOYMENT_NAME}-${ASB_CLUSTER_LOCATION} --query properties.outputs.keyVaultName.value -o tsv)
 
@@ -349,7 +355,7 @@ az network dns record-set a add-record -g $ASB_DNS_ZONE_RG -z $ASB_DNS_ZONE -n "
 mkdir -p $ASB_GIT_PATH/istio
 
 # istio pod identity config
-cat templates/istio/istio-pod-identity.yaml | envsubst > $ASB_GIT_PATH/istio/istio-pod-identity-config.yaml
+cat templates/istio/istio-pod-identity-config.yaml | envsubst > $ASB_GIT_PATH/istio/istio-pod-identity-config.yaml
 
 # istio gateway config
 cat templates/istio/istio-gateway.yaml | envsubst > $ASB_GIT_PATH/istio/istio-gateway.yaml
@@ -467,15 +473,15 @@ kubectl create secret generic fluentbit-secrets --from-literal=WorkspaceId=$(az 
 
 mkdir $ASB_GIT_PATH/fluentbit
 
-cp templates/fluentbit/namespace.yaml $ASB_GIT_PATH/fluentbit/01-namespace.yaml
+cp templates/fluentbit/01-namespace.yaml $ASB_GIT_PATH/fluentbit/01-namespace.yaml
 
-cp templates/fluentbit/config.yaml $ASB_GIT_PATH/fluentbit/02-config.yaml
+cp templates/fluentbit/02-config.yaml $ASB_GIT_PATH/fluentbit/02-config.yaml
 
-cat templates/fluentbit/config-log.yaml | envsubst > $ASB_GIT_PATH/fluentbit/03-config-log.yaml
+cat templates/fluentbit/03-config-log.yaml | envsubst > $ASB_GIT_PATH/fluentbit/03-config-log.yaml
 
-cp templates/fluentbit/role.yaml  $ASB_GIT_PATH/fluentbit/04-role.yaml
+cp templates/fluentbit/04-role.yaml  $ASB_GIT_PATH/fluentbit/04-role.yaml
 
-cat templates/fluentbit/daemonset.yaml | envsubst > $ASB_GIT_PATH/fluentbit/05-daemonset.yaml
+cat templates/fluentbit/05-daemonset.yaml | envsubst > $ASB_GIT_PATH/fluentbit/05-daemonset.yaml
 
 git add $ASB_GIT_PATH/fluentbit
 

@@ -71,11 +71,23 @@ export ASB_GRAFANA_SP_CLIENT_ID=[insert CLIENT_ID]
 export ASB_GRAFANA_SP_TENANT_ID=[insert TENANT_ID]
 export ASB_GRAFANA_MI_NAME=grafana-id
 
-# create grafana deployment file
-cat templates/monitoring/03-grafana-aad.yaml | envsubst  > $ASB_GIT_PATH/monitoring/03-grafana.yaml
+# create grafana-config config-map file
+cat templates/monitoring/grafana/01-grafana-config.yaml | envsubst  > $ASB_GIT_PATH/monitoring/grafana/01-grafana-config.yaml
 
-# create grafana pod identity deployment file
-cat templates/monitoring/04-grafana-pod-identity.yaml | envsubst  > $ASB_GIT_PATH/monitoring/04-grafana-pod-identity.yaml
+# create grafana-datasources config-map file
+cat templates/monitoring/grafana/02-grafana-config-datasources.yaml | envsubst  > $ASB_GIT_PATH/monitoring/grafana/02-grafana-config-datasources.yaml
+
+# create grafana-dashboard-providers config-map file
+cat templates/monitoring/grafana/03-grafana-config-dashboards.yaml | envsubst  > $ASB_GIT_PATH/monitoring/grafana/03-grafana-config-dashboards.yaml
+
+# create AzureIdentity, AzureIdentityBinding, SecretProviderClass file
+cat templates/monitoring/grafana/04-grafana-pod-identity.yaml | envsubst  > $ASB_GIT_PATH/monitoring/grafana/04-grafana-pod-identity.yaml
+
+# IMPORTANT: dashboard yaml files are not in templates
+# create manually and place in $ASB_GIT_PATH/monitoring/grafana/dashboards
+
+# create Deployment, Service, VirtualService file
+cat templates/monitoring/grafana/05-grafana.yaml | envsubst  > $ASB_GIT_PATH/monitoring/grafana/05-grafana.yaml
 
 ```
 
