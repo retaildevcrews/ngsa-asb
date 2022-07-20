@@ -1,7 +1,8 @@
 # ClusterAPI AKS provisioning spike
 
-This spike walks through an introductory setup of AKS provisioning with Cluster API.
-The goal is to get the [boostrap and pivot](https://cluster-api.sigs.k8s.io/clusterctl/commands/move.html?#bootstrap--pivot) process up and running, document steps for future automation, and document work items for future research and/or improvements.
+This document walks through an introductory setup of AKS provisioning with Cluster API using the [boostrap and pivot](https://cluster-api.sigs.k8s.io/clusterctl/commands/move.html?#bootstrap--pivot) process. The goal is to get up and running, document steps for future automation, and document work items for future research and/or improvements.
+
+This bootstrap and pivot setup allows for the same automation to be used to provision all clusters in the system. A separate piece of automation can then be used to target specific clusters, turning them into CLuster API management clusters.
 
 ![Bootstrap and pivot diagram](../../docs/diagrams/out/ClusterAPI-Bootstrap-Pivot.svg)
 
@@ -22,7 +23,6 @@ The goal is to get the [boostrap and pivot](https://cluster-api.sigs.k8s.io/clus
 - clusterctl [download](https://cluster-api.sigs.k8s.io/user/quick-start.html#install-clusterctl)
 - Access to existing Kubernetes cluster or ability to create a local one
   - example: k3d, kind, minikube, etc
-- Service Principal <https://capz.sigs.k8s.io/topics/getting-started.html#prerequisites>
 
 ## Using Codespaces
 
@@ -36,7 +36,7 @@ To open with codespaces:
 
 ## Bootstrap
 
-One of the desired outcomes of this spike is to use Cluster API to create the management cluster. But, Cluster API needs to run in a Kubernetes cluster. When using this repo's codespaces, K3d is used as the temoprary [bootstrap cluster](https://cluster-api.sigs.k8s.io/reference/glossary.html#bootstrap) that is responsible for creating the [management cluster](https://cluster-api.sigs.k8s.io/reference/glossary.html#management-cluster).
+One of the desired outcomes of this spike is to use Cluster API to create the management cluster, leveraging the automation in the Cluster API infrastructure provider. But, Cluster API needs to run in a Kubernetes cluster. When using this repo's codespaces, K3d is used as the temoprary [bootstrap cluster](https://cluster-api.sigs.k8s.io/reference/glossary.html#bootstrap) that is responsible for creating the [management cluster](https://cluster-api.sigs.k8s.io/reference/glossary.html#management-cluster).
 
 ### Create local bootstrap cluster
 
@@ -66,8 +66,27 @@ Setup the service principal details for Cluster API to use.
 
 ```bash
 
-# Setup identity variables.
+az login --use-device-code
+
+# verify subscription
+az account show
+
+# create service principal
 export AZURE_SUBSCRIPTION_ID="<SubscriptionId>"
+export SP_NAME="<ServicePrincipalName>"
+
+az ad sp create-for-rbac \
+  --name $SP_NAME \
+  --role contributor \
+  --scopes="/subscriptions/${AZURE_SUBSCRIPTION_ID}"
+
+```
+
+Setup environment variables.
+
+```bash
+
+# Setup identity variables.
 export AZURE_TENANT_ID="<Tenant>"
 export AZURE_CLIENT_ID="<AppId>"
 export AZURE_CLIENT_SECRET="<Password>"
@@ -330,49 +349,46 @@ kubectl --kubeconfig="$WORKLOAD_CLUSTER_KUBECONFIG_PATH" delete pod hello-world
 
 ## TODOs and follow up research
 
-TODO: cleanup and categorize into prereq, bootstrap, management, and workload categories
-
-- investigate issue where cluster's storage profile is being updated every few minutes.
+- [ ] investigate issue where cluster's storage profile is being updated every few minutes.
   - the update are alternating between adding and removing the storageProfile field from the cluster's properties
-- how to prevent accidental cluster deletes
+- [ ] how to prevent accidental cluster deletes
   - processes and permissions required to prevent user and service principal from accidentally deleting resources
-- observability into Cluster API actions and progress
+- [ ] observability into Cluster API actions and progress
   - observed cluster switching between "Succeeded(Running)" and "Updating(Running)"
-- quick start links to docs for setting up service principal. <https://capz.sigs.k8s.io/topics/getting-started.html#prerequisites>
+- [ ] quick start links to docs for setting up service principal. <https://capz.sigs.k8s.io/topics/getting-started.html#prerequisites>
   - it includes a deprecation warning with another link to recommended approach
   - > The capability to set credentials using environment variables is now deprecated and will be removed in future releases, the recommended approach is to use AzureClusterIdentity as explained [here](https://capz.sigs.k8s.io/topics/multitenancy.html)
-- customer environment has required service principal credentials be valid for a limited duration
+- [ ] customer environment has required service principal credentials be valid for a limited duration
   - a credential rotation process will be required to keep secrets in the management cluster up to date
   - how does customer currently handle secret rotation on service principals?
-- The AKS cluster is created with default Azure CNI
+- [ ] The AKS cluster is created with default Azure CNI
   - Look into using Cilium
   - there is a "spec.networkPlugin" option to control the network plugin for azuremanagedcontrolplanes.
   - need to investigate if there is an option for Bring your own CNI preview feature.
-- Add cluster to an existing vnet and subnet
-- Research other pre and post cluster create needs from customer and provide guidance
+- [ ] Add cluster to an existing vnet and subnet
+- [ ] Research other pre and post cluster create needs from customer and provide guidance
 
 ### AzureManagedMachinePool name conflict
 
-Issue when creating multiple AKS clusters using default AKS template.
-
-- MachinePool and AzureManagedMachinePool CRDs that are generated by the AKS template are hardcoded to pool0 and pool1
-- causes conflict error when k8s tries to patch immutable fields on existing AzureManagedMachinePool with the same name
-- potential solutions:
-  1. generate cluster config files in their own namespace
-  1. unique templatized metatadata.name with simple AzureManagedMachinePool.spec.name for the actual node pool name
-      - AzureManagedMachinePool has spec.name that can be set to the simple pool0 and pool1
-      - The the different pool related CRDs can have more unique metadata.name values
-      - nodepool name has specific restrictions but, these should not apply to the k8s CRD metadata.name
-      - <https://docs.microsoft.com/en-us/azure/aks/troubleshooting#what-naming-restrictions-are-enforced-for-aks-resources-and-parameters>
-  1. Look into using custom templates, yaml generation, and potentially some post processing to futher customize templates
-      - Look into using custom templates, yaml generation, and potentially some post processing to futher customize templates
-      - <https://cluster-api.sigs.k8s.io/clusterctl/commands/generate-cluster.html>
-      - <https://cluster-api.sigs.k8s.io/clusterctl/commands/generate-yaml.html>
-      - <https://cluster-api.sigs.k8s.io/clusterctl/commands/generate-cluster.html#alternative-source-for-cluster-templates>
+- [ ] Issue when creating multiple AKS clusters using default AKS template.
+  - MachinePool and AzureManagedMachinePool CRDs that are generated by the AKS template are hardcoded to pool0 and pool1
+  - causes conflict error when k8s tries to patch immutable fields on existing AzureManagedMachinePool with the same name
+  - potential solutions:
+    1. generate cluster config files in their own namespace
+    1. unique templatized metatadata.name with simple AzureManagedMachinePool.spec.name for the actual node pool name
+        - AzureManagedMachinePool has spec.name that can be set to the simple pool0 and pool1
+        - The the different pool related CRDs can have more unique metadata.name values
+        - nodepool name has specific restrictions but, these should not apply to the k8s CRD metadata.name
+        - <https://docs.microsoft.com/en-us/azure/aks/troubleshooting#what-naming-restrictions-are-enforced-for-aks-resources-and-parameters>
+    1. Look into using custom templates, yaml generation, and potentially some post processing to futher customize templates
+        - Look into using custom templates, yaml generation, and potentially some post processing to futher customize templates
+        - <https://cluster-api.sigs.k8s.io/clusterctl/commands/generate-cluster.html>
+        - <https://cluster-api.sigs.k8s.io/clusterctl/commands/generate-yaml.html>
+        - <https://cluster-api.sigs.k8s.io/clusterctl/commands/generate-cluster.html#alternative-source-for-cluster-templates>
 
 ### clusterctl move command error
 
-Error from cluster move command. This does not seem to affect the walkthrough. Investigate.
+- [ ] Error from cluster move command. This does not seem to affect the walkthrough. Investigate.
 
 ```bash
 

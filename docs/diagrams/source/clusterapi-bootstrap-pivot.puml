@@ -5,18 +5,23 @@ participant bootstrap
 participant management
 participant workload
 
-group bootstrap and pivot
+group bootstrap
   user -> bootstrap: create temporary cluster
   user -> bootstrap: initialize temporary cluster
-  user -> bootstrap: apply new cluster configs
-  bootstrap -> management: create new cluster
-  user -> management: initialize new cluster
-  user -> bootstrap: delete bootstrap cluster
+  user -> bootstrap: apply cluster configs
+  bootstrap -> management: create cluster
+end
+
+group pivot
+  user -> management: initialize cluster
+  user -> bootstrap: disable cluster api
+  bootstrap -> management: transfer any existing resources
+  user -> bootstrap: delete temporary cluster
 end
 
 group workload
-  user -> management: apply new cluster configs
-  management -> workload: create new cluster
+  user -> management: apply cluster configs
+  management -> workload: create cluster
 end
 
 @enduml
