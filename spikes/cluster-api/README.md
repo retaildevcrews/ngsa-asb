@@ -2,7 +2,7 @@
 
 This document walks through an introductory setup of AKS provisioning with Cluster API using the [boostrap and pivot](https://cluster-api.sigs.k8s.io/clusterctl/commands/move.html?#bootstrap--pivot) process. The goal is to get up and running, document steps for future automation, and document work items for future research and/or improvements.
 
-This bootstrap and pivot setup allows for the same automation to be used to provision all clusters in the system. A separate piece of automation can then be used to target specific clusters, turning them into CLuster API management clusters.
+This bootstrap and pivot process allows for the same automation to create all clusters in a uniform way through Cluster API. This includes the [management cluster]((https://cluster-api.sigs.k8s.io/reference/glossary.html#management-cluster)) itself that needs to run Cluster API. Another benefit is a clear boundry between creating a cluster, and bootstrapping it for a specific use case. After a cluster is provisioned by Cluster API, extra automation can then target specific clusters, turning them into Cluster API management clusters.
 
 ![Bootstrap and pivot diagram](../../docs/diagrams/out/ClusterAPI-Bootstrap-Pivot.svg)
 
@@ -36,7 +36,7 @@ To open with codespaces:
 
 ## Bootstrap
 
-One of the desired outcomes of this spike is to use Cluster API to create the management cluster, leveraging the automation in the Cluster API infrastructure provider. But, Cluster API needs to run in a Kubernetes cluster. When using this repo's codespaces, K3d is used as the temoprary [bootstrap cluster](https://cluster-api.sigs.k8s.io/reference/glossary.html#bootstrap) that is responsible for creating the [management cluster](https://cluster-api.sigs.k8s.io/reference/glossary.html#management-cluster).
+One of the desired outcomes of this spike is to use Cluster API to create the management cluster, leveraging the automation in the Cluster API infrastructure provider. But, Cluster API needs to run in a Kubernetes cluster. When using this repo's codespaces, K3d is used as the temoprary [bootstrap cluster](https://cluster-api.sigs.k8s.io/reference/glossary.html#bootstrap) that is responsible for creating the management cluster.
 
 ### Create local bootstrap cluster
 
@@ -230,6 +230,8 @@ kubectl --kubeconfig="$MANAGEMENT_CLUSTER_KUBECONFIG_PATH" \
 
 ```
 
+### Pivot
+
 Initialize the AKS cluster, turning it into a management cluster.
 
 ```bash
@@ -241,8 +243,6 @@ export CLUSTER_TOPOLOGY=true
 clusterctl init --kubeconfig="$MANAGEMENT_CLUSTER_KUBECONFIG_PATH" --infrastructure azure
 
 ```
-
-### Pivot
 
 Disable cluster reconciliation on the bootstrap cluster and copy any Cluster API objects.
 
