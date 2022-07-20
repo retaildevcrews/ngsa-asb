@@ -1,0 +1,22 @@
+@startuml ClusterAPI-Bootstrap-Pivot
+
+actor user
+participant bootstrap
+participant management
+participant workload
+
+group bootstrap and pivot
+  user -> bootstrap: create temporary cluster
+  user -> bootstrap: initialize temporary cluster
+  user -> bootstrap: apply new cluster configs
+  bootstrap -> management: create new cluster
+  user -> management: initialize new cluster
+  user -> bootstrap: delete bootstrap cluster
+end
+
+group workload
+  user -> management: apply new cluster configs
+  management -> workload: create new cluster
+end
+
+@enduml
