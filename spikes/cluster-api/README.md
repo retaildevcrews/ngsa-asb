@@ -10,6 +10,7 @@ This bootstrap and pivot process allows for the same automation to create all cl
 
 - Intro to Cluster API <https://cluster-api.sigs.k8s.io/introduction.html>
 - Cluster API quickstart <https://cluster-api.sigs.k8s.io/user/quick-start.html>
+- Cluster API concepts <https://cluster-api.sigs.k8s.io/user/concepts.html>
 - Bootstrap and pivot process <https://cluster-api.sigs.k8s.io/clusterctl/commands/move.html?#bootstrap--pivot>
 - Azure provider <https://capz.sigs.k8s.io/>
 - AKS support <https://capz.sigs.k8s.io/topics/managedcluster.html>
