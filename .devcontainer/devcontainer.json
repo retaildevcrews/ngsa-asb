@@ -20,8 +20,5 @@
 		"humao.rest-client"
 	],
 
-	"onCreateCommand": "/bin/bash .devcontainer/on-create.sh",
-
-	// Run Bash script in .devcontainer directory
-	"postCreateCommand": "/bin/bash .devcontainer/post-create.sh"
+	"onCreateCommand": "/bin/bash .devcontainer/on-create.sh"
 }

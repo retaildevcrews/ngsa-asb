@@ -4,7 +4,7 @@ This document walks through an introductory setup of AKS provisioning with Clust
 
 This bootstrap and pivot process allows for the same automation to create all clusters in a uniform way with Cluster API. This includes the [management cluster]((https://cluster-api.sigs.k8s.io/reference/glossary.html#management-cluster)) itself that needs to run Cluster API. Another benefit is a clear boundary between creating a cluster, and bootstrapping it for a specific use case. After a cluster is provisioned by Cluster API, extra automation can then target specific clusters, turning them into Cluster API management clusters.
 
-![Bootstrap and pivot diagram](../../docs/diagrams/out/ClusterAPI-Bootstrap-Pivot.svg)
+![Bootstrap and pivot diagram](./diagrams/out/ClusterAPI-Bootstrap-Pivot.svg)
 
 ## Helpful links
 
@@ -72,7 +72,9 @@ az login --use-device-code
 az account show
 
 # create service principal
-export AZURE_SUBSCRIPTION_ID="<SubscriptionId>"
+export AZURE_SUBSCRIPTION_ID="$(az account show --query "id" -o tsv)"
+
+# choose a name for the service principal
 export SP_NAME="<ServicePrincipalName>"
 
 az ad sp create-for-rbac \
@@ -87,10 +89,11 @@ Setup environment variables.
 ```bash
 
 # Setup identity variables.
-export AZURE_TENANT_ID="<Tenant>"
+export AZURE_TENANT_ID="$(az account show --query "tenantId" -o tsv)"
+
+# set identity and location values for this walkthrough
 export AZURE_CLIENT_ID="<AppId>"
 export AZURE_CLIENT_SECRET="<Password>"
-
 export AZURE_LOCATION="<Azure Location>"
 
 # Base64 encode the variables
