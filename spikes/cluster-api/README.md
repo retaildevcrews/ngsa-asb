@@ -329,6 +329,8 @@ clusterctl get kubeconfig \
 
 ```
 
+### Workload post-create
+
 Test some commands in the workload cluster.
 
 ```bash
@@ -358,15 +360,15 @@ kubectl --kubeconfig="$WORKLOAD_CLUSTER_KUBECONFIG_PATH" delete pod hello-world
 - [ ] quick start links to docs for setting up service principal. <https://capz.sigs.k8s.io/topics/getting-started.html#prerequisites>
   - it includes a deprecation warning with another link to recommended approach
   - > The capability to set credentials using environment variables is now deprecated and will be removed in future releases, the recommended approach is to use AzureClusterIdentity as explained [here](https://capz.sigs.k8s.io/topics/multitenancy.html)
-- [ ] customer environment has required service principal credentials be valid for a limited duration
-  - a credential rotation process will be required to keep secrets in the management cluster up to date
-  - how does customer currently handle secret rotation on service principals?
-- [ ] The AKS cluster is created with default Azure CNI
+- [ ] handle service principal credential expiration and rotation
+  - how does customer currently handle secret rotation for service principals?
+- [ ] The AKS cluster is created with default CNI
   - Look into using Cilium
   - there is a "spec.networkPlugin" option to control the network plugin for azuremanagedcontrolplanes.
   - need to investigate if there is an option for Bring your own CNI preview feature.
 - [ ] Add cluster to an existing vnet and subnet
 - [ ] Research other pre and post cluster create needs from customer and provide guidance
+- [ ] Research alternatives to Codespaces for setting up bootstrap environment
 
 ### AzureManagedMachinePool name conflict
 
