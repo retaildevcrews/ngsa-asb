@@ -1,8 +1,8 @@
-# ClusterAPI AKS provisioning spike
+# Cluster API AKS provisioning spike
 
 This document walks through an introductory setup of AKS provisioning with Cluster API using the [boostrap and pivot](https://cluster-api.sigs.k8s.io/clusterctl/commands/move.html?#bootstrap--pivot) process. The goal is to get up and running, document steps for future automation, and document work items for future research and/or improvements.
 
-This bootstrap and pivot process allows for the same automation to create all clusters in a uniform way through Cluster API. This includes the [management cluster]((https://cluster-api.sigs.k8s.io/reference/glossary.html#management-cluster)) itself that needs to run Cluster API. Another benefit is a clear boundry between creating a cluster, and bootstrapping it for a specific use case. After a cluster is provisioned by Cluster API, extra automation can then target specific clusters, turning them into Cluster API management clusters.
+This bootstrap and pivot process allows for the same automation to create all clusters in a uniform way with Cluster API. This includes the [management cluster]((https://cluster-api.sigs.k8s.io/reference/glossary.html#management-cluster)) itself that needs to run Cluster API. Another benefit is a clear boundary between creating a cluster, and bootstrapping it for a specific use case. After a cluster is provisioned by Cluster API, extra automation can then target specific clusters, turning them into Cluster API management clusters.
 
 ![Bootstrap and pivot diagram](../../docs/diagrams/out/ClusterAPI-Bootstrap-Pivot.svg)
 
