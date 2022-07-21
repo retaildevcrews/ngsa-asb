@@ -25,6 +25,9 @@ spec:
         app.kubernetes.io/name: fluentbit
       annotations:
         sidecar.istio.io/inject: "false"
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "2020"
+        prometheus.io/path: /api/v1/metrics/prometheus
     spec:
       priorityClassName: system-node-critical
       serviceAccountName: fluentbit

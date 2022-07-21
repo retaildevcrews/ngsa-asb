@@ -96,10 +96,6 @@ data:
       - job_name: 'loderunner'
         static_configs:
           - targets: [ 'loderunner.loderunner.svc.cluster.local:8080' ]
-      - job_name: 'fluentbit'
-        metrics_path: /api/v1/metrics/prometheus
-        static_configs:
-          - targets: [ 'fluentbit-api.fluentbit.svc.cluster.local:2020' ]
 
 ---
 
