@@ -23,17 +23,21 @@ To do that we have two options:
 - Or we can use another private repo and make sure our cluster can access the repo
     > This requires several extra steps and should be done for SPIKEs only
 
-For deploying using another private repo (in this case `kdevacr.azurecr.io`) couple of things to keep in mind:
+Extra steps for deploying using another private repo (in this case `kdevacr.azurecr.io`) couple of things to keep in mind:
 
 - Add the ACR's address in `rg-ngsa-asb-dev-hub/fw-policies-eastus` allow rule collection.
 - Add managed identity for the Westus2 cluster (e.g `aks-3i2qzkkxofr7c-westus2-agentpool`) to the ACR and give it `AcrPull` permissions
-- Change the repository values (13 of time) in the helm chart to point to the private repo
 - Deploy helm in `azure-arc` repo, since its in the policy exception list.
 
+Common steps:
+
+- Change the repository values (13 of time) in the helm chart to point to the proper acr repo
+- Set the Harbor Portal admin password in `helm-values.yaml` (harborAdminPassword: )
+
 Now that all of the setup is done, to deploy:
-> Default user for harbor portal is admin and password is `Harbor12345`.
+> Default user for harbor portal is admin.
 >
-> This can be changed in `helm-values.yaml` file.
+> Default password should be set in `helm-values.yaml` file defore deployment.
 
 ```bash
 # Add harbor helm repo and update
