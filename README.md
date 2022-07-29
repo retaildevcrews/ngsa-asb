@@ -7,6 +7,7 @@
 * [Create Deployment Files](#create-deployment-files)
 * [Deploy Flux](#deploy-flux)
 * [Deploying NGSA Applications](#deploying-ngsa-applications)
+* [Deploying LodeRunner Applications](#deploying-loderunner-applications)
 * [Deploy Fluent Bit](#deploy-fluent-bit)
 * [Deploy Grafana and Prometheus](#deploy-grafana-and-prometheus)
 * [Leveraging Subdomains for App Endpoints](#leveraging-subdomains-for-app-endpoints)
@@ -452,6 +453,54 @@ az keyvault set-policy -n $ASB_KV_NAME --object-id $ASB_NGSA_MI_PRINCIPAL_ID --s
 NGSA Application can be deployed into the cluster using two different approaches:
 
 * [Deploy using yaml with FluxCD](./docs/deployNgsaYaml.md)
+
+* [Deploy using AutoGitops with FluxCD](https://github.com/bartr/autogitops)
+
+  * AutoGitOps is reccomended for a full CI/CD integration. For this approach the application repository must be autogitops enabled.
+
+## Deploying LodeRunner Applications
+
+### 🛑 Prerequisite - [Setup Cosmos DB in secure baseline.](./docs/cosmos.md)
+
+### Create managed identity for LodeRunner app
+
+```bash
+
+# Create managed identity for loderunner-app
+export ASB_LR_MI_NAME="${ASB_DEPLOYMENT_NAME}-loderunner-id"
+
+export ASB_LR_MI_RESOURCE_ID=$(az identity create -g $ASB_RG_CORE -n $ASB_LR_MI_NAME --query "id" -o tsv)
+
+# save env vars
+./saveenv.sh -y
+
+```
+
+### AAD pod identity setup for loderunner-app
+
+```bash
+
+# allow cluster to manage app identity for aad pod identity
+export ASB_AKS_IDENTITY_ID=$(az aks show -g $ASB_RG_CORE -n $ASB_AKS_NAME --query "identityProfile.kubeletidentity.objectId" -o tsv)
+
+az role assignment create --role "Managed Identity Operator" --assignee $ASB_AKS_IDENTITY_ID --scope $ASB_LR_MI_RESOURCE_ID
+
+# give app identity read access to secrets in keyvault
+export ASB_LR_MI_PRINCIPAL_ID=$(az identity show -n $ASB_LR_MI_NAME -g $ASB_RG_CORE --query "principalId" -o tsv)
+
+az keyvault set-policy -n $ASB_KV_NAME --object-id $ASB_LR_MI_PRINCIPAL_ID --secret-permissions get
+
+# Add to KeyVault
+az keyvault secret set -o table --vault-name $ASB_KV_NAME --name "CosmosLRDatabase" --value "LodeRunnerDB"
+az keyvault secret set -o table --vault-name $ASB_KV_NAME --name "CosmosLRCollection" --value "LodeRunner"
+
+# save env vars
+./saveenv.sh -y
+```
+
+LodeRunner Application can be deployed into the cluster using two different approaches:
+
+* [Deploy using yaml with FluxCD](./docs/deployLodeRunnerYaml.md)
 
 * [Deploy using AutoGitops with FluxCD](https://github.com/bartr/autogitops)
 
