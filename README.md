@@ -577,7 +577,7 @@ A better approach would be to use a unique subdomain for each app instance. The 
 
 # app DNS name, in subdomain format
 # format [app]-[region]-[env].cse.ms
-export ASB_APP_NAME=ngsa-cosmos
+export ASB_APP_NAME=[application-name] # e.g: ngsa-cosmos, ngsa-java, ngsa-memory, loderunner-api, loderunner-ui.
 export ASB_APP_DNS_NAME=${ASB_APP_NAME}-${ASB_SPOKE_LOCATION}-${ASB_ENV}
 export ASB_APP_DNS_FULL_NAME=${ASB_APP_DNS_NAME}.${ASB_DNS_ZONE}
 export ASB_APP_HEALTH_ENDPOINT="/healthz"
