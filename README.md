@@ -715,3 +715,28 @@ az aks disable-addons --addons azure-policy -g $ASB_RG_CORE -n $ASB_AKS_NAME
 # delete your AKS cluster (keep your network)
 az deployment group delete -g $ASB_RG_CORE -n cluster-${ASB_DEPLOYMENT_NAME}
 ```
+
+### Run Checkov scan
+
+- Navigate to `Codespaces main menu` (top left icon with three horizontal lines)
+- Click on `Terminal` menu item, then `Run Task`
+- From tasks menu locate `Run Checkov Scan` and click on it
+- Task terminal will show up executing substasks and indicating when scan completed
+- Scan results file `checkov_scan_results` will be created at root level, and automatically will get open by VSCode
+- Review the file and evaluate failed checks. For instance:
+
+```bash
+  kubernetes scan results:
+
+  Passed checks: 860, Failed checks: 146, Skipped checks: 0
+  ...
+  ...
+
+  dockerfile scan results:
+
+  Passed checks: 22, Failed checks: 4, Skipped checks: 0
+
+  ...
+  ...
+
+```
