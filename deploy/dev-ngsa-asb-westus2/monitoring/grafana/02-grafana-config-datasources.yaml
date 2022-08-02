@@ -1,4 +1,3 @@
----
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -20,14 +19,14 @@ data:
               "basicAuth": false,
               "isDefault": true,
               "jsonData": {
-                "azureLogAnalyticsSameAs": true,
-                "clientId": "d26fa2ad-c0c1-42ce-8989-6a8c5d207e06",
-                "cloudName": "azuremonitor",
-                "logAnalyticsClientId": "d26fa2ad-c0c1-42ce-8989-6a8c5d207e06",
-                "logAnalyticsDefaultWorkspace": "6e15e078-3857-48e1-b64c-9791741a5968",
-                "logAnalyticsTenantId": "72f988bf-86f1-41af-91ab-2d7cd011db47",
-                "subscriptionId": "648dcb5a-de1e-48b2-af6b-fe6ef28d355c",
-                "tenantId": "72f988bf-86f1-41af-91ab-2d7cd011db47"
+                  "azureLogAnalyticsSameAs": true,
+                  "clientId": "d26fa2ad-c0c1-42ce-8989-6a8c5d207e06",
+                  "cloudName": "azuremonitor",
+                  "logAnalyticsClientId": "d26fa2ad-c0c1-42ce-8989-6a8c5d207e06",
+                  "logAnalyticsDefaultWorkspace": "128a9fb0-cbb6-4730-8a8b-1c540b62315c",
+                  "logAnalyticsTenantId": "72f988bf-86f1-41af-91ab-2d7cd011db47",
+                  "subscriptionId": "648dcb5a-de1e-48b2-af6b-fe6ef28d355c",
+                  "tenantId": "72f988bf-86f1-41af-91ab-2d7cd011db47"
               },
               "secureJsonData": {
                 "clientSecret": $AZURE_MONITOR_CLIENT_SECRET

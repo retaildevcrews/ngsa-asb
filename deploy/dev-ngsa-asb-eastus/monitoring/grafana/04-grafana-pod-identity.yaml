@@ -6,7 +6,7 @@ metadata:
 spec:
   type: 0
   resourceID: /subscriptions/648dcb5a-de1e-48b2-af6b-fe6ef28d355c/resourcegroups/rg-ngsa-asb-dev/providers/Microsoft.ManagedIdentity/userAssignedIdentities/ngsa-asb-ngsa-id
-  clientID: b8d1820f-82a9-44ad-95c3-a1874dffe426
+  clientID: ed1c4c70-e050-48c6-b864-ea1f8695054e
 
 ---
 

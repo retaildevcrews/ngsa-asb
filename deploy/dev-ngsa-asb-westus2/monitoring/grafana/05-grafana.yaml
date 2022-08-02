@@ -71,7 +71,7 @@ spec:
             limits:
               memory: "512Mi"
               cpu: "1000m"
-            requests: 
+            requests:
               memory: "512Mi"
               cpu: "500m"
           securityContext:
@@ -96,6 +96,8 @@ spec:
               mountPath: /var/lib/grafana/dashboards/ngsa-az-monitor-rel
             - name: dashboards-ngsa-az-monitor-perf
               mountPath: /var/lib/grafana/dashboards/ngsa-az-monitor-perf
+            - name: dashboards-ngsa-az-blocked-traffic
+              mountPath: /var/lib/grafana/dashboards/ngsa-az-blocked-traffic
             - name: grafana-secrets
               mountPath: /mnt/secrets
               readOnly: true
@@ -118,6 +120,9 @@ spec:
         - name: dashboards-ngsa-az-monitor-perf
           configMap:
             name: grafana-dashboards-ngsa-az-monitor-perf
+        - name: dashboards-ngsa-az-blocked-traffic
+          configMap:
+            name: grafana-dashboards-ngsa-az-blocked-traffic
         - name: grafana-secrets
           csi:
             driver: secrets-store.csi.k8s.io
@@ -157,4 +162,3 @@ spec:
         port:
           number: 3000
         host: grafana
-  

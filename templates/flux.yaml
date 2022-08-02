@@ -72,7 +72,7 @@ spec:
           defaultMode: 0400
       containers:
       - name: flux
-        image: docker.io/fluxcd/flux:1.21.1
+        image: docker.io/fluxcd/flux:1.25.3
         imagePullPolicy: IfNotPresent
         securityContext:
           capabilities:

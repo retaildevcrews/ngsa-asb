@@ -6,7 +6,7 @@ metadata:
   namespace: loderunner
 spec:
   type: 0
-  resourceID: /subscriptions/72f988bf-86f1-41af-91ab-2d7cd011db47/resourcegroups/rg-ngsa-asb-dev/providers/Microsoft.ManagedIdentity/userAssignedIdentities/ngsa-asb-loderunner-id
+  resourceID: /subscriptions/648dcb5a-de1e-48b2-af6b-fe6ef28d355c/resourcegroups/rg-ngsa-asb-dev/providers/Microsoft.ManagedIdentity/userAssignedIdentities/ngsa-asb-loderunner-id
   clientID: 1fab1cae-3611-4c4e-8836-4e1002f791e9
 
 ---
@@ -69,4 +69,4 @@ spec:
         - |
           objectName: CosmosUrl
           objectType: secret
-    tenantId: 72f988bf-86f1-41af-91ab-2d7cd011db47
+    tenantId: "72f988bf-86f1-41af-91ab-2d7cd011db47"
