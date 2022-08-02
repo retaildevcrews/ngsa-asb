@@ -1,0 +1,40 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: test-extension
+spec:
+  selector:
+    matchLabels:
+      app: test-extension
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: test-extension
+    spec:
+      containers:
+      - command:
+        - /extension
+        image: k3d-registry.localhost:5000/capi-ext
+        name: extension
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 9443
+          name: webhook-server
+          protocol: TCP
+        volumeMounts:
+        - mountPath: /tmp/k8s-webhook-server/serving-certs
+          name: cert
+          readOnly: true
+      volumes:
+      - name: cert
+        secret:
+          secretName: webhook-service-cert
+      terminationGracePeriodSeconds: 10
+      serviceAccountName: test-extension
+      tolerations:
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/master
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/control-plane
