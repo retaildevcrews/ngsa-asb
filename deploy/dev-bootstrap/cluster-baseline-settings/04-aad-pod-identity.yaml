@@ -577,6 +577,15 @@ spec:
             port: 8085
           initialDelaySeconds: 10
           periodSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 8085
+          initialDelaySeconds: 10
+          periodSeconds: 5
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
       nodeSelector:
         kubernetes.io/os: linux
         agentpool: npuser01
@@ -617,6 +626,10 @@ spec:
           - "--logtostderr"
         securityContext:
           runAsUser: 0
+          capabilities:
+            drop:
+              - ALL
+          readOnlyRootFilesystem: true
         env:
         - name: MIC_POD_NAMESPACE
           valueFrom:
@@ -639,6 +652,15 @@ spec:
             port: 8080
           initialDelaySeconds: 10
           periodSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 5
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
       volumes:
       - name: k8s-azure-file
         hostPath:
