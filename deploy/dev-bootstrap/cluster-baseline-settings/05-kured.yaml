@@ -129,6 +129,10 @@ spec:
               memory: 16Mi
           securityContext:
             privileged: true # Give permission to nsenter /proc/1/ns/mnt
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
           env:
             - name: KURED_NODE_ID
               valueFrom:
@@ -168,3 +172,6 @@ spec:
 #            - --annotate-nodes=false
 #            - --lock-release-delay=30m
 #            - --log-format=text
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
