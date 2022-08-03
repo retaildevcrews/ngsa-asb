@@ -1,6 +1,7 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
+  namespace: monitoring
   name: prometheus-pv
   labels:
     type: local
@@ -16,6 +17,7 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
+  namespace: monitoring
   name: prometheus-pvc-host
 spec:
   storageClassName: host-pv
