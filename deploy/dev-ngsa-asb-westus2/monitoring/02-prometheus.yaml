@@ -1,34 +1,4 @@
 apiVersion: v1
-kind: PersistentVolume
-metadata:
-  namespace: monitoring
-  name: prometheus-pv
-  labels:
-    type: local
-spec:
-  storageClassName: host-pv
-  capacity:
-    storage: 5Gi
-  accessModes:
-    - ReadWriteOnce
-  hostPath:
-    path: "/mnt/prometheus-data"
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  namespace: monitoring
-  name: prometheus-pvc-host
-spec:
-  storageClassName: host-pv
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 4Gi
----
-
-apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: prometheus-pvc
@@ -243,7 +213,7 @@ spec:
             name: prometheus-server-conf
         - name: prometheus-storage-volume
           persistentVolumeClaim:
-            claimName: prometheus-pvc-host
+            claimName: prometheus-pvc
 
 ---
 
