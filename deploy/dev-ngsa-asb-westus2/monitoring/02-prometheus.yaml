@@ -1,4 +1,32 @@
 apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: prometheus-pv
+  labels:
+    type: local
+spec:
+  storageClassName: host-pv
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/mnt/prometheus-data"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: prometheus-pvc-host
+spec:
+  storageClassName: host-pv
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 4Gi
+---
+
+apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: prometheus-pvc
@@ -96,6 +124,21 @@ data:
       - job_name: 'loderunner'
         static_configs:
           - targets: [ 'loderunner.loderunner.svc.cluster.local:8080' ]
+      - job_name: 'fluentbit'
+        metrics_path: /api/v1/metrics/prometheus
+        kubernetes_sd_configs:
+        - role: pod
+          namespaces:
+            names:
+            - fluentbit
+          selectors:
+            - role: "pod"
+              label: "app.kubernetes.io/name=fluentbit"
+              field: "status.phase=Running"
+        relabel_configs:
+        - source_labels: [ __meta_kubernetes_pod_name ]
+          action: replace
+          target_label: instance
 
 ---
 
@@ -126,6 +169,7 @@ spec:
       labels:
         app: prometheus-server
     spec:
+      serviceAccountName: prometheus
       containers:
         - name: prometheus
           image: acraks3i2qzkkxofr7c.azurecr.io/prom/prometheus:v2.30.0
@@ -197,7 +241,7 @@ spec:
             name: prometheus-server-conf
         - name: prometheus-storage-volume
           persistentVolumeClaim:
-            claimName: prometheus-pvc
+            claimName: prometheus-pvc-host
 
 ---
 
