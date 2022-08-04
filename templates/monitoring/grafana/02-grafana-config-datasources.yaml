@@ -23,7 +23,7 @@ data:
                   "clientId": "$ASB_GRAFANA_SP_CLIENT_ID",
                   "cloudName": "azuremonitor",
                   "logAnalyticsClientId": "$ASB_GRAFANA_SP_CLIENT_ID",
-                  "logAnalyticsDefaultWorkspace": "ASB_LA_WORKSPACE_ID",
+                  "logAnalyticsDefaultWorkspace": "$ASB_LA_WORKSPACE_ID",
                   "logAnalyticsTenantId": "$ASB_TENANT_ID",
                   "subscriptionId": "$ASB_SUBSCRIPTION_ID",
                   "tenantId": "$ASB_TENANT_ID"

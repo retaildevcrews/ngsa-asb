@@ -263,7 +263,7 @@ export ASB_CLUSTER_GEO_LOCATION=westus
 # This section takes 15-20 minutes
 
 # Set Kubernetes Version
-export ASB_K8S_VERSION=1.21.7
+export ASB_K8S_VERSION=1.23.8
 
 # Create AKS
 az deployment group create -g $ASB_RG_CORE \
