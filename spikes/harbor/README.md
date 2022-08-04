@@ -9,30 +9,56 @@
 - Create a public dns entry `harbor-core-westus2-dev.cse.ms` in `dns-rg/cse.ms` and put the public ip for WestUS2 dev cluster
 - Add below settings for harbor (similar to ngsa apps) in Application Gateway:
   - Backend pool
-  - Backend settings (with no custom probes, that we don't have to configure probes)
+  - Backend settings
+    - [Optional] For a probe use `/api/v2.0/health` endpoint
   - Listeners (http and https)
   - Rules (http and https)
-- Add an exception for the harbor-host in the WAF policy (e.g. for WestUS2-dev you'll add it in `rg-ngsa-asb-dev/ngsa-asb-waf-policy-westus2`)
+- [Optional] Add an exception for the harbor-host in the WAF policy (e.g. for WestUS2-dev you'll add it in `rg-ngsa-asb-dev/ngsa-asb-waf-policy-westus2`)
 
 At this point Harbor should be ready to deploy.
-Now we need to make sure our cluste can pull the container images.
+Now we need to make sure our cluster can pull the container images.
 To do that we have two options:
 
 - We can push Harbor images into our cluster acr repo (`rg-ngsa-asb-dev/acraks3i2qzkkxofr7c`)
     > This is easier and preferable for pre-prod and dev clusters
-- Or we can use another private repo and make sure our cluster can access the repo
+  - Goto your private acr instance, and click on `Networking`
+  - Check `Add you client IP address` and save
+- **Or** we can use another private repo and make sure our cluster can access the repo.
     > This requires several extra steps and should be done for SPIKEs only
+  - Add the ACR's address in `rg-ngsa-asb-dev-hub/fw-policies-eastus` allow rule collection.
+  - Add managed identity for the Westus2 cluster (e.g `aks-3i2qzkkxofr7c-westus2-agentpool`) to the ACR and give it `AcrPull` permissions
+  - Must deploy the helm in `azure-arc` repo, since its in the policy exception list.
 
-Extra steps for deploying using another private repo (in this case `kdevacr.azurecr.io`) couple of things to keep in mind:
+Now push all required harbor images to the ACR with `az acr import` command.
 
-- Add the ACR's address in `rg-ngsa-asb-dev-hub/fw-policies-eastus` allow rule collection.
-- Add managed identity for the Westus2 cluster (e.g `aks-3i2qzkkxofr7c-westus2-agentpool`) to the ACR and give it `AcrPull` permissions
-- Deploy helm in `azure-arc` repo, since its in the policy exception list.
+  ```bash
+  # Select proper subscription for your ACR and login to the account
+  az account set -s "jofultz-wcnp" --output table
+  az login --scope https://management.core.windows.net//.default
+  # Now push images to the ACR
+  ## Here we're using docker image TAG v2.5.3 and ACR acraks3i2qzkkxofr7c
+  az acr import --source docker.io/goharbor/chartmuseum-photon:v2.5.3 -n acraks3i2qzkkxofr7c
+  az acr import --source docker.io/goharbor/harbor-core:v2.5.3 -n acraks3i2qzkkxofr7c
+  az acr import --source docker.io/goharbor/harbor-db:v2.5.3 -n acraks3i2qzkkxofr7c
+  az acr import --source docker.io/goharbor/harbor-exporter:v2.5.3 -n acraks3i2qzkkxofr7c
+  az acr import --source docker.io/goharbor/harbor-jobservice:v2.5.3 -n acraks3i2qzkkxofr7c
+  az acr import --source docker.io/goharbor/harbor-portal:v2.5.3 -n acraks3i2qzkkxofr7c
+  az acr import --source docker.io/goharbor/harbor-registryctl:v2.5.3 -n acraks3i2qzkkxofr7c
+  az acr import --source docker.io/goharbor/nginx-photon:v2.5.3 -n acraks3i2qzkkxofr7c
+  az acr import --source docker.io/goharbor/notary-server-photon:v2.5.3 -n acraks3i2qzkkxofr7c
+  az acr import --source docker.io/goharbor/notary-signer-photon:v2.5.3 -n acraks3i2qzkkxofr7c
+  az acr import --source docker.io/goharbor/redis-photon:v2.5.3 -n acraks3i2qzkkxofr7c
+  az acr import --source docker.io/goharbor/registry-photon:v2.5.3 -n acraks3i2qzkkxofr7c
+  az acr import --source docker.io/goharbor/trivy-adapter-photon:v2.5.3 -n acraks3i2qzkkxofr7c
+  ```
 
 Common steps:
 
-- Change the repository values (13 of time) in the helm chart to point to the proper acr repo
-- Set the Harbor Portal admin password in `helm-values.yaml` (harborAdminPassword: )
+- In [helm-values.yaml](./helm-values.yaml):
+  - Change the repository and tag values (13 of them) to point to the proper acr repo and tag
+  - Set the Harbor Portal admin password (harborAdminPassword: )
+- In [harbor-virtual-svc.yaml](./harbor-virtual-svc.yaml)
+  - In k8s if deploying to a different namespace than `azure-arc`, change the namespace
 
 Now that all of the setup is done, to deploy:
 > Default user for harbor portal is admin.
@@ -50,7 +76,8 @@ helm repo update
 ## <NOTE>: In that case, make sure you change the repository from kdevacr.azurecr.io/ to proper ACR name 
 helm install -f helm-values.yaml harbor harbor/harbor -n azure-arc --create-namespace
 
-# Be sure to change the namespace in harbor-virtual-svc.yaml file
+## Be sure to change the namespace in harbor-virtual-svc.yaml file
+## ^^^^^^^
 kubectl apply -f harbor-virtual-svc.yaml
 ```
 
@@ -78,7 +105,7 @@ Follow the steps below (based on [installation config](https://goharbor.io/docs/
 
     ```bash
     # Here replace $HARBOR_PATH with the extracted dir path
-    ./gen-multi-domain-certs.bash --cert-path ${HARBOR_PATH} --cert-prefix harbor-ssl -san 127.0.0.1,localhost,harboar.core.local,harbor.notary.local,harboar.local
+    ./gen-multi-domain-certs.bash --cert-path ${HARBOR_PATH} --cert-prefix harbor-ssl -san 127.0.0.1,localhost,harboar.core.local,harbor.notary.local,harbor.local
     ```
 
 5. Change `certificate` and `private_key` entry in `harbor.yml` file and point to `$HARBOR_PATH/harbor-ssl.crt` and `$HARBOR_PATH/harbor-ssl.key`.
