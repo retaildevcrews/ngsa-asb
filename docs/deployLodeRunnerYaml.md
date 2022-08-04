@@ -58,7 +58,7 @@ kubectl logs deployment/loderunner -n loderunner
 
 ### Configure App Subdomain Endpoints
 
-You will need to manually setup the endpoints for the `loderunner-ui` and `loderunner-api` apps. Follow the steps in the [subdomain setup guide](../README.md#create-a-subdomain-endpoint) for each application endpoint to setup.
+You will need to manually setup the endpoints for the `loderunner` app. Follow the steps in the [subdomain setup guide](../README.md#create-a-subdomain-endpoint) for each application endpoint to setup.
 
 ### Validate
 
@@ -69,7 +69,7 @@ You will need to manually setup the endpoints for the `loderunner-ui` and `loder
 kubectl get pods -n loderunner
 kubectl get pods -n istio-system
 
-http https://loderunner-ui-${ASB_DOMAIN_SUFFIX}
-http https://loderunner-api-${ASB_DOMAIN_SUFFIX}/api
+http https://loderunner-${ASB_DOMAIN_SUFFIX}
+http https://loderunner-${ASB_DOMAIN_SUFFIX}/api
 
 ```

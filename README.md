@@ -577,7 +577,7 @@ A better approach would be to use a unique subdomain for each app instance. The 
 
 # app DNS name, in subdomain format
 # format [app]-[region]-[env].cse.ms
-export ASB_APP_NAME=[application-name] # e.g: ngsa-cosmos, ngsa-java, ngsa-memory, loderunner-api, loderunner-ui.
+export ASB_APP_NAME=[application-name] # e.g: ngsa-cosmos, ngsa-java, ngsa-memory, loderunner.
 export ASB_APP_DNS_NAME=${ASB_APP_NAME}-${ASB_SPOKE_LOCATION}-${ASB_ENV}
 export ASB_APP_DNS_FULL_NAME=${ASB_APP_DNS_NAME}.${ASB_DNS_ZONE}
 export ASB_APP_HEALTH_ENDPOINT="/healthz"
@@ -609,9 +609,18 @@ az network application-gateway http-settings create -g $ASB_RG_CORE --gateway-na
   -n "$ASB_APP_DNS_NAME-httpsettings" --port 443 --protocol Https --cookie-based-affinity Disabled --connection-draining-timeout 0 \
   --timeout 20 --host-name-from-backend-pool true --enable-probe --probe "probe-$ASB_APP_DNS_NAME"
 
+export MAX_RULE_PRIORITY=$(az network application-gateway rule list -g $ASB_RG_CORE --gateway-name $ASB_APP_GW_NAME --query "max([].priority)")
+
+export ABS_HTTPSETTINGS_RULE_PRIORITY=$(($MAX_RULE_PRIORITY+1))
+
+# Verify that the new prority is correct.
+echo $ABS_HTTPSETTINGS_RULE_PRIORITY
+
 az network application-gateway rule create -g $ASB_RG_CORE --gateway-name $ASB_APP_GW_NAME \
   -n "$ASB_APP_DNS_NAME-routing-rule" --address-pool $ASB_APP_DNS_FULL_NAME \
-  --http-settings "$ASB_APP_DNS_NAME-httpsettings" --http-listener "listener-$ASB_APP_DNS_NAME"
+  --http-settings "$ASB_APP_DNS_NAME-httpsettings" --http-listener "listener-$ASB_APP_DNS_NAME" --priority $ABS_HTTPSETTINGS_RULE_PRIORITY 
+
+🛑 Note: If the command 'az network application-gateway rule create' fails due to priority value already been used, please refer to Azure portal in order to identify a priority that does not exist yet.
 
 # set http redirection
 # create listener for HTTP (80), HTTPS redirect config and HTTPS redirect routing rule
@@ -622,9 +631,17 @@ az network application-gateway redirect-config create -g $ASB_RG_CORE --gateway-
   -n "https-redirect-config-$ASB_APP_DNS_NAME" -t "Permanent" --include-path true \
   --include-query-string true --target-listener "listener-$ASB_APP_DNS_NAME"
 
+export MAX_RULE_PRIORITY=$(az network application-gateway rule list -g $ASB_RG_CORE --gateway-name $ASB_APP_GW_NAME --query "max([].priority)")
+
+export ABS_HTTPS_REDIRECT_RULE_PRIORITY=$(($MAX_RULE_PRIORITY+1))
+
+# Verify that the new prority is correct.
+echo $ABS_HTTPS_REDIRECT_RULE_PRIORITY
+
 az network application-gateway rule create -g $ASB_RG_CORE --gateway-name $ASB_APP_GW_NAME \
   -n "https-redirect-$ASB_APP_DNS_NAME-routing-rule" --http-listener "http-listener-$ASB_APP_DNS_NAME" \
-  --redirect-config "https-redirect-config-$ASB_APP_DNS_NAME"
+  --redirect-config "https-redirect-config-$ASB_APP_DNS_NAME" --priority $ABS_HTTPS_REDIRECT_RULE_PRIORITY
+
 ```
 
 ## Deploy WASM sidecar filter
