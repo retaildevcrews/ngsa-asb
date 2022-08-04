@@ -16,7 +16,7 @@ spec:
       containers:
       - command:
         - /extension
-        image: k3d-registry.localhost:5000/capi-ext
+        image: localhost:5000/capi-ext
         name: extension
         imagePullPolicy: Always
         ports:

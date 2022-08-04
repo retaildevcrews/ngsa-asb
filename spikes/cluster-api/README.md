@@ -50,6 +50,8 @@ mkdir -p ./spikes/cluster-api/capi-configs
 # see Makefile for more info
 make create
 
+# kind create cluster --config ./spikes/cluster-api/extension/kind-cluster-with-extramounts.yaml
+
 ```
 
 Verify cluster creation.
@@ -129,8 +131,10 @@ Initilize bootstrap cluster with Azure [provider](https://cluster-api.sigs.k8s.i
 export EXP_AKS=true
 export EXP_MACHINE_POOL=true
 export CLUSTER_TOPOLOGY=true
+export EXP_CLUSTER_RESOURCE_SET=true
+export EXP_RUNTIME_SDK=true
 
-clusterctl init --infrastructure azure
+clusterctl init --infrastructure azure,docker
 
 ```
 
@@ -149,6 +153,8 @@ export AZURE_NODE_MACHINE_TYPE="Standard_D2s_v3"
 export BASE_CAPI_CONFIG_DIR="./spikes/cluster-api/capi-configs"
 export MANAGEMENT_CLUSTER_YAML_PATH="${BASE_CAPI_CONFIG_DIR}/capi-quickstart-management.yaml"
 export MANAGEMENT_CLUSTER_KUBECONFIG_PATH="${BASE_CAPI_CONFIG_DIR}/capi-quickstart-management.kubeconfig"
+
+export DOCKER_CLUSTER_YAML_PATH="${BASE_CAPI_CONFIG_DIR}/capi-quickstart-docker.yaml"
 
 ```
 
@@ -172,12 +178,45 @@ Generate AKS cluster configuration yaml files.
 
 ```bash
 
+# # deploy the extension to the management cluster
+# kubectl apply -f spikes/cluster-api/extension/deploy
+
+# # wait for test-extension pod to be running
+# kubectl wait --for=condition=Ready -l app=test-extension
+
+# # deploy the extension configuration so it can be registered with the capi controller
+# kubectl apply -f spikes/cluster-api/extension/extension-config.yaml
+
+# check if k3d is already in there
+cat /etc/hosts | grep registry
+
+# if it is not there, append to file
+echo "127.0.0.1 k3d-registry.localhost" | sudo tee -a /etc/hosts
+# double check that it was updated
+cat /etc/hosts | grep registry
+
+make build-extension
+
+make deploy-extension
+
+rm "$MANAGEMENT_CLUSTER_YAML_PATH"
+rm "$DOCKER_CLUSTER_YAML_PATH"
+
 clusterctl generate cluster capi-quickstart-management \
   --kubernetes-version v1.24.0 \
-  --control-plane-machine-count=3 \
-  --worker-machine-count=3 \
+  --control-plane-machine-count=1 \
+  --worker-machine-count=1 \
   --flavor=aks \
+  --infrastructure=azure \
   > "$MANAGEMENT_CLUSTER_YAML_PATH"
+
+clusterctl generate cluster capi-quickstart-docker \
+  --kubernetes-version v1.24.0 \
+  --control-plane-machine-count=1 \
+  --worker-machine-count=1 \
+  --flavor development \
+  --infrastructure=docker \
+  > "$DOCKER_CLUSTER_YAML_PATH"
 
 ```
 
@@ -188,6 +227,8 @@ Apply config files to bootstrap cluster.
 ```bash
 
 kubectl apply -f "$MANAGEMENT_CLUSTER_YAML_PATH"
+
+kubectl apply -f "$DOCKER_CLUSTER_YAML_PATH"
 
 ```
 
@@ -405,5 +446,36 @@ Moving Cluster API objects ClusterClasses=0
 Creating objects in the target cluster
 Deleting objects from the source cluster
 Error: action failed after 10 attempts: error deleting "infrastructure.cluster.x-k8s.io/v1beta1, Kind=AzureManagedMachinePool" default/pool0: admission webhook "validation.azuremanagedmachinepools.infrastructure.cluster.x-k8s.io" denied the request: if the delete is triggered via owner MachinePool please refer to trouble shooting section in https://capz.sigs.k8s.io/topics/managedcluster.html: AKS Cluster must have at least one system pool
+
+```
+
+## other
+
+```bash
+
+# building and pushing extension
+
+# export REGISTRY="k3d-registry.localhost:5000"
+
+# export REGISTRY="localhost:5000"
+
+# check if k3d is already in there
+cat /etc/hosts | grep registry
+
+# if it is not there, append to file
+echo "127.0.0.1 k3d-registry.localhost" | sudo tee -a /etc/hosts
+# double check that it was updated
+cat /etc/hosts | grep registry
+
+# DOCKER_BUILDKIT=1 docker build ./spikes/cluster-api/extension \
+#   -f ./spikes/cluster-api/extension/Dockerfile \
+#   --build-arg builder_image=golang:1.17.2 \
+#   -t k3d-registry.localhost:5000/capi-ext \
+#   -t localhost:5001/capi-ext
+
+# docker push k3d-registry.localhost:5000/capi-ext
+# docker push localhost:5001/capi-ext
+
+make build-extension
 
 ```
