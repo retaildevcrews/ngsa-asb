@@ -58,7 +58,7 @@ Common steps:
   - Change the repository and tag values (13 of them) to point to the proper acr repo and tag
   - Set the Harbor Portal admin password (harborAdminPassword: )
 - In [harbor-virtual-svc.yaml](./harbor-virtual-svc.yaml)
-  - In k8s if deploying to a different namespace than `azure-arc`, change the namespace
+  - In k8s if deploying to a different namespace than `harbor`, change the namespace
 
 Now that all of the setup is done, to deploy:
 > Default user for harbor portal is admin.
