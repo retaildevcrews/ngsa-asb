@@ -614,6 +614,84 @@ http https://ngsa-cosmos-$ASB_DOMAIN_SUFFIX/healthz
 
 ```
 
+## Deploy Harbor
+
+> The steps below are guidelines for the dev cluster, but is replicable for the pre-prod as well
+
+* Create a dns entry for Harbor (e.g. `harbor-core-westus2-dev` for WestUS2)
+  in `rg-ngsa-asb-dev/cse.ms` private dns and put the LoadBalancer IP address for the region.
+  * You can find LoadBalancer for your cluster under `rg-ngsa-asb-dev-nodepools-{REGION}`
+  * Or you can check existing dns entries for same region
+* Create a public dns entry (e.g. `harbor-core-westus2-dev` for WestUS2)
+  in `dns-rg/cse.ms` and put the public ip for the regional cluster
+  * You can find the public IP in Application Gateway for the cluster
+    (e.g `rg-ngsa-asb-dev/apw-aks-{HASH}-{REGION}` )
+  * Or you can check existing dns entries for same region
+* Add the settings below for Harbor (similar to NGSA apps) in Application Gateway:
+  * Backend pool
+  * Backend settings
+    * [Optional] If using a health probe, use `/api/v2.0/health` Harbor endpoint
+  * Listeners (http and https)
+  * Rules (http and https)
+* [Optional] Add an exception for the harbor-host in the WAF policy (e.g. for
+  WestUS2-dev you'll add it in `rg-ngsa-asb-dev/ngsa-asb-waf-policy-westus2`)
+
+At this point Harbor should be ready to deploy.
+Now we need to make sure our cluster can pull the Harbor container images.
+We will push Harbor images into our cluster's private ACR repo
+  (e.g. `rg-ngsa-asb-dev/acraks3i2qzkkxofr7c`).
+
+* Goto your private ACR instance, and click on `Networking`
+* Check `Add your client IP address` and save
+  * This will add your machine's IP addr which will enable you to view and
+    push registries into this ACR.
+* Now we push all required Harbor images to the ACR with `az acr import`.
+
+  ```bash
+  # Select proper subscription for your ACR and login to the account
+  az account set -s "jofultz-wcnp" --output table
+  az login --scope https://management.core.windows.net//.default
+
+  # Now push images to ACR
+  ## Here we're using docker image TAG v2.5.3 and ACR acraks3i2qzkkxofr7c
+  az acr import --source docker.io/goharbor/chartmuseum-photon:v2.5.3 -n acraks3i2qzkkxofr7c
+  az acr import --source docker.io/goharbor/harbor-core:v2.5.3 -n acraks3i2qzkkxofr7c
+  az acr import --source docker.io/goharbor/harbor-db:v2.5.3 -n acraks3i2qzkkxofr7c
+  az acr import --source docker.io/goharbor/harbor-exporter:v2.5.3 -n acraks3i2qzkkxofr7c
+  az acr import --source docker.io/goharbor/harbor-jobservice:v2.5.3 -n acraks3i2qzkkxofr7c
+  az acr import --source docker.io/goharbor/harbor-portal:v2.5.3 -n acraks3i2qzkkxofr7c
+  az acr import --source docker.io/goharbor/harbor-registryctl:v2.5.3 -n acraks3i2qzkkxofr7c
+  az acr import --source docker.io/goharbor/nginx-photon:v2.5.3 -n acraks3i2qzkkxofr7c
+  az acr import --source docker.io/goharbor/notary-server-photon:v2.5.3 -n acraks3i2qzkkxofr7c
+  az acr import --source docker.io/goharbor/notary-signer-photon:v2.5.3 -n acraks3i2qzkkxofr7c
+  az acr import --source docker.io/goharbor/redis-photon:v2.5.3 -n acraks3i2qzkkxofr7c
+  az acr import --source docker.io/goharbor/registry-photon:v2.5.3 -n acraks3i2qzkkxofr7c
+  az acr import --source docker.io/goharbor/trivy-adapter-photon:v2.5.3 -n acraks3i2qzkkxofr7c
+  ```
+
+After that, modify the required YAML files to prepare for deployment:
+
+* In [helm-values.yaml](./helm-values.yaml):
+  * Change the `repository:` and `tag:` value pairs (13 of them) to point to the proper ACR repo and tag
+  * Set the Harbor portal admin password (`harborAdminPassword:` )
+* In [harbor-virtual-svc.yaml](./harbor-virtual-svc.yaml)
+  * If deploying to a different namespace than `harbor`, change the namespace value
+
+Now that all of the setup is done, we're ready to deploy:
+> Default user for Harbor portal is admin.
+>
+> Default password should be set in `helm-values.yaml` file before deployment.
+
+```bash
+# Add Harbor helm repo and update
+helm repo add harbor https://helm.goharbor.io
+helm repo update
+
+helm install -f helm-values.yaml harbor harbor/harbor -n harbor --create-namespace
+
+kubectl apply -f harbor-virtual-svc.yaml
+```
+
 ## Deploying Multiple Clusters Using Existing Network
 
 Please see Instructions to deploy Multiple Clusters Using Existing Network [here](./docs/deployAdditionalCluster.md)
