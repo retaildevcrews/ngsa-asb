@@ -5,37 +5,43 @@
 
 > The steps below are guidelines for the dev cluster, but is replicable for the pre-prod as well
 
-- Create a dns entry for harbor (*harbor-core-westus2-dev.cse.ms*) `rg-ngsa-asb-dev/cse.ms` private dns and put the Load-Balancer IP address for Westus2.
-- Create a public dns entry `harbor-core-westus2-dev.cse.ms` in `dns-rg/cse.ms` and put the public ip for WestUS2 dev cluster
-- Add below settings for harbor (similar to ngsa apps) in Application Gateway:
+- Create a dns entry for Harbor (e.g. `harbor-core-westus2-dev` for WestUS2) in `rg-ngsa-asb-dev/cse.ms` private dns and put the LoadBalancer IP address for the region.
+  - You can find LoadBalancer for your cluster under `rg-ngsa-asb-dev-nodepools-{REGION}`
+  - Or you can check existing dns entries for same region
+- Create a public dns entry (e.g. `harbor-core-westus2-dev` for WestUS2) in `dns-rg/cse.ms` and put the public ip for the regional cluster
+  - You can find public ip in Application Gateway for the cluster (e.g `rg-ngsa-asb-dev/apw-aks-{HASH-REGION}` )
+  - Or you can check existing dns entries for same region
+- Add the settings below for Harbor (similar to NGSA apps) in Application Gateway:
   - Backend pool
   - Backend settings
-    - [Optional] For a probe use `/api/v2.0/health` endpoint
+    - [Optional] If using a health probe, use `/api/v2.0/health` Harbor endpoint
   - Listeners (http and https)
   - Rules (http and https)
 - [Optional] Add an exception for the harbor-host in the WAF policy (e.g. for WestUS2-dev you'll add it in `rg-ngsa-asb-dev/ngsa-asb-waf-policy-westus2`)
 
 At this point Harbor should be ready to deploy.
-Now we need to make sure our cluster can pull the container images.
+Now we need to make sure our cluster can pull the Harbor container images.
 To do that we have two options:
 
-- We can push Harbor images into our cluster acr repo (`rg-ngsa-asb-dev/acraks3i2qzkkxofr7c`)
+- We can push Harbor images into our cluster's private ACR repo (e.g. `rg-ngsa-asb-dev/acraks3i2qzkkxofr7c`).
     > This is easier and preferable for pre-prod and dev clusters
-  - Goto your private acr instance, and click on `Networking`
-  - Check `Add you client IP address` and save
-- **Or** we can use another private repo and make sure our cluster can access the repo.
+  - Goto your private ACR instance, and click on `Networking`
+  - Check `Add your client IP address` and save
+    - This will add your machine's IP addr which will enable you to view and push registries into ACR
+- **Or** we can use another private repo and make sure our cluster can access the ACR repo.
     > This requires several extra steps and should be done for SPIKEs only
   - Add the ACR's address in `rg-ngsa-asb-dev-hub/fw-policies-eastus` allow rule collection.
-  - Add managed identity for the Westus2 cluster (e.g `aks-3i2qzkkxofr7c-westus2-agentpool`) to the ACR and give it `AcrPull` permissions
-  - Must deploy the helm in `azure-arc` repo, since its in the policy exception list.
+  - Add managed identity for the regional cluster (e.g `aks-3i2qzkkxofr7c-westus2-agentpool`) to the ACR and give it `AcrPull` permissions
+  - Must deploy the helm in `azure-arc` repo, since its in the policy exempt list.
 
-Now push all required harbor images to the ACR with `az acr import` command.
+Now we push all required Harbor images to the ACR with `az acr import`.
 
   ```bash
   # Select proper subscription for your ACR and login to the account
   az account set -s "jofultz-wcnp" --output table
   az login --scope https://management.core.windows.net//.default
-  # Now push images to the ACR
+
+  # Now push images to ACR
   ## Here we're using docker image TAG v2.5.3 and ACR acraks3i2qzkkxofr7c
   az acr import --source docker.io/goharbor/chartmuseum-photon:v2.5.3 -n acraks3i2qzkkxofr7c
   az acr import --source docker.io/goharbor/harbor-core:v2.5.3 -n acraks3i2qzkkxofr7c
@@ -52,38 +58,37 @@ Now push all required harbor images to the ACR with `az acr import` command.
   az acr import --source docker.io/goharbor/trivy-adapter-photon:v2.5.3 -n acraks3i2qzkkxofr7c
   ```
 
-Common steps:
+After that, modify the required YAML files to prepare for deployment:
 
 - In [helm-values.yaml](./helm-values.yaml):
-  - Change the repository and tag values (13 of them) to point to the proper acr repo and tag
-  - Set the Harbor Portal admin password (harborAdminPassword: )
+  - Change the `repository:` and `tag:` value pairs (13 of them) to point to the proper ACR repo and tag
+  - Set the Harbor portal admin password (`harborAdminPassword:` )
 - In [harbor-virtual-svc.yaml](./harbor-virtual-svc.yaml)
-  - In k8s if deploying to a different namespace than `harbor`, change the namespace
+  - If deploying to a different namespace than `harbor`, change the namespace value
 
 Now that all of the setup is done, to deploy:
-> Default user for harbor portal is admin.
+> Default user for Harbor portal is admin.
 >
-> Default password should be set in `helm-values.yaml` file defore deployment.
+> Default password should be set in `helm-values.yaml` file before deployment.
 
 ```bash
-# Add harbor helm repo and update
+# Add Harbor helm repo and update
 helm repo add harbor https://helm.goharbor.io
 helm repo update
 
 # From this spikes/harbor directory
 ## <NOTE>: For the spike we're deploying in `azure-arc` namespace, since it is exempt from some policies
-## <NOTE>: but if you have access to push images to the private repo, you can deploy to any namespace
-## <NOTE>: In that case, make sure you change the repository from kdevacr.azurecr.io/ to proper ACR name 
+## <NOTE>: but if you have access to push images to cluster private repo, you can deploy to any namespace
+## <NOTE>: In that case, make sure you change the repository to proper ACR name 
 helm install -f helm-values.yaml harbor harbor/harbor -n azure-arc --create-namespace
 
-## Be sure to change the namespace in harbor-virtual-svc.yaml file
-## ^^^^^^^
+## Make sure you changed the namespace in harbor-virtual-svc.yaml file
 kubectl apply -f harbor-virtual-svc.yaml
 ```
 
 ## Locally or in a VM with Docker
 
-For deploying harbor locally we need to have these tools available:
+For deploying Harbor locally we need to have these tools available:
 
 - Bash
 - Docker
@@ -243,9 +248,9 @@ FOLLOW UP:
 - [X] AAD Integration - Delete any local user (other than admin) then integrate
 - [X] Repository replication from/to other repo
 - [X] Repository proxy
-  - [X] Can harbor act as a proxy to other registries
+  - [X] Can Harbor act as a proxy to other registries
     - Ans: It can
-  - [X] If harbor doesn't have an image, can it pull from a know public registry and deliver
+  - [X] If Harbor doesn't have an image, can it pull from a know public registry and deliver
     - Ans: It can pull from most known repos, given we provide an endpoint with proper Access Keys
 - [X] What happens if scanner finds issue in harbor? DevOps flow [Assuming `Prevent vulerable images from running` is selected]
   - When the scanner is running, we can't pull It will show this msg
