@@ -680,7 +680,7 @@ http https://ngsa-cosmos-$ASB_DOMAIN_SUFFIX/healthz
 
 ```
 
-## Deploy Harbor
+## Deploy Harbor (spike)
 
 > The steps below are guidelines for the dev cluster, but is replicable for the pre-prod as well
 
@@ -737,10 +737,10 @@ We will push Harbor images into our cluster's private ACR repo
 
 After that, modify the required YAML files to prepare for deployment:
 
-* In [helm-values.yaml](./helm-values.yaml):
+* In [helm-values.yaml](./spikes/harbor/helm-values.yaml):
   * Change the `repository:` and `tag:` value pairs (13 of them) to point to the proper ACR repo and tag
   * Set the Harbor portal admin password (`harborAdminPassword:` )
-* In [harbor-virtual-svc.yaml](./harbor-virtual-svc.yaml)
+* In [harbor-virtual-svc.yaml](./spikes/harbor/harbor-virtual-svc.yaml)
   * If deploying to a different namespace than `harbor`, change the namespace value
 
 Now that all of the setup is done, we're ready to deploy:
@@ -749,13 +749,14 @@ Now that all of the setup is done, we're ready to deploy:
 > Default password should be set in `helm-values.yaml` file before deployment.
 
 ```bash
+# Assuming we're at REPO_ROOT
 # Add Harbor helm repo and update
 helm repo add harbor https://helm.goharbor.io
 helm repo update
 
-helm install -f helm-values.yaml harbor harbor/harbor -n harbor --create-namespace
+helm install -f spikes/harbor/helm-values.yaml harbor harbor/harbor -n harbor --create-namespace
 
-kubectl apply -f harbor-virtual-svc.yaml
+kubectl apply -f spikes/harbor/harbor-virtual-svc.yaml
 ```
 
 ## Deploying Multiple Clusters Using Existing Network
