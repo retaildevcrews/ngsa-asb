@@ -22,7 +22,7 @@ data:
               }
             ]
           },
-          "description": "Inspired by https://grafana.com/grafana/dashboards/7752",
+          "description": "Inspired by https://grafana.com/grafana/dashboards/7752 and https://docs.fluentbit.io/manual/administration/monitoring",
           "editable": true,
           "fiscalYearStartMonth": 0,
           "gnetId": 7752,
