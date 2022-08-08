@@ -642,9 +642,35 @@ kubectl get ns
 # start over at Deploy Flux
 ```
 
+## Adding resource locks to resource groups
+
+Set resource locks on resources groups to prevent accidental deletions. This can be done in the Azure portal or with az cli.
+
+Review the [documentation on the side effects](https://docs.microsoft.com/en-us/azure/azure-resource-manager/management/lock-resources?tabs=json#considerations-before-applying-your-locks) of the different types of resource locks. Our use case will be the `CanNotDelete` type to prevent deletions.
+
+```bash
+
+# view resource groups in the current subscription
+az group list -o table
+
+# view only the names, query the name field
+az group list --query "[].name" -o tsv
+
+# view existing resource locks
+az lock list -o table
+
+# create a lock to prevent deletions in the desired resource groups
+LOCK_RESOURCE_GROUP="<resource group name>"
+az lock create \
+  --lock-type CanNotDelete \
+  --name "$LOCK_RESOURCE_GROUP" \
+  --resource-group "$LOCK_RESOURCE_GROUP"
+
+```
+
 ## Delete Azure Resources
 
-> Do not just delete the resource groups
+> Do not just delete the resource groups. Double check for existing resource locks and disable as needed.
 
 Make sure ASB_DEPLOYMENT_NAME is set correctly
 
