@@ -48,8 +48,7 @@ az account show -o table
 export ASB_CLUSTER_ADMIN_GROUP=4-co
 
 # Verify you are a member of the security group
-# Might need to execute this line if nested groups exist.
-az ad group member list -g $ASB_CLUSTER_ADMIN_GROUP  --query [].displayName -o table
+az ad group member check -g $ASB_CLUSTER_ADMIN_GROUP --member-id $(az ad signed-in-user show --query id -o tsv) --query value -o tsv
 ```
 
 ### Set Deployment Short Name
