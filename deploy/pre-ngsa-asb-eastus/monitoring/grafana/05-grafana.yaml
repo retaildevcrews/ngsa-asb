@@ -98,6 +98,8 @@ spec:
               mountPath: /var/lib/grafana/dashboards/ngsa-az-monitor-rel
             - name: dashboards-ngsa-az-blocked-traffic
               mountPath: /var/lib/grafana/dashboards/ngsa-az-blocked-traffic
+            - name: dashboards-ngsa-fluentbit
+              mountPath: /var/lib/grafana/dashboards/ngsa-fluentbit
             - name: grafana-secrets
               mountPath: /mnt/secrets
               readOnly: true
@@ -123,6 +125,9 @@ spec:
         - name: dashboards-ngsa-az-blocked-traffic
           configMap:
             name: grafana-dashboards-ngsa-az-blocked-traffic
+        - name: dashboards-ngsa-fluentbit
+          configMap:
+            name: grafana-dashboards-ngsa-fluentbit
         - name: grafana-secrets
           csi:
             driver: secrets-store.csi.k8s.io
