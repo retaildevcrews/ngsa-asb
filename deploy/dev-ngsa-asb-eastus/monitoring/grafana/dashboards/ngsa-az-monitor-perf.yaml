@@ -2677,7 +2677,7 @@ data:
           },
           "timepicker": {},
           "timezone": "browser",
-          "title": "NGSA Dev - Azure Monitor - Performance",
+          "title": "NGSA - Azure Monitor - Performance",
           "uid": "2IRD5FSnp",
           "version": 2,
           "weekStart": ""

@@ -747,7 +747,7 @@ data:
             ]
           },
           "timezone": "",
-          "title": "NGSA Dev - Fluent Bit",
+          "title": "NGSA - Fluent Bit",
           "uid": "fluentbit",
           "version": 2,
           "weekStart": ""
