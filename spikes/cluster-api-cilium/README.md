@@ -56,7 +56,7 @@ For the Nodepools to be in Ready state, a Container Network Interface(CNI) must 
 # Install Cilum CNI
 cilium install --azure-resource-group $AZURE_RG_NAME
 
-# Verify AKS node
+# Verify AKS nodes, they should be in Ready state
 kubectl get nodes
 ```
 
@@ -106,15 +106,15 @@ clusterctl init --infrastructure azure
 
 ## Patch Cluster API provider for Azure (CAPZ)
 
-To have a Cilium CNI workload cluster deployed using Cluster API, the workload cluster must be BYONCI supported. As of now this feature is not GA, so we will have to apply an experimental patch to support this.
+To have a Cilium CNI workload cluster deployed using Cluster API, the workload cluster must be BYOCNI supported. As of now this feature is not GA, so we will have to apply an experimental patch to support this.
 
 ```bash
 # Install Custom CRD for Azure Managed Control Planes (--network-plugin none)
-kubectl apply -f ./spikes/cluster-api-cilium/manifests/infrastructure.cluster.x-k8s.io_azuremanagedcontrolplanes.yaml.yaml 
+kubectl apply -f ./spikes/cluster-api-cilium/manifests/infrastructure.cluster.x-k8s.io_azuremanagedcontrolplanes.yaml 
 
-# Update CAPZ deployment image for a custom forked image that supports BYONCI
+# Update CAPZ deployment image for a custom forked image that supports BYOCNI
 kubectl set image deployment/capz-controller-manager \
-  manager=ghcr.io/joaquinrz/cluster-api-azure-controller:beta \
+  manager=ghcr.io/retaildevcrews/cluster-api-azure-controller:beta \
   -n capz-system
 
 # Wait for new capz-controller manager to be ready
