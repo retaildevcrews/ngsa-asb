@@ -635,19 +635,11 @@
                     "maxCapacity": 10
                 },
                 "webApplicationFirewallConfiguration": {
-                    "enabled": true,
+                    "enabled": false,
                     "firewallMode": "Prevention",
                     "ruleSetType": "OWASP",
                     "ruleSetVersion": "3.0",
-                    "disabledRuleGroups": [
-                        {
-                            "ruleGroupName": "REQUEST-942-APPLICATION-ATTACK-SQLI",
-                            "rules": [
-                                942150,
-                                942410
-                            ]
-                        }
-                    ]
+                    "disabledRuleGroups": []
                 },
                 "enableHttp2": false,
                 "sslCertificates": [
