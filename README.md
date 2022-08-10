@@ -589,7 +589,13 @@ az network dns record-set a add-record -g $ASB_DNS_ZONE_RG -z $ASB_DNS_ZONE -n $
 export ASB_AKS_PRIVATE_IP="$ASB_SPOKE_IP_PREFIX".4.4
 az network private-dns record-set a add-record -g $ASB_RG_CORE -z $ASB_DNS_ZONE -n $ASB_APP_DNS_NAME -a $ASB_AKS_PRIVATE_IP --query fqdn
 
-# create app gateway resources
+```
+
+#### Create app gateway resources
+
+🛑 NOTE: In case of encounter an error when creating app gateway resources refer to [Disable WAF config](./docs/disableWAFconfig.md)
+
+```bash
 # backend pool, HTTPS listener (443), health probe, http setting and routing rule
 export ASB_APP_GW_NAME="apw-$ASB_AKS_NAME"
 
