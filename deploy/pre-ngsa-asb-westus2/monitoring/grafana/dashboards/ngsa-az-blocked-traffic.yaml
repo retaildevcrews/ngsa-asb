@@ -1,0 +1,892 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-dashboards-ngsa-az-blocked-traffic
+  namespace: monitoring
+  labels:
+    app: grafana
+data:
+  ngsaAzBlockedTraffic.json: |-
+        {
+          "annotations": {
+            "list": [
+              {
+                "builtIn": 1,
+                "datasource": "-- Grafana --",
+                "enable": true,
+                "hide": true,
+                "iconColor": "rgba(0, 211, 255, 1)",
+                "name": "Annotations & Alerts",
+                "type": "dashboard"
+              }
+            ]
+          },
+          "editable": true,
+          "gnetId": null,
+          "graphTooltip": 0,
+          "id": 8,
+          "links": [],
+          "panels": [
+            {
+              "collapsed": false,
+              "datasource": null,
+              "gridPos": {
+                "h": 1,
+                "w": 24,
+                "x": 0,
+                "y": 0
+              },
+              "id": 6,
+              "panels": [],
+              "title": "Blocked by Firewall network rules",
+              "type": "row"
+            },
+            {
+              "datasource": "Azure Monitor",
+              "fieldConfig": {
+                "defaults": {
+                  "custom": {
+                    "align": null,
+                    "filterable": false
+                  },
+                  "mappings": [],
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": null
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  }
+                },
+                "overrides": []
+              },
+              "gridPos": {
+                "h": 7,
+                "w": 12,
+                "x": 0,
+                "y": 1
+              },
+              "id": 2,
+              "options": {
+                "showHeader": true,
+                "sortBy": []
+              },
+              "pluginVersion": "7.3.0",
+              "targets": [
+                {
+                  "appInsights": {
+                    "dimension": [],
+                    "metricName": "select",
+                    "timeGrain": "auto"
+                  },
+                  "azureLogAnalytics": {
+                    "query": "AzureDiagnostics\r\n| where $__timeFilter(TimeGenerated)\n  and Category == \"AzureFirewallNetworkRule\"\r\n  and msg_s has \"Deny\"\r\n| parse msg_s with Protocol \" request from \" SourceIP \":\" SourcePort \" to \" DestinationIP \":\" DestinationPort \". Action: \" Action \".\" *\r\n| summarize count() by SourceIP, DestinationIP, Resource, Protocol\n| project count_, SourceIP, DestinationIP, Resource, Protocol\n",
+                    "resultFormat": "table",
+                    "workspace": "46502eb0-890b-4bfa-95a0-c9291acece0e"
+                  },
+                  "azureMonitor": {
+                    "aggOptions": [],
+                    "dimensionFilter": "*",
+                    "dimensionFilters": [],
+                    "metricDefinition": "select",
+                    "metricName": "select",
+                    "metricNamespace": "select",
+                    "resourceGroup": "select",
+                    "resourceName": "select",
+                    "timeGrain": "auto",
+                    "timeGrains": [],
+                    "top": "10"
+                  },
+                  "insightsAnalytics": {
+                    "query": "",
+                    "resultFormat": "time_series"
+                  },
+                  "queryType": "Azure Log Analytics",
+                  "refId": "A",
+                  "subscription": "648dcb5a-de1e-48b2-af6b-fe6ef28d355c"
+                }
+              ],
+              "timeFrom": null,
+              "timeShift": null,
+              "title": "",
+              "type": "table"
+            },
+            {
+              "aliasColors": {},
+              "bars": false,
+              "dashLength": 10,
+              "dashes": false,
+              "datasource": null,
+              "fieldConfig": {
+                "defaults": {
+                  "custom": {}
+                },
+                "overrides": []
+              },
+              "fill": 1,
+              "fillGradient": 0,
+              "gridPos": {
+                "h": 7,
+                "w": 12,
+                "x": 12,
+                "y": 1
+              },
+              "hiddenSeries": false,
+              "id": 4,
+              "legend": {
+                "avg": false,
+                "current": false,
+                "max": false,
+                "min": false,
+                "show": true,
+                "total": false,
+                "values": false
+              },
+              "lines": true,
+              "linewidth": 1,
+              "nullPointMode": "null",
+              "options": {
+                "alertThreshold": true
+              },
+              "percentage": false,
+              "pluginVersion": "7.3.0",
+              "pointradius": 2,
+              "points": false,
+              "renderer": "flot",
+              "seriesOverrides": [],
+              "spaceLength": 10,
+              "stack": false,
+              "steppedLine": false,
+              "targets": [
+                {
+                  "appInsights": {
+                    "dimension": [],
+                    "metricName": "select",
+                    "timeGrain": "auto"
+                  },
+                  "azureLogAnalytics": {
+                    "query": "AzureDiagnostics\r\n| where $__timeFilter(TimeGenerated)\n  and Category == \"AzureFirewallNetworkRule\"\r\n  and msg_s has \"Deny\"\r\n| summarize count() by bin_at(TimeGenerated, $__interval, datetime(00:00))\r\n| order by TimeGenerated asc",
+                    "resultFormat": "time_series",
+                    "workspace": "46502eb0-890b-4bfa-95a0-c9291acece0e"
+                  },
+                  "azureMonitor": {
+                    "aggOptions": [],
+                    "dimensionFilter": "*",
+                    "dimensionFilters": [],
+                    "metricDefinition": "select",
+                    "metricName": "select",
+                    "metricNamespace": "select",
+                    "resourceGroup": "select",
+                    "resourceName": "select",
+                    "timeGrain": "auto",
+                    "timeGrains": [],
+                    "top": "10"
+                  },
+                  "insightsAnalytics": {
+                    "query": "",
+                    "resultFormat": "time_series"
+                  },
+                  "queryType": "Azure Log Analytics",
+                  "refId": "A",
+                  "subscription": "648dcb5a-de1e-48b2-af6b-fe6ef28d355c"
+                }
+              ],
+              "thresholds": [],
+              "timeFrom": null,
+              "timeRegions": [],
+              "timeShift": null,
+              "title": "",
+              "tooltip": {
+                "shared": true,
+                "sort": 0,
+                "value_type": "individual"
+              },
+              "type": "graph",
+              "xaxis": {
+                "buckets": null,
+                "mode": "time",
+                "name": null,
+                "show": true,
+                "values": []
+              },
+              "yaxes": [
+                {
+                  "format": "short",
+                  "label": null,
+                  "logBase": 1,
+                  "max": null,
+                  "min": null,
+                  "show": true
+                },
+                {
+                  "format": "short",
+                  "label": null,
+                  "logBase": 1,
+                  "max": null,
+                  "min": null,
+                  "show": true
+                }
+              ],
+              "yaxis": {
+                "align": false,
+                "alignLevel": null
+              }
+            },
+            {
+              "collapsed": false,
+              "datasource": null,
+              "gridPos": {
+                "h": 1,
+                "w": 24,
+                "x": 0,
+                "y": 8
+              },
+              "id": 12,
+              "panels": [],
+              "title": "Blocked by Firewall application rules",
+              "type": "row"
+            },
+            {
+              "datasource": null,
+              "fieldConfig": {
+                "defaults": {
+                  "custom": {
+                    "align": null,
+                    "filterable": false
+                  },
+                  "mappings": [],
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": null
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  }
+                },
+                "overrides": []
+              },
+              "gridPos": {
+                "h": 7,
+                "w": 12,
+                "x": 0,
+                "y": 9
+              },
+              "id": 10,
+              "options": {
+                "showHeader": true,
+                "sortBy": []
+              },
+              "pluginVersion": "7.3.0",
+              "targets": [
+                {
+                  "appInsights": {
+                    "dimension": [],
+                    "metricName": "select",
+                    "timeGrain": "auto"
+                  },
+                  "azureLogAnalytics": {
+                    "query": "AzureDiagnostics\r\n| where $__timeFilter(TimeGenerated)\n  and Category == \"AzureFirewallApplicationRule\"\r\n  and msg_s has \"Deny\"\r\n| parse msg_s with Protocol \" request from \" SourceIP \":\" SourcePort \" to \" Destination \":\" DestinationPort \". Action: \" Action \". \" Reason\n\r\n| summarize count() by SourceIP, Destination, Resource, Reason\n| project count_, SourceIP, Destination, Resource, Reason",
+                    "resultFormat": "table",
+                    "workspace": "46502eb0-890b-4bfa-95a0-c9291acece0e"
+                  },
+                  "azureMonitor": {
+                    "aggOptions": [],
+                    "dimensionFilter": "*",
+                    "dimensionFilters": [],
+                    "metricDefinition": "select",
+                    "metricName": "select",
+                    "metricNamespace": "select",
+                    "resourceGroup": "select",
+                    "resourceName": "select",
+                    "timeGrain": "auto",
+                    "timeGrains": [],
+                    "top": "10"
+                  },
+                  "insightsAnalytics": {
+                    "query": "",
+                    "resultFormat": "time_series"
+                  },
+                  "queryType": "Azure Log Analytics",
+                  "refId": "A",
+                  "subscription": "648dcb5a-de1e-48b2-af6b-fe6ef28d355c"
+                }
+              ],
+              "timeFrom": null,
+              "timeShift": null,
+              "title": "",
+              "type": "table"
+            },
+            {
+              "aliasColors": {},
+              "bars": false,
+              "dashLength": 10,
+              "dashes": false,
+              "datasource": null,
+              "fieldConfig": {
+                "defaults": {
+                  "custom": {}
+                },
+                "overrides": []
+              },
+              "fill": 1,
+              "fillGradient": 0,
+              "gridPos": {
+                "h": 7,
+                "w": 12,
+                "x": 12,
+                "y": 9
+              },
+              "hiddenSeries": false,
+              "id": 14,
+              "legend": {
+                "avg": false,
+                "current": false,
+                "max": false,
+                "min": false,
+                "show": true,
+                "total": false,
+                "values": false
+              },
+              "lines": true,
+              "linewidth": 1,
+              "nullPointMode": "null",
+              "options": {
+                "alertThreshold": true
+              },
+              "percentage": false,
+              "pluginVersion": "7.3.0",
+              "pointradius": 2,
+              "points": false,
+              "renderer": "flot",
+              "seriesOverrides": [],
+              "spaceLength": 10,
+              "stack": false,
+              "steppedLine": false,
+              "targets": [
+                {
+                  "appInsights": {
+                    "dimension": [],
+                    "metricName": "select",
+                    "timeGrain": "auto"
+                  },
+                  "azureLogAnalytics": {
+                    "query": "AzureDiagnostics\r\n| where $__timeFilter(TimeGenerated)\n  and Category == \"AzureFirewallApplicationRule\"\r\n  and msg_s has \"Deny\"\r\n| summarize count() by bin_at(TimeGenerated, $__interval, datetime(00:00))\r\n| order by TimeGenerated asc",
+                    "resultFormat": "time_series",
+                    "workspace": "46502eb0-890b-4bfa-95a0-c9291acece0e"
+                  },
+                  "azureMonitor": {
+                    "aggOptions": [],
+                    "dimensionFilter": "*",
+                    "dimensionFilters": [],
+                    "metricDefinition": "select",
+                    "metricName": "select",
+                    "metricNamespace": "select",
+                    "resourceGroup": "select",
+                    "resourceName": "select",
+                    "timeGrain": "auto",
+                    "timeGrains": [],
+                    "top": "10"
+                  },
+                  "insightsAnalytics": {
+                    "query": "",
+                    "resultFormat": "time_series"
+                  },
+                  "queryType": "Azure Log Analytics",
+                  "refId": "A",
+                  "subscription": "648dcb5a-de1e-48b2-af6b-fe6ef28d355c"
+                }
+              ],
+              "thresholds": [],
+              "timeFrom": null,
+              "timeRegions": [],
+              "timeShift": null,
+              "title": "",
+              "tooltip": {
+                "shared": true,
+                "sort": 0,
+                "value_type": "individual"
+              },
+              "type": "graph",
+              "xaxis": {
+                "buckets": null,
+                "mode": "time",
+                "name": null,
+                "show": true,
+                "values": []
+              },
+              "yaxes": [
+                {
+                  "format": "short",
+                  "label": null,
+                  "logBase": 1,
+                  "max": null,
+                  "min": null,
+                  "show": true
+                },
+                {
+                  "format": "short",
+                  "label": null,
+                  "logBase": 1,
+                  "max": null,
+                  "min": null,
+                  "show": true
+                }
+              ],
+              "yaxis": {
+                "align": false,
+                "alignLevel": null
+              }
+            },
+            {
+              "collapsed": false,
+              "datasource": null,
+              "gridPos": {
+                "h": 1,
+                "w": 24,
+                "x": 0,
+                "y": 16
+              },
+              "id": 16,
+              "panels": [],
+              "title": "Blocked by Network Security Groups",
+              "type": "row"
+            },
+            {
+              "datasource": null,
+              "fieldConfig": {
+                "defaults": {
+                  "custom": {
+                    "align": null,
+                    "filterable": false
+                  },
+                  "mappings": [],
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": null
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  }
+                },
+                "overrides": []
+              },
+              "gridPos": {
+                "h": 7,
+                "w": 12,
+                "x": 0,
+                "y": 17
+              },
+              "id": 20,
+              "options": {
+                "showHeader": true,
+                "sortBy": []
+              },
+              "pluginVersion": "7.3.0",
+              "targets": [
+                {
+                  "appInsights": {
+                    "dimension": [],
+                    "metricName": "select",
+                    "timeGrain": "auto"
+                  },
+                  "azureLogAnalytics": {
+                    "query": "AzureDiagnostics\r\n| where $__timeFilter(TimeGenerated)\n  and Category == \"NetworkSecurityGroupEvent\"\r\n  and type_s == \"block\"\r\n\r\n| summarize count() by Resource, ruleName_s, primaryIPv4Address_s, direction_s\n| project count_, Resource, ruleName_s, primaryIPv4Address_s, direction_s",
+                    "resultFormat": "time_series",
+                    "workspace": "46502eb0-890b-4bfa-95a0-c9291acece0e"
+                  },
+                  "azureMonitor": {
+                    "aggOptions": [],
+                    "dimensionFilter": "*",
+                    "dimensionFilters": [],
+                    "metricDefinition": "select",
+                    "metricName": "select",
+                    "metricNamespace": "select",
+                    "resourceGroup": "select",
+                    "resourceName": "select",
+                    "timeGrain": "auto",
+                    "timeGrains": [],
+                    "top": "10"
+                  },
+                  "insightsAnalytics": {
+                    "query": "",
+                    "resultFormat": "time_series"
+                  },
+                  "queryType": "Azure Log Analytics",
+                  "refId": "A",
+                  "subscription": "648dcb5a-de1e-48b2-af6b-fe6ef28d355c"
+                }
+              ],
+              "timeFrom": null,
+              "timeShift": null,
+              "title": "",
+              "type": "table"
+            },
+            {
+              "aliasColors": {},
+              "bars": false,
+              "dashLength": 10,
+              "dashes": false,
+              "datasource": null,
+              "fieldConfig": {
+                "defaults": {
+                  "custom": {}
+                },
+                "overrides": []
+              },
+              "fill": 1,
+              "fillGradient": 0,
+              "gridPos": {
+                "h": 7,
+                "w": 12,
+                "x": 12,
+                "y": 17
+              },
+              "hiddenSeries": false,
+              "id": 18,
+              "legend": {
+                "avg": false,
+                "current": false,
+                "max": false,
+                "min": false,
+                "show": true,
+                "total": false,
+                "values": false
+              },
+              "lines": true,
+              "linewidth": 1,
+              "nullPointMode": "null",
+              "options": {
+                "alertThreshold": true
+              },
+              "percentage": false,
+              "pluginVersion": "7.3.0",
+              "pointradius": 2,
+              "points": false,
+              "renderer": "flot",
+              "seriesOverrides": [],
+              "spaceLength": 10,
+              "stack": false,
+              "steppedLine": false,
+              "targets": [
+                {
+                  "appInsights": {
+                    "dimension": [],
+                    "metricName": "select",
+                    "timeGrain": "auto"
+                  },
+                  "azureLogAnalytics": {
+                    "query": "AzureDiagnostics\r\n| where $__timeFilter(TimeGenerated)\n  and Category == \"NetworkSecurityGroupEvent\"\r\n  and type_s == \"block\"\r\n| summarize count() by bin_at(TimeGenerated, $__interval, datetime(00:00)), direction_s\r\n| order by TimeGenerated asc\n",
+                    "resultFormat": "time_series",
+                    "workspace": "46502eb0-890b-4bfa-95a0-c9291acece0e"
+                  },
+                  "azureMonitor": {
+                    "aggOptions": [],
+                    "dimensionFilter": "*",
+                    "dimensionFilters": [],
+                    "metricDefinition": "select",
+                    "metricName": "select",
+                    "metricNamespace": "select",
+                    "resourceGroup": "select",
+                    "resourceName": "select",
+                    "timeGrain": "auto",
+                    "timeGrains": [],
+                    "top": "10"
+                  },
+                  "insightsAnalytics": {
+                    "query": "",
+                    "resultFormat": "time_series"
+                  },
+                  "queryType": "Azure Log Analytics",
+                  "refId": "A",
+                  "subscription": "648dcb5a-de1e-48b2-af6b-fe6ef28d355c"
+                }
+              ],
+              "thresholds": [],
+              "timeFrom": null,
+              "timeRegions": [],
+              "timeShift": null,
+              "title": "",
+              "tooltip": {
+                "shared": true,
+                "sort": 0,
+                "value_type": "individual"
+              },
+              "type": "graph",
+              "xaxis": {
+                "buckets": null,
+                "mode": "time",
+                "name": null,
+                "show": true,
+                "values": []
+              },
+              "yaxes": [
+                {
+                  "format": "short",
+                  "label": null,
+                  "logBase": 1,
+                  "max": null,
+                  "min": null,
+                  "show": true
+                },
+                {
+                  "format": "short",
+                  "label": null,
+                  "logBase": 1,
+                  "max": null,
+                  "min": null,
+                  "show": true
+                }
+              ],
+              "yaxis": {
+                "align": false,
+                "alignLevel": null
+              }
+            },
+            {
+              "collapsed": false,
+              "datasource": null,
+              "gridPos": {
+                "h": 1,
+                "w": 24,
+                "x": 0,
+                "y": 24
+              },
+              "id": 22,
+              "panels": [],
+              "title": "Blocked by App Gateway WAF",
+              "type": "row"
+            },
+            {
+              "datasource": null,
+              "fieldConfig": {
+                "defaults": {
+                  "custom": {
+                    "align": null,
+                    "filterable": false
+                  },
+                  "mappings": [],
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": null
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  }
+                },
+                "overrides": []
+              },
+              "gridPos": {
+                "h": 7,
+                "w": 12,
+                "x": 0,
+                "y": 25
+              },
+              "id": 24,
+              "options": {
+                "showHeader": true,
+                "sortBy": []
+              },
+              "pluginVersion": "7.3.0",
+              "targets": [
+                {
+                  "appInsights": {
+                    "dimension": [],
+                    "metricName": "select",
+                    "timeGrain": "auto"
+                  },
+                  "azureLogAnalytics": {
+                    "query": "AzureDiagnostics\r\n| where $__timeFilter(TimeGenerated)\n  and Category == \"ApplicationGatewayFirewallLog\"\r\n  and ResourceProvider == \"MICROSOFT.NETWORK\"\r\n  and action_s == \"Blocked\"\r\n| summarize count() by Resource, hostname_s, requestUri_s, Message\n| project count_, Resource, hostname_s, requestUri_s, Message",
+                    "resultFormat": "table",
+                    "workspace": "b51964b6-4a46-46f2-80b9-01f0649e63f5"
+                  },
+                  "azureMonitor": {
+                    "aggOptions": [],
+                    "dimensionFilter": "*",
+                    "dimensionFilters": [],
+                    "metricDefinition": "select",
+                    "metricName": "select",
+                    "metricNamespace": "select",
+                    "resourceGroup": "select",
+                    "resourceName": "select",
+                    "timeGrain": "auto",
+                    "timeGrains": [],
+                    "top": "10"
+                  },
+                  "insightsAnalytics": {
+                    "query": "",
+                    "resultFormat": "time_series"
+                  },
+                  "queryType": "Azure Log Analytics",
+                  "refId": "A",
+                  "subscription": "648dcb5a-de1e-48b2-af6b-fe6ef28d355c"
+                }
+              ],
+              "timeFrom": null,
+              "timeShift": null,
+              "title": "",
+              "type": "table"
+            },
+            {
+              "aliasColors": {},
+              "bars": false,
+              "dashLength": 10,
+              "dashes": false,
+              "datasource": null,
+              "fieldConfig": {
+                "defaults": {
+                  "custom": {}
+                },
+                "overrides": []
+              },
+              "fill": 1,
+              "fillGradient": 0,
+              "gridPos": {
+                "h": 7,
+                "w": 12,
+                "x": 12,
+                "y": 25
+              },
+              "hiddenSeries": false,
+              "id": 26,
+              "legend": {
+                "avg": false,
+                "current": false,
+                "max": false,
+                "min": false,
+                "show": true,
+                "total": false,
+                "values": false
+              },
+              "lines": true,
+              "linewidth": 1,
+              "nullPointMode": "null",
+              "options": {
+                "alertThreshold": true
+              },
+              "percentage": false,
+              "pluginVersion": "7.3.0",
+              "pointradius": 2,
+              "points": false,
+              "renderer": "flot",
+              "seriesOverrides": [],
+              "spaceLength": 10,
+              "stack": false,
+              "steppedLine": false,
+              "targets": [
+                {
+                  "appInsights": {
+                    "dimension": [],
+                    "metricName": "select",
+                    "timeGrain": "auto"
+                  },
+                  "azureLogAnalytics": {
+                    "query": "AzureDiagnostics\r\n| where $__timeFilter(TimeGenerated)\n  and Category == \"ApplicationGatewayFirewallLog\"\r\n  and ResourceProvider == \"MICROSOFT.NETWORK\"\r\n  and action_s == \"Blocked\"\n| summarize count() by bin_at(TimeGenerated, $__interval, datetime(00:00))\n| order by TimeGenerated asc\r\n",
+                    "resultFormat": "time_series",
+                    "workspace": "b51964b6-4a46-46f2-80b9-01f0649e63f5"
+                  },
+                  "azureMonitor": {
+                    "aggOptions": [],
+                    "dimensionFilter": "*",
+                    "dimensionFilters": [],
+                    "metricDefinition": "select",
+                    "metricName": "select",
+                    "metricNamespace": "select",
+                    "resourceGroup": "select",
+                    "resourceName": "select",
+                    "timeGrain": "auto",
+                    "timeGrains": [],
+                    "top": "10"
+                  },
+                  "insightsAnalytics": {
+                    "query": "",
+                    "resultFormat": "time_series"
+                  },
+                  "queryType": "Azure Log Analytics",
+                  "refId": "A",
+                  "subscription": "648dcb5a-de1e-48b2-af6b-fe6ef28d355c"
+                }
+              ],
+              "thresholds": [],
+              "timeFrom": null,
+              "timeRegions": [],
+              "timeShift": null,
+              "title": "Panel Title",
+              "tooltip": {
+                "shared": true,
+                "sort": 0,
+                "value_type": "individual"
+              },
+              "type": "graph",
+              "xaxis": {
+                "buckets": null,
+                "mode": "time",
+                "name": null,
+                "show": true,
+                "values": []
+              },
+              "yaxes": [
+                {
+                  "format": "short",
+                  "label": null,
+                  "logBase": 1,
+                  "max": null,
+                  "min": null,
+                  "show": true
+                },
+                {
+                  "format": "short",
+                  "label": null,
+                  "logBase": 1,
+                  "max": null,
+                  "min": null,
+                  "show": true
+                }
+              ],
+              "yaxis": {
+                "align": false,
+                "alignLevel": null
+              }
+            }
+          ],
+          "refresh": false,
+          "schemaVersion": 26,
+          "style": "dark",
+          "tags": [],
+          "templating": {
+            "list": []
+          },
+          "time": {
+            "from": "now-30m",
+            "to": "now"
+          },
+          "timepicker": {},
+          "timezone": "",
+          "title": "NGSA - Blocked Traffic",
+          "uid": "PpsPzW8nk",
+          "version": 4
+        }
