@@ -61,6 +61,25 @@ sequenceDiagram
         end
 ```
 
+## Image Push to Harbor
+
+> **_NOTE:_** When pushing images to a Harbor instance, it is ensured that an image that has been loaded that violates the vulnerability threshold is not able to be retrieved from that Harbor instance.
+
+```mermaid
+sequenceDiagram
+    participant action  as Action 
+    participant docker  as Docker
+    participant harbor  as Harbor Container Registry
+    participant scan    as Vuln Scanner
+
+    action     ->> docker: Docker Push executed
+    docker     ->> harbor: Image uploaded and stored <br> in Harbor Container Registry
+    alt If vulnerability scanning is enabled
+        harbor    ->> scan: Cached image scanned <br> for vulnerabilities
+        scan      --) harbor: Results available to Harbor
+        end
+```
+
 ## Image Push to external registry through Harbor
 
 > **_NOTE:_** When pushing images to a Harbor instance, it is ensured that an image that has been loaded that violates the vulnerability threshold is not able to be retrieved from that Harbor instance.
@@ -74,11 +93,12 @@ sequenceDiagram
     participant ecr     as External Container Registry
 
     action     ->> docker: Docker Push executed
-    activate   harbor
     docker     ->> harbor: Image uploaded and stored <br> in Harbor Container Registry
-    harbor    ->> scan: Cached image scanned <br> for vulnerabilities
+    alt If vulnerability scanning is enabled
+        harbor    ->> scan: Cached image scanned <br> for vulnerabilities
+        scan      --) harbor: Results available to Harbor
+        end
     alt Image meets vulnerability threshhold 
         harbor    ->> ecr: Image is pushed to External Registry <br> (Images which violate vulnerability threshhold will <br> not be pushed to the external registry)
         end
-    deactivate  harbor
 ```
