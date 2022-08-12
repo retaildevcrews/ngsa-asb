@@ -61,9 +61,9 @@ sequenceDiagram
         end
 ```
 
-## Image Push to external registry
+## Image Push to external registry through Harbor
 
-All images are stored in harbor registry, if scanner is turned on for project image is scanned before being made available to pull.  When pushing images to a Harbor instance, it is ensured that an image that has been loaded that violates the vulnerability threshold is not able to be retrieved from that Harbor instance.
+> **_NOTE:_** When pushing images to a Harbor instance, it is ensured that an image that has been loaded that violates the vulnerability threshold is not able to be retrieved from that Harbor instance.
 
 ```mermaid
 sequenceDiagram
