@@ -635,11 +635,19 @@
                     "maxCapacity": 10
                 },
                 "webApplicationFirewallConfiguration": {
-                    "enabled": false,
+                    "enabled": true,
                     "firewallMode": "Prevention",
                     "ruleSetType": "OWASP",
                     "ruleSetVersion": "3.0",
-                    "disabledRuleGroups": []
+                    "disabledRuleGroups": [
+                        {
+                            "ruleGroupName": "REQUEST-942-APPLICATION-ATTACK-SQLI",
+                            "rules": [
+                                942150,
+                                942410
+                            ]
+                        }
+                    ]
                 },
                 "enableHttp2": false,
                 "sslCertificates": [
@@ -1180,7 +1188,7 @@
         },
         {
             "type": "Microsoft.ContainerService/managedClusters",
-            "apiVersion": "2021-02-01",
+            "apiVersion": "2022-02-02-preview",
             "name": "[variables('clusterName')]",
             "location": "[parameters('location')]",
             "dependsOn": [
@@ -1281,14 +1289,7 @@
                 "enablePodSecurityPolicy": false,
                 "maxAgentPools": 2,
                 "networkProfile": {
-                    "networkPlugin": "azure",
-                    "networkPolicy": "azure",
-                    "outboundType": "userDefinedRouting",
-                    "loadBalancerSku": "standard",
-                    "loadBalancerProfile": "[json('null')]",
-                    "serviceCidr": "172.16.0.0/16",
-                    "dnsServiceIP": "172.16.0.10",
-                    "dockerBridgeCidr": "172.18.0.1/16"
+                    "networkPlugin": "none"
                 },
                 "aadProfile": {
                     "managed": true,

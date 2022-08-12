@@ -1,0 +1,128 @@
+---
+apiVersion: cluster.x-k8s.io/v1beta1
+kind: Cluster
+metadata:
+  name: aks-southcentralus-cluster01
+spec:
+  clusterNetwork:
+    services:
+      cidrBlocks:
+      - 10.0.0.0/16
+  controlPlaneRef:
+    apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+    kind: AzureManagedControlPlane
+    name: aks-southcentralus-cluster01
+  infrastructureRef:
+    apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+    kind: AzureManagedCluster
+    name: aks-southcentralus-cluster01
+---
+# The control plane abstracts readiness and provisioning of an AKS cluster.
+# Because AKS requires a default pool, this also requires a reference to the
+# default machine pool.
+apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+kind: AzureManagedControlPlane
+metadata:
+  name: aks-southcentralus-cluster01
+spec:
+  identityRef:
+    apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+    kind: AzureClusterIdentity
+    name: cluster-identity
+  location: southcentralus
+  resourceGroupName: $AZURE_RG_NAME
+  sshPublicKey: ""
+  subscriptionID: $AZURE_SUBSCRIPTION_ID
+  version: v1.22.6
+  networkPlugin: none
+  # virtualNetwork:
+  #   name: {{ .Values.virtualNetwork.name }}
+  #   cidrBlock: 10.0.0.0/8
+
+---
+# Due to the nature of managed Kubernetes and the control plane implementation,
+# the infrastructure provider for AKS cluster is basically a no-op.
+# It sets itself to ready as soon as it sees the control plane ready.
+apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+kind: AzureManagedCluster
+metadata:
+  name: aks-southcentralus-cluster01
+---
+# We provision a default machine pool with no bootstrap data (AKS will provide it).
+# We specify an AzureManagedMachinePool as the infrastructure machine it, which
+# will be reflected in Azure as VMSS node pools attached to an AKS cluster.
+apiVersion: cluster.x-k8s.io/v1beta1
+kind: MachinePool
+metadata:
+  name: clagentpool
+spec:
+  clusterName: aks-southcentralus-cluster01
+  replicas: 2
+  template:
+    metadata: {}
+    spec:
+      bootstrap:
+        dataSecretName: ""
+      clusterName: aks-southcentralus-cluster01
+      infrastructureRef:
+        apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+        kind: AzureManagedMachinePool
+        name: clagentpool
+      version: v1.22.6
+---
+# The Azure-specific machine pool implementation drives the configuration of the
+# VMSS instances backing the pool.
+apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+kind: AzureManagedMachinePool
+metadata:
+  name: clagentpool
+spec:
+  mode: System
+  osDiskSizeGB: 30
+  sku: Standard_D2s_v3
+---
+# Deploy a second agent pool with the same number of machines, but using potentially different infrastructure.
+apiVersion: cluster.x-k8s.io/v1beta1
+kind: MachinePool
+metadata:
+  name: wragentpool
+spec:
+  clusterName: aks-southcentralus-cluster01
+  replicas: 1
+  template:
+    metadata: {}
+    spec:
+      bootstrap:
+        dataSecretName: ""
+      clusterName: aks-southcentralus-cluster01
+      infrastructureRef:
+        apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+        kind: AzureManagedMachinePool
+        name: wragentpool
+      version: v1.22.6
+---
+# The infrastructure backing the second pool will use the same VM sku, but a larger OS disk.
+apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+kind: AzureManagedMachinePool
+metadata:
+  name: wragentpool
+spec:
+  mode: User
+  osDiskSizeGB: 40
+  sku: Standard_D2s_v3
+---
+apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+kind: AzureClusterIdentity
+metadata:
+  labels:
+    clusterctl.cluster.x-k8s.io/move-hierarchy: "true"
+  name: cluster-identity
+  namespace: $AZURE_CLUSTER_IDENTITY_SECRET_NAMESPACE
+spec:
+  allowedNamespaces: {}
+  clientID: $AZURE_CLIENT_ID
+  clientSecret:
+    name: cluster-identity-secret
+    namespace: $AZURE_CLUSTER_IDENTITY_SECRET_NAMESPACE
+  tenantID: $AZURE_TENANT_ID
+  type: ServicePrincipal
