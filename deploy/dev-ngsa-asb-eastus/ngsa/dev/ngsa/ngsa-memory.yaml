@@ -24,7 +24,7 @@ spec:
     spec:
       containers:
         - name: app
-          image: ghcr.io/retaildevcrews/ngsa-app:beta
+          image: harbor-core-eastus-dev.cse.ms/retaildevcrews/ngsa-app:beta
           imagePullPolicy: Always
           args: 
           - --in-memory
@@ -66,6 +66,8 @@ spec:
           volumeMounts:
             - mountPath: /tmp
               name: tmp
+      imagePullSecrets:
+        - name: harbor-regcred
       volumes:
         - emptyDir: {}
           name: tmp
