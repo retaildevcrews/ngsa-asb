@@ -55,6 +55,10 @@ You'll need to run a few more steps to completely setup the AAD Service Principa
 2. If you haven't added the users already, go ahead and add them in the "Users and groups" menu from the sidebar.
 3. Go to "Properties", select "Yes" for the "Assignment required?" option and save. This ensures users only assigned to the Service Principal can access Grafana.
 
+### Setup Grafana deployment templates
+
+🛑 The current setup for Grafana uses the default sqlite database for storage. In order to run multiple pods, a shared storage setup should be investigated. With this constraint, Grafana should only have 1 replica. More information here <https://grafana.com/docs/grafana/latest/setup-grafana/set-up-for-high-availability>.
+
 ```bash
 
 # Optional: Add client secret using AZ CLI
