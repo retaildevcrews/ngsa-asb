@@ -44,14 +44,12 @@ spec:
             config:
               # The configuration for the Wasm extension itself
               configuration:
-                "@type": "type.googleapis.com/google.protobuf.StringValue"
-                value: |
-                  { 
-                    "service_cluster": "burstcluster",
-                    "service_authority": "burst.burstservice",
-                    "service_path": "/burstmetrics/deployments",
-                    "cache_seconds": 5
-                  }    
+                "@type": "type.googleapis.com/google.protobuf.Struct"
+                value:
+                    service_cluster: "burstcluster"
+                    service_authority: "burst.burstservice"
+                    service_path: "/burstmetrics/deployments"
+                    cache_seconds: 5 
               root_id: burst-wasm-root-id
               vm_config:
                 vm_id: burst-wasm-vm-id
