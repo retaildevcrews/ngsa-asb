@@ -7,14 +7,25 @@ This is the generic flow for pulling an image that exists in the Harbor registry
 ```mermaid
 sequenceDiagram
     participant action  as Action 
-    participant docker  as Docker
+    participant docker  as Docker.exe
     participant harbor  as Harbor
     
-    action     ->> docker: Docker Pull executed
-    docker     ->> harbor: Image requested from Harbor
-    alt If scanned image <br> meets vulnerability requirements <br> or image has not been scanned
-        harbor     --)  docker: Image returned to docker
-        end
+    action  ->> docker: Docker Pull executed
+    activate action
+    activate docker
+    docker  ->> harbor: Image requested from Harbor
+    activate harbor
+    harbor  ->> harbor: Check image scan status
+    alt Passed scan || First pull
+        harbor -->> docker: Image returned to docker
+    else vulnerabilities detected
+        harbor -->> docker: Error returned
+    end
+    deactivate harbor
+    docker -->> action: Harbor result returned to calling Activity
+    deactivate docker
+    deactivate action
+    
 ```
 
 ## Proxy Cache - Image Pull from External Registry through Harbor
@@ -27,17 +38,30 @@ sequenceDiagram
     participant action  as Action 
     participant docker  as Docker
     participant harbor  as Harbor Container <br> Registry
-    participant ecr     as External Container Registry
+    participant ecr     as Source Container Registry
 
-    action     ->> docker: Docker Pull executed
-    docker     ->> harbor: Image requested from Harbor
-    alt If image doesn't exist in the container registry
-        harbor    ->> ecr: Retrieve from source <br> (External Registry)
-        ecr        --) harbor: Image from source stored <br> in the Harbor Container Registry
-        end
-    alt If scanned image <br> meets vulnerability requirements <br> or image has not been scanned
-        harbor     --)  docker: Image returned to Docker <br> from Harbor Container Registry
-        end
+    action  ->> docker: Docker Pull executed
+    activate action
+    activate docker
+    docker  ->> harbor: Image requested from Harbor
+    activate docker
+    activate harbor
+    alt Is imaged already cached?
+        harbor  ->> ecr: Retrieve from source container registry
+        activate ecr
+        ecr    -->> harbor: Image from source stored <br> in the Harbor Container Registry
+        deactivate ecr
+    end
+    alt Passed scan || First pull
+        harbor -->> docker: Image returned to docker
+    else vulnerabilities detected
+        harbor -->> docker: Error message returned
+    end
+    deactivate harbor
+    docker -->> action: Pull result returned to caller
+    deactivate docker
+    deactivate action
+    
 ```
 
 ## Replicate images from external registry into Harbor Registry
