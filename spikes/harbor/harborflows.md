@@ -7,7 +7,7 @@ This is the generic flow for pulling an image that exists in the Harbor registry
 ```mermaid
 sequenceDiagram
     participant action  as Action 
-    participant docker  as Docker.exe
+    participant docker  as Docker CLI
     participant harbor  as Harbor
     
     action  ->> docker: Docker Pull executed
@@ -36,15 +36,14 @@ In Proxy Cache setup, there is no ability to push to external registry
 ```mermaid
 sequenceDiagram
     participant action  as Action 
-    participant docker  as Docker
-    participant harbor  as Harbor Container <br> Registry
-    participant ecr     as Source Container Registry
+    participant docker  as Docker CLI
+    participant harbor  as Harbor
+    participant ecr     as Source Container <br> Registry
 
     action  ->> docker: Docker Pull executed
     activate action
     activate docker
     docker  ->> harbor: Image requested from Harbor
-    activate docker
     activate harbor
     alt Is imaged already cached?
         harbor  ->> ecr: Retrieve from source container registry
