@@ -111,19 +111,23 @@ sequenceDiagram
 
 ```mermaid
 sequenceDiagram
-    participant action  as Action 
-    participant docker  as Docker
+    participant action  as User or <br> Automation 
+    participant docker  as Docker CLI
     participant harbor  as Harbor Container Registry
-    participant scan    as Vuln Scanner
+    participant scan    as CVE Scanner
     participant ecr     as External Container Registry
 
-    action     ->> docker: Docker Push executed
-    docker     ->> harbor: Image uploaded and stored <br> in Harbor Container Registry
-    alt If vulnerability scanning is enabled
-        harbor    ->> scan: Cached image scanned <br> for vulnerabilities
-        scan      --) harbor: Results available to Harbor
-        end
-    alt Image meets vulnerability threshhold 
-        harbor    ->> ecr: Image is pushed to External Registry <br> (Images which violate vulnerability threshhold will <br> not be pushed to the external registry)
-        end
+    action     ->>+ docker: Docker push to <br> harbor project for target repo
+    docker     ->>+ harbor: Image uploaded and stored <br> in Harbor Container Registry
+    harbor     ->>+ scan: Start scan
+    scan      -->>- harbor: scan results
+    alt Image scan success 
+        harbor  ->>+ ecr: Image is pushed to External Registry 
+        ecr    -->>- harbor: 
+    else Too many CVEs found
+        Note Over harbor,ecr: Imaged not pushed
+        harbor ->> harbor: Report errors, generate alert
+    end
+    harbor   -->>- docker: push complete
+    docker   -->>- action: command complete
 ```
