@@ -75,15 +75,14 @@ sequenceDiagram
     participant scan    as Vuln Scanner
     participant ecr     as External Container Registry
     
-    action      -)+ replicator: Start replication
-    replicator  ->>+ hrCache: Retrieve image from source
-    hrCache     ->>+ ecr: Image pull
-    ecr         -->>- hrCache: Image from source stored <br> in the Harbor Container Registry
-    hrCache -)+ scan: Scan images for <br> vulnerabilities
-    scan    --)- hrCache: Results available to harbor container registry
-    hrCache -->>- replicator: Image fetched and scan started
-
-    replicator --)- action: replication complete
+    action        -)+ replicator: Start replication
+    replicator   ->>+ hrCache: Retrieve image from source
+    hrCache      ->>+ ecr: Image pull
+    ecr         -->>- hrCache: store in proxy cache
+    hrCache       -)+ scan: Scan images for <br> vulnerabilities
+    scan         --)- hrCache: Results available to harbor container registry
+    hrCache     -->>- replicator: Image fetched and scan started
+    replicator   --)- action: replication complete
 ```
 
 ## Image Push to Harbor
@@ -92,17 +91,18 @@ sequenceDiagram
 
 ```mermaid
 sequenceDiagram
-    participant action  as Action 
-    participant docker  as Docker
+    participant action  as User or <br> Automation 
+    participant docker  as Docker CLI
     participant harbor  as Harbor Container Registry
     participant scan    as Vuln Scanner
 
-    action     ->> docker: Docker Push executed
-    docker     ->> harbor: Image uploaded and stored <br> in Harbor Container Registry
-    alt If vulnerability scanning is enabled
-        harbor    ->> scan: Cached image scanned <br> for vulnerabilities
-        scan      --) harbor: Results available to Harbor
-        end
+    action     ->>+ docker: Push issued
+    docker     ->>+ harbor: Imaged pushed to Harbor
+    harbor      -)+ scan: Cached image scanned <br> for vulnerabilities
+    scan       --)- harbor: Results available
+    harbor    -->>- docker: Receipt Acknowledge
+    docker    -->>- action: command completed
+    
 ```
 
 ## Image Push to external registry through Harbor
