@@ -52,6 +52,8 @@ make create
 
 # kind create cluster --config ./spikes/cluster-api/extension/kind-cluster-with-extramounts.yaml
 
+# TODO: move relevant commands from kind-with-registry.sh script here and simplify
+
 ```
 
 Verify cluster creation.
