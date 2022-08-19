@@ -45,7 +45,7 @@ sequenceDiagram
     activate docker
     docker  ->> harbor: Image requested from Harbor
     activate harbor
-    alt Is imaged already cached?
+    alt Image isn't cached
         harbor  ->> ecr: Retrieve from source container registry
         activate ecr
         ecr    -->> harbor: Image from source stored <br> in the Harbor Container Registry
