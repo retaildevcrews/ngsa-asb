@@ -69,19 +69,21 @@ Harbor can pull images from external container registries on a schedule or trigg
 
 ```mermaid
 sequenceDiagram
-    participant action  as Replication Rule Trigger
+    participant action  as Scheduled or Manual <br> Trigger Mechanism
     participant replicator  as Harbor Replication Rule
     participant hrCache as Harbor Container Registry
     participant scan    as Vuln Scanner
     participant ecr     as External Container Registry
     
-    action      ->> replicator: Replication Rule run manualy <br> or as scheduled task
-    replicator  ->> ecr: Image(s) requested from ECR
-    ecr         --) hrCache: Image from source stored <br> in the Harbor Container Registry
-    alt If image scanning is <br> configured and enabled
-        hrCache ->> scan: Scan images for <br> vulnerabilities
-        scan    --) hrCache: Results available to harbor container registry
-        end
+    action      -)+ replicator: Start replication
+    replicator  ->>+ hrCache: Retrieve image from source
+    hrCache     ->>+ ecr: Image pull
+    ecr         -->>- hrCache: Image from source stored <br> in the Harbor Container Registry
+    hrCache -)+ scan: Scan images for <br> vulnerabilities
+    scan    --)- hrCache: Results available to harbor container registry
+    hrCache -->>- replicator: Image fetched and scan started
+
+    replicator --)- action: replication complete
 ```
 
 ## Image Push to Harbor
