@@ -1,4 +1,4 @@
-# Spike: Deploying Thanos
+# Spike: Deploying Thanos in a multi-cluster setup
 
 The following instructions provide a basic implementation of AKS + Thanos for LTS
 
@@ -32,13 +32,14 @@ az group list -o table | grep $AZURE_RG_NAME
 az group create -n $AZURE_RG_NAME -l $AZURE_LOCATION
 
 #### Set name for management cluster
-export AZURE_OBSERVER_CLUSTER_NAME=thanos-observer
+export AZURE_OBSERVER_CLUSTER_NAME=thanos-01
 
 #### Create the AKS Observer Cluster
 az aks create -g $AZURE_RG_NAME \
   -n $AZURE_OBSERVER_CLUSTER_NAME \
   --node-count 3 \
   --generate-ssh-keys
+  --location $AZURE_LOCATION
 
 #### Connect to the AKS cluster
 az aks get-credentials --resource-group $AZURE_RG_NAME --name $AZURE_OBSERVER_CLUSTER_NAME
@@ -61,9 +62,11 @@ export AZURE_STORAGE_ACCOUNT_KEY=$(az storage account keys list -g $AZURE_RG_NAM
 ##### Create Storage Container for Thanos
 az storage container create --name metrics --account-name $AZURE_STORAGE_ACCOUNT_NAME --account-key $AZURE_STORAGE_ACCOUNT_KEY
 
+##### TODO envsubst thanos-storage-config $AZURE_STORAGE_ACCOUNT_KEY
+
 ```
 
-### Install Prometheus + Thanos Query
+### Install Prometheus + Thanos Query for Observer Cluster
 
 ```bash
 ##### Create Monitoring Namespace
@@ -74,32 +77,90 @@ kubectl create secret generic thanos-objstore-config \
   --from-file=spikes/thanos/manifests/thanos-storage-config.yaml \
   -n monitoring
 
-#### Add prometheus-community Helm Repository
-helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
-helm repo update
-
-#### Install kube-prometheus-stack
-helm upgrade --install prometheus prometheus-community/kube-prometheus-stack \
-  -n monitoring \
-  --values spikes/thanos/manifests/prometheus-values.yaml
-
-helm template vault hashicorp/vault --output-dir vault-manifests/helm-manifests
+#### Deploy prometheus + thanos sidecar
+kubectl apply -f spikes/thanos/manifests/observer/prometheus/prometheus.yaml 
 
 #### Verify monitoring pods are running
 kubectl get pods -n monitoring
 
 ```
 
-### Install Thanos Components
+### Install Thanos Components for Observer Cluster
 
 ```bash
 
 ##### Thanos Querier is the layer that will allow us to query all Prometheus instances at once. It needs a Deployment that will be pointed to all sidecars, and it also needs its own Service to be able to be discovered and used.
-kubectl apply -f spikes/thanos/manifests/thanos-querier.yaml 
+kubectl apply -f spikes/thanos/manifests/observer/thanos/thanos-querier.yaml
 
 ##### Thanos Store runs along with the Querier to bring the data from our Object Storage to the queries. It’s composed of a StatefulSet, and a configuration that contains the configuration for the Store, which we previously created as a secret.
-kubectl apply -f spikes/thanos/manifests/thanos-store.yaml
+kubectl apply -f spikes/thanos/manifests/observer/thanos/thanos-store.yaml
 
 ##### Thanos compactor is the service that will downsample the historical data. It’s recommended when you have a lot of incoming data in order to reduce the storage requirements. Just like the Querier component, it is composed of a StatefulSet and a Service. It takes configurations like the Store.
-kubectl apply -f spikes/thanos/manifests/thanos-compactor.yaml
+kubectl apply -f spikes/thanos/manifests/observer/thanos/thanos-compactor.yaml
+
+##### NGSA
+kubectl create ns ngsa
+kubectl apply -f spikes/thanos/manifests/observer/ngsa/ngsa.yaml
+
+##### LR
+kubectl create ns loderunner
+kubectl apply -f spikes/thanos/manifests/observer/ngsa/loderunner.yaml
+
+##### Grafana
+kubectl apply -f spikes/thanos/manifests/observer/grafana/grafana.yaml -n monitoring
+
+# Add Prometheus data source http://thanos-query.monitoring.svc.cluster.local:10902
+# Import dashboard from ngsa.json
+
 ```
+
+## Deploy Observee Cluster
+
+```bash
+
+#### Set the name of your new resource group in Azure.
+export AZURE_LOCATION=eastus
+
+#### Set name for observee cluster
+export AZURE_OBSERVEE_CLUSTER_NAME=thanos-03
+
+#### Create the AKS Observer Cluster
+az aks create -g $AZURE_RG_NAME \
+  -n $AZURE_OBSERVEE_CLUSTER_NAME \
+  --node-count 3 \
+  --generate-ssh-keys \
+  --location $AZURE_LOCATION
+
+#### Connect to the AKS cluster
+az aks get-credentials --resource-group $AZURE_RG_NAME --name $AZURE_OBSERVEE_CLUSTER_NAME
+
+```
+
+### Install Prometheus + Thanos Query for Observee Cluster
+
+```bash
+
+##### Create Monitoring Namespace
+kubectl create ns monitoring
+
+##### Create secret used by Thanos TODO: Convert to template using envsubst
+kubectl create secret generic thanos-objstore-config \
+  --from-file=spikes/thanos/manifests/thanos-storage-config.yaml \
+  -n monitoring
+
+#### Deploy prometheus + thanos sidecar
+kubectl apply -f spikes/thanos/manifests/observee/prometheus/prometheus.yaml 
+
+#### Verify monitoring pods are running
+kubectl get pods -n monitoring
+
+##### NGSA
+kubectl create ns ngsa
+kubectl apply -f spikes/thanos/manifests/observee/ngsa/ngsa.yaml
+
+##### LR
+kubectl create ns loderunner
+kubectl apply -f spikes/thanos/manifests/observee/ngsa/loderunner.yaml
+
+```
+
