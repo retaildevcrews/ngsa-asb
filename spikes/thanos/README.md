@@ -62,17 +62,16 @@ export AZURE_STORAGE_ACCOUNT_KEY=$(az storage account keys list -g $AZURE_RG_NAM
 ##### Create Storage Container for Thanos
 az storage container create --name metrics --account-name $AZURE_STORAGE_ACCOUNT_NAME --account-key $AZURE_STORAGE_ACCOUNT_KEY
 
-##### TODO envsubst thanos-storage-config $AZURE_STORAGE_ACCOUNT_KEY
 
 ```
 
-### Install Prometheus + Thanos Query for Observer Cluster
+### Install Prometheus + Thanos Sidecar for Observer Cluster
 
 ```bash
 ##### Create Monitoring Namespace
 kubectl create ns monitoring
 
-##### Create secret used by Thanos
+##### Create secret used by Thanos (substitue with storage key)
 kubectl create secret generic thanos-objstore-config \
   --from-file=spikes/thanos/manifests/thanos-storage-config.yaml \
   -n monitoring
@@ -136,7 +135,7 @@ az aks get-credentials --resource-group $AZURE_RG_NAME --name $AZURE_OBSERVEE_CL
 
 ```
 
-### Install Prometheus + Thanos Query for Observee Cluster
+### Install Prometheus + Thanos Sidecar for Observee Cluster
 
 ```bash
 
@@ -163,4 +162,3 @@ kubectl create ns loderunner
 kubectl apply -f spikes/thanos/manifests/observee/ngsa/loderunner.yaml
 
 ```
-
