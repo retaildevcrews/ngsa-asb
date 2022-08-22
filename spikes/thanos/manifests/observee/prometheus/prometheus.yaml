@@ -276,7 +276,7 @@ metadata:
 spec:
   selector: 
     app: prometheus-server
-  type: ClusterIP  
+  type: LoadBalancer  
   ports:
     - name: prometheus-server
       port: 9090

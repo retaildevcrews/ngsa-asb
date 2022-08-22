@@ -31,7 +31,7 @@ az group list -o table | grep $AZURE_RG_NAME
 #### Create the new resource group
 az group create -n $AZURE_RG_NAME -l $AZURE_LOCATION
 
-#### Set name for management cluster
+#### Set name for the Observer cluster
 export AZURE_OBSERVER_CLUSTER_NAME=thanos-01
 
 #### Create the AKS Observer Cluster
@@ -72,7 +72,7 @@ az storage container create --name metrics --account-name $AZURE_STORAGE_ACCOUNT
 ##### Create Monitoring Namespace
 kubectl create ns monitoring
 
-##### Create secret used by Thanos TODO: Convert to template using envsubst
+##### Create secret used by Thanos
 kubectl create secret generic thanos-objstore-config \
   --from-file=spikes/thanos/manifests/thanos-storage-config.yaml \
   -n monitoring
