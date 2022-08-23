@@ -5,3 +5,6 @@ capi-configs/
 # Checkov scan result files
 results_cli.txt
 checkov_scan_results.txt
+
+# Thanos spike files
+thanos-storage-config.yaml
