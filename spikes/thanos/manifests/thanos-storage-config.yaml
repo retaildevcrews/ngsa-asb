@@ -1,5 +1,0 @@
-type: AZURE
-config:
-  storage_account: 'joaquinthanos'
-  storage_account_key: ''
-  container: "metrics"
