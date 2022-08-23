@@ -1,22 +1,3 @@
-# apiVersion: monitoring.coreos.com/v1
-# kind: ServiceMonitor
-# metadata:
-#   name: ngsa-memory
-#   namespace: monitoring
-# spec:
-#   jobLabel: ngsa
-#   selector:
-#     matchLabels:
-#       app: ngsa-memory
-#   namespaceSelector:
-#     matchNames:
-#       - 'ngsa'
-#   endpoints:
-#     - port: http
-#       path: /metrics
-#       interval: 5s        
-
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:

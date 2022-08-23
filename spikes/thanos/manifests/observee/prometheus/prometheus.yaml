@@ -84,7 +84,7 @@ data:
       scrape_interval: 15s
       evaluation_interval: 15s
       external_labels:
-        cluster: cluster02
+        cluster: thanos-cluster02
     scrape_configs:      
       - job_name: 'ngsa-memory'
         static_configs:

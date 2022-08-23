@@ -49,7 +49,7 @@ az aks get-credentials --resource-group $AZURE_RG_NAME --name $AZURE_OBSERVER_CL
 
 ```bash
 
-#### Check if storage account name is available
+#### Check if storage account name is available and is a valid name
 export AZURE_STORAGE_ACCOUNT_NAME=<desired account name>
 az storage account check-name --name $AZURE_STORAGE_ACCOUNT_NAME
 
@@ -71,7 +71,10 @@ az storage container create --name metrics --account-name $AZURE_STORAGE_ACCOUNT
 ##### Create Monitoring Namespace
 kubectl create ns monitoring
 
-##### Create secret used by Thanos (substitue with storage key)
+##### Generate secret config  from template
+envsubst < spikes/thanos/manifests/template/thanos-storage-config.yaml.tmpl > spikes/thanos/manifests/thanos-storage-config.yaml
+
+##### Create secret used by Thanos
 kubectl create secret generic thanos-objstore-config \
   --from-file=spikes/thanos/manifests/thanos-storage-config.yaml \
   -n monitoring
@@ -108,8 +111,8 @@ kubectl apply -f spikes/thanos/manifests/observer/ngsa/loderunner.yaml
 ##### Grafana
 kubectl apply -f spikes/thanos/manifests/observer/grafana/grafana.yaml -n monitoring
 
-# Add Prometheus data source http://thanos-query.monitoring.svc.cluster.local:10902
-# Import dashboard from ngsa.json
+# In Grafana , Add Prometheus data source pointed to: http://thanos-query.monitoring.svc.cluster.local:10902
+# Import dashboard in /spikes/thanos/manifests/observer/grafana/ngsa.json
 
 ```
 
@@ -121,7 +124,7 @@ kubectl apply -f spikes/thanos/manifests/observer/grafana/grafana.yaml -n monito
 export AZURE_LOCATION=eastus
 
 #### Set name for observee cluster
-export AZURE_OBSERVEE_CLUSTER_NAME=thanos-03
+export AZURE_OBSERVEE_CLUSTER_NAME=thanos-02
 
 #### Create the AKS Observer Cluster
 az aks create -g $AZURE_RG_NAME \
@@ -142,7 +145,7 @@ az aks get-credentials --resource-group $AZURE_RG_NAME --name $AZURE_OBSERVEE_CL
 ##### Create Monitoring Namespace
 kubectl create ns monitoring
 
-##### Create secret used by Thanos TODO: Convert to template using envsubst
+##### Create secret used by Thanos
 kubectl create secret generic thanos-objstore-config \
   --from-file=spikes/thanos/manifests/thanos-storage-config.yaml \
   -n monitoring
@@ -160,5 +163,16 @@ kubectl apply -f spikes/thanos/manifests/observee/ngsa/ngsa.yaml
 ##### LR
 kubectl create ns loderunner
 kubectl apply -f spikes/thanos/manifests/observee/ngsa/loderunner.yaml
+
+##### Add observee cluster to the observer's querier
+
+# Change context to observer cluster
+az aks get-credentials --resource-group $AZURE_RG_NAME --name $AZURE_OBSERVER_CLUSTER_NAME
+
+# IMPORTANT: Manually add a store to the observer's querier to include the OBSERVEE external IP address/ For example: --store=20.232.248.146:10901 and re apply
+kubectl apply -f spikes/thanos/manifests/observer/thanos/thanos-querier.yaml
+
+
+# Congrats! now you can access the Grafana Dashboards and see your metrics flowing
 
 ```
