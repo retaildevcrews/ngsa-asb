@@ -764,35 +764,52 @@ helm install -f spikes/harbor/helm-values.yaml harbor harbor/harbor -n harbor --
 kubectl apply -f spikes/harbor/harbor-virtual-svc.yaml
 ```
 
-### Pull directly from Harbor Repo
+### Use images in Harbor for deployments/pods
 
-To pull directly from Harbor repo, since Harbor is a is a private rep,o we need to add our Harbor auth information to kubernetes as secrets.
+To pull directly from Harbor repo, since Harbor is a is a private repo, we need to add our Harbor auth information to kubernetes.
 
 Follow the steps below:
 
-* Create a User account in the specific Harbor Project.
-  * Project's page -> Robot Accounts -> `Add a new robot account` with push/pull permission.
-  * Upon the user creation, it will provide a one-time key which can be used as password
-* Create a kubernetes secret of type `docker-registry`
+* We need to add our Harbor Repo Url to Policy and Firewall whitelist:
+  * Add the repo url `harbor-core-eastus-dev.cse.ms/` to Image-pull whitelist Policy under `rg-ngsa-dev-asb` resource group
+    * Policy location: Azure Portal -> `rg-ngsa-asb-dev` resource group -> Policies -> Assignments -> Under `Kubernetes cluster containers should only use allowed images` add the url to the regex.
+  * Add the repo url `harbor-core-eastus-dev.cse.ms` to ASB Firewall whitelist as well.
+    * Region specific FireWall: Azure Portal -> `rg-ngsa-asb-dev-hub` resource group -> `fw-policies-<REGION>` -> Rule Collection
+* Now create a user account in a Harbor Project.
+  * Project's page -> `Robot Accounts` -> `Add a new robot account` with at least pull permission.
+  * Upon the user creation, it will provide a one-time key which can be used as password.
+  * PS: Instead of project specific robot user, we can also create a global robot user
+* Create a kubernetes `docker-registry` secret
 
   ```bash
     read -sr PASSWORD # In this way the password won't be saved to shell history
     kubectl create secret docker-registry harbor-regcred --docker-server=https://harbor-core-eastus-dev.cse.ms --docker-username='<USERNAME>' --docker-password="$PASSWORD" -n ngsa
   ```
 
-* Note: the `harbor-regcred` is the secret name, which will be used by deployments to pull the images. So it should be in the same namespace as the deployment (in above cmd, its `ngsa`).
-* In the deployment file, add the following portion
+* Note: the `harbor-regcred` is the secret name, which will be used by deployments to pull from Harbor. So it should be in the same namespace as the deployment (in above cmd, its `ngsa`).
+* In the deployment file, add imagePullSecrets to allow the deployment to pull from the repo:
 
 ```yaml
-  imagePullSecrets:
+...
+  imagePullSecrets: # Same level as `containers:`
     - name: harbor-regcred
+  containers:
+    - name: app
+      image: ghcr.io/retaildevcrews/ngsa-app:beta
+      imagePullPolicy: Always
+      args: 
+      - --in-memory
+      - --prometheus
+      - --zone
+      - az-eastus-dev
+      - --region
+      - eastus
+  ...
 ```
 
-```bash
-## Login to Harbor Repo
-```
+With these steps, Kubernetes should be able to pull the image from Harbor repo.
 
-Kubernetes has a dedicated documentation on ["Pulling from private repo"](https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/)
+> Followed the steps in official Kubernetes documentation: ["Pulling from private repo"](https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/#create-a-secret-by-providing-credentials-on-the-command-line)
 
 ## Deploying Multiple Clusters Using Existing Network
 
