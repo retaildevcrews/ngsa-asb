@@ -66,8 +66,6 @@ spec:
           volumeMounts:
             - mountPath: /tmp
               name: tmp
-      imagePullSecrets:
-        - name: harbor-regcred
       volumes:
         - emptyDir: {}
           name: tmp
