@@ -24,7 +24,7 @@ spec:
     spec:
       containers:
         - name: app
-          image: harbor-core-eastus-dev.cse.ms/retaildevcrews/ngsa-app:beta
+          image: ghcr.io/retaildevcrews/ngsa-app:beta
           imagePullPolicy: Always
           args: 
           - --in-memory
