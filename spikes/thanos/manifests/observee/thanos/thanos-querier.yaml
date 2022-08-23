@@ -78,4 +78,4 @@ spec:
   endpoints:
     - port: http-query
       path: /metrics
-      interval: 5s              
+      interval: 5s

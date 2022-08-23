@@ -89,4 +89,3 @@ spec:
       name: http
   selector:
     app: ngsa-memory
-    

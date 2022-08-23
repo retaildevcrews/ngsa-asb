@@ -56,4 +56,3 @@ spec:
     - port: 10902
       name: http
 ---
-
