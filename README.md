@@ -764,6 +764,36 @@ helm install -f spikes/harbor/helm-values.yaml harbor harbor/harbor -n harbor --
 kubectl apply -f spikes/harbor/harbor-virtual-svc.yaml
 ```
 
+### Pull directly from Harbor Repo
+
+To pull directly from Harbor repo, since Harbor is a is a private rep,o we need to add our Harbor auth information to kubernetes as secrets.
+
+Follow the steps below:
+
+* Create a User account in the specific Harbor Project.
+  * Project's page -> Robot Accounts -> `Add a new robot account` with push/pull permission.
+  * Upon the user creation, it will provide a one-time key which can be used as password
+* Create a kubernetes secret of type `docker-registry`
+
+  ```bash
+    read -sr PASSWORD # In this way the password won't be saved to shell history
+    kubectl create secret docker-registry harbor-regcred --docker-server=https://harbor-core-eastus-dev.cse.ms --docker-username='<USERNAME>' --docker-password="$PASSWORD" -n ngsa
+  ```
+
+* Note: the `harbor-regcred` is the secret name, which will be used by deployments to pull the images. So it should be in the same namespace as the deployment (in above cmd, its `ngsa`).
+* In the deployment file, add the following portion
+
+```yaml
+  imagePullSecrets:
+    - name: harbor-regcred
+```
+
+```bash
+## Login to Harbor Repo
+```
+
+Kubernetes has a dedicated documentation on ["Pulling from private repo"](https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/)
+
 ## Deploying Multiple Clusters Using Existing Network
 
 Please see Instructions to deploy Multiple Clusters Using Existing Network [here](./docs/deployAdditionalCluster.md)
