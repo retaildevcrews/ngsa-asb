@@ -14,16 +14,21 @@ metadata:
     checkov.io/skip7: CKV_K8S_30=LR UI requires privileged permissions
     checkov.io/skip8: CKV_K8S_23=LR UI requires privileged permissions
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: loderunner-ui
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
   template:
     metadata:
       labels:
         app: loderunner-ui
-        deploy: 22-08-24-06-05-46
-        version: beta-2208-24-06
+        deploy: 22-08-24-13-39-52
+        version: beta-2208-24-13
     spec:
       containers:
         - name: app
