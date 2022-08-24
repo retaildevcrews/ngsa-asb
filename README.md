@@ -24,7 +24,7 @@ NGSA AKS Secure Base line uses the Patterns and Practices AKS Secure Baseline re
 
 ## Prerequisites
 
-* Access to a subscription with Contributor role and User Access Administrator role
+* Access to a subscription with Owner role and User Access Administrator role
 
 ## Setting up Infrastructure
 
