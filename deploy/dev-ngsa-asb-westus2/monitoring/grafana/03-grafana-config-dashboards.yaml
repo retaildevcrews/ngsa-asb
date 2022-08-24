@@ -17,17 +17,31 @@ data:
       orgId: 1
       type: file
       disableDeletion: false
+    - name: ngsa-azure-monitor-perf
+      folder: NGSA
+      options:
+        path: /var/lib/grafana/dashboards/ngsa-az-monitor-perf
+      orgId: 1
+      type: file
+      disableDeletion: false
     - name: ngsa-azure-monitor-rel
       folder: NGSA
       options:
         path: /var/lib/grafana/dashboards/ngsa-az-monitor-rel
       orgId: 1
       type: file
-      disableDeletion: false
-    - name: ngsa-azure-monitor-perf
+      disableDeletion: false         
+    - name: ngsa-azure-blocked-traffic
       folder: NGSA
       options:
-        path: /var/lib/grafana/dashboards/ngsa-az-monitor-perf
+        path: /var/lib/grafana/dashboards/ngsa-az-blocked-traffic
+      orgId: 1
+      type: file
+      disableDeletion: false
+    - name: ngsa-fluentbit
+      folder: NGSA
+      options:
+        path: /var/lib/grafana/dashboards/ngsa-fluentbit
       orgId: 1
       type: file
       disableDeletion: false

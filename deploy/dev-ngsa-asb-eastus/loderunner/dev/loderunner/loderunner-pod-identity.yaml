@@ -7,7 +7,7 @@ metadata:
 spec:
   type: 0
   resourceID: /subscriptions/648dcb5a-de1e-48b2-af6b-fe6ef28d355c/resourcegroups/rg-ngsa-asb-dev/providers/Microsoft.ManagedIdentity/userAssignedIdentities/ngsa-asb-loderunner-id
-  clientID: f6ec9d17-c3a8-4290-a044-7dc2a41d6e53
+  clientID: e73668c7-f031-4210-868f-81af377a0570
 
 ---
 
@@ -69,4 +69,4 @@ spec:
         - |
           objectName: CosmosUrl
           objectType: secret
-    tenantId: 648dcb5a-de1e-48b2-af6b-fe6ef28d355c
+    tenantId: 72f988bf-86f1-41af-91ab-2d7cd011db47

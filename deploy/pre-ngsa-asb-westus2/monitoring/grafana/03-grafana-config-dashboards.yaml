@@ -13,7 +13,7 @@ data:
     - name: ngsa-prometheus
       folder: NGSA
       options:
-        path: /var/lib/grafana/dashboards/ngsa-prometheus 
+        path: /var/lib/grafana/dashboards/ngsa-prometheus
       orgId: 1
       type: file
       disableDeletion: false
@@ -30,4 +30,18 @@ data:
         path: /var/lib/grafana/dashboards/ngsa-az-monitor-rel
       orgId: 1
       type: file
-      disableDeletion: false      
+      disableDeletion: false         
+    - name: ngsa-azure-blocked-traffic
+      folder: NGSA
+      options:
+        path: /var/lib/grafana/dashboards/ngsa-az-blocked-traffic
+      orgId: 1
+      type: file
+      disableDeletion: false
+    - name: ngsa-fluentbit
+      folder: NGSA
+      options:
+        path: /var/lib/grafana/dashboards/ngsa-fluentbit
+      orgId: 1
+      type: file
+      disableDeletion: false

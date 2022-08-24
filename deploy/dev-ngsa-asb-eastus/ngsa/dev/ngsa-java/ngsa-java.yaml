@@ -6,17 +6,22 @@ metadata:
   labels:
     app.kubernetes.io/name: ngsa-java
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: ngsa-java
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
   template:
     metadata:
       labels:
         aadpodidbinding: ngsa-asb-ngsa-id
         app: ngsa-java
-        deploy: 22-07-19-06-14-05
-        version: beta-2207-19-06
+        deploy: 22-08-24-15-51-51
+        version: beta-2208-24-15
     spec:
       automountServiceAccountToken: false
       securityContext:

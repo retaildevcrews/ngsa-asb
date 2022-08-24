@@ -14,6 +14,10 @@ data:
         HTTP_Server   On
         HTTP_Listen   0.0.0.0
         HTTP_Port     2020
+        Health_Check On
+        HC_Errors_Count 5
+        HC_Retry_Failure_Count 5
+        HC_Period 30
         storage.path  /var/log/flb-storage/
         storage.sync  normal
         storage.backlog.mem_limit 32MB

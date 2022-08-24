@@ -1,3 +1,10 @@
 # Cluster API spike files
 capi-configs/
 *.kubeconfig
+
+# Checkov scan result files
+results_cli.txt
+checkov_scan_results.txt
+
+# Thanos spike files
+thanos-storage-config.yaml

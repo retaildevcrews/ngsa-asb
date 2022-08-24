@@ -7,6 +7,7 @@
 * [Create Deployment Files](#create-deployment-files)
 * [Deploy Flux](#deploy-flux)
 * [Deploying NGSA Applications](#deploying-ngsa-applications)
+* [Deploying LodeRunner Applications](#deploying-loderunner-applications)
 * [Deploy Fluent Bit](#deploy-fluent-bit)
 * [Deploy Grafana and Prometheus](#deploy-grafana-and-prometheus)
 * [Leveraging Subdomains for App Endpoints](#leveraging-subdomains-for-app-endpoints)
@@ -47,8 +48,7 @@ az account show -o table
 export ASB_CLUSTER_ADMIN_GROUP=4-co
 
 # Verify you are a member of the security group
-# Might need to execute this line if nested groups exist.
-az ad group member list -g $ASB_CLUSTER_ADMIN_GROUP  --query [].displayName -o table
+az ad group member check -g $ASB_CLUSTER_ADMIN_GROUP --member-id $(az ad signed-in-user show --query id -o tsv) --query value -o tsv
 ```
 
 ### Set Deployment Short Name
@@ -262,7 +262,7 @@ export ASB_CLUSTER_GEO_LOCATION=westus
 # This section takes 15-20 minutes
 
 # Set Kubernetes Version
-export ASB_K8S_VERSION=1.21.7
+export ASB_K8S_VERSION=1.23.8
 
 # Create AKS
 az deployment group create -g $ASB_RG_CORE \
@@ -457,6 +457,54 @@ NGSA Application can be deployed into the cluster using two different approaches
 
   * AutoGitOps is reccomended for a full CI/CD integration. For this approach the application repository must be autogitops enabled.
 
+## Deploying LodeRunner Applications
+
+### 🛑 Prerequisite - [Setup Cosmos DB in secure baseline.](./docs/cosmos.md)
+
+### Create managed identity for LodeRunner app
+
+```bash
+
+# Create managed identity for loderunner-app
+export ASB_LR_MI_NAME="${ASB_DEPLOYMENT_NAME}-loderunner-id"
+
+export ASB_LR_MI_RESOURCE_ID=$(az identity create -g $ASB_RG_CORE -n $ASB_LR_MI_NAME --query "id" -o tsv)
+
+# save env vars
+./saveenv.sh -y
+
+```
+
+### AAD pod identity setup for loderunner-app
+
+```bash
+
+# allow cluster to manage app identity for aad pod identity
+export ASB_AKS_IDENTITY_ID=$(az aks show -g $ASB_RG_CORE -n $ASB_AKS_NAME --query "identityProfile.kubeletidentity.objectId" -o tsv)
+
+az role assignment create --role "Managed Identity Operator" --assignee $ASB_AKS_IDENTITY_ID --scope $ASB_LR_MI_RESOURCE_ID
+
+# give app identity read access to secrets in keyvault
+export ASB_LR_MI_PRINCIPAL_ID=$(az identity show -n $ASB_LR_MI_NAME -g $ASB_RG_CORE --query "principalId" -o tsv)
+
+az keyvault set-policy -n $ASB_KV_NAME --object-id $ASB_LR_MI_PRINCIPAL_ID --secret-permissions get
+
+# Add to KeyVault
+az keyvault secret set -o table --vault-name $ASB_KV_NAME --name "CosmosLRDatabase" --value "LodeRunnerDB"
+az keyvault secret set -o table --vault-name $ASB_KV_NAME --name "CosmosLRCollection" --value "LodeRunner"
+
+# save env vars
+./saveenv.sh -y
+```
+
+LodeRunner Application can be deployed into the cluster using two different approaches:
+
+* [Deploy using yaml with FluxCD](./docs/deployLodeRunnerYaml.md)
+
+* [Deploy using AutoGitops with FluxCD](https://github.com/bartr/autogitops)
+
+  * AutoGitOps is reccomended for a full CI/CD integration. For this approach the application repository must be autogitops enabled.
+
 ## Deploy Fluent Bit
 
 ```bash
@@ -528,7 +576,7 @@ A better approach would be to use a unique subdomain for each app instance. The 
 
 # app DNS name, in subdomain format
 # format [app]-[region]-[env].cse.ms
-export ASB_APP_NAME=ngsa-cosmos
+export ASB_APP_NAME=[application-name] # e.g: ngsa-cosmos, ngsa-java, ngsa-memory, loderunner.
 export ASB_APP_DNS_NAME=${ASB_APP_NAME}-${ASB_SPOKE_LOCATION}-${ASB_ENV}
 export ASB_APP_DNS_FULL_NAME=${ASB_APP_DNS_NAME}.${ASB_DNS_ZONE}
 export ASB_APP_HEALTH_ENDPOINT="/healthz"
@@ -540,7 +588,13 @@ az network dns record-set a add-record -g $ASB_DNS_ZONE_RG -z $ASB_DNS_ZONE -n $
 export ASB_AKS_PRIVATE_IP="$ASB_SPOKE_IP_PREFIX".4.4
 az network private-dns record-set a add-record -g $ASB_RG_CORE -z $ASB_DNS_ZONE -n $ASB_APP_DNS_NAME -a $ASB_AKS_PRIVATE_IP --query fqdn
 
-# create app gateway resources
+```
+
+#### Create app gateway resources
+
+🛑 NOTE: In case of encounter an error when creating app gateway resources refer to [Disable WAF config](./docs/disableWAFconfig.md)
+
+```bash
 # backend pool, HTTPS listener (443), health probe, http setting and routing rule
 export ASB_APP_GW_NAME="apw-$ASB_AKS_NAME"
 
@@ -560,9 +614,18 @@ az network application-gateway http-settings create -g $ASB_RG_CORE --gateway-na
   -n "$ASB_APP_DNS_NAME-httpsettings" --port 443 --protocol Https --cookie-based-affinity Disabled --connection-draining-timeout 0 \
   --timeout 20 --host-name-from-backend-pool true --enable-probe --probe "probe-$ASB_APP_DNS_NAME"
 
+export MAX_RULE_PRIORITY=$(az network application-gateway rule list -g $ASB_RG_CORE --gateway-name $ASB_APP_GW_NAME --query "max([].priority)")
+
+export ABS_HTTPSETTINGS_RULE_PRIORITY=$(($MAX_RULE_PRIORITY+1))
+
+# Verify that the new prority is correct.
+echo $ABS_HTTPSETTINGS_RULE_PRIORITY
+
 az network application-gateway rule create -g $ASB_RG_CORE --gateway-name $ASB_APP_GW_NAME \
   -n "$ASB_APP_DNS_NAME-routing-rule" --address-pool $ASB_APP_DNS_FULL_NAME \
-  --http-settings "$ASB_APP_DNS_NAME-httpsettings" --http-listener "listener-$ASB_APP_DNS_NAME"
+  --http-settings "$ASB_APP_DNS_NAME-httpsettings" --http-listener "listener-$ASB_APP_DNS_NAME" --priority $ABS_HTTPSETTINGS_RULE_PRIORITY 
+
+🛑 Note: If the command 'az network application-gateway rule create' fails due to priority value already been used, please refer to Azure portal in order to identify a priority that does not exist yet.
 
 # set http redirection
 # create listener for HTTP (80), HTTPS redirect config and HTTPS redirect routing rule
@@ -573,9 +636,17 @@ az network application-gateway redirect-config create -g $ASB_RG_CORE --gateway-
   -n "https-redirect-config-$ASB_APP_DNS_NAME" -t "Permanent" --include-path true \
   --include-query-string true --target-listener "listener-$ASB_APP_DNS_NAME"
 
+export MAX_RULE_PRIORITY=$(az network application-gateway rule list -g $ASB_RG_CORE --gateway-name $ASB_APP_GW_NAME --query "max([].priority)")
+
+export ABS_HTTPS_REDIRECT_RULE_PRIORITY=$(($MAX_RULE_PRIORITY+1))
+
+# Verify that the new prority is correct.
+echo $ABS_HTTPS_REDIRECT_RULE_PRIORITY
+
 az network application-gateway rule create -g $ASB_RG_CORE --gateway-name $ASB_APP_GW_NAME \
   -n "https-redirect-$ASB_APP_DNS_NAME-routing-rule" --http-listener "http-listener-$ASB_APP_DNS_NAME" \
-  --redirect-config "https-redirect-config-$ASB_APP_DNS_NAME"
+  --redirect-config "https-redirect-config-$ASB_APP_DNS_NAME" --priority $ABS_HTTPS_REDIRECT_RULE_PRIORITY
+
 ```
 
 ## Deploy WASM sidecar filter
@@ -642,9 +713,35 @@ kubectl get ns
 # start over at Deploy Flux
 ```
 
+## Adding resource locks to resource groups
+
+Set resource locks on resources groups to prevent accidental deletions. This can be done in the Azure portal or with az cli.
+
+Review the [documentation on the side effects](https://docs.microsoft.com/en-us/azure/azure-resource-manager/management/lock-resources?tabs=json#considerations-before-applying-your-locks) of the different types of resource locks. Our use case will be the `CanNotDelete` type to prevent deletions.
+
+```bash
+
+# view resource groups in the current subscription
+az group list -o table
+
+# view only the names, query the name field
+az group list --query "[].name" -o tsv
+
+# view existing resource locks
+az lock list -o table
+
+# create a lock to prevent deletions in the desired resource groups
+LOCK_RESOURCE_GROUP="<resource group name>"
+az lock create \
+  --lock-type CanNotDelete \
+  --name "$LOCK_RESOURCE_GROUP" \
+  --resource-group "$LOCK_RESOURCE_GROUP"
+
+```
+
 ## Delete Azure Resources
 
-> Do not just delete the resource groups
+> Do not just delete the resource groups. Double check for existing resource locks and disable as needed.
 
 Make sure ASB_DEPLOYMENT_NAME is set correctly
 
@@ -714,4 +811,29 @@ az aks disable-addons --addons azure-policy -g $ASB_RG_CORE -n $ASB_AKS_NAME
 
 # delete your AKS cluster (keep your network)
 az deployment group delete -g $ASB_RG_CORE -n cluster-${ASB_DEPLOYMENT_NAME}
+```
+
+### Run Checkov scan
+
+- Navigate to `Codespaces main menu` (top left icon with three horizontal lines)
+- Click on `Terminal` menu item, then `Run Task`
+- From tasks menu locate `Run Checkov Scan` and click on it
+- Task terminal will show up executing substasks and indicating when scan completed
+- Scan results file `checkov_scan_results` will be created at root level, and automatically will get open by VSCode
+- Review the file and evaluate failed checks. For instance:
+
+```bash
+  kubernetes scan results:
+
+  Passed checks: 860, Failed checks: 146, Skipped checks: 0
+  ...
+  ...
+
+  dockerfile scan results:
+
+  Passed checks: 22, Failed checks: 4, Skipped checks: 0
+
+  ...
+  ...
+
 ```
