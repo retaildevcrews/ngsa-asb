@@ -1,0 +1,290 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: prometheus-pvc
+  namespace: monitoring
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 4Gi
+
+---
+
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: prometheus
+  namespace: monitoring
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: prometheus
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - nodes
+  - nodes/proxy
+  - services
+  - endpoints
+  - pods
+  verbs:
+  - get
+  - list
+  - watch
+
+- apiGroups:
+  - extensions
+  resources:
+  - ingresses
+  verbs:
+  - get
+  - list
+  - watch
+
+- nonResourceURLs:
+  - /metrics
+  verbs:
+  - get
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: prometheus
+
+roleRef:
+  name: prometheus
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+
+subjects:
+- kind: ServiceAccount
+  name: prometheus
+  namespace: monitoring
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-server-conf
+  labels:
+    name: prometheus-server-conf
+  namespace: monitoring
+data:
+  prometheus.yml: |-
+    global:
+      scrape_interval: 15s
+      evaluation_interval: 15s
+      external_labels:
+        cluster: thanos-cluster02
+    scrape_configs:      
+      - job_name: 'ngsa-memory'
+        static_configs:
+          - targets: [ 'ngsa-memory.ngsa.svc.cluster.local:8080' ]
+      - job_name: 'ngsa-cosmos'
+        static_configs:
+          - targets: [ 'ngsa-cosmos.ngsa.svc.cluster.local:8080' ]
+      - job_name: 'ngsa-java'
+        static_configs:
+          - targets: [ 'ngsa-java.ngsa.svc.cluster.local:8080' ]
+      - job_name: 'loderunner'
+        static_configs:
+          - targets: [ 'loderunner.loderunner.svc.cluster.local:8080' ]
+      - job_name: 'fluentbit'
+        metrics_path: /api/v1/metrics/prometheus
+        kubernetes_sd_configs:
+        - role: pod
+          namespaces:
+            names:
+            - fluentbit
+          selectors:
+            - role: "pod"
+              label: "app.kubernetes.io/name=fluentbit"
+              field: "status.phase=Running"
+        relabel_configs:
+        - source_labels: [ __meta_kubernetes_pod_name ]
+          action: replace
+          target_label: instance
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prometheus-deployment
+  namespace: monitoring
+  labels:
+    app: prometheus-server
+  annotations:
+    checkov.io/skip1: CKV_K8S_38=Need service account token for Prometheus
+    checkov.io/skip2: CKV_K8S_14=Allow latest image for jumpbox
+    checkov.io/skip3: CKV_K8S_37=Jumpbox and Prometheus need to run as root
+    checkov.io/skip4: CKV_K8S_20=Jumpbox and Prometheus need to run as root
+    checkov.io/skip5: CKV_K8S_22=Jumpbox and Prometheus need write permissions
+    checkov.io/skip6: CKV_K8S_28=Jumpbox needs network capabilities
+    checkov.io/skip7: CKV_K8S_30=Jumpbox needs to run as root
+    checkov.io/skip8: CKV_K8S_40=Jumpbox and Prometheus needs to run as root
+    checkov.io/skip9: CKV_K8S_23=Jumpbox and Prometheus needs to run as root
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: prometheus-server
+  template:
+    metadata:
+      labels:
+        app: prometheus-server
+    spec:
+      serviceAccountName: prometheus
+      containers:
+        - name: prometheus
+          image: prom/prometheus:v2.30.0 
+          imagePullPolicy: Always
+          args:
+            - "--config.file=/etc/prometheus/prometheus.yml"
+            - "--storage.tsdb.path=/prometheus/"
+            - "--storage.tsdb.retention.size=3900MB"
+            - "--storage.tsdb.retention.time=7d"
+            - "--storage.tsdb.min-block-duration=2h"
+            - "--storage.tsdb.max-block-duration=2h"
+            - "--web.enable-lifecycle"
+            - "--web.enable-admin-api"
+          ports:
+            - containerPort: 9090
+          volumeMounts:
+            - name: prometheus-config-volume
+              mountPath: /etc/prometheus/
+            - name: prometheus-storage-volume
+              mountPath: /prometheus/
+          resources:
+            limits:
+              memory: "512Mi"
+              cpu: "1000m"
+            requests:
+              memory: "512Mi"
+              cpu: "500m"
+          readinessProbe:
+            failureThreshold: 3
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            successThreshold: 1
+            tcpSocket:
+              port: 9090
+            timeoutSeconds: 1
+          livenessProbe:
+            failureThreshold: 3
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            successThreshold: 1
+            tcpSocket:
+              port: 9090
+            timeoutSeconds: 1
+          securityContext:
+            capabilities:
+              drop:
+                - ALL
+        - name: thanos
+          image: quay.io/thanos/thanos:v0.23.0
+          args:
+            - "sidecar"
+            - "--log.level=debug"
+            - "--tsdb.path=/prometheus/"
+            - "--prometheus.url=http://localhost:9090"
+            - "--objstore.config-file=/etc/secret/thanos-storage-config.yaml"
+            - "--reloader.config-file=/etc/prometheus/prometheus.yml"
+            # - "--reloader.config-envsubst-file=/etc/prometheus-shared/prometheus.yml"
+            #- "--reloader.rule-dir=/etc/prometheus/rules/"
+          env:
+            - name : THANOS_OBJSTORE_CONFIG
+              value: /etc/secret/thanos-storage-config.yaml
+          ports:
+            - name: http-sidecar
+              containerPort: 10902
+            - name: grpc
+              containerPort: 10901
+          livenessProbe:
+              httpGet:
+                port: 10902
+                path: /-/healthy
+          readinessProbe:
+            httpGet:
+              port: 10902
+              path: /-/ready
+          volumeMounts:
+            - name: prometheus-storage-volume
+              mountPath: /prometheus
+            # - name: prometheus-config-shared
+            #   mountPath: /etc/prometheus-shared/
+            - name: prometheus-config-volume
+              mountPath: /etc/prometheus
+            - name: thanos-objstore-config
+              mountPath: /etc/secret
+              readOnly: false                
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      initContainers:
+      - name: prometheus-data-permission
+        image: ghcr.io/cse-labs/jumpbox:latest
+        command:
+        - chown
+        - -R
+        - 65534:65534
+        - /prometheus
+        volumeMounts:
+        - name: prometheus-storage-volume
+          mountPath: /prometheus
+        resources:
+          limits:
+            memory: "512Mi"
+            cpu: "1000m"
+          requests:
+            memory: "512Mi"
+            cpu: "500m"
+      volumes:
+        - name: prometheus-config-volume
+          configMap:
+            defaultMode: 420
+            name: prometheus-server-conf
+        - name: prometheus-storage-volume
+          persistentVolumeClaim:
+            claimName: prometheus-pvc
+        - name: prometheus-config-shared
+          emptyDir: {}
+        - name: thanos-objstore-config
+          secret:
+            secretName: thanos-objstore-config
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: prometheus-server
+  namespace: monitoring
+  annotations:
+      prometheus.io/scrape: 'true'
+      prometheus.io/port:   '9090'
+spec:
+  selector: 
+    app: prometheus-server
+  type: LoadBalancer  
+  ports:
+    - name: prometheus-server
+      port: 9090
+      protocol: TCP
+      targetPort: 9090
+    - name: grpc
+      port: 10901
+      targetPort: 10901
+    - name: http-sidecar
+      port: 10902
+      targetPort: 10902
