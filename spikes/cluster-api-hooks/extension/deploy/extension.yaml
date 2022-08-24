@@ -2,21 +2,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: test-extension
+  name: sample-extension
 spec:
   selector:
     matchLabels:
-      app: test-extension
+      app: sample-extension
   replicas: 1
   template:
     metadata:
       labels:
-        app: test-extension
+        app: sample-extension
     spec:
       containers:
       - command:
         - /extension
-        image: localhost:5000/capi-ext
+        image: localhost:5000/capi-extension
         name: extension
         imagePullPolicy: Always
         ports:
@@ -32,7 +32,7 @@ spec:
         secret:
           secretName: webhook-service-cert
       terminationGracePeriodSeconds: 10
-      serviceAccountName: test-extension
+      serviceAccountName: sample-extension
       tolerations:
         - effect: NoSchedule
           key: node-role.kubernetes.io/master
