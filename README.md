@@ -701,7 +701,7 @@ http https://ngsa-cosmos-$ASB_DOMAIN_SUFFIX/healthz
 * Add the settings below for Harbor (similar to NGSA apps) in Application Gateway:
   * Backend pool
   * Backend settings
-    * [Optional] If using a health probe, use `/api/v2.0/health` Harbor endpoint
+    * If using a health probe, use `/api/v2.0/health` Harbor endpoint
   * Listeners (http and https)
   * Rules (http and https)
 * [Optional] Add an exception for the harbor-host in the WAF policy (e.g. for
