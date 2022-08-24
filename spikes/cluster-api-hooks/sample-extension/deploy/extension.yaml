@@ -16,7 +16,7 @@ spec:
       containers:
       - command:
         - /extension
-        image: localhost:5000/capi-extension
+        image: localhost:5000/capi-sample-extension
         name: extension
         imagePullPolicy: Always
         ports:
