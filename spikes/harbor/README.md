@@ -5,36 +5,34 @@
 
 > The steps below are guidelines for the dev cluster, but is replicable for the pre-prod as well
 
-- Create a dns entry for Harbor (e.g. `harbor-core-westus2-dev` for WestUS2) in `rg-ngsa-asb-dev/cse.ms` private dns and put the LoadBalancer IP address for the region.
-  - You can find LoadBalancer for your cluster under `rg-ngsa-asb-dev-nodepools-{REGION}`
-  - Or you can check existing dns entries for same region
-- Create a public dns entry (e.g. `harbor-core-westus2-dev` for WestUS2) in `dns-rg/cse.ms` and put the public ip for the regional cluster
-  - You can find public ip in Application Gateway for the cluster (e.g `rg-ngsa-asb-dev/apw-aks-{HASH-REGION}` )
-  - Or you can check existing dns entries for same region
-- Add the settings below for Harbor (similar to NGSA apps) in Application Gateway:
-  - Backend pool
-  - Backend settings
-    - [Optional] If using a health probe, use `/api/v2.0/health` Harbor endpoint
-  - Listeners (http and https)
-  - Rules (http and https)
-- [Optional] Add an exception for the harbor-host in the WAF policy (e.g. for WestUS2-dev you'll add it in `rg-ngsa-asb-dev/ngsa-asb-waf-policy-westus2`)
+* Create a dns entry for Harbor (e.g. `harbor-core-westus2-dev` for WestUS2)
+  in `rg-ngsa-asb-dev/cse.ms` private dns and put the LoadBalancer IP address for the region.
+  * You can find LoadBalancer for your cluster under `rg-ngsa-asb-dev-nodepools-{REGION}`
+  * Or you can check existing dns entries for same region
+* Create a public dns entry (e.g. `harbor-core-westus2-dev` for WestUS2)
+  in `dns-rg/cse.ms` and put the public ip for the regional cluster
+  * You can find the public IP in Application Gateway for the cluster
+    (e.g `rg-ngsa-asb-dev/apw-aks-{HASH}-{REGION}` )
+  * Or you can check existing dns entries for same region
+* Add the settings below for Harbor (similar to NGSA apps) in Application Gateway:
+  * Backend pool
+  * Backend settings
+    * If using a health probe, use `/api/v2.0/health` Harbor endpoint
+  * Listeners (http and https)
+  * Rules (http and https)
+* [Optional] Add an exception for the harbor-host in the WAF policy (e.g. for
+  WestUS2-dev you'll add it in `rg-ngsa-asb-dev/ngsa-asb-waf-policy-westus2`)
 
 At this point Harbor should be ready to deploy.
 Now we need to make sure our cluster can pull the Harbor container images.
-To do that we have two options:
+We will push Harbor images into our cluster's private ACR repo
+  (e.g. `rg-ngsa-asb-dev/acraks3i2qzkkxofr7c`).
 
-- We can push Harbor images into our cluster's private ACR repo (e.g. `rg-ngsa-asb-dev/acraks3i2qzkkxofr7c`).
-    > This is easier and preferable for pre-prod and dev clusters
-  - Goto your private ACR instance, and click on `Networking`
-  - Check `Add your client IP address` and save
-    - This will add your machine's IP addr which will enable you to view and push registries into ACR
-- **Or** we can use another private repo and make sure our cluster can access the ACR repo.
-    > This requires several extra steps and should be done for SPIKEs only
-  - Add the ACR's address in `rg-ngsa-asb-dev-hub/fw-policies-eastus` allow rule collection.
-  - Add managed identity for the regional cluster (e.g `aks-3i2qzkkxofr7c-westus2-agentpool`) to the ACR and give it `AcrPull` permissions
-  - Must deploy the helm in `azure-arc` repo, since its in the policy exempt list.
-
-Now we push all required Harbor images to the ACR with `az acr import`.
+* Goto your private ACR instance, and click on `Networking`
+* Check `Add your client IP address` and save
+  * This will add your machine's IP addr which will enable you to view and
+    push registries into this ACR.
+* Now we push all required Harbor images to the ACR with `az acr import`.
 
   ```bash
   # Select proper subscription for your ACR and login to the account
@@ -60,40 +58,83 @@ Now we push all required Harbor images to the ACR with `az acr import`.
 
 After that, modify the required YAML files to prepare for deployment:
 
-- In [helm-values.yaml](./helm-values.yaml):
-  - Change the `repository:` and `tag:` value pairs (13 of them) to point to the proper ACR repo and tag
-  - Set the Harbor portal admin password (`harborAdminPassword:` )
-- In [harbor-virtual-svc.yaml](./harbor-virtual-svc.yaml)
-  - If deploying to a different namespace than `harbor`, change the namespace value
+* In [helm-values.yaml](./spikes/harbor/helm-values.yaml):
+  * Change the `repository:` and `tag:` value pairs (13 of them) to point to the proper ACR repo and tag
+  * Set the Harbor portal admin password (`harborAdminPassword:` )
+* In [harbor-virtual-svc.yaml](./spikes/harbor/harbor-virtual-svc.yaml)
+  * If deploying to a different namespace than `harbor`, change the namespace value
 
-Now that all of the setup is done, to deploy:
+Now that all of the setup is done, we're ready to deploy:
 > Default user for Harbor portal is admin.
 >
 > Default password should be set in `helm-values.yaml` file before deployment.
 
 ```bash
+# Assuming we're at REPO_ROOT
 # Add Harbor helm repo and update
 helm repo add harbor https://helm.goharbor.io
 helm repo update
 
-# From this spikes/harbor directory
-## <NOTE>: For the spike we're deploying in `azure-arc` namespace, since it is exempt from some policies
-## <NOTE>: but if you have access to push images to cluster private repo, you can deploy to any namespace
-## <NOTE>: In that case, make sure you change the repository to proper ACR name 
-helm install -f helm-values.yaml harbor harbor/harbor -n azure-arc --create-namespace
+helm install -f spikes/harbor/helm-values.yaml harbor harbor/harbor -n harbor --create-namespace
 
-## Make sure you changed the namespace in harbor-virtual-svc.yaml file
-kubectl apply -f harbor-virtual-svc.yaml
+kubectl apply -f spikes/harbor/harbor-virtual-svc.yaml
 ```
+
+### Use images in Harbor for deployments/pods
+
+To pull directly from Harbor repo, since Harbor is a is a private repo, we need to add our Harbor auth information to kubernetes.
+
+Follow the steps below:
+
+* We need to add our Harbor Repo Url to Policy and Firewall whitelist:
+  * Add the repo url `harbor-core-eastus-dev.cse.ms/` to Image-pull whitelist Policy under `rg-ngsa-dev-asb` resource group
+    * Policy location: Azure Portal -> `rg-ngsa-asb-dev` resource group -> Policies -> Assignments -> Under `Kubernetes cluster containers should only use allowed images` add the url to the regex.
+  * Add the repo url `harbor-core-eastus-dev.cse.ms` to ASB Firewall whitelist as well.
+    * Region specific FireWall: Azure Portal -> `rg-ngsa-asb-dev-hub` resource group -> `fw-policies-<REGION>` -> Rule Collection
+* Now create a user account in a Harbor Project.
+  * Project's page -> `Robot Accounts` -> `Add a new robot account` with at least pull permission.
+  * Upon the user creation, it will provide a one-time key which can be used as password.
+  * PS: Instead of project specific robot user, we can also create a global robot user
+* Create a kubernetes `docker-registry` secret
+
+  ```bash
+    read -sr PASSWORD # In this way the password won't be saved to shell history
+    kubectl create secret docker-registry harbor-regcred --docker-server=https://harbor-core-eastus-dev.cse.ms --docker-username='<USERNAME>' --docker-password="$PASSWORD" -n ngsa
+  ```
+
+* Note: the `harbor-regcred` is the secret name, which will be used by deployments to pull from Harbor. So it should be in the same namespace as the deployment (in above cmd, its `ngsa`).
+* In the deployment file, add imagePullSecrets to allow the deployment to pull from the repo:
+
+```yaml
+...
+  imagePullSecrets: # Same level as `containers:`
+    - name: harbor-regcred
+  containers:
+    - name: app
+      image: ghcr.io/retaildevcrews/ngsa-app:beta
+      imagePullPolicy: Always
+      args: 
+      - --in-memory
+      - --prometheus
+      - --zone
+      - az-eastus-dev
+      - --region
+      - eastus
+  ...
+```
+
+With these steps, Kubernetes should be able to pull the image from Harbor repo.
+
+> Followed the steps in official Kubernetes documentation: ["Pulling from private repo"](https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/#create-a-secret-by-providing-credentials-on-the-command-line)
 
 ## Locally or in a VM with Docker
 
 For deploying Harbor locally we need to have these tools available:
 
-- Bash
-- Docker
-- Docker Compose
-- [Optional] Login to Dockerhub (to pull images)
+* Bash
+* Docker
+* Docker Compose
+* [Optional] Login to Dockerhub (to pull images)
 
 ### Steps
 
@@ -238,12 +279,7 @@ subgraph Harbor Proxy Behavior
     
 end
 ```
-
-<!-- markdownlint-disable MD033 -->
-<!--- This section tracks comments and TODO -->
-<span hidden>
-
-FOLLOW UP:
+<!-- FOLLOW UP:
 
 - [X] AAD Integration - Delete any local user (other than admin) then integrate
 - [X] Repository replication from/to other repo
@@ -264,7 +300,7 @@ FOLLOW UP:
     - Then its scanned, and added to cache
     - Before scanning is finished, it is made available as a passthrough (meaning vulnerable images can be pulled for the first time)
     - At this point if policy allows, it does block further pull if vulnerable
-- [X] Harbor can pull/push from remote repo --> Hence it will be able to pull and scan
+- [X] Harbor can pull/push from remote repo -> Hence it will be able to pull and scan
 - [X] Cache and scan
 - [X] Replication endpoints Harbor/ACR/GHCR[X]
   - Replication (pull mode) works as usual with endpoints
@@ -283,5 +319,4 @@ FOLLOW UP:
 - [ ] Make sure from the cluster we can pull from Harbor without going through the internet
   - DNS settings need to be changed in order for local service acting as a registry
 - [ ] For Proxy: Configure to pre-pull and scan rather than passthrough before the scan
-- [ ] *Multiple Harbor deployment and using Front Door as a one-stop URL
-</span>
+- [ ] *Multiple Harbor deployment and using Front Door as a one-stop URL -->
