@@ -6,17 +6,22 @@ metadata:
   labels:
     app.kubernetes.io/name: ngsa-cosmos
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: ngsa-cosmos
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
   template:
     metadata:
       labels:
         aadpodidbinding: ngsa-asb-ngsa-id
         app: ngsa-cosmos
-        deploy: 22-08-21-16-03-05
-        version: beta-2208-21-16
+        deploy: 22-08-24-13-32-22
+        version: beta-2208-24-13
     spec:
       containers:
         - name: app
