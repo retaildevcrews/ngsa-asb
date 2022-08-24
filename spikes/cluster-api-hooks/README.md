@@ -67,14 +67,14 @@ export BASE_CAPI_CONFIG_DIR="spikes/cluster-api-hooks/capi-configs"
 
 mkdir -p $BASE_CAPI_CONFIG_DIR
 
-export DOCKER_CLUSTER_YAML_PATH="${BASE_CAPI_CONFIG_DIR}/capi-quickstart-docker.kubeconfig"
+export DOCKER_CLUSTER_YAML_PATH="${BASE_CAPI_CONFIG_DIR}/capi-quickstart-docker.yaml"
 
 clusterctl generate cluster capi-quickstart-docker \
   --kubernetes-version v1.24.0 \
   --control-plane-machine-count=1 \
   --worker-machine-count=1 \
-  --flavor development \
   --infrastructure=docker \
+  --flavor development \
   > "$DOCKER_CLUSTER_YAML_PATH"
 
 # create local kind workload cluster
@@ -114,6 +114,31 @@ TODO: get AKS working with ClusterClass CRD
 
 ```bash
 
+# TODO: initial setup for creating AKS cluster
+# - duplicate notes here so spike is standalone (leaning towards this route)
+# - or point relevant section in other spike docs
+# - or other
 
+clusterctl init --infrastructure azure
+
+export AZURE_CONTROL_PLANE_MACHINE_TYPE="Standard_A2_v2"
+export AZURE_NODE_MACHINE_TYPE="Standard_A2_v2"
+
+export AKS_CLUSTER_YAML_PATH="${BASE_CAPI_CONFIG_DIR}/capi-quickstart-aks.yaml"
+
+# TODO: need a template using ClusterClass for lifecycle hooks to work
+
+clusterctl generate cluster capi-quickstart-aks \
+  --kubernetes-version v1.24.0 \
+  --control-plane-machine-count=1 \
+  --worker-machine-count=1 \
+  --infrastructure=azure \
+  --flavor=aks \
+  > "$AKS_CLUSTER_YAML_PATH"
+
+kubectl apply -f "$AKS_CLUSTER_YAML_PATH"
+
+# view the cluster in cluster api
+kubectl get clusters
 
 ```
