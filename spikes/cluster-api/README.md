@@ -174,8 +174,8 @@ Generate AKS cluster configuration yaml files.
 
 clusterctl generate cluster capi-quickstart-management \
   --kubernetes-version v1.24.0 \
-  --control-plane-machine-count=1 \
-  --worker-machine-count=1 \
+  --control-plane-machine-count=3 \
+  --worker-machine-count=3 \
   --flavor=aks \
   --infrastructure=azure \
   > "$MANAGEMENT_CLUSTER_YAML_PATH"
