@@ -20,8 +20,8 @@ spec:
       labels:
         app: loderunner-api
         aadpodidbinding: ngsa-asb-loderunner-id
-        deploy: 22-08-24-13-39-52
-        version: beta-2208-24-13
+        deploy: 22-08-25-06-11-54
+        version: beta-2208-25-06
     spec:
       containers:
         - name: app
