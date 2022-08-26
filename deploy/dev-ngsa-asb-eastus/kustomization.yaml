@@ -3,6 +3,6 @@ kind: Kustomization
 resources:
 # - fluentbit/fluentbit-flux-kustomization.yaml
 # - istio/istio-flux-kustomization.yaml
-# - loderunner/loderunner-flux-kustomization.yaml
 # - monitoring/monitoring-flux-kustomization.yaml
+- loderunner/loderunner-flux-kustomization.yaml
 - ngsa/ngsa-flux-kustomization.yaml
