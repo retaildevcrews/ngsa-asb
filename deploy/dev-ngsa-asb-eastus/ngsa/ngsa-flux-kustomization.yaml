@@ -7,11 +7,11 @@ metadata:
 spec:
   # dependsOn:
   # - name: observability
-  interval: 60m0s # detect drift and undo kubectl edits every hour
+  interval: 1m0s # detect drift and undo kubectl edits every minute
   prune: true # remove stale resources from cluster
   targetNamespace: ngsa # set the namespace for all resources
   path: ./deploy/dev-ngsa-asb-eastus/ngsa
   sourceRef:
     kind: GitRepository
     name: asb-repo-flux
-    namespace: flux-system # points to namespace
+    namespace: flux-system # points to namespace where this GitRepository is
