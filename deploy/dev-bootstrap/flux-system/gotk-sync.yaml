@@ -8,8 +8,8 @@ metadata:
 spec:
   interval: 1m0s
   ref:
-    branch: cpr-demo-istio-gatewayonly
-  # secretRef:
+    branch: kushal/fluxv2-kustomization
+  # secretRef: # We're accessing ngs-asb as readonly repo
   #   name: flux-system
   url: https://github.com/retaildevcrews/ngsa-asb
 ---
