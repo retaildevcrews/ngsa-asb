@@ -51,7 +51,7 @@ spec:
                   remote:
                     sha256: 066844da3cc53ed74aeca0031a57ce13bd44792f0abf9b85ccea4063d446b601
                     http_uri:
-                      uri: https://raw.githubusercontent.com/retaildevcrews/ngsa-asb/new-wasm/wasm/burst_header_struct.wasm
+                      uri: https://raw.githubusercontent.com/retaildevcrews/ngsa-asb/new-wasm/wasm/burst_header.wasm
                       cluster: burstcluster
                       timeout: 10s
               # The configuration for the Wasm extension itself
