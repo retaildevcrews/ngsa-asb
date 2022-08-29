@@ -360,7 +360,7 @@ kubectl --kubeconfig="$WORKLOAD_CLUSTER_KUBECONFIG_PATH" delete pod hello-world
   - the update are alternating between adding and removing the storageProfile field from the cluster's properties
 - [ ] how to prevent accidental cluster deletes
   - processes and permissions required to prevent user and service principal from accidentally deleting resources
-- [ ] observability into Cluster API actions and progress
+- [x] observability into Cluster API actions and progress
   - observed cluster switching between "Succeeded(Running)" and "Updating(Running)"
 - [ ] quick start links to docs for setting up service principal. <https://capz.sigs.k8s.io/topics/getting-started.html#prerequisites>
   - it includes a deprecation warning with another link to recommended approach

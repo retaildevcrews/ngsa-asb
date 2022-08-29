@@ -142,3 +142,6 @@ kubectl apply -f "$AKS_CLUSTER_YAML_PATH"
 kubectl get clusters
 
 ```
+
+sample extension config location
+<https://github.com/kubernetes-sigs/cluster-api/blob/main/docs/proposals/20220221-runtime-SDK.md#registering-runtime-extensions>
