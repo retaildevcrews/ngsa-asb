@@ -42,16 +42,6 @@ spec:
           type_url: type.googleapis.com/envoy.extensions.filters.http.wasm.v3.Wasm
           value:
             config:
-              # The configuration for the Wasm extension itself
-              configuration:
-                "@type": "type.googleapis.com/google.protobuf.StringValue"
-                value: |
-                  { 
-                    "service_cluster": "burstcluster",
-                    "service_authority": "burst.burstservice",
-                    "service_path": "/burstmetrics/deployments",
-                    "cache_seconds": 5
-                  }    
               root_id: burst-wasm-root-id
               vm_config:
                 vm_id: burst-wasm-vm-id
@@ -59,11 +49,19 @@ spec:
                 allow_precompiled: true
                 code:
                   remote:
+                    sha256: 066844da3cc53ed74aeca0031a57ce13bd44792f0abf9b85ccea4063d446b601
                     http_uri:
                       uri: https://raw.githubusercontent.com/retaildevcrews/ngsa-asb/main/wasm/burst_header.wasm
                       cluster: burstcluster
                       timeout: 10s
-                    sha256: 0f54aa9a06f06dc0adb8b155c69b0883dd009c96b87f9f985fb2bee197c46c6d       
+              # The configuration for the Wasm extension itself
+              configuration:
+                "@type": "type.googleapis.com/google.protobuf.Struct"
+                value:
+                  service_cluster: "burstcluster"
+                  service_authority: "burst.burstservice"
+                  service_path: "/burstmetrics/deployments"
+                  cache_seconds: 5
 
   # The  patch adds the cluster that is referenced by the WebAssembly
   - applyTo: CLUSTER
