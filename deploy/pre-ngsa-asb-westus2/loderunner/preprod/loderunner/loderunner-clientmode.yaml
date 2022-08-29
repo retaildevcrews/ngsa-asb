@@ -43,7 +43,7 @@ spec:
           - /app/secrets
           - --prometheus
           - --zone
-          - az-westus2-dev
+          - az-westus2-pre
           - --region
           - westus2
           volumeMounts:
