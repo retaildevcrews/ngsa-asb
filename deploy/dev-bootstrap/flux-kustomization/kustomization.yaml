@@ -1,8 +1,8 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-- ../cluster-baseline-settings/01-namespace.yaml # Apply the namespace before kustomization
+- ../kube-system/azm-flux-kustomization.yaml
+- ../cluster-baseline-settings/01-namespace.yaml
 - ../cluster-baseline-settings/cluster-baseline-flux-kustomization.yaml
-- ../kube-system/azm-flux-kustomization.yaml # kube-system ns should exist already
-- ../istio/01-namespace.yaml # Apply the namespace before kustomization
+- ../istio/01-namespace.yaml
 - ../istio/istio-flux-kustomization.yaml
