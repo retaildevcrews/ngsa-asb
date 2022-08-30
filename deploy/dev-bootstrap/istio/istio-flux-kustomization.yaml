@@ -7,7 +7,6 @@ metadata:
 spec:
   interval: 10m0s # detect drift and undo kubectl edits every 10mins
   prune: true # remove stale resources from cluster
-  targetNamespace: istio-operator # overwrite the ns for resources in path
   path: ./deploy/dev-bootstrap/istio
   sourceRef:
     kind: GitRepository
