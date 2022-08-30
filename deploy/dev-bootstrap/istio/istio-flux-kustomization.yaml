@@ -5,6 +5,9 @@ metadata:
   name: bootstrapped-istio
   namespace: istio-operator
 spec:
+  dependsOn:
+  - name: flux-system
+    namespace: flux-system
   interval: 1m0s # detect drift and undo kubectl edits every 10mins
   prune: true # remove stale resources from cluster
   path: ./deploy/dev-bootstrap/istio
