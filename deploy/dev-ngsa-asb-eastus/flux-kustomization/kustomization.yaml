@@ -3,12 +3,12 @@ kind: Kustomization
 resources:
 - ../istio/istio-flux-kustomization.yaml
 - ../fluentbit/01-namespace.yaml # Apply the namespace before kustomization
-- ../fluentbit/fluentbit-flux-kustomization.yaml
 - ../monitoring/01-namespace.yaml # Apply the namespace before kustomization
-- ../monitoring/monitoring-flux-kustomization.yaml
 - ../loderunner/namespace.yaml # Apply the namespace before kustomization
-- ../loderunner/loderunner-flux-kustomization.yaml
 - ../ngsa/namespace.yaml # Apply the namespace before kustomization
+- ../fluentbit/fluentbit-flux-kustomization.yaml
+- ../monitoring/monitoring-flux-kustomization.yaml
+- ../loderunner/loderunner-flux-kustomization.yaml
 - ../ngsa/ngsa-flux-kustomization.yaml
 
 # Quick k8s kustomize note on directory and file
