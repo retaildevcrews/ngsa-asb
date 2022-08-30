@@ -2,13 +2,12 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
 kind: Kustomization
 metadata:
-  name: flux-system
-  namespace: flux-system
+  name: bootstrapped-cluster-baseline
+  namespace: cluster-baseline-settings
 spec:
   interval: 10m0s # detect drift and undo kubectl edits every 10mins
-  path: ./deploy/dev-bootstrap/flux-system
+  path: ./deploy/dev-bootstrap/cluster-baseline-settings
   prune: true # remove stale resources from cluster
-  targetNamespace: flux-system # set the namespace for all resources
   sourceRef:
     kind: GitRepository
     name: asb-repo-flux
