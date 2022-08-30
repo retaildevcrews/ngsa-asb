@@ -5,8 +5,11 @@ metadata:
   name: loderunner
   namespace: loderunner
 spec:
-  # dependsOn:
-  # - name: observability
+  dependsOn:
+  - name: flux-system
+    namespace: flux-system
+  - name: istio
+    namespace: istio-system
   interval: 1m0s # detect drift and undo kubectl edits every minute
   prune: true # remove stale resources from cluster
   targetNamespace: loderunner # overwrite the ns for resources in path

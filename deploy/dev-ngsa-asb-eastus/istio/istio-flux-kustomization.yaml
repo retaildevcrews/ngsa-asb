@@ -5,8 +5,11 @@ metadata:
   name: istio
   namespace: istio-system
 spec:
-  # dependsOn:
-  # - name: observability
+  dependsOn:
+  - name: flux-system
+    namespace: flux-system
+  - name: bootstrapped-istio
+    namespace: istio-operator
   interval: 1m0s # detect drift and undo kubectl edits every minute
   prune: true # remove stale resources from cluster
   targetNamespace: istio-system # overwrite the ns for resources in path
