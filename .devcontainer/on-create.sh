@@ -9,9 +9,9 @@ sudo chsh --shell /bin/zsh vscode
 k3d --version | grep -Eo '^k3d version v5...[1-9]$' > /dev/null 2>&1
 if [ $? -ne 0 ]; then
     # Means we don't have proper k3d version
-    # Install v5.0.1
-    echo "Installing k3d v5.0.1"
-    wget -q -O - https://raw.githubusercontent.com/rancher/k3d/main/install.sh | sudo bash
+    # Install v5.4.6
+    echo "Installing k3d v5.4.6"
+    wget -q -O - https://raw.githubusercontent.com/rancher/k3d/main/install.sh | TAG=v5.4.6 sudo bash
 fi
 
 # Create Docker Network for k3d
