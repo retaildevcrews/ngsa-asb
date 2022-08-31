@@ -1,5 +1,5 @@
 {
-	"name": "ASB-Ngsa",
+	"name": "ngsa-asb",
 	"dockerFile": "Dockerfile",
 	"runArgs": [ "--init", "--privileged" ],
 	"overrideCommand": false,
@@ -22,5 +22,5 @@
 		"Bridgecrew.checkov"
 	],
 
-	"onCreateCommand": "/bin/bash -c .devcontainer/on-create.sh"
+	"onCreateCommand": "/bin/bash .devcontainer/on-create.sh"
 }
