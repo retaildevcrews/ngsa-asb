@@ -1,14 +1,13 @@
 {
 	"name": "ASB-Ngsa",
-	"image": "ghcr.io/retaildevcrews/asb:latest",
-	//"build": { "dockerfile": "Dockerfile" },
+	"build": { "dockerfile": "Dockerfile" },
 	"runArgs": [ "--init", "--privileged" ],
 	"overrideCommand": false,
 
 	// Set *default* container specific settings.json values on container create.
 	"settings": { },
 
-	"remoteUser": "codespace",
+	"remoteUser": "vscode",
 
 	"forwardPorts": [],
 
@@ -17,7 +16,8 @@
 		"davidanson.vscode-markdownlint",
 		"gruntfuggly.todo-tree",
 		"ms-azuretools.vscode-docker",
-		"humao.rest-client"
+		"humao.rest-client",
+		"Bridgecrew.checkov"
 	],
 
 	"onCreateCommand": "/bin/bash .devcontainer/on-create.sh"
