@@ -43,7 +43,7 @@ spec:
           - /app/secrets
           - --prometheus
           - --zone
-          - az-eastus-dev
+          - az-eastus-pre
           - --region
           - eastus
           volumeMounts:

@@ -20,3 +20,4 @@ spec:
     - "ngsa/ngsa-cosmos-centralus-pre.cse.ms"
     - "ngsa/ngsa-java-centralus-pre.cse.ms"
     - "monitoring/grafana-centralus-pre.cse.ms"
+    - "loderunner/loderunner-centralus-pre.cse.ms"

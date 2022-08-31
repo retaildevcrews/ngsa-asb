@@ -43,9 +43,9 @@ spec:
           - /app/secrets
           - --prometheus
           - --zone
-          - az-eastus-dev
+          - az-westus2-pre
           - --region
-          - eastus
+          - westus2
           volumeMounts:
             - name: secrets
               mountPath: "/app/secrets"

@@ -47,7 +47,7 @@ spec:
               cpu: "500m"
           env:
           - name: "LRAPI_DNS"
-            value: "https://loderunner-eastus-dev.cse.ms/api"
+            value: "https://loderunner-centralus-pre.cse.ms/api"
           readinessProbe:
             initialDelaySeconds: 5
             httpGet:
@@ -94,7 +94,7 @@ spec:
   gateways:
   - istio-system/istio-gateway
   hosts:
-  - loderunner-eastus-dev.cse.ms
+  - loderunner-centralus-pre.cse.ms
   http:
   - match:
     - uri:
