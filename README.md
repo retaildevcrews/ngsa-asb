@@ -363,9 +363,12 @@ cat templates/istio/istio-gateway.yaml | envsubst > $ASB_GIT_PATH/istio/istio-ga
 # istio ingress config
 cat templates/istio/istio-ingress.yaml | envsubst > $ASB_GIT_PATH/istio/istio-ingress.yaml
 
-# GitOps (flux)
-rm -f flux.yaml
-cat templates/flux.yaml | envsubst  > flux.yaml
+# GitOps (flux v2)
+rm -f deploy/bootstrap/flux-system/gotk-repo.yaml
+cat templates/flux-system/gotk-repo.yaml | envsubst  >| deploy/bootstrap/flux-system/gotk-repo.yaml
+# Note: if separate bootstrap folder (dev-bootstrap) for dev env exists, then replace `bootstrap` with `dev-bootstrap`
+# rm -f deploy/dev-bootstrap/flux-system/gotk-repo.yaml
+# cat templates/flux-system/gotk-repo.yaml | envsubst  >| deploy/dev-bootstrap/flux-system/gotk-repo.yaml
 ```
 
 ### Push to GitHub
@@ -384,34 +387,56 @@ git add $ASB_GIT_PATH/istio/istio-gateway.yaml
 git add $ASB_GIT_PATH/istio/istio-ingress.yaml
 
 git commit -m "added cluster config"
+
+# Add and push Flux branch and repo info
+git add deploy/bootstrap/flux-system/
+# Note: if separate bootstrap folder (dev-bootstrap) for dev env exists, then replace `bootstrap` with `dev-bootstrap`
+# git add deploy/dev-bootstrap/flux-system/
+git commit -m "added flux bootstrap config"
+
 git push
 ```
 
 ## Deploy Flux
 
-> ASB uses `Flux CD` for `GitOps`
+> ASB uses `Flux v2` for `GitOps`
 
 ```bash
-# Setup flux
-kubectl apply -f flux.yaml
+# Setup flux base system (replace bootstrap folder with dev-bootstrap for dev env)
+kubectl apply -k deploy/bootstrap/flux-system/ 
+# Note: if previous kubectl apply cmd fails, then simply reapply
+
+# Setup cluster-baseline (replace bootstrap folder with dev-bootstrap for dev env)
+kubectl apply -f deploy/bootstrap/flux-kustomization/bootstrap-kustomization.yaml
+
+# Setup zone specific deployment
+kubectl apply -f $ASB_GIT_PATH/flux-kustomization/${ASB_CLUSTER_LOCATION}-kustomization.yaml
 
 # 🛑 Check the pods until everything is running
-kubectl get pods -n flux-cd -l app.kubernetes.io/name=flux
+kubectl get pods -n flux-system
 
-# Check flux logs
-kubectl logs -n flux-cd -l app.kubernetes.io/name=flux
+# Check flux syncing git repo logs
+kubectl logs -n flux-system -l app=source-controller
 
-# Sync Flux
-fluxctl sync --k8s-fwd-ns flux-cd
+# Check flux syncing kustomization logs
+kubectl logs -n flux-system -l app=kustomize-controller
 
-# Note: Flux will automatically deploy everything in your $ASB_GIT_PATH path as well as everything in the deploy/bootstrap folder
+# List all flux kustmization in the cluster
+# It also shows the state of each kustomization
+flux get kustomizations -A
+
+# Reconcile (sync) one individual kustomization
+flux reconcile kustomization -n ngsa ngsa # note the namespace `-n ngsa`
+
+# Reconcile (sync) all flux kustomization in the cluster
+flux get kustomizations -A --no-header | awk -F' ' '{printf "%s -n %s\n",$2, $1}' | xargs -L 1 -I_ sh -c "flux reconcile kustomization _"
+
+# Suspend one flux kustomization from reconciliation (sync)
+# flux suspend kustomization -n ngsa ngsa # note the namespace `-n ngsa`
+
+# Suspend the git source from updating (should suspend any updates from the git repo)
+# flux suspend source git asb-repo-flux
 ```
-
-> Note: `fluxctl` CLI has a default timeout of 60s, if the above `fluxctl sync`
-> command times out it means `fluxcd` is still working on it
->
-> If you want to wait longer add `--timeout 180s` to your `fluxctl` command.
-> Or upon timeout you can check `fluxcd` logs in the cluster.
 
 ## Deploying NGSA Applications
 
@@ -538,7 +563,7 @@ git commit -m "added fluentbit"
 git push
 
 # Sync Flux
-fluxctl sync --k8s-fwd-ns flux-cd
+flux reconcile kustomization -n fluentbit fluentbit
 # Note: `fluxctl` CLI has a default timeout of 60s, if the above `fluxctl sync` command times out it means `fluxcd` is still working on it
 
 ```
@@ -673,7 +698,7 @@ git commit -m "added burst for ${WASM_TARGET_APP}"
 git push
 
 # Sync Flux
-fluxctl sync --k8s-fwd-ns flux-cd
+flux reconcile kustomization -n burstservice burst
 # Note: `fluxctl` CLI has a default timeout of 60s, if the above `fluxctl sync` command times out it means `fluxcd` is still working on it
 
 # Note: It may be required to re-create the ngsa-cosmos and istio operator pods for changes to take effect
@@ -699,7 +724,7 @@ Please see Instructions to deploy Multiple Clusters Using Existing Network [here
 # delete the namespaces
 # this can take 4-5 minutes
 ### order matters as the deletes will hang and flux could try to re-deploy
-kubectl delete ns flux-cd
+kubectl delete ns flux-system
 kubectl delete ns ngsa
 kubectl delete ns istio-system
 kubectl delete ns istio-operator
