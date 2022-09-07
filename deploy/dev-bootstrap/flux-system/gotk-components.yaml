@@ -5563,6 +5563,7 @@ spec:
           name: temp
       nodeSelector:
         kubernetes.io/os: linux
+        agentpool: npuser01 # Azure Node selector
       securityContext:
         fsGroup: 1337
       serviceAccountName: helm-controller
@@ -5645,6 +5646,7 @@ spec:
           name: temp
       nodeSelector:
         kubernetes.io/os: linux
+        agentpool: npuser01 # Azure Node selector
       securityContext:
         fsGroup: 1337
       serviceAccountName: kustomize-controller
@@ -5732,6 +5734,7 @@ spec:
           name: temp
       nodeSelector:
         kubernetes.io/os: linux
+        agentpool: npuser01 # Azure Node selector
       securityContext:
         fsGroup: 1337
       serviceAccountName: notification-controller
@@ -5823,6 +5826,7 @@ spec:
           name: tmp
       nodeSelector:
         kubernetes.io/os: linux
+        agentpool: npuser01 # Azure Node selector
       securityContext:
         fsGroup: 1337
       serviceAccountName: source-controller
