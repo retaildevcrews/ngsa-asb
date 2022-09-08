@@ -5294,6 +5294,8 @@ metadata:
     app.kubernetes.io/instance: flux-system
     app.kubernetes.io/part-of: flux
     app.kubernetes.io/version: v0.32.0
+  annotations:
+    checkov.io/skip1: CKV_K8S_49=Flux needs wildcard resource access to manage them
   name: crd-controller-flux-system
 rules:
 - apiGroups:
@@ -5497,6 +5499,9 @@ metadata:
     app.kubernetes.io/part-of: flux
     app.kubernetes.io/version: v0.32.0
     control-plane: controller
+  annotations:
+    checkov.io/skip1: CKV_K8S_40=Flux requires privileged permissions
+    checkov.io/skip2: CKV_K8S_38=Flux requires service account token
   name: helm-controller
   namespace: flux-system
 spec:
@@ -5525,7 +5530,7 @@ spec:
             fieldRef:
               fieldPath: metadata.namespace
         image: acraks3i2qzkkxofr7c.azurecr.io/fluxcd/helm-controller:v0.22.2
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always
         livenessProbe:
           httpGet:
             path: /healthz
@@ -5566,6 +5571,8 @@ spec:
         agentpool: npuser01 # Azure Node selector
       securityContext:
         fsGroup: 1337
+        seccompProfile:
+          type: RuntimeDefault
       serviceAccountName: helm-controller
       terminationGracePeriodSeconds: 600
       volumes:
@@ -5580,6 +5587,9 @@ metadata:
     app.kubernetes.io/part-of: flux
     app.kubernetes.io/version: v0.32.0
     control-plane: controller
+  annotations:
+    checkov.io/skip1: CKV_K8S_40=Flux requires privileged permissions
+    checkov.io/skip2: CKV_K8S_38=Flux requires service account token
   name: kustomize-controller
   namespace: flux-system
 spec:
@@ -5608,7 +5618,7 @@ spec:
             fieldRef:
               fieldPath: metadata.namespace
         image: acraks3i2qzkkxofr7c.azurecr.io/fluxcd/kustomize-controller:v0.27.0
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always
         livenessProbe:
           httpGet:
             path: /healthz
@@ -5649,6 +5659,8 @@ spec:
         agentpool: npuser01 # Azure Node selector
       securityContext:
         fsGroup: 1337
+        seccompProfile:
+          type: RuntimeDefault
       serviceAccountName: kustomize-controller
       terminationGracePeriodSeconds: 60
       volumes:
@@ -5663,6 +5675,9 @@ metadata:
     app.kubernetes.io/part-of: flux
     app.kubernetes.io/version: v0.32.0
     control-plane: controller
+  annotations:
+    checkov.io/skip1: CKV_K8S_40=Flux requires privileged permissions
+    checkov.io/skip2: CKV_K8S_38=Flux requires service account token
   name: notification-controller
   namespace: flux-system
 spec:
@@ -5690,7 +5705,7 @@ spec:
             fieldRef:
               fieldPath: metadata.namespace
         image: acraks3i2qzkkxofr7c.azurecr.io/fluxcd/notification-controller:v0.25.1
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always
         livenessProbe:
           httpGet:
             path: /healthz
@@ -5737,6 +5752,8 @@ spec:
         agentpool: npuser01 # Azure Node selector
       securityContext:
         fsGroup: 1337
+        seccompProfile:
+          type: RuntimeDefault
       serviceAccountName: notification-controller
       terminationGracePeriodSeconds: 10
       volumes:
@@ -5751,6 +5768,9 @@ metadata:
     app.kubernetes.io/part-of: flux
     app.kubernetes.io/version: v0.32.0
     control-plane: controller
+  annotations:
+    checkov.io/skip1: CKV_K8S_40=Flux requires privileged permissions
+    checkov.io/skip2: CKV_K8S_38=Flux requires service account token
   name: source-controller
   namespace: flux-system
 spec:
@@ -5783,7 +5803,7 @@ spec:
             fieldRef:
               fieldPath: metadata.namespace
         image: acraks3i2qzkkxofr7c.azurecr.io/fluxcd/source-controller:v0.26.1
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always
         livenessProbe:
           httpGet:
             path: /healthz
@@ -5829,6 +5849,8 @@ spec:
         agentpool: npuser01 # Azure Node selector
       securityContext:
         fsGroup: 1337
+        seccompProfile:
+          type: RuntimeDefault
       serviceAccountName: source-controller
       terminationGracePeriodSeconds: 10
       volumes:
