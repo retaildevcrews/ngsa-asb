@@ -1,0 +1,23 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- ../istio/istio-flux-kustomization.yaml
+- ../fluentbit/01-namespace.yaml # Apply the namespace before kustomization
+- ../monitoring/01-namespace.yaml # Apply the namespace before kustomization
+- ../loderunner/namespace.yaml # Apply the namespace before kustomization
+- ../ngsa/namespace.yaml # Apply the namespace before kustomization
+- ../fluentbit/fluentbit-flux-kustomization.yaml
+- ../monitoring/monitoring-flux-kustomization.yaml
+- ../loderunner/loderunner-flux-kustomization.yaml
+- ../ngsa/ngsa-flux-kustomization.yaml
+
+# Quick k8s kustomize note on directory and file
+# <cur-dir> --> This is where the k8s kustomization.yaml resides
+# ---
+# apiVersion: kustomize.config.k8s.io/v1beta1
+# kind: Kustomization
+# resources:
+# - dir-1/app.yaml     # --> Applies <cur-dir>/dir-1/app.yaml
+# - dir-2/             # --> Applies <cur-dir>/dir-2/*
+# - ../dir-3/app.yaml  # --> Applied <cur-dir>/../dir-3/app.yaml
+# - ../dir-4/          # --> Applied <cur-dir>/../dir-4/*
