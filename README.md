@@ -411,8 +411,9 @@ Before deploying flux we need to import the flux images to ACR.
 grep 'image:' deploy/bootstrap/flux-system/gotk-components.yaml | awk -F'azurecr.io' '{print $2}' | xargs -I_ az acr import --source "ghcr.io_" -n $ASB_ACR_NAME
 
 # Setup flux base system (replace bootstrap folder with dev-bootstrap for dev env)
-kubectl apply -k deploy/bootstrap/flux-system/ 
-# Note: if previous kubectl apply cmd fails, then simply reapply
+kubectl create -k deploy/bootstrap/flux-system/
+# Note: If flux v2 exists in cluster, use "kubectl apply -k"
+# Note: if "kubectl create/apply -k" fails once (sometimes CRD takes some time to be injected into the API), then simply reapply
 
 # Setup cluster-baseline (replace bootstrap folder with dev-bootstrap for dev env)
 kubectl apply -f deploy/bootstrap/flux-kustomization/bootstrap-kustomization.yaml
