@@ -6,8 +6,6 @@ metadata:
   namespace: loderunner
 spec:
   dependsOn:
-  - name: flux-system
-    namespace: flux-system
   - name: istio
     namespace: istio-system
   interval: 1m0s # detect drift and undo kubectl edits every minute

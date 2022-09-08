@@ -6,8 +6,6 @@ metadata:
   namespace: istio-system
 spec:
   dependsOn:
-  - name: flux-system
-    namespace: flux-system
   - name: bootstrapped-istio
     namespace: istio-operator
   interval: 1m0s # detect drift and undo kubectl edits every minute
