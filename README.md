@@ -401,7 +401,15 @@ git push
 
 > ASB uses `Flux v2` for `GitOps`
 
+Before deploying flux we need to import the flux images to ACR.
+
+> Make sure your IP is added to ACR for image push access.
+> Goto the ACR in Azure Portal -> Networking -> Add your client IP -> Save
+
 ```bash
+# Import all Flux images to private ACR
+grep 'image:' deploy/bootstrap/flux-system/gotk-components.yaml | awk -F'azurecr.io' '{print $2}' | xargs -I_ az acr import --source "ghcr.io_" -n $ASB_ACR_NAME
+
 # Setup flux base system (replace bootstrap folder with dev-bootstrap for dev env)
 kubectl apply -k deploy/bootstrap/flux-system/ 
 # Note: if previous kubectl apply cmd fails, then simply reapply
