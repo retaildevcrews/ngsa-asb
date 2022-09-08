@@ -2018,7 +2018,7 @@
                             "gatekeeper-system",
                             "azure-arc",
                             "cluster-baseline-settings",
-                            "flux-cd",
+                            "flux-system",
                             "ngsa",
                             "tiny"
                         ]
@@ -2112,7 +2112,7 @@
                             "gatekeeper-system",
                             "azure-arc",
                             "cluster-baseline-settings",
-                            "flux-cd",
+                            "flux-system",
                             "ngsa",
                             "tiny"
                         ]
@@ -2141,7 +2141,7 @@
                             "kube-system",
                             "gatekeeper-system",
                             "azure-arc",
-                            "flux-cd",
+                            "flux-system",
                             "ingress"
                         ]
                     },

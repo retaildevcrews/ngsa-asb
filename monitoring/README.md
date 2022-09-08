@@ -103,7 +103,7 @@ Add, commit and push the modified files using git to your working branch.
 
   ```bash
 
-  fluxctl sync --k8s-fwd-ns flux-cd
+  flux reconcile kustomization -n monitoring monitoring
 
   ```
 

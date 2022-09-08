@@ -44,7 +44,7 @@ Flux will pick up the latest changes. Use the command below to force flux to syn
 ```bash
 
 # Force flux to sync changes
-fluxctl sync --k8s-fwd-ns flux-cd
+flux reconcile kustomization -n loderunner loderunner
 
 # Check loderunner pod loderunner until is running
 
