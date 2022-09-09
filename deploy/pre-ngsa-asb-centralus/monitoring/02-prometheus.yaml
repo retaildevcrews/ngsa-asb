@@ -83,19 +83,67 @@ data:
     global:
       scrape_interval: 15s
       evaluation_interval: 15s
-    scrape_configs:      
+    scrape_configs:
       - job_name: 'ngsa-memory'
-        static_configs:
-          - targets: [ 'ngsa-memory.ngsa.svc.cluster.local:8080' ]
+        metrics_path: /metrics
+        kubernetes_sd_configs:
+        - role: pod
+          namespaces:
+            names:
+            - ngsa
+          selectors:
+            - role: "pod"
+              label: "app=ngsa-memory"
+              field: "status.phase=Running"
+        relabel_configs:
+        - source_labels: [ __meta_kubernetes_pod_name ]
+          action: replace
+          target_label: instance
       - job_name: 'ngsa-cosmos'
-        static_configs:
-          - targets: [ 'ngsa-cosmos.ngsa.svc.cluster.local:8080' ]
+        metrics_path: /metrics
+        kubernetes_sd_configs:
+        - role: pod
+          namespaces:
+            names:
+            - ngsa
+          selectors:
+            - role: "pod"
+              label: "app=ngsa-cosmos"
+              field: "status.phase=Running"
+        relabel_configs:
+        - source_labels: [ __meta_kubernetes_pod_name ]
+          action: replace
+          target_label: instance
       - job_name: 'ngsa-java'
-        static_configs:
-          - targets: [ 'ngsa-java.ngsa.svc.cluster.local:8080' ]
-      - job_name: 'loderunner'
-        static_configs:
-          - targets: [ 'loderunner.loderunner.svc.cluster.local:8080' ]
+        metrics_path: /metrics
+        kubernetes_sd_configs:
+        - role: pod
+          namespaces:
+            names:
+            - ngsa
+          selectors:
+            - role: "pod"
+              label: "app=ngsa-java"
+              field: "status.phase=Running"
+        relabel_configs:
+        - source_labels: [ __meta_kubernetes_pod_name ]
+          action: replace
+          target_label: instance
+      - job_name: 'loderunner-commandmode'
+        metrics_path: /metrics
+        kubernetes_sd_configs:
+        - role: pod
+          namespaces:
+            names:
+            - loderunner
+          selectors:
+            - role: "pod"
+              label: "app=loderunner"
+              field: "status.phase=Running"
+        relabel_configs:
+        - source_labels: [ __meta_kubernetes_pod_name ]
+          action: replace
+          target_label: instance
       - job_name: 'fluentbit'
         metrics_path: /api/v1/metrics/prometheus
         kubernetes_sd_configs:
