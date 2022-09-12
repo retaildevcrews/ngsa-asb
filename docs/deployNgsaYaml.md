@@ -42,7 +42,7 @@ Flux will pick up the latest changes. Use the command below to force flux to syn
 ```bash
 
 # force flux to sync changes
-fluxctl sync --k8s-fwd-ns flux-cd
+flux reconcile kustomization -n ngsa ngsa
 
 ```
 

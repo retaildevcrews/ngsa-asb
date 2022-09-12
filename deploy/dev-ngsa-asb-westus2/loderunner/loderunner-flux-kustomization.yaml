@@ -1,0 +1,18 @@
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: loderunner
+  namespace: loderunner
+spec:
+  dependsOn:
+  - name: istio
+    namespace: istio-system
+  interval: 1m0s # detect drift and undo kubectl edits every minute
+  prune: true # remove stale resources from cluster
+  targetNamespace: loderunner # overwrite the ns for resources in path
+  path: ./deploy/dev-ngsa-asb-westus2/loderunner
+  sourceRef:
+    kind: GitRepository
+    name: asb-repo-flux
+    namespace: flux-system # points to namespace where this GitRepository is

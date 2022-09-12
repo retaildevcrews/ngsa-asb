@@ -1,0 +1,8 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- ../kube-system/azm-flux-kustomization.yaml
+- ../cluster-baseline-settings/01-namespace.yaml
+- ../cluster-baseline-settings/cluster-baseline-flux-kustomization.yaml
+- ../istio/01-namespace.yaml
+- ../istio/istio-flux-kustomization.yaml
