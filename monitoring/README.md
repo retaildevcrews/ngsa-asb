@@ -21,9 +21,6 @@ export ASB_ACR_NAME=$(az deployment group show -g $ASB_RG_CORE -n cluster-${ASB_
 # import Prometheus into ACR
 az acr import --source docker.io/prom/prometheus:v2.30.0 -n $ASB_ACR_NAME
 
-# import jumpbox into ACR. (jumpbox is required by prometheus to be able to mount a volume for persistent data)
-az acr import --source ghcr.io/cse-labs/jumpbox -n $ASB_ACR_NAME
-
 # import Grafana into ACR
 az acr import --source docker.io/grafana/grafana:8.5.5 -n $ASB_ACR_NAME
 

@@ -35,8 +35,6 @@ echo "alias kdelf='kubectl delete -f'" >> $HOME/.bashrc
 echo "alias kl='kubectl logs'" >> $HOME/.bashrc
 echo "alias kccc='kubectl config current-context'" >> $HOME/.bashrc
 echo "alias kcgc='kubectl config get-contexts'" >> $HOME/.bashrc
-echo "alias kj='kubectl exec -it jumpbox -- bash -l'" >> $HOME/.bashrc
-echo "alias kje='kubectl exec -it jumpbox -- '" >> $HOME/.bashrc
 
 echo "" >> $HOME/.bashrc
 echo "# env vars" >> $HOME/.bashrc
