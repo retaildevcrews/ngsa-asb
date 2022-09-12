@@ -4,6 +4,7 @@ metadata:
   name: prometheus-pvc
   namespace: monitoring
 spec:
+  storageClassName: "managed-csi"
   accessModes:
     - ReadWriteOnce
   resources:
@@ -171,24 +172,20 @@ metadata:
     app: prometheus-server
   annotations:
     checkov.io/skip1: CKV_K8S_38=Need service account token for Prometheus
-    checkov.io/skip2: CKV_K8S_14=Allow latest image for jumpbox
-    checkov.io/skip3: CKV_K8S_37=Jumpbox and Prometheus need to run as root
-    checkov.io/skip4: CKV_K8S_20=Jumpbox and Prometheus need to run as root
-    checkov.io/skip5: CKV_K8S_22=Jumpbox and Prometheus need write permissions
-    checkov.io/skip6: CKV_K8S_28=Jumpbox needs network capabilities
-    checkov.io/skip7: CKV_K8S_30=Jumpbox needs to run as root
-    checkov.io/skip8: CKV_K8S_40=Jumpbox and Prometheus needs to run as root
-    checkov.io/skip9: CKV_K8S_23=Jumpbox and Prometheus needs to run as root
+    checkov.io/skip2: CKV_K8S_22=Prometheus needs write access
 spec:
   replicas: 1
   selector:
     matchLabels:
       app: prometheus-server
+  strategy:
+    type: Recreate
   template:
     metadata:
       labels:
         app: prometheus-server
     spec:
+      serviceAccountName: prometheus
       containers:
         - name: prometheus
           image: ${ASB_ACR_NAME}.azurecr.io/prom/prometheus:v2.30.0
@@ -233,38 +230,13 @@ spec:
             capabilities:
               drop:
                 - ALL
-            runAsUser: 10001
-            readOnlyRootFilesystem: true
-            runAsNonRoot: true
       securityContext:
         seccompProfile:
           type: RuntimeDefault
-      initContainers:
-      - name: prometheus-data-permission
-        image: ${ASB_ACR_NAME}.azurecr.io/cse-labs/jumpbox:latest
-        command:
-        - chown
-        - -R
-        - 65534:65534
-        - /prometheus
-        volumeMounts:
-        - name: prometheus-storage-volume
-          mountPath: /prometheus
-        resources:
-          limits:
-            memory: "512Mi"
-            cpu: "1000m"
-          requests:
-            memory: "512Mi"
-            cpu: "500m"
-        securityContext:
-          allowPrivilegeEscalation: false
-          capabilities:
-            drop:
-              - ALL
-          runAsUser: 10001
-          readOnlyRootFilesystem: true
-          runAsNonRoot: true
+        fsGroup: 65534
+        runAsGroup: 65534
+        runAsNonRoot: true
+        runAsUser: 65534
       volumes:
         - name: prometheus-config-volume
           configMap:

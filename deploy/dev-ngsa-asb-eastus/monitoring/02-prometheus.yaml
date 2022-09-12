@@ -172,8 +172,7 @@ metadata:
     app: prometheus-server
   annotations:
     checkov.io/skip1: CKV_K8S_38=Need service account token for Prometheus
-    checkov.io/skip2: CKV_K8S_20=Prometheus allowPrivilegeEscalation
-    checkov.io/skip3: CKV_K8S_22=Prometheus needs write access
+    checkov.io/skip2: CKV_K8S_22=Prometheus needs write access
 spec:
   replicas: 1
   selector:
@@ -227,6 +226,7 @@ spec:
               port: 9090
             timeoutSeconds: 1
           securityContext:
+            allowPrivilegeEscalation: false
             capabilities:
               drop:
                 - ALL
