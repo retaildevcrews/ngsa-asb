@@ -1,0 +1,708 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.4.0
+  creationTimestamp: null
+  labels:
+    app.kubernetes.io/component: csi-driver
+    app.kubernetes.io/name: secrets-store-csi-driver-secretproviderclasses-crd
+  name: secretproviderclasses.secrets-store.csi.x-k8s.io
+spec:
+  group: secrets-store.csi.x-k8s.io
+  names:
+    kind: SecretProviderClass
+    listKind: SecretProviderClassList
+    plural: secretproviderclasses
+    singular: secretproviderclass
+  scope: Namespaced
+  versions:
+  - name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: SecretProviderClass is the Schema for the secretproviderclasses
+          API
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: SecretProviderClassSpec defines the desired state of SecretProviderClass
+            properties:
+              parameters:
+                additionalProperties:
+                  type: string
+                description: Configuration for specific provider
+                type: object
+              provider:
+                description: Configuration for provider name
+                type: string
+              secretObjects:
+                items:
+                  description: SecretObject defines the desired state of synced K8s
+                    secret objects
+                  properties:
+                    data:
+                      items:
+                        description: SecretObjectData defines the desired state of
+                          synced K8s secret object data
+                        properties:
+                          key:
+                            description: data field to populate
+                            type: string
+                          objectName:
+                            description: name of the object to sync
+                            type: string
+                        type: object
+                      type: array
+                    labels:
+                      additionalProperties:
+                        type: string
+                      description: labels of K8s secret object
+                      type: object
+                    secretName:
+                      description: name of the K8s secret object
+                      type: string
+                    type:
+                      description: type of K8s secret object
+                      type: string
+                  type: object
+                type: array
+            type: object
+          status:
+            description: SecretProviderClassStatus defines the observed state of SecretProviderClass
+            properties:
+              byPod:
+                items:
+                  description: ByPodStatus defines the state of SecretProviderClass
+                    as seen by an individual controller
+                  properties:
+                    id:
+                      description: id of the pod that wrote the status
+                      type: string
+                    namespace:
+                      description: namespace of the pod that wrote the status
+                      type: string
+                  type: object
+                type: array
+            type: object
+        type: object
+    served: true
+    storage: true
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.4.0
+  creationTimestamp: null
+  labels:
+    app.kubernetes.io/component: csi-driver
+    app.kubernetes.io/name: secrets-store-csi-driver-secretproviderclasspodstatuses-crd
+  name: secretproviderclasspodstatuses.secrets-store.csi.x-k8s.io
+spec:
+  group: secrets-store.csi.x-k8s.io
+  names:
+    kind: SecretProviderClassPodStatus
+    listKind: SecretProviderClassPodStatusList
+    plural: secretproviderclasspodstatuses
+    singular: secretproviderclasspodstatus
+  scope: Namespaced
+  versions:
+  - name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: SecretProviderClassPodStatus is the Schema for the secretproviderclassespodstatus
+          API
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          status:
+            description: SecretProviderClassPodStatusStatus defines the observed state
+              of SecretProviderClassPodStatus
+            properties:
+              mounted:
+                type: boolean
+              objects:
+                items:
+                  description: SecretProviderClassObject defines the object fetched
+                    from external secrets store
+                  properties:
+                    id:
+                      type: string
+                    version:
+                      type: string
+                  type: object
+                type: array
+              podName:
+                type: string
+              secretProviderClassName:
+                type: string
+              targetPath:
+                type: string
+            type: object
+        type: object
+    served: true
+    storage: true
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  labels:
+    app.kubernetes.io/component: csi-provider
+    app.kubernetes.io/name: csi-secrets-store-provider-azure
+  name: csi-secrets-store-provider-azure
+  namespace: cluster-baseline-settings
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: kured
+  namespace: cluster-baseline-settings
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  labels:
+    app.kubernetes.io/component: csi-driver
+    app.kubernetes.io/name: secrets-store-csi-driver
+  name: secrets-store-csi-driver
+  namespace: cluster-baseline-settings
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: kured
+  namespace: cluster-baseline-settings
+rules:
+- apiGroups:
+  - apps
+  resourceNames:
+  - kured
+  resources:
+  - daemonsets
+  verbs:
+  - update
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: kured
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - nodes
+  verbs:
+  - get
+  - patch
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  verbs:
+  - list
+  - delete
+  - get
+- apiGroups:
+  - apps
+  resources:
+  - daemonsets
+  verbs:
+  - get
+- apiGroups:
+  - ""
+  resources:
+  - pods/eviction
+  verbs:
+  - create
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  creationTimestamp: null
+  labels:
+    app.kubernetes.io/component: csi-driver
+    app.kubernetes.io/name: secrets-store-csi-driver
+  name: secretproviderclasses-role
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - events
+  verbs:
+  - create
+  - patch
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - secrets-store.csi.x-k8s.io
+  resources:
+  - secretproviderclasses
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - secrets-store.csi.x-k8s.io
+  resources:
+  - secretproviderclasspodstatuses
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - secrets-store.csi.x-k8s.io
+  resources:
+  - secretproviderclasspodstatuses/status
+  verbs:
+  - get
+  - patch
+  - update
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  creationTimestamp: null
+  labels:
+    app.kubernetes.io/component: csi-driver
+    app.kubernetes.io/name: secrets-store-csi-driver
+  name: secretprovidersyncing-role
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - secrets
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: kured
+  namespace: cluster-baseline-settings
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: kured
+subjects:
+- kind: ServiceAccount
+  name: kured
+  namespace: cluster-baseline-settings
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: kured
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: kured
+subjects:
+- kind: ServiceAccount
+  name: kured
+  namespace: cluster-baseline-settings
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  labels:
+    app.kubernetes.io/component: csi-driver
+    app.kubernetes.io/name: secrets-store-csi-driver
+  name: secretproviderclasses-rolebinding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: secretproviderclasses-role
+subjects:
+- kind: ServiceAccount
+  name: secrets-store-csi-driver
+  namespace: cluster-baseline-settings
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  labels:
+    app.kubernetes.io/component: csi-driver
+    app.kubernetes.io/name: secrets-store-csi-driver
+  name: secretprovidersyncing-rolebinding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: secretprovidersyncing-role
+subjects:
+- kind: ServiceAccount
+  name: secrets-store-csi-driver
+  namespace: cluster-baseline-settings
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  annotations:
+    checkov.io/skip1: CKV_K8S_8=CSI Driver does not contain liveness endpoints
+    checkov.io/skip2: CKV_K8S_9=CSI Driver does not contain ready endpoints
+    checkov.io/skip3: CKV_K8S_16=CSI Driver requires privileged execution
+    checkov.io/skip4: CKV_K8S_19=CSI Driver requires running on host network namespace
+    checkov.io/skip5: CKV_K8S_20=CSI Driver requires privileged execution
+    checkov.io/skip6: CKV_K8S_38=CSI Driver requires auto-mounted Service Account
+      tokens
+    checkov.io/skip7: CKV_K8S_23=CSI Driver needs to run as root
+    checkov.io/skip8: CKV_K8S_40=CSI Driver needs to run as root
+  labels:
+    app: csi-secrets-store
+    app.kubernetes.io/component: csi-driver
+    app.kubernetes.io/name: csi-secrets-store
+  name: csi-secrets-store
+  namespace: cluster-baseline-settings
+spec:
+  selector:
+    matchLabels:
+      app: csi-secrets-store
+  template:
+    metadata:
+      labels:
+        app: csi-secrets-store
+        app.kubernetes.io/component: csi-driver
+        app.kubernetes.io/name: csi-secrets-store
+    spec:
+      containers:
+      - args:
+        - --v=5
+        - --csi-address=/csi/csi.sock
+        - --kubelet-registration-path=/var/lib/kubelet/plugins/csi-secrets-store/csi.sock
+        env:
+        - name: KUBE_NODE_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: spec.nodeName
+        image: mcr.microsoft.com/oss/kubernetes-csi/csi-node-driver-registrar:v2.0.1
+        imagePullPolicy: Always
+        name: node-driver-registrar
+        resources:
+          limits:
+            cpu: 100m
+            memory: 100Mi
+          requests:
+            cpu: 10m
+            memory: 20Mi
+        securityContext:
+          capabilities:
+            drop:
+            - ALL
+          readOnlyRootFilesystem: true
+        volumeMounts:
+        - mountPath: /csi
+          name: plugin-dir
+        - mountPath: /registration
+          name: registration-dir
+      - args:
+        - --debug=false
+        - --endpoint=$(CSI_ENDPOINT)
+        - --nodeid=$(KUBE_NODE_NAME)
+        - --provider-volume=/etc/kubernetes/secrets-store-csi-providers
+        - --metrics-addr=:8095
+        - --enable-secret-rotation=false
+        - --rotation-poll-interval=5m
+        - --grpc-supported-providers=azure
+        env:
+        - name: CSI_ENDPOINT
+          value: unix:///csi/csi.sock
+        - name: KUBE_NODE_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: spec.nodeName
+        image: mcr.microsoft.com/oss/kubernetes-csi/secrets-store/driver:v0.0.20
+        imagePullPolicy: Always
+        livenessProbe:
+          failureThreshold: 5
+          httpGet:
+            path: /healthz
+            port: healthz
+          initialDelaySeconds: 30
+          periodSeconds: 15
+          timeoutSeconds: 10
+        name: secrets-store
+        ports:
+        - containerPort: 9808
+          name: healthz
+          protocol: TCP
+        resources:
+          limits:
+            cpu: 200m
+            memory: 200Mi
+          requests:
+            cpu: 50m
+            memory: 100Mi
+        securityContext:
+          capabilities:
+            drop:
+            - ALL
+          privileged: true
+          readOnlyRootFilesystem: true
+        volumeMounts:
+        - mountPath: /csi
+          name: plugin-dir
+        - mountPath: /var/lib/kubelet/pods
+          mountPropagation: Bidirectional
+          name: mountpoint-dir
+        - mountPath: /etc/kubernetes/secrets-store-csi-providers
+          name: providers-dir
+      - args:
+        - --csi-address=/csi/csi.sock
+        - --probe-timeout=3s
+        - --health-port=9808
+        - -v=2
+        image: mcr.microsoft.com/oss/kubernetes-csi/livenessprobe:v2.2.0
+        imagePullPolicy: Always
+        name: liveness-probe
+        resources:
+          limits:
+            cpu: 100m
+            memory: 100Mi
+          requests:
+            cpu: 10m
+            memory: 20Mi
+        securityContext:
+          capabilities:
+            drop:
+            - ALL
+          readOnlyRootFilesystem: true
+        volumeMounts:
+        - mountPath: /csi
+          name: plugin-dir
+      hostNetwork: true
+      nodeSelector:
+        agentpool: npuser01
+        kubernetes.io/os: linux
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      serviceAccountName: secrets-store-csi-driver
+      volumes:
+      - hostPath:
+          path: /var/lib/kubelet/pods
+          type: DirectoryOrCreate
+        name: mountpoint-dir
+      - hostPath:
+          path: /var/lib/kubelet/plugins_registry/
+          type: Directory
+        name: registration-dir
+      - hostPath:
+          path: /var/lib/kubelet/plugins/csi-secrets-store/
+          type: DirectoryOrCreate
+        name: plugin-dir
+      - hostPath:
+          path: /etc/kubernetes/secrets-store-csi-providers
+          type: DirectoryOrCreate
+        name: providers-dir
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  annotations:
+    checkov.io/skip1: CKV_K8S_8=CSI Provider does not contain ready endpoints
+    checkov.io/skip2: CKV_K8S_9=CSI Provider does not contain ready endpoints
+    checkov.io/skip3: CKV_K8S_19=CSI Provider requires running on host network namespace
+    checkov.io/skip4: CKV_K8S_20=CSI Provider requires privileged execution and running
+      as root
+    checkov.io/skip5: CKV_K8S_23=CSI Provider requires privileged execution and running
+      as root
+    checkov.io/skip6: CKV_K8S_40=CSI Provider requires privileged execution and running
+      as root
+  labels:
+    app: csi-secrets-store-provider-azure
+    app.kubernetes.io/component: csi-provider
+    app.kubernetes.io/name: csi-secrets-store-provider-azure
+  name: csi-secrets-store-provider-azure
+  namespace: cluster-baseline-settings
+spec:
+  selector:
+    matchLabels:
+      app: csi-secrets-store-provider-azure
+  template:
+    metadata:
+      labels:
+        app: csi-secrets-store-provider-azure
+        app.kubernetes.io/component: csi-provider
+        app.kubernetes.io/name: csi-secrets-store-provider-azure
+    spec:
+      automountServiceAccountToken: false
+      containers:
+      - args:
+        - --endpoint=unix:///provider/azure.sock
+        image: mcr.microsoft.com/oss/azure/secrets-store/provider-azure:0.0.13
+        imagePullPolicy: Always
+        lifecycle:
+          preStop:
+            exec:
+              command:
+              - rm /provider/azure.sock
+        name: provider-azure-installer
+        resources:
+          limits:
+            cpu: 50m
+            memory: 100Mi
+          requests:
+            cpu: 50m
+            memory: 100Mi
+        securityContext:
+          capabilities:
+            drop:
+            - ALL
+          readOnlyRootFilesystem: true
+        volumeMounts:
+        - mountPath: /provider
+          name: providervol
+        - mountPath: /var/lib/kubelet/pods
+          mountPropagation: HostToContainer
+          name: mountpoint-dir
+      hostNetwork: true
+      nodeSelector:
+        agentpool: npuser01
+        kubernetes.io/os: linux
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      serviceAccountName: csi-secrets-store-provider-azure
+      volumes:
+      - hostPath:
+          path: /etc/kubernetes/secrets-store-csi-providers
+        name: providervol
+      - hostPath:
+          path: /var/lib/kubelet/pods
+        name: mountpoint-dir
+  updateStrategy:
+    type: RollingUpdate
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  annotations:
+    checkov.io/skip1: CKV_K8S_8=Kured doesn't support liveness probe
+    checkov.io/skip2: CKV_K8S_9=Kured doesn't support readiness probe
+    checkov.io/skip3: CKV_K8S_16=Kured requires privileged permissions
+    checkov.io/skip4: CKV_K8S_20=Kured requires privileged permissions
+    checkov.io/skip5: CKV_K8S_40=Kured requires privileged permissions
+    checkov.io/skip6: CKV_K8S_17=Kured requires host PID
+    checkov.io/skip7: CKV_K8S_38=Kured requires automount service account token
+    checkov.io/skip8: CKV_K8S_23=Kured needs to run as root
+  name: kured
+  namespace: cluster-baseline-settings
+spec:
+  selector:
+    matchLabels:
+      name: kured
+  template:
+    metadata:
+      annotations:
+        prometheus.io/path: /metrics
+        prometheus.io/port: "8080"
+        prometheus.io/scrape: "true"
+      labels:
+        name: kured
+    spec:
+      containers:
+      - command:
+        - /usr/bin/kured
+        - --ds-namespace=cluster-baseline-settings
+        env:
+        - name: KURED_NODE_ID
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        image: docker.io/weaveworks/kured:1.9.0
+        imagePullPolicy: Always
+        name: kured
+        resources:
+          limits:
+            cpu: 500m
+            memory: 48Mi
+          requests:
+            cpu: 200m
+            memory: 16Mi
+        securityContext:
+          capabilities:
+            drop:
+            - ALL
+          privileged: true
+          readOnlyRootFilesystem: true
+      hostPID: true
+      nodeSelector:
+        kubernetes.io/arch: amd64
+        kubernetes.io/os: linux
+      restartPolicy: Always
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      serviceAccountName: kured
+      tolerations:
+      - effect: NoSchedule
+        key: node-role.kubernetes.io/master
+      - effect: NoSchedule
+        key: CriticalAddonsOnly
+        operator: Equal
+        value: "true"
+  updateStrategy:
+    type: RollingUpdate
+---
+apiVersion: storage.k8s.io/v1
+kind: CSIDriver
+metadata:
+  labels:
+    app.kubernetes.io/component: csi-driver
+    app.kubernetes.io/name: secrets-store-csi-driver
+  name: secrets-store.csi.k8s.io
+spec:
+  attachRequired: false
+  podInfoOnMount: true
+  volumeLifecycleModes:
+  - Ephemeral
