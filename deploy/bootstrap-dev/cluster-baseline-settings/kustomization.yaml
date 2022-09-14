@@ -1,9 +1,8 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - 01-namespace.yaml
-  - cluster-baseline-flux-kustomization.yaml
   - ../../base/bootstrap/cluster-baseline-settings
   - 04-aad-pod-identity.yaml
+  - cluster-baseline-flux-kustomization.yaml
 patchesStrategicMerge:
   - values-kured.yaml
