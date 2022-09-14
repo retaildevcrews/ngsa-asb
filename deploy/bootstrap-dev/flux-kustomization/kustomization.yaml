@@ -4,5 +4,5 @@ resources:
 - bootstrap-kustomization.yaml
 - ../cluster-baseline-settings
 - ../../base/bootstrap/kube-system
-# - ../../base/bootstrap/istio/01-namespace.yaml
+- ../../base/bootstrap/istio
 # - ../../base/bootstrap/istio/istio-flux-kustomization.yaml
