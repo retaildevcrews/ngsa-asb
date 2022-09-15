@@ -1,6 +1,6 @@
 # NGSA App Kustomizations
 
-## Kustomize Layers
+## Kustomize Layers for NGSA
 
 Kubernetes Kustomize allows for specialization of Kubernetes files and Helm charts by applying overlays on top of base versions of files. This provides ability to chain bulding out configurations in a layered approach reducing the need for duplication of our infrastructure description code.
 
