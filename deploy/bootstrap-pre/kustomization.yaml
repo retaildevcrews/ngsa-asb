@@ -1,5 +1,7 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
+- bootstrap-kustomization.yaml
 - cluster-baseline-settings
-- flux-kustomization
+- ../base/bootstrap/kube-system
+- ../base/bootstrap/istio

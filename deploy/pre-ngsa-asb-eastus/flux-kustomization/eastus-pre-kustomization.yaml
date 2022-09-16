@@ -2,6 +2,23 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
 kind: Kustomization
 metadata:
+  name: cluster-bootstrap
+  namespace: flux-system
+spec:
+  dependsOn:
+  - name: flux-system
+    namespace: flux-system
+  interval: 1m0s # detect drift and undo kubectl edits every minute
+  prune: true # remove stale resources from cluster
+  path: ../../bootstrap-pre # This is where the cluster kustomization.yaml resides for bootstraping application for preproduction environment
+  sourceRef:
+    kind: GitRepository
+    name: asb-repo-flux
+    namespace: flux-system # points to namespace where this GitRepository is
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
   name: cluster-eastus
   namespace: flux-system
 spec:
