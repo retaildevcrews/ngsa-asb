@@ -571,6 +571,12 @@ spec:
         - name: kubelet-config
           mountPath: /etc/default/kubelet
           readOnly: true
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8085
+          initialDelaySeconds: 10
+          periodSeconds: 5
         readinessProbe:
           httpGet:
             path: /healthz
@@ -640,6 +646,12 @@ spec:
         - name: k8s-azure-file
           mountPath: /etc/kubernetes/azure.json
           readOnly: true
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 5
         readinessProbe:
           httpGet:
             path: /healthz
