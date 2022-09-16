@@ -10,7 +10,7 @@ spec:
     namespace: flux-system
   interval: 1m0s # detect drift and undo kubectl edits every minute
   prune: true # remove stale resources from cluster
-  path: ../../bootstrap-dev # This is where the cluster kustomization.yaml resides for bootstraping application for dev environment
+  path: ./deploy/bootstrap-dev # This is where the cluster kustomization.yaml resides for bootstraping application for dev environment
   sourceRef:
     kind: GitRepository
     name: asb-repo-flux
