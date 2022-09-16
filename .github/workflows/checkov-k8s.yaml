@@ -8,7 +8,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2      
+      - uses: actions/checkout@v2 
+      - name: Install kustomize 
+        run: docker pull traherom/kustomize-docker  
       - name: Run Checkov
         id: checkov
         uses: bridgecrewio/checkov-action@master
