@@ -11,6 +11,7 @@ jobs:
       - uses: actions/checkout@v2 
       - name: Install kustomize 
         run: docker pull traherom/kustomize-docker  
+      - run: kustomize version
       - name: Run Checkov
         id: checkov
         uses: bridgecrewio/checkov-action@master
