@@ -415,9 +415,6 @@ kubectl create -k deploy/bootstrap/flux-system/
 # Note: If flux v2 exists in cluster, use "kubectl apply -k"
 # Note: if "kubectl create/apply -k" fails once (sometimes CRD takes some time to be injected into the API), then simply reapply
 
-# Setup cluster-baseline (replace bootstrap folder with dev-bootstrap for dev env)
-kubectl apply -f deploy/bootstrap/flux-kustomization/bootstrap-kustomization.yaml
-
 # Setup zone specific deployment
 kubectl apply -f $ASB_GIT_PATH/flux-kustomization/${ASB_CLUSTER_LOCATION}-kustomization.yaml
 
