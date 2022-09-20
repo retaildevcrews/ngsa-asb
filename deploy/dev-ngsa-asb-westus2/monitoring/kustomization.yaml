@@ -3,5 +3,9 @@ kind: Kustomization
 resources:
 - 01-namespace.yaml # Apply the namespace before kustomization
 - 02-prometheus.yaml
-- grafana/dashboards/
-- grafana/
+- grafana/dashboards/ # This will apply the kustomization.yaml at grafana/dashboards/
+- grafana/01-grafana-config.yaml
+- grafana/02-grafana-config-datasources.yaml
+- grafana/03-grafana-config-dashboards.yaml
+- grafana/04-grafana-pod-identity.yaml
+- grafana/05-grafana.yaml

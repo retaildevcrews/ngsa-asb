@@ -1,0 +1,10 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- flux-cluster.yaml
+- flux-control-plane.yaml
+- ngsa-az-blocked-traffic.yaml
+- ngsa-az-monitor-perf.yaml
+- ngsa-az-monitor-rel.yaml
+- ngsa-fluentbit.yaml
+- ngsa-prometheus.yaml
