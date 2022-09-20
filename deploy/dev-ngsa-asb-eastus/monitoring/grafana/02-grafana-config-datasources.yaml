@@ -39,9 +39,9 @@ data:
               "orgId": 1,
               "name": "Prometheus",
               "access":"proxy",
-              "editable": true,   
+              "editable": true,
               "type": "prometheus",
-              "url": "http://prometheus-server.monitoring.svc:9090"
+              "url": "http://thanos-query.monitoring.svc.cluster.local:10902"
             }
         ]
     }

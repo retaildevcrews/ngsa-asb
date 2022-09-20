@@ -24,6 +24,77 @@ az acr import --source docker.io/prom/prometheus:v2.30.0 -n $ASB_ACR_NAME
 # import Grafana into ACR
 az acr import --source docker.io/grafana/grafana:8.5.5 -n $ASB_ACR_NAME
 
+# import Thanos into ACR
+az acr import --source quay.io/thanos/thanos:v0.23.0 -n $ASB_ACR_NAME
+
+```
+
+### Thanos setup
+
+#### Private DNS
+
+Create a private DNS entry for prometheus so Thanos can communicate with prometheus on each environment cluster within the virtual network. Perform this step for each cluster's `ASB_SPOKE_IP_PREFIX`.
+
+```bash
+
+export ASB_APP_NAME=prometheus
+export $=${ASB_APP_NAME}-${ASB_SPOKE_LOCATION}-${ASB_ENV}
+export ASB_AKS_PRIVATE_IP="$ASB_SPOKE_IP_PREFIX".4.4
+az network private-dns record-set a add-record -g $ASB_RG_CORE -z $ASB_DNS_ZONE -n $ASB_APP_DNS_NAME -a $ASB_AKS_PRIVATE_IP --query fqdn
+
+```
+
+#### Create Azure Storage Account
+
+Create a storage account in the shared core resource group. Storage account names are limited to lowercase letters and numbers. <https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftstorage>.
+
+```bash
+
+# Check if storage account name is available and is a valid name
+export ASB_THANOS_STORAGE_ACCOUNT_NAME="sangsaasb$ASB_ENV"
+az storage account check-name --name $ASB_THANOS_STORAGE_ACCOUNT_NAME
+
+# Create storage account
+az storage account create \
+  --name $ASB_THANOS_STORAGE_ACCOUNT_NAME \
+  --resource-group $ASB_RG_CORE \
+  --location $ASB_HUB_LOCATION
+
+# Create Storage Container for Thanos
+az storage container create \
+  --name metrics \
+  --account-name $ASB_THANOS_STORAGE_ACCOUNT_NAME \
+  --account-key "$(az storage account keys list -g $ASB_RG_CORE -n $ASB_THANOS_STORAGE_ACCOUNT_NAME --query [0].value -o tsv)"
+
+# Save environment variables
+./saveenv.sh
+
+```
+
+#### Setup secret configuration
+
+The Thanos configuration has a secret for accessing the storage account. This will be saved to the environment key vault for future use.
+
+```bash
+
+# Generate secret config from template and save to keyvault
+THANOS_KV_SET_COMMAND='AZURE_STORAGE_ACCOUNT_KEY=$(az storage account keys list -g $ASB_RG_CORE -n $ASB_THANOS_STORAGE_ACCOUNT_NAME --query [0].value -o tsv) envsubst < monitoring/template/thanos-storage-config.yaml.tmpl'
+az keyvault secret set --name "thanos-storage-config" --vault-name $ASB_KV_NAME --value "$(eval $THANOS_KV_SET_COMMAND)"
+
+```
+
+> Note: Create the Kubernetes secret resource in all the clusters for the environment.
+
+```bash
+
+# create monitoring namespace if it does not exist already
+kubectl create namespace monitoring
+
+# Create k8s secret for Thanos components
+kubectl create secret generic thanos-objstore-config \
+  --from-literal="thanos-storage-config.yaml=$(az keyvault secret show --name "thanos-storage-config" --vault-name $ASB_KV_NAME --query value -o tsv)" \
+  -n monitoring
+
 ```
 
 ### Create Deployment Templates
@@ -35,6 +106,23 @@ mkdir $ASB_GIT_PATH/monitoring
 cp templates/monitoring/01-namespace.yaml $ASB_GIT_PATH/monitoring/01-namespace.yaml
 # create prometheus deployment file
 cat templates/monitoring/02-prometheus.yaml | envsubst  > $ASB_GIT_PATH/monitoring/02-prometheus.yaml
+
+```
+
+> Note:
+> This step is only required for the Thanos observer cluster.
+> Skip this section for all other clusters.
+
+```bash
+
+# create thanos querier deployment file
+cat templates/monitoring/thanos/thanos-querier.yaml | envsubst  > $ASB_GIT_PATH/monitoring/thanos/thanos-querier.yaml
+
+# create thanos store deployment file
+cat templates/monitoring/thanos/thanos-store.yaml | envsubst > $ASB_GIT_PATH/monitoring/thanos/thanos-store.yaml
+
+# create thanos compactor deployment file
+cat templates/monitoring/thanos/thanos-compactor.yaml | envsubst > $ASB_GIT_PATH/monitoring/thanos/thanos-compactor.yaml
 
 ```
 

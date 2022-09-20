@@ -1,0 +1,64 @@
+# querier-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: thanos-query
+  namespace: monitoring
+  labels:
+    app: thanos-query
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: thanos-query
+  template:
+    metadata:
+      labels:
+        app: thanos-query
+    spec:
+      containers:
+        - name: thanos-query
+          image: ${ASB_ACR_NAME}.azurecr.io/thanos/thanos:v0.23.0
+          args:
+            - query
+            - --log.level=debug
+            - --query.auto-downsampling
+            - --query.replica-label=prometheus_replica
+            - --store=dnssrv+_grpc._tcp.prometheus-server.monitoring.svc
+            - --store=dnssrv+_grpc._tcp.thanos-store.monitoring.svc
+            - --grpc-address=0.0.0.0:10901
+            - --http-address=0.0.0.0:10902
+            - --query.partial-response
+          resources:
+            requests:
+              cpu: '100m'
+              memory: '64Mi'
+            limits:
+              cpu: '250m'
+              memory: '256Mi'
+          ports:
+            - name: http
+              containerPort: 10902
+            - name: grpc
+              containerPort: 10901
+            - name: cluster
+              containerPort: 10900
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: thanos-query
+  labels:
+    app: thanos-query
+    release: prometheus-operator
+    jobLabel: thanos
+  namespace: monitoring
+spec:
+  selector:
+    app: thanos-query
+  ports:
+    - port: 10902
+      protocol: TCP
+      targetPort: http
+      name: http-query
+---
