@@ -45,3 +45,10 @@ data:
       orgId: 1
       type: file
       disableDeletion: false
+    - name: flux-cluster
+      folder: NGSA
+      options:
+        path: /var/lib/grafana/dashboards/flux-cluster
+      orgId: 1
+      type: file
+      disableDeletion: false
