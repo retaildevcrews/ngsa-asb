@@ -253,6 +253,13 @@ spec:
               containerPort: 10902
             - name: grpc
               containerPort: 10901
+          resources:
+            requests:
+              cpu: '100m'
+              memory: '64Mi'
+            limits:
+              cpu: '250m'
+              memory: '256Mi'
           livenessProbe:
               httpGet:
                 port: 10902
@@ -315,24 +322,3 @@ spec:
     - name: http-sidecar
       port: 10902
       targetPort: 10902
-
----
-
-apiVersion: networking.istio.io/v1alpha3
-kind: VirtualService
-metadata:
-  name: prometheus-vs
-  namespace: monitoring
-spec:
-  gateways:
-  - istio-system/istio-gateway
-  hosts:
-  - prometheus-westus2-dev.cse.ms
-  http:
-  - match:
-      port: 10901
-    route:
-    - destination:
-        port:
-          number: 10901
-        host: prometheus-server

@@ -26,7 +26,6 @@ spec:
             - --query.replica-label=prometheus_replica
             - --store=dnssrv+_grpc._tcp.prometheus-server.monitoring.svc
             - --store=dnssrv+_grpc._tcp.thanos-store.monitoring.svc
-            - --store=prometheus-westus2-dev.cse.ms:10901
             - --grpc-address=0.0.0.0:10901
             - --http-address=0.0.0.0:10902
             - --query.partial-response

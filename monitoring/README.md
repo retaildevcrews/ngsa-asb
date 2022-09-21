@@ -31,19 +31,6 @@ az acr import --source quay.io/thanos/thanos:v0.23.0 -n $ASB_ACR_NAME
 
 ### Thanos setup
 
-#### Private DNS
-
-Create a private DNS entry for prometheus so Thanos can communicate with prometheus on each environment cluster within the virtual network. Perform this step for each cluster's `ASB_SPOKE_IP_PREFIX`.
-
-```bash
-
-export ASB_APP_NAME=prometheus
-export $=${ASB_APP_NAME}-${ASB_SPOKE_LOCATION}-${ASB_ENV}
-export ASB_AKS_PRIVATE_IP="$ASB_SPOKE_IP_PREFIX".4.4
-az network private-dns record-set a add-record -g $ASB_RG_CORE -z $ASB_DNS_ZONE -n $ASB_APP_DNS_NAME -a $ASB_AKS_PRIVATE_IP --query fqdn
-
-```
-
 #### Create Azure Storage Account
 
 Create a storage account in the shared core resource group. Storage account names are limited to lowercase letters and numbers. <https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftstorage>.
