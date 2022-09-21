@@ -49,7 +49,7 @@ spec:
                 allow_precompiled: true
                 code:
                   remote:
-                    sha256: 066844da3cc53ed74aeca0031a57ce13bd44792f0abf9b85ccea4063d446b601
+                    sha256: 67d51a9c6be170a4b9668449c5d9637ffe398db3bec3272830ecbb4a25a49ff9
                     http_uri:
                       uri: https://raw.githubusercontent.com/retaildevcrews/ngsa-asb/main/wasm/burst_header.wasm
                       cluster: burstcluster
