@@ -8,7 +8,7 @@ metadata:
 spec:
   interval: 1m0s
   ref:
-    branch: pragmatical/flux2
+    branch: main
   # secretRef: # We're accessing ngs-asb as readonly repo
   #   name: flux-system
   url: https://github.com/retaildevcrews/ngsa-asb
