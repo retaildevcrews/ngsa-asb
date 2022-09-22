@@ -20,9 +20,11 @@ spec:
         app: thanos-store
         app.kubernetes.io/name: thanos-store
     spec:
+      automountServiceAccountToken: false
       containers:
         - name: thanos-store
           image: acraks3i2qzkkxofr7c.azurecr.io/thanos/thanos:v0.23.0
+          imagePullPolicy: Always
           args:
             - 'store'
             - '--log.level=debug'
@@ -44,12 +46,33 @@ spec:
             limits:
               cpu: '250m'
               memory: '256Mi'
+          livenessProbe:
+              httpGet:
+                port: 10902
+                path: /-/healthy
+          readinessProbe:
+            httpGet:
+              port: 10902
+              path: /-/ready
           volumeMounts:
             - name: config
               mountPath: /config/
               readOnly: true
             - name: data
               mountPath: /var/thanos/store
+          securityContext:
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+        fsGroup: 65534
+        runAsGroup: 65534
+        runAsNonRoot: true
+        runAsUser: 65534
       volumes:
         - name: data
           emptyDir: {}
