@@ -238,6 +238,7 @@ spec:
                 - ALL
         - name: thanos
           image: ${ASB_ACR_NAME}.azurecr.io/thanos/thanos:v0.23.0
+          imagePullPolicy: Always
           args:
             - "sidecar"
             - "--log.level=debug"
@@ -276,6 +277,11 @@ spec:
             - name: thanos-objstore-config
               mountPath: /etc/secret
               readOnly: false
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
       securityContext:
         seccompProfile:
           type: RuntimeDefault
