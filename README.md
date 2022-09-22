@@ -165,7 +165,7 @@ export ASB_SUBSCRIPTION_ID=$(az account show --query id -o tsv)
 export ASB_TENANT_ID=$(az account show --query tenantId -o tsv)
 
 # Get AAD cluster admin group
-export ASB_CLUSTER_ADMIN_ID=$(az ad group show -g $ASB_CLUSTER_ADMIN_GROUP --query objectId -o tsv)
+export ASB_CLUSTER_ADMIN_ID=$(az ad group show -g $ASB_CLUSTER_ADMIN_GROUP --query id -o tsv)
 
 # Verify AAD admin group
 echo $ASB_CLUSTER_ADMIN_GROUP
