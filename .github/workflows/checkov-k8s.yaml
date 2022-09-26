@@ -10,7 +10,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2 
       - name: Install kustomize 
-        run: docker pull traherom/kustomize-docker  
+        run: curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh" | bash  
       - run: kustomize version
       - name: Run Checkov
         id: checkov
