@@ -102,7 +102,7 @@ spec:
               mountPath: /var/lib/grafana/dashboards/ngsa-fluentbit
             - name: dashboards-flux-cluster
               mountPath: /var/lib/grafana/dashboards/flux-cluster
-            - name: grafana-dashboards-flux-control-plane
+            - name: dashboards-flux-control-plane
               mountPath: /var/lib/grafana/dashboards/flux-control-plane
             - name: grafana-secrets
               mountPath: /mnt/secrets
