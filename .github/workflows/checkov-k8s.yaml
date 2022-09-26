@@ -8,13 +8,15 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2      
+      - uses: actions/checkout@v2 
+      - name: Install kustomize 
+        run: curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh" | bash  
       - name: Run Checkov
         id: checkov
         uses: bridgecrewio/checkov-action@master
         with:
           directory: deploy/
-          framework: kubernetes
+          framework: kustomize
           skip_check: CKV_K8S_43 # optional: skip a specific check_id. can be comma separated list
           quiet: true
           output_format: github_failed_only
