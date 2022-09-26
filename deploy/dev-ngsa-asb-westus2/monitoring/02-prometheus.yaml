@@ -84,6 +84,8 @@ data:
     global:
       scrape_interval: 15s
       evaluation_interval: 15s
+      external_labels:
+        cluster: aks-3i2qzkkxofr7c-westus2
     scrape_configs:
       - job_name: 'ngsa-memory'
         metrics_path: /metrics
@@ -195,6 +197,10 @@ spec:
             - "--storage.tsdb.path=/prometheus/"
             - "--storage.tsdb.retention.size=3900MB"
             - "--storage.tsdb.retention.time=7d"
+            - "--storage.tsdb.min-block-duration=2h"
+            - "--storage.tsdb.max-block-duration=2h"
+            - "--web.enable-lifecycle"
+            - "--web.enable-admin-api"
           ports:
             - containerPort: 9090
           volumeMounts:
@@ -230,6 +236,52 @@ spec:
             capabilities:
               drop:
                 - ALL
+        - name: thanos
+          image: acraks3i2qzkkxofr7c.azurecr.io/thanos/thanos:v0.23.0
+          imagePullPolicy: Always
+          args:
+            - "sidecar"
+            - "--log.level=debug"
+            - "--tsdb.path=/prometheus/"
+            - "--prometheus.url=http://localhost:9090"
+            - "--objstore.config-file=/etc/secret/thanos-storage-config.yaml"
+            - "--reloader.config-file=/etc/prometheus/prometheus.yml"
+          env:
+            - name : THANOS_OBJSTORE_CONFIG
+              value: /etc/secret/thanos-storage-config.yaml
+          ports:
+            - name: http-sidecar
+              containerPort: 10902
+            - name: grpc
+              containerPort: 10901
+          resources:
+            requests:
+              cpu: '100m'
+              memory: '64Mi'
+            limits:
+              cpu: '250m'
+              memory: '256Mi'
+          livenessProbe:
+              httpGet:
+                port: 10902
+                path: /-/healthy
+          readinessProbe:
+            httpGet:
+              port: 10902
+              path: /-/ready
+          volumeMounts:
+            - name: prometheus-storage-volume
+              mountPath: /prometheus
+            - name: prometheus-config-volume
+              mountPath: /etc/prometheus
+            - name: thanos-objstore-config
+              mountPath: /etc/secret
+              readOnly: false
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
       securityContext:
         seccompProfile:
           type: RuntimeDefault
@@ -245,6 +297,11 @@ spec:
         - name: prometheus-storage-volume
           persistentVolumeClaim:
             claimName: prometheus-pvc
+        - name: prometheus-config-shared
+          emptyDir: {}
+        - name: thanos-objstore-config
+          secret:
+            secretName: thanos-objstore-config
 
 ---
 
@@ -257,10 +314,17 @@ metadata:
       prometheus.io/scrape: 'true'
       prometheus.io/port:   '9090'
 spec:
-  selector: 
+  selector:
     app: prometheus-server
-  type: ClusterIP  
+  type: ClusterIP
   ports:
-    - port: 9090
+    - name: prometheus-server
+      port: 9090
       protocol: TCP
       targetPort: 9090
+    - name: grpc
+      port: 10901
+      targetPort: 10901
+    - name: http-sidecar
+      port: 10902
+      targetPort: 10902
