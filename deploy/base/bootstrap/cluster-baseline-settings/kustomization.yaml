@@ -4,4 +4,3 @@ resources:
   - 01-namespace.yaml
   - 03-akv-secrets-store-csi.yaml
   - 05-kured.yaml
-  

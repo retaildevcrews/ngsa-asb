@@ -6,4 +6,3 @@ resources:
   - cluster-baseline-flux-kustomization.yaml
 patchesStrategicMerge:
   - values-kured.yaml
-  
