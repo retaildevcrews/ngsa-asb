@@ -284,7 +284,7 @@ spec:
       serviceAccountName: prometheus
       containers:
         - name: prometheus
-          image: acraks3i2qzkkxofr7c.azurecr.io/prom/prometheus:v2.30.0
+          image: acraksfykg5bqasutle.azurecr.io/prom/prometheus:v2.30.0
           imagePullPolicy: Always
           args:
             - "--config.file=/etc/prometheus/prometheus.yml"
