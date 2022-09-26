@@ -62,7 +62,7 @@ You'll need to run a few more steps to completely setup the AAD Service Principa
 # You can also add it manually using the Azure portal with the secret name "grafana-aad-client-secret" [Recommended]
 
 # Give logged in user access to key vault
-az keyvault set-policy --secret-permissions set --object-id $(az ad signed-in-user show --query objectId -o tsv) -n $ASB_KV_NAME -g $ASB_RG_CORE
+az keyvault set-policy --secret-permissions set --object-id $(az ad signed-in-user show --query id -o tsv) -n $ASB_KV_NAME -g $ASB_RG_CORE
 
 # Set grafana AAD client secrets
 az keyvault secret set -o table --vault-name $ASB_KV_NAME --name "grafana-aad-client-secret" --value [insert CLIENT_SECRET]
