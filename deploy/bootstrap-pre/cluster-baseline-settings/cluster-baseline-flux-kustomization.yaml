@@ -9,7 +9,7 @@ spec:
   - name: flux-system
     namespace: flux-system
   interval: 10m0s # detect drift and undo kubectl edits every 10mins
-  path: ./deploy/bootstrap-dev/cluster-baseline-settings
+  path: ./deploy/bootstrap-pre/cluster-baseline-settings
   prune: true # remove stale resources from cluster
   sourceRef:
     kind: GitRepository
