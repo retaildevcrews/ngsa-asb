@@ -25,6 +25,8 @@ spec:
   dependsOn:
   - name: flux-system
     namespace: flux-system
+  - name: bootstrapped-istio
+    namespace: istio-operator
   interval: 1m0s # detect drift and undo kubectl edits every minute
   prune: true # remove stale resources from cluster
   path: ./deploy/pre-ngsa-asb-eastus/flux-kustomization # This is where the cluster kustomization.yaml resides
