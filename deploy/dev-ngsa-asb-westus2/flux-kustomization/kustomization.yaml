@@ -7,7 +7,6 @@ resources:
 - ../loderunner/namespace.yaml # Apply the namespace before kustomization
 - ../ngsa/namespace.yaml # Apply the namespace before kustomization
 - ../fluentbit/fluentbit-flux-kustomization.yaml
-- ../monitoring/grafana/dashboards/ # Deploy dashboards before Grafana
 - ../monitoring/monitoring-flux-kustomization.yaml
 - ../loderunner/loderunner-flux-kustomization.yaml
 - ../ngsa/ngsa-flux-kustomization.yaml
