@@ -96,8 +96,10 @@ cat templates/monitoring/02-prometheus.yaml | envsubst  > $ASB_GIT_PATH/monitori
 
 ```
 
-> Note:
+> 🛑 **Important**:
+>
 > This step is only required for the Thanos observer cluster.
+>
 > Skip this section for all other clusters.
 
 ```bash
