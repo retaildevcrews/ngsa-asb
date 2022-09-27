@@ -552,10 +552,10 @@ spec:
         resources:
           limits:
             cpu: 200m
-            memory: 512Mi
-          requests:
-            cpu: 100m
             memory: 256Mi
+          requests:
+            cpu: 50m
+            memory: 64Mi
         securityContext:
           runAsUser: 0
           capabilities:
@@ -638,10 +638,10 @@ spec:
         resources:
           limits:
             cpu: 200m
-            memory: 1024Mi
-          requests:
-            cpu: 100m
             memory: 256Mi
+          requests:
+            cpu: 50m
+            memory: 64Mi
         volumeMounts:
         - name: k8s-azure-file
           mountPath: /etc/kubernetes/azure.json
