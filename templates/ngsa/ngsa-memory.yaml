@@ -19,6 +19,15 @@ spec:
         prometheus.io/port: '8080'
     spec:
       containers:
+        - name: istio-proxy
+          image: auto
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 1000m
+              memory: 256Mi
         - name: app
           image: ghcr.io/retaildevcrews/ngsa-app:beta
           imagePullPolicy: Always
@@ -38,11 +47,11 @@ spec:
 
           resources:
             limits:
-              cpu: 500m
+              cpu: 1000m
               memory: 512Mi
             requests:
-              cpu: 500m
-              memory: 512Mi
+              cpu: 50m
+              memory: 128Mi
 
       nodeSelector:
         agentpool: npuser01
