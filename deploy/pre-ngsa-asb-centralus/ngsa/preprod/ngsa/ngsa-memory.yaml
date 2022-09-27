@@ -18,6 +18,15 @@ spec:
         deploy: 22-09-25-06-06-57
     spec:
       containers:
+        - name: istio-proxy
+          image: auto
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 1000m
+              memory: 256Mi
         - name: app
           image: ghcr.io/retaildevcrews/ngsa-app:beta
           imagePullPolicy: Always
