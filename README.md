@@ -690,8 +690,7 @@ The following instructions will help you get started to deploy a sidecar filter 
 # Set target app
 export WASM_TARGET_APP=ngsa-cosmos
 
-# Enable istio-injection on ngsa namespace
-kubectl label namespace ngsa istio-injection=enabled
+# Istio-injection is enabled at the ngsa-cosmos deployment through the sidecar.istio.io/inject=true annotation
 
 # Copy yaml files to cluster deployment directory
 mkdir $ASB_GIT_PATH/burst
