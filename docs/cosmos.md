@@ -75,7 +75,7 @@ az network private-dns link vnet create \
 ```bash
 
 # give logged in user access to key vault
-az keyvault set-policy --secret-permissions set --object-id $(az ad signed-in-user show --query objectId -o tsv) -n $ASB_KV_NAME -g $ASB_RG_CORE
+az keyvault set-policy --secret-permissions set --object-id $(az ad signed-in-user show --query id -o tsv) -n $ASB_KV_NAME -g $ASB_RG_CORE
 
 # set app secrets
 az keyvault secret set -o table --vault-name $ASB_KV_NAME --name "CosmosDatabase" --value $ASB_IMDB_DB
@@ -85,7 +85,7 @@ az keyvault secret set -o table --vault-name $ASB_KV_NAME --name "CosmosKey" \
 az keyvault secret set -o table --vault-name $ASB_KV_NAME --name "CosmosUrl" --value "https://${ASB_COSMOS_DB_NAME}.documents.azure.com:443/"
 
 # remove logged in user's access to key vault
-az keyvault delete-policy --object-id $(az ad signed-in-user show --query objectId -o tsv) -n $ASB_KV_NAME -g $ASB_RG_CORE
+az keyvault delete-policy --object-id $(az ad signed-in-user show --query id -o tsv) -n $ASB_KV_NAME -g $ASB_RG_CORE
 
 ```
 

@@ -1,0 +1,100 @@
+# store-statefulset.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: thanos-store
+  namespace: monitoring
+  labels:
+    app: thanos-store
+    app.kubernetes.io/name: thanos-store
+spec:
+  serviceName: 'thanos-store'
+  replicas: 1
+  selector:
+    matchLabels:
+      app: thanos-store
+      app.kubernetes.io/name: thanos-store
+  template:
+    metadata:
+      labels:
+        app: thanos-store
+        app.kubernetes.io/name: thanos-store
+    spec:
+      automountServiceAccountToken: false
+      containers:
+        - name: thanos-store
+          image: ${ASB_ACR_NAME}.azurecr.io/thanos/thanos:v0.23.0
+          imagePullPolicy: Always
+          args:
+            - 'store'
+            - '--log.level=debug'
+            - '--data-dir=/var/thanos/store'
+            - "--grpc-address=0.0.0.0:10901"
+            - "--http-address=0.0.0.0:10902"
+            - '--objstore.config-file=/config/thanos-storage-config.yaml'
+          ports:
+            - name: http
+              containerPort: 10902
+            - name: grpc
+              containerPort: 10901
+            - name: cluster
+              containerPort: 10900
+          resources:
+            requests:
+              cpu: '100m'
+              memory: '64Mi'
+            limits:
+              cpu: '250m'
+              memory: '256Mi'
+          livenessProbe:
+              httpGet:
+                port: 10902
+                path: /-/healthy
+          readinessProbe:
+            httpGet:
+              port: 10902
+              path: /-/ready
+          volumeMounts:
+            - name: config
+              mountPath: /config/
+              readOnly: true
+            - name: data
+              mountPath: /var/thanos/store
+          securityContext:
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+        fsGroup: 65534
+        runAsGroup: 65534
+        runAsNonRoot: true
+        runAsUser: 65534
+      volumes:
+        - name: data
+          emptyDir: {}
+        - name: config
+          secret:
+            secretName: thanos-objstore-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: thanos-store
+  namespace: monitoring
+  labels:
+    app.kubernetes.io/name: thanos-store
+spec:
+  clusterIP: None
+  ports:
+  - name: grpc
+    port: 10901
+    targetPort: 10901
+  - name: http
+    port: 10902
+    targetPort: 10902
+  selector:
+    app.kubernetes.io/name: thanos-store

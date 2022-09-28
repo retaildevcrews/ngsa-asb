@@ -29,7 +29,7 @@ DNS_ZONE_NAME=aks-sb.com
 AZURE_CREDENTIALS=$(az ad sp create-for-rbac -n $SP_NAME --skip-assignment --sdk-auth)
 
 # fetch object id of service principal
-SP_OBJECT_ID=$(az ad sp show --id $SP_NAME --query objectId -o tsv)
+SP_OBJECT_ID=$(az ad sp show --id $SP_NAME --query id -o tsv)
 
 # fetch resource ID of DNS Zone
 DNS_ZONE_ID=$(az network dns zone show -n $DNS_ZONE_NAME -g $DNS_ZONE_RG --query id -o tsv)

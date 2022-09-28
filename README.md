@@ -165,7 +165,7 @@ export ASB_SUBSCRIPTION_ID=$(az account show --query id -o tsv)
 export ASB_TENANT_ID=$(az account show --query tenantId -o tsv)
 
 # Get AAD cluster admin group
-export ASB_CLUSTER_ADMIN_ID=$(az ad group show -g $ASB_CLUSTER_ADMIN_GROUP --query objectId -o tsv)
+export ASB_CLUSTER_ADMIN_ID=$(az ad group show -g $ASB_CLUSTER_ADMIN_GROUP --query id -o tsv)
 
 # Verify AAD admin group
 echo $ASB_CLUSTER_ADMIN_GROUP
@@ -414,9 +414,6 @@ grep 'image:' deploy/bootstrap/flux-system/gotk-components.yaml | awk -F'azurecr
 kubectl create -k deploy/bootstrap/flux-system/
 # Note: If flux v2 exists in cluster, use "kubectl apply -k"
 # Note: if "kubectl create/apply -k" fails once (sometimes CRD takes some time to be injected into the API), then simply reapply
-
-# Setup cluster-baseline (replace bootstrap folder with dev-bootstrap for dev env)
-kubectl apply -f deploy/bootstrap/flux-kustomization/bootstrap-kustomization.yaml
 
 # Setup zone specific deployment
 kubectl apply -f $ASB_GIT_PATH/flux-kustomization/${ASB_CLUSTER_LOCATION}-kustomization.yaml
@@ -693,8 +690,7 @@ The following instructions will help you get started to deploy a sidecar filter 
 # Set target app
 export WASM_TARGET_APP=ngsa-cosmos
 
-# Enable istio-injection on ngsa namespace
-kubectl label namespace ngsa istio-injection=enabled
+# Istio-injection is enabled at the ngsa-cosmos deployment through the sidecar.istio.io/inject=true annotation
 
 # Copy yaml files to cluster deployment directory
 mkdir $ASB_GIT_PATH/burst

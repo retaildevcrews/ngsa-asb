@@ -409,11 +409,11 @@ nginx:
   revisionHistoryLimit: 10
   resources:
     requests:
+      memory: 64Mi
+      cpu: 50m
+    limits:
       memory: 256Mi
       cpu: 100m
-    limits:
-      memory: 512Mi
-      cpu: 500m
   nodeSelector: {}
   tolerations: []
   affinity: {}
@@ -434,11 +434,11 @@ portal:
   revisionHistoryLimit: 10
   resources:
     requests:
+      memory: 64Mi
+      cpu: 50m
+    limits:
       memory: 256Mi
       cpu: 100m
-    limits:
-      memory: 512Mi
-      cpu: 500m
   nodeSelector: {}
   tolerations: []
   affinity: {}
@@ -463,11 +463,11 @@ core:
     initialDelaySeconds: 10
   resources:
     requests:
-      memory: 256Mi
-      cpu: 100m
+      memory: 128Mi
+      cpu: 50m
     limits:
       memory: 512Mi
-      cpu: 500m
+      cpu: 100m
   nodeSelector: {}
   tolerations: []
   affinity: {}
@@ -514,11 +514,11 @@ jobservice:
 
   resources:
     requests:
+      memory: 64Mi
+      cpu: 50m
+    limits:
       memory: 256Mi
       cpu: 100m
-    limits:
-      memory: 512Mi
-      cpu: 500m
   nodeSelector: {}
   tolerations: []
   affinity: {}
@@ -542,11 +542,11 @@ registry:
       tag: v2.5.3
     resources:
       requests:
-        memory: 256Mi
-        cpu: 100m
+        memory: 128Mi
+        cpu: 50m
       limits:
         memory: 512Mi
-        cpu: 500m
+        cpu: 100m
   controller:
     image:
       repository: acraks3i2qzkkxofr7c.azurecr.io/goharbor/harbor-registryctl
@@ -554,11 +554,11 @@ registry:
 
     resources:
       requests:
+        memory: 64Mi
+        cpu: 50m
+      limits:
         memory: 256Mi
         cpu: 100m
-      limits:
-        memory: 512Mi
-        cpu: 500m
   replicas: 1
   revisionHistoryLimit: 10
   nodeSelector: {}
@@ -616,11 +616,11 @@ chartmuseum:
   revisionHistoryLimit: 10
   resources:
     requests:
+      memory: 64Mi
+      cpu: 50m
+    limits:
       memory: 256Mi
       cpu: 100m
-    limits:
-      memory: 512Mi
-      cpu: 500m
   nodeSelector: {}
   tolerations: []
   affinity: {}
@@ -689,10 +689,10 @@ trivy:
   timeout: 5m0s
   resources:
     requests:
-      cpu: 200m
-      memory: 512Mi
+      cpu: 50m
+      memory: 128Mi
     limits:
-      cpu: 1
+      cpu: 500m
       memory: 512Mi
   nodeSelector: {}
   tolerations: []
@@ -715,11 +715,11 @@ notary:
     replicas: 1
     resources:
       requests:
-        memory: 256Mi
-        cpu: 100m
+        memory: 64Mi
+        cpu: 50m
       limits:
-        memory: 512Mi
-        cpu: 500m  
+        memory: 256Mi
+        cpu: 100m  
     nodeSelector: {}
     tolerations: []
     affinity: {}
@@ -738,11 +738,11 @@ notary:
     replicas: 1
     resources:
       requests:
+        memory: 64Mi
+        cpu: 50m
+      limits:
         memory: 256Mi
         cpu: 100m
-      limits:
-        memory: 512Mi
-        cpu: 500m
     nodeSelector: {}
     tolerations: []
     affinity: {}
@@ -801,10 +801,10 @@ database:
         resources:
           requests:
             memory: 128Mi
-            cpu: 100m
+            cpu: 50m
           limits:
             memory: 512Mi
-            cpu: 500m
+            cpu: 100m
   external:
     host: "192.168.0.1"
     port: "5432"
@@ -845,11 +845,11 @@ redis:
       tag: v2.5.3
     resources:
       requests:
+        memory: 64Mi
+        cpu: 50m
+      limits:
         memory: 256Mi
         cpu: 100m
-      limits:
-        memory: 512Mi
-        cpu: 500m
     nodeSelector: {}
     tolerations: []
     affinity: {}

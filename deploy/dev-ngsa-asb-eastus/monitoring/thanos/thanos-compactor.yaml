@@ -1,0 +1,88 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: thanos-compactor
+  namespace: monitoring
+  labels:
+    app: thanos-compactor
+spec:
+  serviceName: 'thanos-compactor'
+  replicas: 1
+  selector:
+    matchLabels:
+      app: thanos-compactor
+  template:
+    metadata:
+      labels:
+        app: thanos-compactor
+    spec:
+      automountServiceAccountToken: false
+      containers:
+        - name: thanos-compactor
+          image: acraks3i2qzkkxofr7c.azurecr.io/thanos/thanos:v0.23.0
+          imagePullPolicy: Always
+          args:
+            - 'compact'
+            - '--log.level=debug'
+            - '--data-dir=/var/thanos/store'
+            - '--objstore.config-file=/config/thanos-storage-config.yaml'
+            - '--wait'
+          ports:
+            - name: http
+              containerPort: 10902
+          resources:
+            requests:
+              cpu: '100m'
+              memory: '64Mi'
+            limits:
+              cpu: '250m'
+              memory: '256Mi'
+          livenessProbe:
+              httpGet:
+                port: 10902
+                path: /-/healthy
+          readinessProbe:
+            httpGet:
+              port: 10902
+              path: /-/ready
+          volumeMounts:
+            - name: config
+              mountPath: /config/
+              readOnly: true
+            - name: data
+              mountPath: /var/thanos/store
+          securityContext:
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+        fsGroup: 65534
+        runAsGroup: 65534
+        runAsNonRoot: true
+        runAsUser: 65534
+      volumes:
+        - name: data
+          emptyDir: {}
+        - name: config
+          secret:
+            secretName: thanos-objstore-config
+---
+# compactor-service-servicemonitor.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: thanos-compactor
+  labels:
+    app: thanos-compactor
+  namespace: monitoring
+spec:
+  selector:
+    app: thanos-compactor
+  ports:
+    - port: 10902
+      name: http
+---
