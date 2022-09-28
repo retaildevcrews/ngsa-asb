@@ -27,8 +27,8 @@ spec:
     metadata:
       labels:
         app: loderunner-ui
-        deploy: 22-09-27-06-20-34
-        version: beta-2209-27-06
+        deploy: 22-09-28-20-02-46
+        version: beta-2209-28-20
     spec:
       containers:
         - name: app
@@ -40,11 +40,11 @@ spec:
               protocol: TCP
           resources:
             limits:
-              memory: "512Mi"
+              memory: "256Mi"
               cpu: "1000m"
             requests:
-              memory: "512Mi"
-              cpu: "500m"
+              memory: "64Mi"
+              cpu: "50m"
           env:
           - name: "LRAPI_DNS"
             value: "https://loderunner-centralus-pre.cse.ms/api"
