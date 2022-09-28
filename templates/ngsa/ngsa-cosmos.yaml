@@ -15,11 +15,23 @@ spec:
       labels:
         app: ngsa-cosmos
         aadpodidbinding: $ASB_NGSA_MI_NAME
+        # Add this label to enable istio sidecar injection
+        # sidecar.istio.io/inject: "true"
       annotations:
         prometheus.io/scrape: 'true'
         prometheus.io/port: '8080'
     spec:
       containers:
+        # Add this istio-proxy container block only if using istio sidecar
+        # - name: istio-proxy
+        #   image: auto
+        #   resources:
+        #     requests:
+        #       cpu: 50m
+        #       memory: 64Mi
+        #     limits:
+        #       cpu: 1000m
+        #       memory: 256Mi
         - name: app
           image: ghcr.io/retaildevcrews/ngsa-app:beta
           imagePullPolicy: Always
@@ -38,12 +50,11 @@ spec:
 
           resources:
             limits:
-              cpu: 500m
+              cpu: 1000m
               memory: 512Mi
             requests:
-              cpu: 500m
-              memory: 512Mi
-
+              cpu: 50m
+              memory: 128Mi
           volumeMounts:
             - name: secrets
               mountPath: "/app/secrets"
