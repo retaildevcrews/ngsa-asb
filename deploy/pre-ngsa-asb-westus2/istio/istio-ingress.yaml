@@ -11,11 +11,11 @@ spec:
       k8s:
         resources:
           limits:
-            cpu: 1000m
+            cpu: 200m
             memory: 512M
           requests:
-            cpu: 500m
-            memory: 256M
+            cpu: 50m
+            memory: 128M
     ingressGateways:
     - name: istio-ingressgateway
       label:
@@ -23,11 +23,11 @@ spec:
       k8s:
         resources:
           limits:
-            cpu: 1000m
+            cpu: 200m
             memory: 512M
           requests:
-            cpu: 500m
-            memory: 256M
+            cpu: 50m
+            memory: 128M
         nodeSelector:
           agentpool: npuser01
         service:

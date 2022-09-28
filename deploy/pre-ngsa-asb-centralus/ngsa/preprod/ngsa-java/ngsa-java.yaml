@@ -20,8 +20,8 @@ spec:
       labels:
         aadpodidbinding: ngsa-asb-ngsa-id
         app: ngsa-java
-        deploy: 22-09-25-06-12-21
-        version: beta-2209-25-06
+        deploy: 22-09-28-20-08-22
+        version: beta-2209-28-20
     spec:
       automountServiceAccountToken: false
       securityContext:
@@ -72,11 +72,11 @@ spec:
               port: 8080              
           resources:
             limits:
-              cpu: 384m
+              cpu: 1000m
               memory: 1536Mi
             requests:
               cpu: 50m
-              memory: 1000Mi
+              memory: 384Mi
           volumeMounts:
             - name: secrets
               mountPath: "/app/secrets"

@@ -19,8 +19,8 @@ spec:
     metadata:
       labels:
         app: ngsa-memory
-        version: beta-2209-25-06
-        deploy: 22-09-25-06-06-57
+        version: beta-2209-28-19
+        deploy: 22-09-28-19-54-13
     spec:
       containers:
         - name: istio-proxy
