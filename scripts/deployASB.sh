@@ -273,41 +273,21 @@ function validateAks()
 {
   echo "Deploying AKS..."
 
-  # Validate that you are using the correct vnet for cluster deployment
-  echo $ASB_SPOKE_VNET_ID
-  echo $ASB_ORG_APP_ID_NAME
+  # Get cluster name
+  export ASB_AKS_NAME=$(az deployment group show -g $ASB_RG_CORE -n cluster-${ASB_DEPLOYMENT_NAME}-${ASB_CLUSTER_LOCATION} --query properties.outputs.aksClusterName.value -o tsv)
 
-  # Set cluster location by choosing the closest pair - not all regions support ASB.
-  # Note: Cluster location must be the same as spoke location
-  export ASB_CLUSTER_LOCATION=${ASB_SPOKE_LOCATION}
-  export ASB_CLUSTER_GEO_LOCATION=westus
+  # Get AKS credentials
+  az aks get-credentials -g $ASB_RG_CORE -n $ASB_AKS_NAME
 
-  # This section takes 15-20 minutes
+  # Rename context for simplicity
+  kubectl config rename-context $ASB_AKS_NAME $ASB_DEPLOYMENT_NAME-${ASB_CLUSTER_LOCATION}
 
-  # Set Kubernetes Version
-  export ASB_K8S_VERSION=1.23.8
+  # Check the nodes
+  # Requires Azure login
+  kubectl get nodes
 
-  # Create AKS
-  az deployment group create -g $ASB_RG_CORE \
-    -f cluster/cluster-stamp.json \
-    -n cluster-${ASB_DEPLOYMENT_NAME}-${ASB_CLUSTER_LOCATION} \
-    -p appGatewayListenerCertificate=${APP_GW_CERT_CSMS} \
-      asbDomainSuffix=${ASB_DOMAIN_SUFFIX} \
-      asbDnsName=${ASB_SPOKE_LOCATION}-${ASB_ENV} \
-      asbDnsZone=${ASB_DNS_ZONE} \
-      aksIngressControllerCertificate="$(echo $INGRESS_CERT_CSMS | base64 -d)" \
-      aksIngressControllerKey="$(echo $INGRESS_KEY_CSMS | base64 -d)" \
-      clusterAdminAadGroupObjectId=${ASB_CLUSTER_ADMIN_ID} \
-      deploymentName=${ASB_DEPLOYMENT_NAME} \
-      geoRedundancyLocation=${ASB_CLUSTER_GEO_LOCATION} \
-      hubVnetResourceId=${ASB_HUB_VNET_ID} \
-      k8sControlPlaneAuthorizationTenantId=${ASB_TENANT_ID} \
-      kubernetesVersion=${ASB_K8S_VERSION} \
-      location=${ASB_CLUSTER_LOCATION} \
-      nodepoolsRGName=${ASB_RG_NAME} \
-      orgAppId=${ASB_ORG_APP_ID_NAME} \
-      targetVnetResourceId=${ASB_SPOKE_VNET_ID} \
-      -c --query name
+  # Check the pods
+  kubectl get pods -A
 
   echo "Completed Deploying AKS."
 
