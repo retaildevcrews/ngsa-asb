@@ -561,8 +561,7 @@ function deployFlux()
 }
 
 function showNextSteps(){
-
-  echo "All Complete! Continue with readme"
+  echo "All Complete! Continue with https://github.com/retaildevcrews/ngsa-asb#deploying-ngsa-applications. (Deploying NGSA Applications)"
 }
 
 if test -f .current-deployment; then
