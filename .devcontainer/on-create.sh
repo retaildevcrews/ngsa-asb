@@ -30,11 +30,10 @@ sudo mv ./clusterctl /usr/local/bin/clusterctl
 
 # install kubelogin
 wget https://github.com/Azure/kubelogin/releases/download/v0.0.20/kubelogin-linux-amd64.zip
-unzip ./kubelogin-linux-amd64.zip 
-chmod +x ./bin/linux_amd64/kubelogin
-sudo mv ./bin/linux_amd64/kubelogin /usr/local/bin/kubelogin
-rm ./kubelogin-linux-amd64.zip
-kubelogin --version >> $HOME/status
+unzip -p kubelogin-linux-amd64.zip bin/linux_amd64/kubelogin > kubelogin
+chmod +x kubelogin
+sudo mv kubelogin /usr/local/bin/kubelogin
+rm kubelogin-linux-amd64.zip
 
 # install latest flux in ~/.local/bin
 curl -s https://fluxcd.io/install.sh |  bash -s - ~/.local/bin
@@ -43,4 +42,4 @@ echo '. <(flux completion bash)' >> ~/.bashrc
 # install flux completions for zsh
 echo '. <(flux completion zsh)' >> ~/.zshrc
 
-echo "on-create completed" >> $HOME/status
+echo "on-create completed" > $HOME/status
