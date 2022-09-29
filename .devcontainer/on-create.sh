@@ -42,4 +42,4 @@ echo '. <(flux completion bash)' >> ~/.bashrc
 # install flux completions for zsh
 echo '. <(flux completion zsh)' >> ~/.zshrc
 
-echo "on-create completed" > $HOME/status
+echo "on-create completed" >> $HOME/status
