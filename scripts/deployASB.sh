@@ -177,8 +177,11 @@ function createResourceGroup($groupName, $location){
   fi
 }
 
+#TODO:  copy over .JSON file changes
 function deployHubAndSpoke()
 {
+  start_time=$(date +%s.%3N)
+
   echo "Deploying Hub and Spoke..."
 
   # Create hub network
@@ -219,7 +222,9 @@ function deployHubAndSpoke()
   # Get spoke vnet id
   export ASB_SPOKE_VNET_ID=$(az deployment group show -g $ASB_RG_SPOKE -n spoke-$ASB_ORG_APP_ID_NAME --query properties.outputs.clusterVnetResourceId.value -o tsv)
 
-  echo "Completed Deploying Hub and Spoke."
+  end_time=$(date +%s.%3N)
+  elapsed=$(echo "scale=3; $end_time - $start_time" | bc)
+  echo "Completed Deploying Hub and Spoke. ($elapsed)"
 
   export ASB_SCRIPT_STEP=deployAks
   # Save environment variables
@@ -231,6 +236,7 @@ function deployHubAndSpoke()
 
 function deployAks()
 {
+  start_time=$(date +%s.%3N)
   echo "Deploying AKS..."
 
   # Validate that you are using the correct vnet for cluster deployment
@@ -269,9 +275,13 @@ function deployAks()
       targetVnetResourceId=${ASB_SPOKE_VNET_ID} \
       -c --query name
 
-  echo "Completed Deploying AKS."
+  end_time=$(date +%s.%3N)
+  elapsed=$(echo "scale=3; $end_time - $start_time" | bc)
+
+  echo "Completed Deploying AKS. ($elapsed)"
 
   export ASB_SCRIPT_STEP=validateAks
+
   # Save environment variables
   ./saveenv.sh -y
 
