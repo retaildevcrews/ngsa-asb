@@ -153,10 +153,10 @@ function createResourceGroups()
 {
   echo "Creating Resource Groups..."
 
-  az group create -n $ASB_RG_CORE -l $ASB_HUB_LOCATION
-  az group create -n $ASB_RG_HUB -l $ASB_HUB_LOCATION
-  az group create -n $ASB_RG_SPOKE -l $ASB_SPOKE_LOCATION
-
+  createResourceGroup($ASB_RG_CORE, $ASB_HUB_LOCATION)
+  createResourceGroup($ASB_RG_HUB, $ASB_HUB_LOCATION)
+  createResourceGroup($ASB_RG_SPOKE, $ASB_SPOKE_LOCATION)
+  
   echo "Completed Creating Resource Groups."
 
   export ASB_SCRIPT_STEP=deployHubAndSpoke
@@ -165,6 +165,16 @@ function createResourceGroups()
 
   # Invoke Next Step In Setup
   $ASB_SCRIPT_STEP
+}
+
+function createResourceGroup($groupName, $location){
+  echo "Creating Resource Group $groupName..."
+  if [ $(az group exists --name $groupName) = true ]; then 
+    echo "resource group $groupName already exists."
+  else
+    az group create -n $groupName -l $location 
+    echo "Creating resource group $groupName."
+  fi
 }
 
 function deployHubAndSpoke()
