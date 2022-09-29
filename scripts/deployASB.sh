@@ -2,21 +2,54 @@
 
 function checkPermissions()
 {
-  # check admin
+  # Set your security group name
+  export ASB_CLUSTER_ADMIN_GROUP=4-co
+
+  echo "Type Cluster Admin Group Name (Default is $ASB_CLUSTER_ADMIN_GROUP):"
+  read ans
+  if [[ $ans ]]; then
+    export ASB_CLUSTER_ADMIN_GROUP=$ans
+  fi
+
+  # Verify you are a member of the security group
+  echo "Checking if you are a member of group $ASB_CLUSTER_ADMIN_GROUP"
+  if $(az ad group member check -g $ASB_CLUSTER_ADMIN_GROUP --member-id $(az ad signed-in-user show --query id -o tsv) --query value -o tsv); then
+    echo You a member of group $ASB_CLUSTER_ADMIN_GROUP
+  else
+    >&2 echo "You are not a member of group $ASB_CLUSTER_ADMIN_GROUP"
+    exit 1;
+  fi
+
   setDeploymentName
 }
 
 function setDeploymentName()
 {
-  function promptDeploymentName() {
-    read -p "Enter Deployment Name: " ASB_DEPLOYMENT_NAME
-    if [[ "$ASB_DEPLOYMENT_NAME" =~ "^[a-z][^_\W]{2,7}$" ]]; then
-      exit 0
-    else
-      exit 1
-    fi
+  function isValidDeploymentName() {
+    [[ $1 =~ ^[a-z][^_\W]{2,7}$ ]]
   }
-  until promptDeploymentName; do : ; done
+  requirements="* Deployment Name is very particular and won't fail for about an hour
+* we recommend a short a name to total length of 8 or less
+* must be lowercase
+* must start with a-z
+* must only be a-z or 0-9
+* max length is 8
+* min length is 3"
+
+  while ! isValidDeploymentName "$ASB_DEPLOYMENT_NAME";do
+      read -p "$requirements
+Enter Deployment Name: " ASB_DEPLOYMENT_NAME
+  done
+
+  export ASB_ENV=dev
+
+  echo "Type Environment Name (Default is $ASB_ENV):"
+  read ans
+  if [[ $ans ]]; then
+    export ASB_ENV=$ans
+  fi
+
+  export ASB_RG_NAME=${ASB_DEPLOYMENT_NAME}-${ASB_ENV}
 
   setDeploymentRegion
 }
@@ -151,11 +184,21 @@ function setVariablesForDeployment()
 
 function createResourceGroups()
 {
+  function createResourceGroup(){
+    echo "Creating Resource Group $1..."
+    if [ $(az group exists --name $1) = true ]; then 
+      echo "resource group $1 already exists."
+    else
+      az group create -n $1 -l $2 
+      echo "Creating resource group $1."
+    fi
+  }
+
   echo "Creating Resource Groups..."
 
-  createResourceGroup($ASB_RG_CORE, $ASB_HUB_LOCATION)
-  createResourceGroup($ASB_RG_HUB, $ASB_HUB_LOCATION)
-  createResourceGroup($ASB_RG_SPOKE, $ASB_SPOKE_LOCATION)
+  createResourceGroup $ASB_RG_CORE $ASB_HUB_LOCATION
+  createResourceGroup $ASB_RG_HUB $ASB_HUB_LOCATION
+  createResourceGroup $ASB_RG_SPOKE $ASB_SPOKE_LOCATION
   
   echo "Completed Creating Resource Groups."
 
@@ -165,16 +208,6 @@ function createResourceGroups()
 
   # Invoke Next Step In Setup
   $ASB_SCRIPT_STEP
-}
-
-function createResourceGroup($groupName, $location){
-  echo "Creating Resource Group $groupName..."
-  if [ $(az group exists --name $groupName) = true ]; then 
-    echo "resource group $groupName already exists."
-  else
-    az group create -n $groupName -l $location 
-    echo "Creating resource group $groupName."
-  fi
 }
 
 #TODO:  copy over .JSON file changes
@@ -507,11 +540,12 @@ function showNextSteps(){
 
 
 #read variables
-source .env file
+#source .env file
 
 #check if in codespaces
 
 #check logged into azure
 
 #start at step
-$ASB_SCRIPT_STEP
+#$ASB_SCRIPT_STEP
+checkPermissions
