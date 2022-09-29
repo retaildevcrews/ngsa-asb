@@ -30,10 +30,10 @@ sudo mv ./clusterctl /usr/local/bin/clusterctl
 
 # install kubelogin
 wget https://github.com/Azure/kubelogin/releases/download/v0.0.20/kubelogin-linux-amd64.zip
-unzip -p kubelogin-linux-amd64.zip bin/linux_amd64/kubelogin > kubelogin
-chmod +x kubelogin
-sudo mv kubelogin /usr/local/bin/kubelogin
-rm kubelogin-linux-amd64.zip
+unzip -p ./kubelogin-linux-amd64.zip bin/linux_amd64/kubelogin > kubelogin
+chmod +x ./kubelogin
+sudo mv ./kubelogin /usr/local/bin/kubelogin
+rm ./kubelogin-linux-amd64.zip
 
 # install latest flux in ~/.local/bin
 curl -s https://fluxcd.io/install.sh |  bash -s - ~/.local/bin
