@@ -41,6 +41,7 @@ function setDeploymentName()
 Enter Deployment Name: " ASB_DEPLOYMENT_NAME
   done
 
+  export ASB_DEPLOYMENT_NAME=$ASB_DEPLOYMENT_NAME
   export ASB_ENV=dev
 
   echo "Type Environment Name (Default is $ASB_ENV):"
@@ -58,6 +59,7 @@ Enter Deployment Name: " ASB_DEPLOYMENT_NAME
 
 function setDeploymentRegion()
 {
+  echo "Getting Azure Locations..."
   azure_locations=( $(az account list-locations --query [].id -o tsv) )
   location_selections=( "${azure_locations[@]##*/}" )
 
@@ -72,6 +74,8 @@ function setDeploymentRegion()
       echo "Number Not In Range, Try Again"
     fi
   done
+
+  export ASB_HUB_LOCATION=$ASB_HUB_LOCATION
 
   # We are using 'dns-rg' for triplets
   export ASB_DNS_ZONE_RG=dns-rg
@@ -88,6 +92,7 @@ function setDeploymentRegion()
       echo "Number Not In Range, Try Again"
     fi
   done
+  export ASB_SPOKE_LOCATION=$ASB_SPOKE_LOCATION
 
   # Make sure the DNS record does not exist
   az network dns record-set a list -g $ASB_DNS_ZONE_RG -z $ASB_DNS_ZONE -o table | grep "$ASB_SPOKE_LOCATION-$ASB_ENV"
