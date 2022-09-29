@@ -32,4 +32,5 @@ else
   done
 
   cat ${ASB_DEPLOYMENT_NAME}-${ASB_ENV}-${ASB_SPOKE_LOCATION}.env
+  echo ${ASB_DEPLOYMENT_NAME}-${ASB_ENV}-${ASB_SPOKE_LOCATION}.env > .current-deployment
 fi

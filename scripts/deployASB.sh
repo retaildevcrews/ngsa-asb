@@ -2,6 +2,24 @@
 
 function checkPermissions()
 {
+  # Check if owner or contributor for subscription
+  subscription_id=$(az account show --query id -o tsv)
+  userId=$(az ad signed-in-user show --query id -o tsv)
+  userRolesInSubscription=( $(az role assignment list --all --assignee $userId --query [].roleDefinitionName -o tsv) )
+  desiredRoles=("Owner" "User Access Administrator")
+
+  for userRole in $userRolesInSubscription; do
+    for desiredRole in $desiredRoles; do
+        if [[ $desiredRole = $userRole ]]; then
+            export doesUserHaveDesiredRole=true
+        fi
+    done
+  done
+
+  if [ -z $doesUserHaveDesiredRole ]; then >&2 echo "You Need To Have Elevator Privileges To This Subscription.
+  Elevated Privileges are: $(IFS=, ; echo "${desiredRoles[*]}")"; exit 1; fi
+
+
   # Set your security group name
   export ASB_CLUSTER_ADMIN_GROUP=4-co
 
@@ -26,7 +44,7 @@ function checkPermissions()
 function setDeploymentName()
 {
   function isValidDeploymentName() {
-    [[ $1 =~ ^[a-z][^_\W]{2,7}$ ]]
+    [[ $1 =~ ^[a-z]([a-z]|\d){2,7}$ ]]
   }
   requirements="* Deployment Name is very particular and won't fail for about an hour
 * we recommend a short a name to total length of 8 or less
@@ -109,6 +127,11 @@ function setDeploymentRegion()
 
 function checkoutBranch()
 {
+  # Create a branch for your cluster
+  # Do not change the branch name from $ASB_RG_NAME
+  git checkout -b $ASB_RG_NAME
+  git push -u origin $ASB_RG_NAME
+
   export ASB_SCRIPT_STEP=validateIngressVariables
   # Save environment variables
   ./saveenv.sh -y
@@ -215,7 +238,6 @@ function createResourceGroups()
   $ASB_SCRIPT_STEP
 }
 
-#TODO:  copy over .JSON file changes
 function deployHubAndSpoke()
 {
   start_time=$(date +%s.%3N)
@@ -543,14 +565,26 @@ function showNextSteps(){
   echo "All Complete! Continue with readme"
 }
 
-
-#read variables
-#source .env file
+if test -f .current-deployment; then
+  if test -f $(cat .current-deployment); then
+    source $(cat .current-deployment)
+  else
+    export ASB_SCRIPT_STEP=checkPermissions
+  fi
+else
+  export ASB_SCRIPT_STEP=checkPermissions
+fi
 
 #check if in codespaces
+if [ -z $APP_GW_CERT_CSMS ]; then echo "Please run script using CodeSpaces" 1>&2; exit 1; fi
 
-#check logged into azure
+#check if logged into azure
+if az account show -o none; then
+  echo "Your are logged into Azure subscription $(az account show --query name)"
+else
+  echo "Please run 'az login --use-device-code' before continuing" 1>&2
+  exit 1
+fi
 
 #start at step
-#$ASB_SCRIPT_STEP
-checkPermissions
+$ASB_SCRIPT_STEP
