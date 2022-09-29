@@ -24,16 +24,20 @@ k3d registry create registry.localhost --port 5000
 docker network connect k3d k3d-registry.localhost
 
 # install clusterctl (Cluster API)
+echo "  install clusterctl" >> $HOME/status
 curl -L https://github.com/kubernetes-sigs/cluster-api/releases/download/v1.1.5/clusterctl-linux-amd64 -o clusterctl
 chmod +x ./clusterctl
 sudo mv ./clusterctl /usr/local/bin/clusterctl
+echo "  install clusterctl done" >> $HOME/status
 
 # install kubelogin
+echo "  install kubelogin" >> $HOME/status
 wget https://github.com/Azure/kubelogin/releases/download/v0.0.20/kubelogin-linux-amd64.zip
 unzip -p kubelogin-linux-amd64.zip bin/linux_amd64/kubelogin > kubelogin
 chmod +x kubelogin
 sudo mv kubelogin /usr/local/bin/kubelogin
 rm kubelogin-linux-amd64.zip
+echo "  install kubelogin done" >> $HOME/status
 
 # install latest flux in ~/.local/bin
 curl -s https://fluxcd.io/install.sh |  bash -s - ~/.local/bin
@@ -42,4 +46,4 @@ echo '. <(flux completion bash)' >> ~/.bashrc
 # install flux completions for zsh
 echo '. <(flux completion zsh)' >> ~/.zshrc
 
-echo "on-create completed" > $HOME/status
+echo "on-create completed" >> $HOME/status
