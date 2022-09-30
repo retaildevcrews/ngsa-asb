@@ -20,24 +20,6 @@ flux-init
     ╰── *(1)kustomization.yaml # k8s kustmzn: 1. <kubectl apply -k> applies all yaml files above
 ```
 
-### `flux-init` flowchart
-
-```mermaid
-
-flowchart LR
-    classDef k8s fill:#889988,stroke:#933
-    classDef start fill:#f121,stroke:#099,stroke-width:2px;
-    apply[["kubectl apply -k"]]:::start --> k8skust[kustomization.yaml]:::k8s
-
-    subgraph "Directory: flux-init"
-        k8skust -->|applies| repo[gotk-repo.yaml]
-        k8skust -->|applies| sync[gotk-sync.yaml]
-        k8skust -->|applies| comp[gotk-components.yaml]
-        sync    -.reconcile/sync.-> k8skust
-    end
-
-```
-
 ## `deploy/bootstrap` Directory
 
 ```bash
@@ -60,12 +42,6 @@ deploy
 ╰─── bootstrap-pre
         ╰── cluster-baseline-settings
             ╰── <similar yamls as bootstrap-dev>
-```
-
-### `bootstrap` flowchart
-
-```mermaid
-
 ```
 
 ## Zone specific directory (e.g. `deploy/dev-ngsa-asb-eastus`)
@@ -103,3 +79,119 @@ deploy/dev-ngsa-asb-eastus
 ```
 
 > *`(1)`, `(2)` and `(3)` represents the order of operations (`kubectl apply`) to setup a cluster with Flux GitOps. 
+
+## Directory Operation Flowchart
+
+```mermaid
+flowchart TD
+    subgraph Legend
+    flux-nodes("flux nodes")
+    k8s_nodes["k8s kustomization nodes"]:::k8s
+    yamls{{rest of yamls}}:::other
+    end
+    classDef k8s stroke:#a71
+    classDef other stroke:#691
+    classDef start fill:#f121,stroke:#099,stroke-width:2px;
+```
+
+### `flux-init` flowchart
+
+```mermaid
+flowchart LR
+    classDef k8s stroke:#a71
+    classDef other stroke:#691
+    classDef start fill:#f121,stroke:#099,stroke-width:2px;
+    apply[["kubectl apply -k"]]:::start --> k8skust[kustomization.yaml]:::k8s
+
+    subgraph "Directory: flux-init"
+        k8skust -->|applies| repo(gotk-repo.yaml)
+        k8skust -->|applies| sync(gotk-sync.yaml)
+        k8skust -->|applies| comp{{gotk-components.yaml}}
+        sync    -.reconciles/syncs.-> k8skust
+    end
+```
+
+### `bootstrap` flowchart
+
+```mermaid
+flowchart LR
+    classDef k8s stroke:#a71
+    classDef other stroke:#691
+    classDef start fill:#f121,stroke:#099,stroke-width:2px;
+    
+    %% Node definitions
+    k8skust_root[kustomization.yaml]:::k8s
+    k8skust_cb[kustomization.yaml]:::k8s
+    base_kube[kustomization.yaml]:::k8s
+    base_istio[kustomization.yaml]:::k8s
+    base_cb[kustomization.yaml]:::k8s
+    flux-kust(flux-kustomziation.yaml)
+    values-kured[values-kured.yaml]:::k8s
+    other-yamls{{"other-yamls"}}:::other
+    bcb_yaml{{"other-yamls"}}:::other
+
+    bistio_yaml{{"other-yamls"}}:::other
+    bistio_flux("flux-kustomziation.yaml")
+
+    bksys_yaml{{"other-yamls"}}:::other
+    bksys_flux("flux-kustomziation.yaml")
+
+    %% Total graph
+    apply[["kubectl apply -k"]]:::start --> k8skust_root
+    k8skust_root --> k8skust_cb
+    k8skust_root --> base_kube
+    k8skust_root --> base_istio
+
+    %% bootstrap cluster-baseline
+    k8skust_cb   --->|patches using value files| base_cb
+    k8skust_cb   --> flux-kust
+    k8skust_cb   --used as patch--> values-kured
+    k8skust_cb   --> other-yamls
+    flux-kust    -.reconciles.-> k8skust_cb
+    
+    %% base cluser-baseline-settings
+    base_cb --> bcb_yaml
+
+    %% base istio
+    base_istio --> bistio_flux
+    base_istio --> bistio_yaml
+    bistio_flux -.reconciles.-> base_istio
+
+    %% %base kube-system
+    bksys_flux -.reconciles.-> base_kube
+    base_kube --> bksys_yaml
+    base_kube --> bksys_flux
+
+    subgraph bst ["/deploy/bootstrap-dev"]
+        k8skust_root
+        subgraph bootstrap-cb ["/cluster-baseline-settings"]
+            k8skust_cb
+            other-yamls
+            flux-kust
+            values-kured
+        end
+    end
+    subgraph bboot ["/deploy/base/bootstrap"]
+        subgraph kks ["/kube-system"]
+        base_kube
+        bksys_flux
+        bksys_yaml
+        end
+
+        subgraph istio ["/istio"]
+        base_istio
+        bistio_flux
+        bistio_yaml
+        end
+
+        subgraph base-cb ["/cluster-baseline-settings"]
+        base_cb
+        bcb_yaml
+        end
+    end
+```
+
+### Zone specific flowchart
+
+> Showing `deploy/dev-ngsa-asb-eastus`
+
