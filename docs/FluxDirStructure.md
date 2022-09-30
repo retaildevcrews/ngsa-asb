@@ -85,9 +85,9 @@ deploy/dev-ngsa-asb-eastus
 ```mermaid
 flowchart TD
     subgraph Legend
-    flux-nodes("flux nodes")
-    k8s_nodes["k8s kustomization nodes"]:::k8s
-    yamls{{rest of yamls}}:::other
+    flux-nodes("flux node")
+    k8s_nodes["k8s kustomization node"]:::k8s
+    yamls{{standard yaml node}}:::other
     end
     classDef k8s stroke:#a71
     classDef other stroke:#691
@@ -107,7 +107,7 @@ flowchart LR
         k8skust -->|applies| repo(gotk-repo.yaml)
         k8skust -->|applies| sync(gotk-sync.yaml)
         k8skust -->|applies| comp{{gotk-components.yaml}}
-        sync    -.reconciles/syncs.-> k8skust
+        sync    -.reconciles/syncs.-o k8skust
     end
 ```
 
@@ -138,29 +138,29 @@ flowchart LR
 
     %% Total graph
     apply[["kubectl apply -k"]]:::start --> k8skust_root
-    k8skust_root --> k8skust_cb
-    k8skust_root --> base_kube
-    k8skust_root --> base_istio
+    k8skust_root -->|applies| k8skust_cb
+    k8skust_root -->|applies| base_kube
+    k8skust_root -->|applies| base_istio
 
     %% bootstrap cluster-baseline
     k8skust_cb   --->|patches using value files| base_cb
-    k8skust_cb   --> flux-kust
+    k8skust_cb   -->|applies| flux-kust
     k8skust_cb   --used as patch--> values-kured
-    k8skust_cb   --> other-yamls
-    flux-kust    -.reconciles.-> k8skust_cb
+    k8skust_cb   -->|applies| other-yamls
+    flux-kust    -.reconciles.-o k8skust_cb
     
     %% base cluser-baseline-settings
-    base_cb --> bcb_yaml
+    base_cb -->|applies| bcb_yaml
 
     %% base istio
-    base_istio --> bistio_flux
-    base_istio --> bistio_yaml
-    bistio_flux -.reconciles.-> base_istio
+    base_istio -->|applies| bistio_flux
+    base_istio -->|applies| bistio_yaml
+    bistio_flux -.reconciles.-o base_istio
 
     %% %base kube-system
-    bksys_flux -.reconciles.-> base_kube
-    base_kube --> bksys_yaml
-    base_kube --> bksys_flux
+    bksys_flux -.reconciles.-o base_kube
+    base_kube -->|applies| bksys_yaml
+    base_kube -->|applies| bksys_flux
 
     subgraph bst ["/deploy/bootstrap-dev"]
         k8skust_root
@@ -195,3 +195,77 @@ flowchart LR
 
 > Showing `deploy/dev-ngsa-asb-eastus`
 
+```mermaid
+flowchart LR
+    classDef k8s stroke:#a71
+    classDef other stroke:#691
+    classDef start fill:#f121,stroke:#099,stroke-width:2px;
+    
+    %% Node definitions
+    root-flux(flux-kustomization.yaml)
+    root-k8skust[kustomization.yaml]:::k8s
+    ngsa-flux(flux-kustomization.yaml)
+    ngsa-yamls{{"all-yamls-recursive"}}:::other
+    lr-flux(flux-kustomization.yaml)
+    lr-yamls{{"all-yamls-recursive"}}:::other
+    mon-flux(flux-kustomization.yaml)
+    mon-k8skust[kustomization.yaml]:::k8s
+    mon-prom{{"prometheus-yamls"}}:::other
+    mon-grafana-dash{{"dashboard-yamls*"}}:::other
+    mon-grafana{{"grafana-yamls*"}}:::other
+    fb-flux(flux-kustomization.yaml)
+    fb-yamls{{"all-yamls-recursive"}}:::other
+    istio-flux(flux-kustomization.yaml)
+    istio-yamls{{"all-yamls-recursive"}}:::other
+
+    apply[["kubectl apply -f"]]:::start --> root-flux
+
+    root-flux -.reconciles.-o root-k8skust
+    root-k8skust -->|applies| ngsa-flux
+    root-k8skust -->|applies| fb-flux
+    root-k8skust -->|applies| mon-flux
+    root-k8skust -->|applies| istio-flux
+    root-k8skust -->|applies| lr-flux
+
+    %% ngsa
+    ngsa-flux -.reconciles.-ongsa-yamls
+    %% fb
+    fb-flux -.reconciles.-o fb-yamls
+    %% mon
+    mon-flux -.reconciles.-o mon-k8skust
+    mon-k8skust -->|applies|mon-prom
+    mon-k8skust -->|applies|mon-grafana-dash
+    mon-k8skust -->|applies|mon-grafana
+    %% istio
+    istio-flux -.reconciles.-o istio-yamls
+    %% lr
+    lr-flux -.reconciles.-o lr-yamls
+
+    subgraph flux-k["/flux-kustomization"]
+        root-flux
+        root-k8skust
+    end
+    subgraph ngsa["/ngsa"]
+    ngsa-flux
+    ngsa-yamls
+    end
+    subgraph fb["/fluentbit"]
+    fb-flux
+    fb-yamls
+    end
+    subgraph mon["/monitoring"]
+    mon-flux
+    mon-k8skust
+    mon-prom
+    mon-grafana-dash
+    mon-grafana
+    end
+    subgraph istio["/istio"]
+    istio-flux
+    istio-yamls
+    end
+    subgraph lr["/loderunner"]
+    lr-flux
+    lr-yamls
+    end
+```
