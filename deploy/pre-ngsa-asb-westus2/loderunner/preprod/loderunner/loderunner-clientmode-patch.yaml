@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: loderunner-clientmode
+  namespace: loderunner
+  labels:
+    app.kubernetes.io/name: loderunner-clientmode
+spec:
+  template:
+    spec:
+      containers:
+        - name: app
+          args: 
+          - --mode 
+          - Client
+          - --secrets-volume
+          - /app/secrets
+          - --prometheus
+          - --zone
+          - az-westus2-pre
+          - --region
+          - westus2

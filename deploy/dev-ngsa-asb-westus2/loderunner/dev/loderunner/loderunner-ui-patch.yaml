@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: loderunner-ui
+  namespace: loderunner
+  labels:
+    app.kubernetes.io/name: loderunner-ui
+spec:
+  template:
+    spec:
+      containers:
+        - name: app
+          env:
+          - name: "LRAPI_DNS"
+            value: "https://loderunner-westus2-dev.cse.ms/api"
+       
+---
+
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: loderunner-vs
+  namespace: loderunner
+spec:
+  hosts:
+  - loderunner-westus2-dev.cse.ms

@@ -43,9 +43,9 @@ spec:
           - /app/secrets
           - --prometheus
           - --zone
-          - az-centralus-pre
+          - PLACEHOLDER
           - --region
-          - centralus
+          - PLACEHOLDER          
           volumeMounts:
             - name: secrets
               mountPath: "/app/secrets"
