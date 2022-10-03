@@ -399,7 +399,9 @@ git push
 
 ## Deploy Flux
 
-> ASB uses `Flux v2` for `GitOps`
+> ASB uses `Flux v2` for `GitOps`.
+>
+> Details on the directory structure used for flux can be found [here](./docs/FluxDirStructure.md).
 
 Before deploying flux we need to import the flux images to ACR.
 
