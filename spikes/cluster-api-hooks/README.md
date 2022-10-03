@@ -4,12 +4,9 @@ This spike covers a sample development workflow of a Cluster API [lifecycle hook
 
 ## Diagrams
 
-TODO: add info about requests that will be made <https://editor.swagger.io/?url=https://cluster-api.sigs.k8s.io/tasks/experimental-features/runtime-sdk/runtime-sdk-openapi.yaml>
+Swagger UI containing information about the different requests that Cluster API will make when lifecycl hooks are triggere. <https://editor.swagger.io/?url=https://cluster-api.sigs.k8s.io/tasks/experimental-features/runtime-sdk/runtime-sdk-openapi.yaml>.
 
 Deployment
-TODO: diagram extension setup and hooks flow
-
-Development loop
 TODO: diagram extension setup and hooks flow
 
 ## Management cluster setup
@@ -55,7 +52,7 @@ Build the sample extention and deploy it to the local container registry
 ```bash
 
 # build and tag
-docker build spikes/cluster-api-hooks/sample-extension \
+DOCKER_BUILDKIT=1 docker build spikes/cluster-api-hooks/sample-extension \
   -f spikes/cluster-api-hooks/sample-extension/Dockerfile \
   -t localhost:5001/capi-sample-extension
 
