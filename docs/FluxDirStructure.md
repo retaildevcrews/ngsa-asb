@@ -78,7 +78,9 @@ deploy/dev-ngsa-asb-eastus
     ╰── ngsa-flux-kustomization.yaml
 ```
 
-> *`(1)`, `(2)` and `(3)` represents the order of operations (`kubectl apply`) to setup a cluster with Flux GitOps. 
+> *`(1)`, `(2)` and `(3)` represents the order of operations (`kubectl apply`) to setup a cluster with Flux GitOps.
+>
+> See the flowcharts below for order of operations and detailed chart of dependencies
 
 ## Directory Operation Flowchart
 
@@ -107,7 +109,11 @@ flowchart LR
         k8skust -->|applies| repo(gotk-repo.yaml)
         k8skust -->|applies| sync(gotk-sync.yaml)
         k8skust -->|applies| comp{{gotk-components.yaml}}
-        sync    -.reconciles/syncs.-o k8skust
+        sync    -.reconciles/syncs.-> k8skust
+    end
+
+    subgraph "(1) Deploy Flux"
+        apply
     end
 ```
 
@@ -143,11 +149,11 @@ flowchart LR
     k8skust_root -->|applies| base_istio
 
     %% bootstrap cluster-baseline
-    k8skust_cb   --->|patches using value files| base_cb
     k8skust_cb   -->|applies| flux-kust
     k8skust_cb   --used as patch--> values-kured
     k8skust_cb   -->|applies| other-yamls
-    flux-kust    -.reconciles.-o k8skust_cb
+    flux-kust    -.reconciles.-> k8skust_cb
+    k8skust_cb   -->|patches using values-kured.yaml| base_cb
     
     %% base cluser-baseline-settings
     base_cb -->|applies| bcb_yaml
@@ -155,40 +161,44 @@ flowchart LR
     %% base istio
     base_istio -->|applies| bistio_flux
     base_istio -->|applies| bistio_yaml
-    bistio_flux -.reconciles.-o base_istio
+    bistio_flux -.reconciles.-> base_istio
 
     %% %base kube-system
-    bksys_flux -.reconciles.-o base_kube
+    bksys_flux -.reconciles.-> base_kube
     base_kube -->|applies| bksys_yaml
     base_kube -->|applies| bksys_flux
 
     subgraph bst ["/deploy/bootstrap-dev"]
-        k8skust_root
         subgraph bootstrap-cb ["/cluster-baseline-settings"]
             k8skust_cb
             other-yamls
-            flux-kust
             values-kured
+            flux-kust
         end
+        k8skust_root
     end
-    subgraph bboot ["/deploy/base/bootstrap"]
+    subgraph base-boot ["/deploy/base/bootstrap"]
         subgraph kks ["/kube-system"]
-        base_kube
-        bksys_flux
-        bksys_yaml
+            base_kube
+            bksys_flux
+            bksys_yaml
         end
 
         subgraph istio ["/istio"]
-        base_istio
-        bistio_flux
-        bistio_yaml
+            base_istio
+            bistio_flux
+            bistio_yaml
+        end
+        subgraph base-cb ["/cluster-baseline-settings"]
+            base_cb
+            bcb_yaml
         end
 
-        subgraph base-cb ["/cluster-baseline-settings"]
-        base_cb
-        bcb_yaml
-        end
     end
+    subgraph "(2) Deploy bootstrap"
+        apply
+    end
+    bootstrap-cb o-..-o base-cb
 ```
 
 ### Zone specific flowchart
@@ -220,7 +230,7 @@ flowchart LR
 
     apply[["kubectl apply -f"]]:::start --> root-flux
 
-    root-flux -.reconciles.-o root-k8skust
+    root-flux -.reconciles.-> root-k8skust
     root-k8skust -->|applies| ngsa-flux
     root-k8skust -->|applies| fb-flux
     root-k8skust -->|applies| mon-flux
@@ -228,44 +238,49 @@ flowchart LR
     root-k8skust -->|applies| lr-flux
 
     %% ngsa
-    ngsa-flux -.reconciles.-ongsa-yamls
+    ngsa-flux -.reconciles.->ngsa-yamls
     %% fb
-    fb-flux -.reconciles.-o fb-yamls
+    fb-flux -.reconciles.-> fb-yamls
     %% mon
-    mon-flux -.reconciles.-o mon-k8skust
+    mon-flux -.reconciles.-> mon-k8skust
     mon-k8skust -->|applies|mon-prom
     mon-k8skust -->|applies|mon-grafana-dash
     mon-k8skust -->|applies|mon-grafana
     %% istio
-    istio-flux -.reconciles.-o istio-yamls
+    istio-flux -.reconciles.-> istio-yamls
     %% lr
-    lr-flux -.reconciles.-o lr-yamls
+    lr-flux -.reconciles.-> lr-yamls
+
 
     subgraph flux-k["/flux-kustomization"]
         root-flux
         root-k8skust
     end
     subgraph ngsa["/ngsa"]
-    ngsa-flux
-    ngsa-yamls
+        ngsa-flux
+        ngsa-yamls
     end
     subgraph fb["/fluentbit"]
-    fb-flux
-    fb-yamls
+        fb-flux
+        fb-yamls
     end
     subgraph mon["/monitoring"]
-    mon-flux
-    mon-k8skust
-    mon-prom
-    mon-grafana-dash
-    mon-grafana
+        mon-flux
+        mon-k8skust
+        mon-prom
+        mon-grafana-dash
+        mon-grafana
     end
     subgraph istio["/istio"]
-    istio-flux
-    istio-yamls
+        istio-flux
+        istio-yamls
     end
     subgraph lr["/loderunner"]
-    lr-flux
-    lr-yamls
+        lr-flux
+        lr-yamls
+    end
+
+    subgraph "(3) Zone Deployment"
+        apply
     end
 ```
