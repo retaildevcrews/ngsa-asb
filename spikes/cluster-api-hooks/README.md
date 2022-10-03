@@ -1,25 +1,31 @@
-# TODO: rough notes
+# Cluster API Lifecycle Hook spike
 
+This spike covers a sample development workflow of a Cluster API [lifecycle hook runtime extensions](https://cluster-api.sigs.k8s.io/tasks/experimental-features/runtime-sdk/implement-lifecycle-hooks.html) using kind clusters. The [test extention](https://github.com/kubernetes-sigs/cluster-api/tree/main/test/extension) from Cluster API is used as the foundation of this spike.
+
+## Diagrams
+
+TODO: add info about requests that will be made <https://editor.swagger.io/?url=https://cluster-api.sigs.k8s.io/tasks/experimental-features/runtime-sdk/runtime-sdk-openapi.yaml>
+
+Deployment
 TODO: diagram extension setup and hooks flow
 
-TODO:
+Development loop
+TODO: diagram extension setup and hooks flow
 
-- briefly tried getting local clusters working with k3d with no luck
-- try again and see if it is relatively easy to get it working with k3d setup vs simply installing kind
-- if sticking with kind, make note of choice and reason for moving away from default k3d setup
-  - short version, cluster api had kind instructions
+## Management cluster setup
+
+Setup a local Cluster API management cluster using Kind.
 
 ```bash
 
-# setup
-
+# start a container registry for kind
 docker run \
     -d --restart=always \
     -p "127.0.0.1:5001:5000" \
     --name "kind-registry" \
     registry:2
 
-# TODO: install kind. <https://kind.sigs.k8s.io/docs/user/quick-start/#installing-from-release-binaries>
+# install kind. <https://kind.sigs.k8s.io/docs/user/quick-start/#installing-from-release-binaries>
 curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.14.0/kind-linux-amd64
 chmod +x ./kind
 sudo mv ./kind /usr/local/bin/kind
@@ -27,48 +33,66 @@ sudo mv ./kind /usr/local/bin/kind
 # create local kind management cluster
 kind create cluster --config spikes/cluster-api-hooks/kind-cluster.yaml
 
+# connect the registry to the same network as the cluster
 docker network connect "kind" "kind-registry"
 
+# expose the registry to the cluster
 kubectl apply -f spikes/cluster-api-hooks/local-registry-configmap.yaml
 
-# capi init
-
-export EXP_AKS=true
+# initialize cluster api
 export EXP_MACHINE_POOL=true
 export CLUSTER_TOPOLOGY=true
 export EXP_RUNTIME_SDK=true
 
-# initialize local kind management cluster
 clusterctl init --infrastructure docker
 
-# build extension
+```
 
+## Build extension
+
+Build the sample extention and deploy it to the local container registry
+
+```bash
+
+# build and tag
 docker build spikes/cluster-api-hooks/sample-extension \
   -f spikes/cluster-api-hooks/sample-extension/Dockerfile \
   -t localhost:5001/capi-sample-extension
 
+# push image
 docker push localhost:5001/capi-sample-extension
 
-# deploy extension
+```
 
+## Initial deployment
+
+```bash
+
+# deploy the extention for the first time
 kubectl apply -f spikes/cluster-api-hooks/sample-extension/deploy
 
+# wait for deployment to be ready
 kubectl wait pod --for=condition=Ready -l app=sample-extension --timeout=60s
 
 # register the extention with cluster api
 kubectl apply -f spikes/cluster-api-hooks/sample-extension/extension-config.yaml
 
-# rapid testing with of extension with local kind clusters
-# make changes to extension, deploy and test locally
-# then create AKS clusters for further testing
-# saves time since creating, updating, and deleting an AKS cluster can take minutes
+```
 
+## Test extension
+
+With Cluster API and the sample extention ready, create another cluster to test the extention. For a quick development loop, Kind clusters can be created, updated, and deleted quickly to test the lifecycle hook extension before testing on a non-local cluster. This allows for rapid development by removing the time to deploy cloud infrastructure.
+
+```bash
+
+# create directory for spike cluster configs
 export BASE_CAPI_CONFIG_DIR="spikes/cluster-api-hooks/capi-configs"
 
 mkdir -p $BASE_CAPI_CONFIG_DIR
 
 export DOCKER_CLUSTER_YAML_PATH="${BASE_CAPI_CONFIG_DIR}/capi-quickstart-docker.yaml"
 
+# generate configuration files for a Kind workload cluster
 clusterctl generate cluster capi-quickstart-docker \
   --kubernetes-version v1.24.0 \
   --control-plane-machine-count=1 \
@@ -77,71 +101,44 @@ clusterctl generate cluster capi-quickstart-docker \
   --flavor development \
   > "$DOCKER_CLUSTER_YAML_PATH"
 
-# create local kind workload cluster
+# apply the workload cluster config file to the management cluster
 kubectl apply -f "$DOCKER_CLUSTER_YAML_PATH"
-
-# view the cluster in cluster api
-kubectl get clusters
-
-# view the kind cluster
-kind get clusters
-
-# view the logs of the extension to see the lifecycle hooks in action
-kubectl logs -l app=sample-extension
-
-# delete the cluster
-kubectl delete cluster capi-quickstart-docker
-
-# view the updated logs again after cluster has been deleted
-kubectl logs -l app=sample-extension
 
 ```
 
-inner-loop dev
+## Verify results
 
-Use local kind clusters to test code changes locally before testing on cloud clusters
-
-- update extension go code
-- run local build command
-- push to local registry
-- restart extention deployment a.k.a delete pod
-  - `kubectl delete pod -l app=sample-extension`
-- create, update, or delete a local kind cluster
-- observe behavior of updated hooks
-- repeat process
-
-TODO: get AKS working with ClusterClass CRD
+View the behavior of the different components involved in the flow.
 
 ```bash
 
-# TODO: initial setup for creating AKS cluster
-# - duplicate notes here so spike is standalone (leaning towards this route)
-# - or point relevant section in other spike docs
-# - or other
-
-clusterctl init --infrastructure azure
-
-export AZURE_CONTROL_PLANE_MACHINE_TYPE="Standard_A2_v2"
-export AZURE_NODE_MACHINE_TYPE="Standard_A2_v2"
-
-export AKS_CLUSTER_YAML_PATH="${BASE_CAPI_CONFIG_DIR}/capi-quickstart-aks.yaml"
-
-# TODO: need a template using ClusterClass for lifecycle hooks to work
-
-clusterctl generate cluster capi-quickstart-aks \
-  --kubernetes-version v1.24.0 \
-  --control-plane-machine-count=1 \
-  --worker-machine-count=1 \
-  --infrastructure=azure \
-  --flavor=aks \
-  > "$AKS_CLUSTER_YAML_PATH"
-
-kubectl apply -f "$AKS_CLUSTER_YAML_PATH"
-
-# view the cluster in cluster api
+# view the workload cluster resource in the cluster api management cluster
 kubectl get clusters
+
+# view the newly created cluster directly with kind
+kind get clusters
+
+# view the logs of the extension to see the lifecycle hooks in action
+# there will be log messages prefixed with "SPIKE".
+kubectl logs -l app=sample-extension
+
+# delete the workload cluster
+kubectl delete cluster capi-quickstart-docker
+
+# view the updated logs again after the workload cluster has been deleted
+kubectl logs -l app=sample-extension
 
 ```
 
-sample extension config location
-<https://github.com/kubernetes-sigs/cluster-api/blob/main/docs/proposals/20220221-runtime-SDK.md#registering-runtime-extensions>
+## Further development
+
+The developer can now repease the process below to test and verify changes locally.
+
+1. update extension code
+1. build and tag container image
+1. push to local registry
+1. restart extention deployment a.k.a delete pod
+    - `kubectl delete pod -l app=sample-extension`
+1. create, update, or delete a workload cluster's configuration
+1. observe behavior of updated hooks
+1. repeat process

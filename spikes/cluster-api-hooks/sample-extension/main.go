@@ -131,19 +131,19 @@ func main() {
 
 func DoBeforeClusterCreate(ctx context.Context, request *runtimehooksv1.BeforeClusterCreateRequest, response *runtimehooksv1.BeforeClusterCreateResponse) {
 	log := ctrl.LoggerFrom(ctx)
-	log.Info("BeforeClusterCreate hook is called")
+	log.Info("SPIKE: BeforeClusterCreate hook is called")
 	// Your implementation
 }
 
 func DoAfterControlPlaneInitialized(ctx context.Context, request *runtimehooksv1.AfterControlPlaneInitializedRequest, response *runtimehooksv1.AfterControlPlaneInitializedResponse) {
 	log := ctrl.LoggerFrom(ctx)
-	log.Info("AfterControlPlaneInitialized hook is called")
+	log.Info("SPIKE: AfterControlPlaneInitialized hook is called")
 	// Your implementation
 }
 
 func DoBeforeClusterDelete(ctx context.Context, request *runtimehooksv1.BeforeClusterDeleteRequest, response *runtimehooksv1.BeforeClusterDeleteResponse) {
 	log := ctrl.LoggerFrom(ctx)
-	log.Info("BeforeClusterDelete hook is called")
+	log.Info("SPIKE: BeforeClusterDelete hook is called")
 	// Your implementation
 }
 
