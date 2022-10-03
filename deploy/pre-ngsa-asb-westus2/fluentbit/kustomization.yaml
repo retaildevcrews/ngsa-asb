@@ -4,17 +4,18 @@ resources:
   - ../../base/fluentbit
 patches:
   - patch: |-
-      data:
-        zone: az-eastus-dev
-        region: eastus
-    target:
+      apiVersion: v1
       kind: ConfigMap
-      name: fluentbit-log-config
-      namespace: fluentbit
+      metadata:
+        name: fluentbit
+        namespace: fluentbit
+      data:
+        zone: az-westus2-pre
+        region: westus2
   - patch: |
         - op: replace
           path: "/spec/template/spec/containers/0/image"
-          value: "acraks3i2qzkkxofr7c.azurecr.io/fluent/fluent-bit:1.9.5"        
+          value: "acraksfykg5bqasutle.azurecr.io/fluent/fluent-bit:1.9.5"        
     target:
       kind: DaemonSet
       name: fluentbit

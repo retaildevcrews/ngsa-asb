@@ -1,6 +1,8 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-- cluster-baseline-settings
-- ../base/bootstrap/kube-system
-- ../base/bootstrap/istio
+- 01-namespace.yaml
+- 02-config.yaml
+- 03-config-log.yaml
+- 04-role.yaml
+- 05-daemonset.yaml
