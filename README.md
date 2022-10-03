@@ -296,6 +296,9 @@ export ASB_AKS_NAME=$(az deployment group show -g $ASB_RG_CORE -n cluster-${ASB_
 # Get AKS credentials
 az aks get-credentials -g $ASB_RG_CORE -n $ASB_AKS_NAME
 
+# Authenticate Kubectl
+kubelogin convert-kubeconfig -l azurecli
+
 # Rename context for simplicity
 kubectl config rename-context $ASB_AKS_NAME $ASB_DEPLOYMENT_NAME-${ASB_CLUSTER_LOCATION}
 
