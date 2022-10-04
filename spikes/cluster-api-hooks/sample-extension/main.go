@@ -84,12 +84,12 @@ func main() {
 
 	// Lifecycle Hooks server configuration
 	// Leverage the runtime extension package from Cluster API to easily add hook handlers to the server.
-	// Lifecyclke hook runtime extension do not have to be written in GO, but the package provided makes it straight forward.
+	// Lifecycle hook runtime extension do not have to be written in GO, but the package provided makes it straight forward.
 
 	// In the next few blocks below, hook endpoints are named, configured, and given handler functions.
-	// The first one for example will correspond to the request that Cluster API will make to the endpoint,
+	// The first one, for example, will correspond to the request that Cluster API will make to the endpoint,
 	// /hooks.runtime.cluster.x-k8s.io/v1alpha1/beforeclustercreate/before-cluster-create
-	// Other endpoints can be views in the swagger ui
+	// Other endpoints can be viewed in the swagger ui
 	// https://editor.swagger.io/?url=https://cluster-api.sigs.k8s.io/tasks/experimental-features/runtime-sdk/runtime-sdk-openapi.yaml
 	if err := webhookServer.AddExtensionHandler(server.ExtensionHandler{
 		Hook:           runtimehooksv1.BeforeClusterCreate,
