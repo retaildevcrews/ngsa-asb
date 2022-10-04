@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"flag"
-	"net/http"
 	"os"
 
 	"github.com/spf13/pflag"
@@ -27,13 +26,14 @@ var (
 	setupLog = ctrl.Log.WithName("setup")
 
 	// Flags.
-	profilerAddress string
-	webhookPort     int
-	webhookCertDir  string
-	logOptions      = logs.NewOptions()
+	webhookPort    int
+	webhookCertDir string
+	logOptions     = logs.NewOptions()
 )
 
 func init() {
+	// infrav1 in this context is the package that contains the k8s API schema related to docker cluster CRDs.
+	// Will need to add the appropriate schema(s) for other types of cluster CRDs, like AKS, when the time comes.
 	_ = infrav1.AddToScheme(scheme)
 
 	// Register the RuntimeHook types into the catalog.
@@ -45,12 +45,13 @@ func InitFlags(fs *pflag.FlagSet) {
 	logs.AddFlags(fs, logs.SkipLoggingConfigurationFlags())
 	logOptions.AddFlags(fs)
 
-	fs.StringVar(&profilerAddress, "profiler-address", "",
-		"Bind address to expose the pprof profiler (e.g. localhost:6060)")
-
 	fs.IntVar(&webhookPort, "webhook-port", 9443,
 		"Webhook Server port")
 
+	// HTTPS is required according to the Cluster API documentation.
+	// cert-manager is added to the management cluster when initialized with clusterctl.
+	// This cert-manager is used in this setup to generate the required secrets.
+	// Existing certs can be used instead if they're available. ex: cse.ms certs.
 	fs.StringVar(&webhookCertDir, "webhook-cert-dir", "/tmp/k8s-webhook-server/serving-certs/",
 		"Webhook cert dir, only used when webhook-port is specified.")
 }
@@ -69,13 +70,6 @@ func main() {
 	// klog.Background will automatically use the right logger.
 	ctrl.SetLogger(klog.Background())
 
-	if profilerAddress != "" {
-		klog.Infof("Profiler listening for requests at %s", profilerAddress)
-		go func() {
-			klog.Info(http.ListenAndServe(profilerAddress, nil))
-		}()
-	}
-
 	ctx := ctrl.SetupSignalHandler()
 
 	webhookServer, err := server.NewServer(server.Options{
@@ -88,7 +82,15 @@ func main() {
 		os.Exit(1)
 	}
 
-	// Lifecycle Hooks
+	// Lifecycle Hooks server configuration
+	// Leverage the runtime extension package from Cluster API to easily add hook handlers to the server.
+	// Lifecyclke hook runtime extension do not have to be written in GO, but the package provided makes it straight forward.
+
+	// In the next few blocks below, hook endpoints are named, configured, and given handler functions.
+	// The first one for example will correspond to the request that Cluster API will make to the endpoint,
+	// /hooks.runtime.cluster.x-k8s.io/v1alpha1/beforeclustercreate/before-cluster-create
+	// Other endpoints can be views in the swagger ui
+	// https://editor.swagger.io/?url=https://cluster-api.sigs.k8s.io/tasks/experimental-features/runtime-sdk/runtime-sdk-openapi.yaml
 	if err := webhookServer.AddExtensionHandler(server.ExtensionHandler{
 		Hook:           runtimehooksv1.BeforeClusterCreate,
 		Name:           "before-cluster-create",
@@ -129,6 +131,7 @@ func main() {
 	}
 }
 
+// Lifecycle Hook handlers that will be referenced in the appropriate hook configuration above
 func DoBeforeClusterCreate(ctx context.Context, request *runtimehooksv1.BeforeClusterCreateRequest, response *runtimehooksv1.BeforeClusterCreateResponse) {
 	log := ctrl.LoggerFrom(ctx)
 	log.Info("SPIKE: BeforeClusterCreate hook is called")
