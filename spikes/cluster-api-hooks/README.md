@@ -6,6 +6,9 @@ This spike uses Kind instead of K3d because of two reasons. The Cluster API quic
 
 The diagram belows shows a simplified flow when creating a cluster. The Swagger UI contains detailed information about the available hooks, their requests, and responses. <https://editor.swagger.io/?url=https://cluster-api.sigs.k8s.io/tasks/experimental-features/runtime-sdk/runtime-sdk-openapi.yaml>.
 
+The Cluster API documentation also includes other best-practices on building and deploying runtime extensions.
+<https://cluster-api.sigs.k8s.io/tasks/experimental-features/runtime-sdk/implement-extensions.html>.
+
 ![Lifecycle hook extension diagram](./diagrams/out/ClusterAPI-Lifecycle-Hook-Extension.svg)
 
 ## Management cluster setup
