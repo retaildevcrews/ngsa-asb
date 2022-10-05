@@ -2,8 +2,6 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
 - ../base
-- gotk-repo.yaml
-- gotk-sync.yaml
 patches:
     - patch: |
         - op: replace
@@ -36,4 +34,14 @@ patches:
       target:
         kind: Deployment
         name: source-controller
+        namespace: flux-system
+    - patch: |- # Remove default secret volm
+        - op: replace
+          path: /spec/path
+          value: ./flux-init/init-preprod
+      target:
+        group: kustomize.toolkit.fluxcd.io
+        version: v1beta2
+        kind: Kustomization
+        name: flux-system
         namespace: flux-system
