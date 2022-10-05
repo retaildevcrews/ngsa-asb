@@ -4,7 +4,7 @@ function GetClusterAdminID(){
     echo "Getting Cluster Admin ID..."
 
     if az account show -o none; then
-        echo "Your are logged into Azure subscription $(az account show --query name)"
+        echo "Your are logged into Azure subscription $(az account show --query name) as user $(az account show --query user.name)"
     else
         az login --use-device-code --output none
     fi
