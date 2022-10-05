@@ -6,8 +6,7 @@ function GetClusterAdminID(){
 
     export ASB_CLUSTER_ADMIN_GROUP=4-co
 
-    $clusterAdminId = $(az ad group show -g $ASB_CLUSTER_ADMIN_GROUP --query id -o tsv)
-    echo $clusterAdminId
+    az ad group show -g $ASB_CLUSTER_ADMIN_GROUP --query id -o tsv
 }
 
 GetClusterAdminID
