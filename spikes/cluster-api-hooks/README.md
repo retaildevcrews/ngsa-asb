@@ -9,7 +9,30 @@ The diagram belows shows a simplified flow when creating a cluster. The Swagger 
 The Cluster API documentation also includes other best-practices on building and deploying runtime extensions.
 <https://cluster-api.sigs.k8s.io/tasks/experimental-features/runtime-sdk/implement-extensions.html>.
 
-![Lifecycle hook extension diagram](./diagrams/out/ClusterAPI-Lifecycle-Hook-Extension.svg)
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User
+    participant cluster as Cluster API
+    participant lifecycle as Lifecycle hook extension deployment
+
+    User->>cluster: kubectl apply cluster CRDs to trigger flow
+    critical Kubernetes Cluster
+    cluster->>lifecycle: POST /hooks.runtime.cluster.x-k8s.io/v1alpha1/beforeclustercreate/{name}
+    activate lifecycle
+    lifecycle-->>lifecycle: perform required actions before cluster is created
+    lifecycle-->>cluster: 
+    deactivate lifecycle
+
+    cluster ->> cluster: create cluster
+
+    cluster->>lifecycle: POST /hooks.runtime.cluster.x-k8s.io/v1alpha1/aftercontrolplaneinitialized/{name}
+    activate lifecycle
+    lifecycle-->>lifecycle: perform required actions when control plane is ready
+    lifecycle-->>cluster: 
+    deactivate lifecycle
+    end
+```
 
 ## Management cluster setup
 
