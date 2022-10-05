@@ -14,7 +14,7 @@ function GetClusterAdminID(){
     
     cluster_admin_id=$(az ad group show -g $ASB_CLUSTER_ADMIN_GROUP --query id -o tsv)
     echo ""
-    echo "Clusater Admin ID: $cluster_admin_id"
+    echo "Cluster Admin ID: $cluster_admin_id"
 }
 
 GetClusterAdminID
