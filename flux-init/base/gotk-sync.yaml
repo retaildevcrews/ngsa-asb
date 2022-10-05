@@ -6,7 +6,7 @@ metadata:
   namespace: flux-system
 spec:
   interval: 10m0s # detect drift and undo kubectl edits every 10mins
-  path: ./flux-init/init-dev
+  path: ./flux-init/base
   prune: true # remove stale resources from cluster
   targetNamespace: flux-system # set the namespace for all resources
   sourceRef:
