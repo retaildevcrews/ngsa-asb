@@ -1,5 +1,25 @@
 #!/bin/bash
 
+function collectInputParameters()
+{
+  if [ "$#" < 4 ] || [ "$#" > 4 ]; then
+    echo "Please provide the 1. Cluster Admin ID, and 2. Name of the admin group."
+    exit 1
+  else 
+    export ASB_CLUSTER_ADMIN_ID=$1
+    export ASB_CLUSTER_ADMIN_GROUP=$2
+
+    export ASB_SCRIPT_STEP=checkPermissions
+
+      # Save environment variables
+    ./saveenv.sh -y
+
+    # Invoke Next Step In Setup
+    $ASB_SCRIPT_STEP    
+  fi
+}
+
+
 function checkPermissions()
 {
   # Check if owner or contributor for subscription
@@ -21,7 +41,7 @@ function checkPermissions()
 
 
   # Set your security group name
-  export ASB_CLUSTER_ADMIN_GROUP=4-co
+  export ASB_CLUSTER_ADMIN_GROUP=$ASB_CLUSTER_ADMIN_GROUP
 
   echo "Type Cluster Admin Group Name (Default is $ASB_CLUSTER_ADMIN_GROUP):"
   read ans
@@ -170,7 +190,11 @@ function getAadValues()
   export ASB_TENANT_ID=$(az account show --query tenantId -o tsv)
 
   # Get AAD cluster admin group
-  export ASB_CLUSTER_ADMIN_ID=$(az ad group show -g $ASB_CLUSTER_ADMIN_GROUP --query id -o tsv)
+
+  #export ASB_CLUSTER_ADMIN_ID=$(az ad group show -g $ASB_CLUSTER_ADMIN_GROUP --query id -o tsv)
+
+  #Revieves Cluster_Admin_ID from external script and WSL2
+  export ASB_CLUSTER_ADMIN_ID=$ASB_CLUSTER_ADMIN_ID
 
   echo "Completed Getting AAD Values."
 
@@ -568,10 +592,10 @@ if test -f .current-deployment; then
   if test -f $(cat .current-deployment); then
     source $(cat .current-deployment)
   else
-    export ASB_SCRIPT_STEP=checkPermissions
+    export ASB_SCRIPT_STEP=collectInputParameters
   fi
 else
-  export ASB_SCRIPT_STEP=checkPermissions
+  export ASB_SCRIPT_STEP=collectInputParameters
 fi
 
 #check if in codespaces
