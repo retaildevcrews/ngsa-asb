@@ -84,6 +84,30 @@ kubectl create secret generic thanos-objstore-config \
 
 ```
 
+#### Setup private DNS
+
+Create DNS records in the private DNS zone to allow cross cluster communication
+
+```bash
+
+export ASB_AKS_PRIVATE_IP="$ASB_SPOKE_IP_PREFIX".4.4
+
+az network private-dns record-set a add-record \
+  -g $ASB_RG_CORE \
+  -z $ASB_DNS_ZONE \
+  -n "thanos-grpc-${ASB_SPOKE_LOCATION}-${ASB_ENV}" \
+  -a $ASB_AKS_PRIVATE_IP \
+  --query fqdn
+
+az network private-dns record-set a add-record \
+  -g $ASB_RG_CORE \
+  -z $ASB_DNS_ZONE \
+  -n "thanos-store-grpc-${ASB_SPOKE_LOCATION}-${ASB_ENV}" \
+  -a $ASB_AKS_PRIVATE_IP \
+  --query fqdn
+
+```
+
 ### Create Deployment Templates
 
 ```bash
@@ -103,6 +127,8 @@ cat templates/monitoring/02-prometheus.yaml | envsubst  > $ASB_GIT_PATH/monitori
 > Skip this section for all other clusters.
 
 ```bash
+
+mkdir -p  $ASB_GIT_PATH/monitoring/thanos
 
 # create thanos querier deployment file
 cat templates/monitoring/thanos/thanos-querier.yaml | envsubst  > $ASB_GIT_PATH/monitoring/thanos/thanos-querier.yaml
