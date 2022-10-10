@@ -1,0 +1,21 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- ../../../base/apps/monitoring/prometheus
+patches:
+- patch: |
+    - op: replace
+      path: "/spec/template/spec/containers/0/env/0/value"
+      value: "aks-3i2qzkkxofr7c-eastus"
+    - op: replace
+      path: "/spec/template/spec/containers/0/image"
+      value: "acraks3i2qzkkxofr7c.azurecr.io/prom/prometheus:v2.30.0"
+    - op: replace
+      path: "/spec/template/spec/containers/1/image"
+      value: "acraks3i2qzkkxofr7c.azurecr.io/thanos/thanos:v0.23.0"
+  target:
+    group: apps
+    version: v1
+    kind: Deployment
+    name: prometheus-deployment
+    namespace: monitoring
