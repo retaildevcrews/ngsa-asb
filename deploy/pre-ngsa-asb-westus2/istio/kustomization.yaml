@@ -67,4 +67,3 @@ patches:
       kind: SecretProviderClass
       name: istio-ingress-tls-secret-csi-akv
       namespace: istio-system
- 
