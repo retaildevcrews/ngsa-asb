@@ -31,7 +31,7 @@ spec:
       terminationGracePeriodSeconds: 10
       containers:
         - name: fluentbit
-          image: acraksfykg5bqasutle.azurecr.io/fluent/fluent-bit:1.9.5
+          image: fluent/fluent-bit:1.9.5
           imagePullPolicy: Always
           ports:
             - name: http

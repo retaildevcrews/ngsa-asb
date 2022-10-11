@@ -1,0 +1,22 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../../base/apps/fluentbit
+patches:
+  - patch: |-
+      apiVersion: v1
+      kind: ConfigMap
+      metadata:
+        name: fluentbit
+        namespace: fluentbit
+      data:
+        zone: az-westus2-dev
+        region: westus2
+  - patch: |
+        - op: replace
+          path: "/spec/template/spec/containers/0/image"
+          value: "acraks3i2qzkkxofr7c.azurecr.io/fluent/fluent-bit:1.9.5"        
+    target:
+      kind: DaemonSet
+      name: fluentbit
+      namespace: fluentbit

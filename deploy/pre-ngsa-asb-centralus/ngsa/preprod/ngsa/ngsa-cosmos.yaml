@@ -6,7 +6,6 @@ metadata:
   labels:
     app.kubernetes.io/name: ngsa-cosmos
 spec:
-  replicas: 2
   selector:
     matchLabels:
       app: ngsa-cosmos
@@ -20,8 +19,8 @@ spec:
       labels:
         aadpodidbinding: ngsa-asb-ngsa-id
         app: ngsa-cosmos
-        deploy: 22-09-28-19-54-13
-        version: beta-2209-28-19
+        deploy: 22-10-11-15-20-53
+        version: beta-2210-11-15
     spec:
       containers:
         - name: app

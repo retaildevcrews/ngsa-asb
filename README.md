@@ -30,7 +30,7 @@ NGSA AKS Secure Base line uses the Patterns and Practices AKS Secure Baseline re
 ## Setting up Infrastructure
 
 ```bash
-🛑 Run these commands one at a time
+🛑 Run these commands one at a time. Note that the 'az ad' commands will not work in Codespaces due to a Conditional Access Policy on Azure Active Directory in the Microsoft tenant. Such commands should be run locally, and the responses saved to variables in Codespaces when necessary. If you are not working in Codespaces, then some environment variables will need to be copied from Codespaces to your local environment. The steps that need to be altered depending on the environment you are working in have been highlighted with additional instructions.
 
 # Login to your Azure subscription
 az login --use-device-code
@@ -49,6 +49,12 @@ export ASB_CLUSTER_ADMIN_GROUP=4-co
 
 # Verify you are a member of the security group
 az ad group member check -g $ASB_CLUSTER_ADMIN_GROUP --member-id $(az ad signed-in-user show --query id -o tsv) --query value -o tsv
+
+🛑 # If you are setting up the infrastructure in Codespaces you will need to run this az ad command locally
+# - Ensure that you are logged into the same subscription locally as you are in Codespaces
+# - in Codespaces, echo the command above: 
+# -   echo "az ad group member check -g $ASB_CLUSTER_ADMIN_GROUP --member-id $(az ad signed-in-user show --query id -o tsv) --query value -o tsv"
+# - copy the output and run it locally
 ```
 
 ### Set Deployment Short Name
@@ -147,7 +153,16 @@ echo $ASB_DEPLOYMENT_NAME
 # Verify the correct subscription
 az account show -o table
 
-🛑 # These env vars are already set in Codespaces enviroment for "cse.ms"
+🛑 # These environment variables are already set in Codespaces enviroment for "cse.ms". If you are setting up the infrastructure locally, 
+# you need to copy and get these environment variables and their values from Codespaces and save them locally:
+# In Codespaces:
+# - echo $APP_GW_CERT_CSMS 
+# - echo $INGRESS_CERT_CSMS
+# - echo $INGRESS_KEY_CSMS
+# Locally 
+# - APP_GW_CERT_CSMS=[output from echo command]
+# - INGRESS_CERT_CSMS=[output from echo command]
+# - INGRESS_KEY_CSMS=[output from echo command]
 
 # Check certificates
 if [ -z $APP_GW_CERT_CSMS ]; then echo "App Gateway cert not set correctly"; fi
@@ -166,6 +181,13 @@ export ASB_TENANT_ID=$(az account show --query tenantId -o tsv)
 
 # Get AAD cluster admin group
 export ASB_CLUSTER_ADMIN_ID=$(az ad group show -g $ASB_CLUSTER_ADMIN_GROUP --query id -o tsv)
+🛑 # If you are setting up the infrastructure in Codespaces you will need to run this az ad command locally
+# - Ensure that you are logged into the same subscription locally as you are in Codespaces
+# - in Codespaces, echo the command above: 
+# -   echo "az ad group show -g $ASB_CLUSTER_ADMIN_GROUP --query objectId -o tsv"
+# - copy the output and run it locally
+# - save the output from the local run
+# - export ASB_CLUSTER_ADMIN_ID=[output copied from local run]  
 
 # Verify AAD admin group
 echo $ASB_CLUSTER_ADMIN_GROUP
@@ -296,6 +318,9 @@ export ASB_AKS_NAME=$(az deployment group show -g $ASB_RG_CORE -n cluster-${ASB_
 # Get AKS credentials
 az aks get-credentials -g $ASB_RG_CORE -n $ASB_AKS_NAME
 
+# Authenticate Kubectl
+kubelogin convert-kubeconfig -l azurecli
+
 # Rename context for simplicity
 kubectl config rename-context $ASB_AKS_NAME $ASB_DEPLOYMENT_NAME-${ASB_CLUSTER_LOCATION}
 
@@ -399,7 +424,9 @@ git push
 
 ## Deploy Flux
 
-> ASB uses `Flux v2` for `GitOps`
+> ASB uses `Flux v2` for `GitOps`.
+>
+> Details on the directory structure used for flux can be found [here](./docs/FluxDirStructure.md).
 
 Before deploying flux we need to import the flux images to ACR.
 
