@@ -28,6 +28,18 @@ patches:
 
   - patch: |
         - op: replace
+          path: "/spec/components/ingressGateways/0/k8s/resources/limits/cpu"
+          value: 1000m
+
+        - op: replace
+          path: "/spec/components/ingressGateways/0/k8s/resources/requests/cpu"
+          value: 500m  
+
+        - op: replace
+          path: "/spec/components/ingressGateways/0/k8s/resources/requests/memory"
+          value: 256M  
+
+        - op: replace
           path: "/spec/components/ingressGateways/0/k8s/service/loadBalancerIP"
           value: 10.241.4.4
 

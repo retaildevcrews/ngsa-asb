@@ -23,11 +23,11 @@ spec:
       k8s:
         resources:
           limits:
-            cpu: 1000m
+            cpu: PLACEHOLDER
             memory: 512M
           requests:
-            cpu: 500m
-            memory: 256M
+            cpu: PLACEHOLDER
+            memory: PLACEHOLDER
         nodeSelector:
           agentpool: npuser01
         service:
