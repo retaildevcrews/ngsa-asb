@@ -15,12 +15,11 @@ patches:
             - "loderunner/loderunner-westus2-dev.cse.ms"
 
         - op: add
-          path: "/spec/servers/0"
-          value: 
-            tls:
-              mode: SIMPLE
-              serverCertificate: /etc/istio/ingressgateway-certs/tls.crt
-              privateKey: /etc/istio/ingressgateway-certs/tls.key            
+          path: "/spec/servers/0/tls"
+          value:
+            mode: SIMPLE
+            serverCertificate: /etc/istio/ingressgateway-certs/tls.crt
+            privateKey: /etc/istio/ingressgateway-certs/tls.key
     target:
       kind: Gateway
       name: istio-gateway

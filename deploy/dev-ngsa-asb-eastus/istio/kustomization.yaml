@@ -20,7 +20,7 @@ patches:
           value:
             mode: SIMPLE
             serverCertificate: /etc/istio/ingressgateway-certs/tls.crt
-            privateKey: /etc/istio/ingressgateway-certs/tls.key            
+            privateKey: /etc/istio/ingressgateway-certs/tls.key
     target:
       kind: Gateway
       name: istio-gateway
