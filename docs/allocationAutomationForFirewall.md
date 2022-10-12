@@ -56,11 +56,11 @@ Follow the steps below to assure the prerequisites are installed and up-to-date.
   # extensions without prompts
   az config set extension.use_dynamic_install=yes_without_prompt
   
-  # Install or update Azure CLI automation extension 
-  if [-z $(az extension list-versions --name automation)]; then
+  # Install or update Azure CLI automation extension
+  if [[ $(az extension list --query "[?name=='automation']") = false ]];
+  then
     az extension add --name automation
   else
-    # update extension if needed
     az extension update --name automation
   fi
 
@@ -83,7 +83,7 @@ Follow the steps below to assure the prerequisites are installed and up-to-date.
 ### Create Azure Automation Account
 
   ``` bash
-  # Check if account exists, if so ask to change name, else create
+  # Check if account exists, if so ask to change name, else create  
   if [[ $(az automation account list 
   --resource-group $AutomationResourceGroup 
   --query "[?name=='$AutomationAccountName'] | length(@)") > 0 ]]; then
