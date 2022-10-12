@@ -23,16 +23,16 @@ spec:
       k8s:
         resources:
           limits:
-            cpu: 200m
+            cpu: PLACEHOLDER
             memory: 512M
           requests:
-            cpu: 50m
-            memory: 128M
+            cpu: PLACEHOLDER
+            memory: PLACEHOLDER
         nodeSelector:
           agentpool: npuser01
         service:
           type: LoadBalancer
-          loadBalancerIP: 10.241.4.4
+          loadBalancerIP: PLACEHOLDER
           externalTrafficPolicy: Local
         serviceAnnotations:
           service.beta.kubernetes.io/azure-load-balancer-internal: "true"

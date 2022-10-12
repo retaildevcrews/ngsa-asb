@@ -1,0 +1,40 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sample-extension
+spec:
+  selector:
+    matchLabels:
+      app: sample-extension
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: sample-extension
+    spec:
+      containers:
+      - command:
+        - /extension
+        image: localhost:5000/capi-sample-extension
+        name: extension
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 9443
+          name: webhook-server
+          protocol: TCP
+        volumeMounts:
+        - mountPath: /tmp/k8s-webhook-server/serving-certs
+          name: cert
+          readOnly: true
+      volumes:
+      - name: cert
+        secret:
+          secretName: webhook-service-cert
+      terminationGracePeriodSeconds: 10
+      serviceAccountName: sample-extension
+      tolerations:
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/master
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/control-plane
