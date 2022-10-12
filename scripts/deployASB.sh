@@ -40,7 +40,7 @@ Enter Deployment Name: " ASB_DEPLOYMENT_NAME
   export ASB_DEPLOYMENT_NAME=$ASB_DEPLOYMENT_NAME
   export ASB_ENV=dev
 
-  echo "Type Environment Name (Default is $ASB_ENV):"
+  echo "Type Environment Name (Press Enter to accept default of $ASB_ENV):"
   read ans
   if [[ $ans ]]; then
     export ASB_ENV=$ans
@@ -89,9 +89,10 @@ function setDeploymentRegion()
   export ASB_SPOKE_LOCATION=$ASB_SPOKE_LOCATION
 
   # Make sure the DNS record does not exist
-  az network dns record-set a list -g $ASB_DNS_ZONE_RG -z $ASB_DNS_ZONE -o table | grep "$ASB_SPOKE_LOCATION-$ASB_ENV"
+  dns_list_count=$(az network dns record-set a list -g $ASB_DNS_ZONE_RG -z $ASB_DNS_ZONE -o tsv --query [].name | grep "$ASB_SPOKE_LOCATION-$ASB_ENV" | wc -l)
 
-  # If any records exist, choose a different deployment region and try again
+  if [ $dns_list_count != 0 ]; then >&2 echo "DNS Records Already Set With $ASB_SPOKE_LOCATION Spoke Location and $ASB_ENV Environment
+  Restart Script With Different Values"; exit 1; fi
 
   export ASB_SCRIPT_STEP=checkoutBranch
   # Save environment variables
