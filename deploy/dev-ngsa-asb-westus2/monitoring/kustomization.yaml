@@ -1,17 +1,6 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-- 01-namespace.yaml
-- 02-prometheus.yaml
-- grafana/dashboards/flux-cluster.yaml # Apply Grafana dashboards before Grafana deployment
-- grafana/dashboards/flux-control-plane.yaml
-- grafana/dashboards/ngsa-az-blocked-traffic.yaml
-- grafana/dashboards/ngsa-az-monitor-perf.yaml
-- grafana/dashboards/ngsa-az-monitor-rel.yaml
-- grafana/dashboards/ngsa-fluentbit.yaml
-- grafana/dashboards/ngsa-prometheus.yaml
-- grafana/01-grafana-config.yaml # Apply Grafana deployment
-- grafana/02-grafana-config-datasources.yaml
-- grafana/03-grafana-config-dashboards.yaml
-- grafana/04-grafana-pod-identity.yaml
-- grafana/05-grafana.yaml
+- ../../base/apps/monitoring/ # Then apply rest of monitoring
+patchesStrategicMerge:
+- "prometheus/prometheus-patch.yaml"
