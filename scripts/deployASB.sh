@@ -2,63 +2,21 @@
 
 function collectInputParameters()
 {
-  if [ "$#" < 4 ] || [ "$#" > 4 ]; then
-    echo "Please provide the 1. Cluster Admin ID, and 2. Name of the admin group."
+  if [ "$#" != 1 ]; then
+    echo "Please provide the Cluster Admin ID when calling this script"
+    echo "This command can be retrieved by running ./getClusterAdminIDforDeployment.sh from your local machine (not CodeSpaces)"
     exit 1
   else 
     export ASB_CLUSTER_ADMIN_ID=$1
-    export ASB_CLUSTER_ADMIN_GROUP=$2
 
-    export ASB_SCRIPT_STEP=checkPermissions
+    export ASB_SCRIPT_STEP=setDeploymentName
 
       # Save environment variables
     ./saveenv.sh -y
 
     # Invoke Next Step In Setup
-    $ASB_SCRIPT_STEP    
+    $ASB_SCRIPT_STEP
   fi
-}
-
-
-function checkPermissions()
-{
-  # Check if owner or contributor for subscription
-  subscription_id=$(az account show --query id -o tsv)
-  userId=$(az ad signed-in-user show --query id -o tsv)
-  userRolesInSubscription=( $(az role assignment list --all --assignee $userId --query [].roleDefinitionName -o tsv) )
-  desiredRoles=("Owner" "User Access Administrator")
-
-  for userRole in $userRolesInSubscription; do
-    for desiredRole in $desiredRoles; do
-        if [[ $desiredRole = $userRole ]]; then
-            export doesUserHaveDesiredRole=true
-        fi
-    done
-  done
-
-  if [ -z $doesUserHaveDesiredRole ]; then >&2 echo "You Need To Have Elevator Privileges To This Subscription.
-  Elevated Privileges are: $(IFS=, ; echo "${desiredRoles[*]}")"; exit 1; fi
-
-
-  # Set your security group name
-  export ASB_CLUSTER_ADMIN_GROUP=$ASB_CLUSTER_ADMIN_GROUP
-
-  echo "Type Cluster Admin Group Name (Default is $ASB_CLUSTER_ADMIN_GROUP):"
-  read ans
-  if [[ $ans ]]; then
-    export ASB_CLUSTER_ADMIN_GROUP=$ans
-  fi
-
-  # Verify you are a member of the security group
-  echo "Checking if you are a member of group $ASB_CLUSTER_ADMIN_GROUP"
-  if $(az ad group member check -g $ASB_CLUSTER_ADMIN_GROUP --member-id $(az ad signed-in-user show --query id -o tsv) --query value -o tsv); then
-    echo You a member of group $ASB_CLUSTER_ADMIN_GROUP
-  else
-    >&2 echo "You are not a member of group $ASB_CLUSTER_ADMIN_GROUP"
-    exit 1;
-  fi
-
-  setDeploymentName
 }
 
 function setDeploymentName()
@@ -92,8 +50,6 @@ Enter Deployment Name: " ASB_DEPLOYMENT_NAME
 
   setDeploymentRegion
 }
-
-
 
 function setDeploymentRegion()
 {
@@ -188,13 +144,6 @@ function getAadValues()
 
   # Export AAD env vars
   export ASB_TENANT_ID=$(az account show --query tenantId -o tsv)
-
-  # Get AAD cluster admin group
-
-  #export ASB_CLUSTER_ADMIN_ID=$(az ad group show -g $ASB_CLUSTER_ADMIN_GROUP --query id -o tsv)
-
-  #Revieves Cluster_Admin_ID from external script and WSL2
-  export ASB_CLUSTER_ADMIN_ID=$ASB_CLUSTER_ADMIN_ID
 
   echo "Completed Getting AAD Values."
 
