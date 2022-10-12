@@ -38,11 +38,11 @@ spec:
 
           resources:
             limits:
-              cpu: 500m
-              memory: 512Mi
+              cpu: 1000m
+              memory: 1536Mi
             requests:
-              cpu: 500m
-              memory: 512Mi
+              cpu: 50m
+              memory: 384Mi
 
           volumeMounts:
             - name: secrets

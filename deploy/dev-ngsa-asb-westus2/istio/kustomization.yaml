@@ -1,0 +1,105 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../../base/apps/istio
+
+patches:
+  - patch: |
+        - op: replace
+          path: "/spec/servers/0/hosts"
+          value: 
+            - "ngsa/ngsa-memory-westus2-dev.cse.ms"
+            - "ngsa/ngsa-cosmos-westus2-dev.cse.ms"
+            - "ngsa/ngsa-java-westus2-dev.cse.ms"
+            - "monitoring/grafana-westus2-dev.cse.ms"
+            - "loderunner/loderunner-westus2-dev.cse.ms"
+
+        - op: add
+          path: "/spec/servers/0/tls"
+          value:
+            mode: SIMPLE
+            serverCertificate: /etc/istio/ingressgateway-certs/tls.crt
+            privateKey: /etc/istio/ingressgateway-certs/tls.key
+    target:
+      kind: Gateway
+      name: istio-gateway
+      namespace: istio-system
+
+  - patch: |
+        - op: replace
+          path: "/spec/components/ingressGateways/0/k8s/resources/limits/cpu"
+          value: 1000m
+
+        - op: replace
+          path: "/spec/components/ingressGateways/0/k8s/resources/requests/cpu"
+          value: 500m  
+
+        - op: replace
+          path: "/spec/components/ingressGateways/0/k8s/resources/requests/memory"
+          value: 256M  
+
+        - op: replace
+          path: "/spec/components/ingressGateways/0/k8s/service/loadBalancerIP"
+          value: 10.241.4.4
+
+        - op: add
+          path: "/spec/meshConfig"
+          value: 
+            accessLogEncoding: JSON
+            accessLogFile: "/dev/stdout"
+            accessLogFormat: |
+              {
+                "start_time": "%START_TIME%",
+                "request_method": "%REQ(:METHOD)%",
+                "path": "%REQ(X-ENVOY-ORIGINAL-PATH?:PATH)%",
+                "protocol": "%PROTOCOL%",
+                "response_code": "%RESPONSE_CODE%",
+                "response_code_details": "%RESPONSE_CODE_DETAILS%",
+                "response_flags": "%RESPONSE_FLAGS%",
+                "connection_termination_details": "%CONNECTION_TERMINATION_DETAILS%",
+                "upstream_transport_failure_reason": "%UPSTREAM_TRANSPORT_FAILURE_REASON%",
+                "bytes_received": "%BYTES_RECEIVED%",
+                "bytes_sent": "%BYTES_SENT%",
+                "duration": "%DURATION%",
+                "x_envoy_upstream_service_time": "%RESP(X-ENVOY-UPSTREAM-SERVICE-TIME)%",
+                "x_forwarded_for": "%REQ(X-FORWARDED-FOR)%",
+                "user_agent": "%REQ(USER-AGENT)%",
+                "request_id": "%REQ(X-REQUEST-ID)%",
+                "x_b3_traceid": "%REQ(X-B3-TRACEID)%",
+                "x_b3_spanid": "%REQ(X-B3-SPANID)%",
+                "x-load-feedback": "%RESP(X-LOAD-FEEDBACK)%",
+                "request_authority": "%REQ(:AUTHORITY)%",
+                "host": "%UPSTREAM_HOST%",
+                "upstream_cluster": "%UPSTREAM_CLUSTER%",
+                "upstream_local_address": "%UPSTREAM_LOCAL_ADDRESS%",
+                "downstream_local_address": "%DOWNSTREAM_LOCAL_ADDRESS%",
+                "downstream_remote_address": "%DOWNSTREAM_REMOTE_ADDRESS%",
+                "requested_server_name": "%REQUESTED_SERVER_NAME%",
+                "route_name": "%ROUTE_NAME%"
+              }
+    target:
+      kind: IstioOperator
+      name: istio-default
+      namespace: istio-system
+
+  - patch: |
+        - op: replace
+          path: "/spec/resourceID"
+          value: "/subscriptions/648dcb5a-de1e-48b2-af6b-fe6ef28d355c/resourceGroups/rg-ngsa-asb-dev/providers/Microsoft.ManagedIdentity/userAssignedIdentities/podmi-ingress-controller"
+
+        - op: replace
+          path: "/spec/clientID"
+          value: "c4d9277f-d849-4c44-a6f1-6ebb2153944a"
+    target:
+      kind: AzureIdentity
+      name: istio-ingress-id
+      namespace: istio-system
+
+  - patch: |
+        - op: replace
+          path: "/spec/parameters/keyvaultName"
+          value: "kv-aks-3i2qzkkxofr7c"   
+    target:
+      kind: SecretProviderClass
+      name: istio-ingress-tls-secret-csi-akv
+      namespace: istio-system

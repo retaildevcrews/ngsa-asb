@@ -1,0 +1,69 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../../base/apps/istio
+
+patches:
+  - patch: |
+        - op: replace
+          path: "/spec/servers/0/hosts"
+          value: 
+          - "ngsa/ngsa-memory-centralus-pre.cse.ms"
+          - "ngsa/ngsa-cosmos-centralus-pre.cse.ms"
+          - "ngsa/ngsa-java-centralus-pre.cse.ms"
+          - "monitoring/grafana-centralus-pre.cse.ms"
+          - "loderunner/loderunner-centralus-pre.cse.ms"            
+
+        - op: add
+          path: "/spec/servers/0/tls"
+          value:
+            mode: SIMPLE
+            serverCertificate: /etc/istio/ingressgateway-certs/tls.crt
+            privateKey: /etc/istio/ingressgateway-certs/tls.key
+    target:
+      kind: Gateway
+      name: istio-gateway
+      namespace: istio-system
+
+  - patch: |
+        - op: replace
+          path: "/spec/components/ingressGateways/0/k8s/resources/limits/cpu"
+          value: 200m
+
+        - op: replace
+          path: "/spec/components/ingressGateways/0/k8s/resources/requests/cpu"
+          value: 50m  
+
+        - op: replace
+          path: "/spec/components/ingressGateways/0/k8s/resources/requests/memory"
+          value: 128M  
+
+        - op: replace
+          path: "/spec/components/ingressGateways/0/k8s/service/loadBalancerIP"
+          value: 10.242.4.4
+    target:
+      kind: IstioOperator
+      name: istio-default
+      namespace: istio-system
+
+  - patch: |
+        - op: replace
+          path: "/spec/resourceID"
+          value: "/subscriptions/648dcb5a-de1e-48b2-af6b-fe6ef28d355c/resourceGroups/rg-ngsa-asb-pre/providers/Microsoft.ManagedIdentity/userAssignedIdentities/podmi-ingress-controller"
+
+        - op: replace
+          path: "/spec/clientID"
+          value: "056ce182-3da5-4ab8-afff-a90deb2b9a84"
+    target:
+      kind: AzureIdentity
+      name: istio-ingress-id
+      namespace: istio-system
+
+  - patch: |
+        - op: replace
+          path: "/spec/parameters/keyvaultName"
+          value: "kv-aks-fykg5bqasutle"   
+    target:
+      kind: SecretProviderClass
+      name: istio-ingress-tls-secret-csi-akv
+      namespace: istio-system

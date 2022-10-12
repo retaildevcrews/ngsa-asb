@@ -20,8 +20,8 @@ spec:
       labels:
         app: loderunner-api
         aadpodidbinding: ngsa-asb-loderunner-id
-        deploy: 22-09-27-06-20-34
-        version: beta-2209-27-06
+        deploy: 22-10-12-06-12-14
+        version: beta-2210-12-06
     spec:
       containers:
         - name: app
@@ -39,8 +39,8 @@ spec:
               memory: "512Mi"
               cpu: "1000m"
             requests:
-              memory: "512Mi"
-              cpu: "500m"
+              memory: "128Mi"
+              cpu: "50m"
           env:
           - name: "ASPNETCORE_ENVIRONMENT"
             value: "Production"
