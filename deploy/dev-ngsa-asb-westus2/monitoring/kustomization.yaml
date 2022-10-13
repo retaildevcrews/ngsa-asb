@@ -5,4 +5,5 @@ resources:
 - grafana/04-grafana-pod-identity.yaml
 patchesStrategicMerge:
 - "prometheus/prometheus-patch.yaml"
+- "grafana/dashboards/ngsa-prometheus.yaml"
 - "grafana/grafana-patch.yaml"
