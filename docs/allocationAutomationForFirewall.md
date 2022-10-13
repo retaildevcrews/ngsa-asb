@@ -8,6 +8,12 @@ Azure Firewall has [costs (Azure Firewall Pricing Link)](https://azure.microsoft
 
 - Azure CLI Extension for Automation [Install Azure CLI Extensions](https://learn.microsoft.com/en-us/cli/azure/azure-cli-extensions-list)
 
+- Azure Powershell module for Linux
+
+``` bash
+  sudo apt-get install Az.Automation
+```
+
 ## Infrastructure & Assets to Create
 
 The following infrastructure assets should be established in the subscription with the Azure Firewall(s) to be managed.
@@ -36,7 +42,7 @@ Follow the steps below to assure the prerequisites are installed and up-to-date.
 
 | Parameter Name | Example Value | Rules for Naming |
 |--------------|:-----:|-----------:|
-| AutomationResourceGroupName | rg-ngsa-automation-dev | |
+| AutomationResourceGroupNameName | rg-ngsa-automation-dev | |
 | Location | eastus | |
 | AutomationAccountName | ngsaAutomation | [6-50	Alphanumerics and hyphens.  Start with letter and end with alphanumeric.6-50.  Alphanumerics and hyphens.  Start with letter and end with alphanumeric.](https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftautomation) |
 | Sku | Basic | |
@@ -76,75 +82,82 @@ Follow the steps below to assure the prerequisites are installed and up-to-date.
 
   ``` bash
   #Check if automation resource group exists, and create it if it does not.
-  if [ $(az group exists --name $AutomationResourceGroup) = false ]; then
-    az group create 
-    --name $AutomationResourceGroup 
-    --location $Location
+  if [[ $(az group exists --name $AutomationResourceGroupNameName)=false ]]; then
+    az group create --name $AutomationResourceGroupNameName --location $Location
   fi
   ```
 
 ### Create Azure Automation Account
 
   ``` bash
-    echo "Creating Azure Automation Account $AutomationAccountName in Resource Group $AutomationResourceGroupName..."
-    if [[ $(az automation account list --resource-group $AutomationResourceGroupName --query "[?name=='$AutomationAccountName'] | length(@)") > 0 ]];
+    echo "Creating Azure Automation Account $AutomationAccountName in Resource Group $AutomationResourceGroupNameName..."
+    if [[ $(az automation account list --resource-group $AutomationResourceGroupNameName --query "[?name=='$AutomationAccountName'] | length(@)") > 0 ]];
     then
       echo "$AutomationAccountName exists, please review, and choose a different name if appropriate."
 
     else
       echo "Creating Azure Automation Account $AutomationAccountName..."
       
-      az automation account create --automation-account-name $AutomationAccountName --location $Location --sku $Sku --resource-group $AutomationResourceGroupName
+      az automation account create --automation-account-name $AutomationAccountName --location $Location --sku $Sku --resource-group $AutomationResourceGroupNameName
 
-      echo "Complated creating Azure Automation Account $AutomationAccountName."
+      echo "Completed creating Azure Automation Account $AutomationAccountName."
   fi
 
-  echo "Completed creating Azure Automation Account $AutomationAccountName in Resource Group $AutomationResourceGroupName."
+  echo "Completed creating Azure Automation Account $AutomationAccountName in Resource Group $AutomationResourceGroupNameName."
 ```
 
 ### Create User-Assigned Managed Identity
 
 ``` bash
-  echo "Creating User-Assigned Managed Identity $IdentityName..."
-  az identity create --resource-group $AutomationResourceGroup --name $IdentityName
-  echo "Completed created User-Assigned Managed Identity $IdentityName in $AutomationResourceGroup."   
+  echo "Creating User-Assigned Managed Identity $IdentityName in $AutomationResourceGroupNameName..."
+   az identity create --resource-group $AutomationResourceGroupNameName --name $IdentityName
+  echo "Completed created User-Assigned Managed Identity $IdentityName in $AutomationResourceGroupNameName."
 ```
 
 ### Assign Role to User-Assigned Managed Identity
 
 ``` bash
-  echo "Assigning User-Assigned Managed Identity $IdentityName to $Subscription..."
-  az role assignment create --assignee "$IdentityName" --role "Microsoft.Network/azureFirewalls" --subscription "$Subscription"
-  echo "Completed Assigning User-Assigned Managed Identity $IdentityName to $Subscription."
+  #Get the ID for the user-assigned managed identity
+  export Identity=$(az identity list -o tsv --query "[].{id:id, principalId: principalId} | [? contains(id, '$IdentityName')]".id)
 
-```
+  export PrincipalId=$(az identity list -o tsv --query "[].{id:id, principalId: principalId} | [? contains(id, '$IdentityName')]".principalId)
 
-### Assign User-Assigned Managed Identity to Automation Account
+  export RoleName=$(az role definition list -o tsv --query "[].{roleName:roleName} | [? contains(roleName, 'Network Contributor')].roleName")
 
-``` bash
-  echo "Assigning User-Assigned Managed Identity $IdentityName to $AutomationAccountName in $AutomationResourceGroup..."
-  az automation account identity assign --resource-group $AutomationResourceGroup --name $AutomationAccountName --identity $IdentityName
-  echo "Completed assigning User-Assigned Managed Identity $IdentityName to $AutomationAccountName in $AutomationResourceGroup."
+  echo "Assigning User-Assigned Managed Identity $IdentityName to $Subscription in resource group $AutomationResourceGroupNameName..."
+  az role assignment create --assignee-object-id $PrincipalId --role "Network Contributor" --subscription $Subscription
+  echo "Completed Assigning User-Assigned Managed Identity $IdentityName to $Subscription in resource group $AutomationResourceGroupNameName."
+
 ```
 
 ### Create Automation Powershell Runbook
 
 ``` bash
-  if [[ $(az automation runbook list --resource-group $AutomationResourceGroup --automation-account-name $AutomationAccountName --query "[?name=='$PowerShellRunbookName'] | length(@)") > 0 ]]; then
-        echo "$PowerShellRunbookName exists, please review, and choose a different name if appropriate."
+  if [[ $(az automation runbook list --resource-group $AutomationResourceGroupNameName --automation-account-name $AutomationAccountName --query "[?name=='$PowerShellPowerShellRunbookName'] | length(@)") > 0 ]]; then
+        echo "$PowerShellPowerShellRunbookName exists, please review, and choose a different name if appropriate."
     else
-        echo "Creating PowerShell Runbook $PowerShellRunbookName in $AutomationResourceGroup for $AutomationAccountName..."
-        az automation runbook create --resource-group $AutomationResourceGroup --automation-account-name $AutomationAccountName --name $PowerShellRunbookName --runbook-type PowerShell --description $PowerShellRunbookDescription --log-progress --log-debug --log-error --log-output --output-folder $PowerShellRunbookOutputFolder
-        echo "Completed creating PowerShell Runbook $PowerShellRunbookName in $AutomationResourceGroup for $AutomationAccountName."
+        echo "Creating PowerShell Runbook $PowerShellPowerShellRunbookName in $AutomationResourceGroupNameName for $AutomationAccountName..."
+        az automation runbook create --resource-group $AutomationResourceGroupNameName --automation-account-name $AutomationAccountName --name $PowerShellPowerShellRunbookName --runbook-type PowerShell --description $PowerShellRunbookDescription
+        echo "Completed creating PowerShell Runbook $PowerShellPowerShellRunbookName in $AutomationResourceGroupNameName for $AutomationAccountName."
     fi
 ```
 
 ### Publish Runbook
 
 ``` bash
-  echo "Uploading Runbook Content $RunbookName to $AutomationAccountName in $AutomationResourceGroup..."
-  az automation runbook publish --resource-group $AutomationResourceGroup --automation-account-name $AutomationAccountName --name $RunbookName --type PowerShell --log-progress --description $RunbookDescription --runbook-content   az automation runbook publish --resource-group $AutomationResourceGroup --automation-account-name $AutomationAccountName --name $RunbookName --type PowerShell --log-progress --description $RunbookDescription --runbook-content "./FirewallToggle.ps1"
-  echo "Completed uploading Runbook Content $RunbookName to $AutomationAccountName in $AutomationResourceGroup"
+  echo "Uploading Runbook Content from $PowerShellRunbookFileName to $PowerShellRunbookName to $AutomationAccountName in $AutomationResourceGroupNameName..."
+  
+  export repositoryName=$(basename -s .git `git config --get remote.origin.url`)
+  
+  export file=$(cat automation/$PowerShellRunbookFileName) 
+
+ az automation runbook replace-content --automation-account-name $AutomationAccountName --resource-group $AutomationResourceGroupName --name $PowerShellRunbookName --content $file
+
+  az automation runbook publish --resource-group $AutomationResourceGroupName --automation-account-name $AutomationAccountName --name $PowerShellRunbookName
+  
+  echo "Completed uploading Runbook Content from $PowerShellRunbookFileName to $PowerShellRunbookName to $AutomationAccountName in $AutomationResourceGroupNameName"
+
+ 
 ```
 
 ### Create Schedule (PowerShell)
@@ -155,20 +168,32 @@ Follow the steps below to assure the prerequisites are installed and up-to-date.
   $EndTime = $StartTime.AddYears(3)
 
   New-AzAutomationSchedule 
-  -AutomationAccountName $AutomationAccountName 
-  -Name $ScheduleName 
+  -AutomationAccountName $Env:AutomationAccountName 
+  -Name "$Env:BaseScheduleNameStart + $Env:Asb_Environment"
   -StartTime $StartTime 
   -ExpiryTime $EndTime 
   -DayInterval 1 
-  -ResourceGroupName $AutomationResourceGroup
+  -ResourceGroupName $Env:AutomationResourceGroupName
+
+  New-AzAutomationSchedule 
+  -AutomationAccountName $Env:AutomationAccountName 
+  -Name "$Env:BaseScheduleNameStop + $Env:Asb_Environment"
+  -StartTime $StartTime 
+  -ExpiryTime $EndTime 
+  -DayInterval 1 
+  -ResourceGroupName $Env:AutomationResourceGroupName
+
+  Register-AzAutomationScheduledRunbook -AutomationAccountName $Env:AutomationAccountName -RunbookName $Env:PowerShellRunbookName -ScheduleName "$Env:BaseScheduleNameStart + $Env:Asb_Environment" -ResourceGroupName $Env:AutomationResourceGroupName -Parameters @{"Key1"="Value1";"Key2"="Value2"}
+
+  Register-AzAutomationScheduledRunbook -AutomationAccountName $Env:AutomationAccountName -RunbookName $Env:PowerShellRunbookName -ScheduleName "$Env:BaseScheduleNameStop + $Env:Asb_Environment" -ResourceGroupName $Env:AutomationResourceGroupName -Parameters @{"Key1"="Value1";"Key2"="Value2"}
 ```
 
 ### Associate Schedule with Runbook
 
 ``` bash
-  echo "Creating schedule for runbook $1 in $AutomationResourceGroup for $AutomationAccountName..."
-  az automation schedule create --resource-group $AutomationResourceGroup --automation-account-name $AutomationAccountName --name $ScheduleName --description $ScheduleDescription --start-time $ScheduleStartTime --expiry-time $ScheduleExpiryTime --frequency $ScheduleFrequency --interval $ScheduleInterval --time-zone $ScheduleTimeZone --advanced-schedule $ScheduleAdvancedSchedule
-  echo "Completed creating schedule for runbook $1 in $AutomationResourceGroup for $AutomationAccountName."
+  echo "Creating schedule for runbook $1 in $AutomationResourceGroupName for $AutomationAccountName..."
+  az automation schedule create --resource-group $AutomationResourceGroupName --automation-account-name $AutomationAccountName --name $ScheduleName --description $ScheduleDescription --start-time $ScheduleStartTime --expiry-time $ScheduleExpiryTime --frequency $ScheduleFrequency --interval $ScheduleInterval --time-zone $ScheduleTimeZone --advanced-schedule $ScheduleAdvancedSchedule
+  echo "Completed creating schedule for runbook $1 in $AutomationResourceGroupName for $AutomationAccountName."
 ```
 
 ### PowerShell Artifact
