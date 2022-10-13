@@ -13,26 +13,40 @@ data:
           "list": [
             {
               "builtIn": 1,
-              "datasource": "-- Grafana --",
+              "datasource": {
+                "type": "datasource",
+                "uid": "grafana"
+              },
               "enable": true,
               "hide": true,
               "iconColor": "rgba(0, 211, 255, 1)",
               "name": "Annotations & Alerts",
+              "target": {
+                "limit": 100,
+                "matchAny": false,
+                "tags": [],
+                "type": "dashboard"
+              },
               "type": "dashboard"
             }
           ]
         },
         "description": "",
         "editable": true,
+        "fiscalYearStartMonth": 0,
         "gnetId": 10915,
         "graphTooltip": 0,
-        "id": 2,
-        "iteration": 1646972191256,
+        "id": 9,
+        "iteration": 1665527068715,
         "links": [],
+        "liveNow": false,
         "panels": [
           {
             "collapsed": false,
-            "datasource": null,
+            "datasource": {
+              "type": "grafana-azure-monitor-datasource",
+              "uid": "P1EB995EACC6832D3"
+            },
             "gridPos": {
               "h": 1,
               "w": 24,
@@ -49,11 +63,12 @@ data:
             "bars": false,
             "dashLength": 10,
             "dashes": false,
-            "datasource": "$datasource",
+            "datasource": {
+              "uid": "$datasource"
+            },
             "description": "",
             "fieldConfig": {
               "defaults": {
-                "custom": {},
                 "links": []
               },
               "overrides": []
@@ -88,7 +103,7 @@ data:
               "alertThreshold": true
             },
             "percentage": false,
-            "pluginVersion": "7.3.0",
+            "pluginVersion": "8.5.5",
             "pointradius": 2,
             "points": false,
             "renderer": "flot",
@@ -106,9 +121,7 @@ data:
               }
             ],
             "thresholds": [],
-            "timeFrom": null,
             "timeRegions": [],
-            "timeShift": null,
             "title": "Requests",
             "tooltip": {
               "shared": true,
@@ -117,53 +130,47 @@ data:
             },
             "type": "graph",
             "xaxis": {
-              "buckets": null,
               "mode": "time",
-              "name": null,
               "show": true,
               "values": []
             },
             "yaxes": [
               {
                 "format": "short",
-                "label": null,
                 "logBase": 1,
-                "max": null,
                 "min": "0",
                 "show": true
               },
               {
                 "format": "short",
-                "label": null,
                 "logBase": 1,
-                "max": null,
-                "min": null,
                 "show": true
               }
             ],
             "yaxis": {
-              "align": false,
-              "alignLevel": null
+              "align": false
             }
           },
           {
-            "cacheTimeout": null,
-            "datasource": "$datasource",
+            "datasource": {
+              "uid": "$datasource"
+            },
             "description": "",
             "fieldConfig": {
               "defaults": {
                 "color": {
                   "mode": "thresholds"
                 },
-                "custom": {},
                 "decimals": 1,
                 "mappings": [
                   {
-                    "id": 0,
-                    "op": "=",
-                    "text": "N/A",
-                    "type": 1,
-                    "value": "null"
+                    "options": {
+                      "match": "null",
+                      "result": {
+                        "text": "N/A"
+                      }
+                    },
+                    "type": "special"
                   }
                 ],
                 "noValue": "0",
@@ -195,7 +202,6 @@ data:
               "y": 1
             },
             "id": 5,
-            "interval": null,
             "links": [],
             "maxDataPoints": 100,
             "options": {
@@ -211,7 +217,7 @@ data:
               "showThresholdMarkers": true,
               "text": {}
             },
-            "pluginVersion": "7.3.0",
+            "pluginVersion": "8.5.5",
             "targets": [
               {
                 "expr": "sum(rate(NgsaAppDuration_count{region=~\"$region\",job=~\"$service.*\",mode=~\"$mode\"}[1m]))",
@@ -221,14 +227,15 @@ data:
                 "refId": "A"
               }
             ],
-            "timeFrom": null,
-            "timeShift": null,
             "title": "Avg RPS",
             "type": "gauge"
           },
           {
             "collapsed": false,
-            "datasource": null,
+            "datasource": {
+              "type": "grafana-azure-monitor-datasource",
+              "uid": "P1EB995EACC6832D3"
+            },
             "gridPos": {
               "h": 1,
               "w": 24,
@@ -245,14 +252,10 @@ data:
             "bars": false,
             "dashLength": 10,
             "dashes": false,
-            "datasource": "$datasource",
-            "description": "",
-            "fieldConfig": {
-              "defaults": {
-                "custom": {}
-              },
-              "overrides": []
+            "datasource": {
+              "uid": "$datasource"
             },
+            "description": "",
             "fill": 0,
             "fillGradient": 0,
             "gridPos": {
@@ -279,7 +282,7 @@ data:
               "alertThreshold": true
             },
             "percentage": false,
-            "pluginVersion": "7.3.0",
+            "pluginVersion": "8.5.5",
             "pointradius": 2,
             "points": false,
             "renderer": "flot",
@@ -299,9 +302,7 @@ data:
               }
             ],
             "thresholds": [],
-            "timeFrom": null,
             "timeRegions": [],
-            "timeShift": null,
             "title": "Server Response Time",
             "tooltip": {
               "shared": true,
@@ -310,33 +311,24 @@ data:
             },
             "type": "graph",
             "xaxis": {
-              "buckets": null,
               "mode": "time",
-              "name": null,
               "show": true,
               "values": []
             },
             "yaxes": [
               {
                 "format": "short",
-                "label": null,
                 "logBase": 1,
-                "max": null,
-                "min": null,
                 "show": true
               },
               {
                 "format": "short",
-                "label": null,
                 "logBase": 1,
-                "max": null,
-                "min": null,
                 "show": true
               }
             ],
             "yaxis": {
-              "align": false,
-              "alignLevel": null
+              "align": false
             }
           },
           {
@@ -344,14 +336,10 @@ data:
             "bars": false,
             "dashLength": 10,
             "dashes": false,
-            "datasource": "$datasource",
-            "description": "",
-            "fieldConfig": {
-              "defaults": {
-                "custom": {}
-              },
-              "overrides": []
+            "datasource": {
+              "uid": "$datasource"
             },
+            "description": "",
             "fill": 0,
             "fillGradient": 0,
             "gridPos": {
@@ -378,7 +366,7 @@ data:
               "alertThreshold": true
             },
             "percentage": false,
-            "pluginVersion": "7.3.0",
+            "pluginVersion": "8.5.5",
             "pointradius": 2,
             "points": false,
             "renderer": "flot",
@@ -398,9 +386,7 @@ data:
               }
             ],
             "thresholds": [],
-            "timeFrom": null,
             "timeRegions": [],
-            "timeShift": null,
             "title": "LodeRunner Response Time",
             "tooltip": {
               "shared": true,
@@ -409,38 +395,32 @@ data:
             },
             "type": "graph",
             "xaxis": {
-              "buckets": null,
               "mode": "time",
-              "name": null,
               "show": true,
               "values": []
             },
             "yaxes": [
               {
                 "format": "short",
-                "label": null,
                 "logBase": 1,
-                "max": null,
-                "min": null,
                 "show": true
               },
               {
                 "format": "short",
-                "label": null,
                 "logBase": 1,
-                "max": null,
-                "min": null,
                 "show": true
               }
             ],
             "yaxis": {
-              "align": false,
-              "alignLevel": null
+              "align": false
             }
           },
           {
             "collapsed": false,
-            "datasource": null,
+            "datasource": {
+              "type": "grafana-azure-monitor-datasource",
+              "uid": "P1EB995EACC6832D3"
+            },
             "gridPos": {
               "h": 1,
               "w": 24,
@@ -457,11 +437,12 @@ data:
             "bars": false,
             "dashLength": 10,
             "dashes": false,
-            "datasource": "$datasource",
+            "datasource": {
+              "uid": "$datasource"
+            },
             "description": "",
             "fieldConfig": {
               "defaults": {
-                "custom": {},
                 "links": []
               },
               "overrides": []
@@ -496,7 +477,7 @@ data:
               "alertThreshold": true
             },
             "percentage": false,
-            "pluginVersion": "7.3.0",
+            "pluginVersion": "8.5.5",
             "pointradius": 2,
             "points": false,
             "renderer": "flot",
@@ -513,9 +494,7 @@ data:
               }
             ],
             "thresholds": [],
-            "timeFrom": null,
             "timeRegions": [],
-            "timeShift": null,
             "title": "Errors",
             "tooltip": {
               "shared": true,
@@ -524,33 +503,25 @@ data:
             },
             "type": "graph",
             "xaxis": {
-              "buckets": null,
               "mode": "time",
-              "name": null,
               "show": true,
               "values": []
             },
             "yaxes": [
               {
                 "format": "reqps",
-                "label": null,
                 "logBase": 1,
-                "max": null,
                 "min": "0",
                 "show": true
               },
               {
                 "format": "short",
-                "label": null,
                 "logBase": 1,
-                "max": null,
-                "min": null,
                 "show": true
               }
             ],
             "yaxis": {
-              "align": false,
-              "alignLevel": null
+              "align": false
             }
           },
           {
@@ -558,11 +529,12 @@ data:
             "bars": false,
             "dashLength": 10,
             "dashes": false,
-            "datasource": "$datasource",
+            "datasource": {
+              "uid": "$datasource"
+            },
             "description": "",
             "fieldConfig": {
               "defaults": {
-                "custom": {},
                 "links": []
               },
               "overrides": []
@@ -597,7 +569,7 @@ data:
               "alertThreshold": true
             },
             "percentage": false,
-            "pluginVersion": "7.3.0",
+            "pluginVersion": "8.5.5",
             "pointradius": 2,
             "points": false,
             "renderer": "flot",
@@ -614,9 +586,7 @@ data:
               }
             ],
             "thresholds": [],
-            "timeFrom": null,
             "timeRegions": [],
-            "timeShift": null,
             "title": "Retry Errors",
             "tooltip": {
               "shared": true,
@@ -625,38 +595,30 @@ data:
             },
             "type": "graph",
             "xaxis": {
-              "buckets": null,
               "mode": "time",
-              "name": null,
               "show": true,
               "values": []
             },
             "yaxes": [
               {
                 "format": "reqps",
-                "label": null,
                 "logBase": 1,
-                "max": null,
                 "min": "0",
                 "show": true
               },
               {
                 "format": "short",
-                "label": null,
                 "logBase": 1,
-                "max": null,
-                "min": null,
                 "show": true
               }
             ],
             "yaxis": {
-              "align": false,
-              "alignLevel": null
+              "align": false
             }
           }
         ],
         "refresh": "1m",
-        "schemaVersion": 26,
+        "schemaVersion": 36,
         "style": "dark",
         "tags": [],
         "templating": {
@@ -667,8 +629,6 @@ data:
                 "text": "Prometheus",
                 "value": "Prometheus"
               },
-              "description": null,
-              "error": null,
               "hide": 2,
               "includeAll": false,
               "label": "datasource",
@@ -683,43 +643,35 @@ data:
               "type": "datasource"
             },
             {
-              "allValue": null,
-              "current": {
-                "selected": true,
-                "text": "eastus",
-                "value": "eastus"
+              "datasource": {
+                "type": "prometheus",
+                "uid": "PBFA97CFB590B2093"
               },
-              "description": null,
-              "error": null,
+              "definition": "label_values(NgsaAppSummary{},region)",
               "hide": 0,
               "includeAll": false,
               "label": "",
               "multi": false,
               "name": "region",
-              "options": [
-                {
-                  "selected": true,
-                  "text": "eastus",
-                  "value": "eastus"
-                }
-              ],
-              "query": "eastus",
-              "queryValue": "",
+              "options": [],
+              "query": {
+                "query": "label_values(NgsaAppSummary{},region)",
+                "refId": "StandardVariableQuery"
+              },
+              "refresh": 1,
+              "regex": "",
               "skipUrlSync": false,
-              "type": "custom"
+              "sort": 0,
+              "type": "query"
             },
             {
-              "allValue": null,
               "current": {
                 "selected": true,
                 "text": "ngsa-cosmos",
                 "value": "ngsa-cosmos"
               },
-              "description": null,
-              "error": null,
               "hide": 0,
               "includeAll": false,
-              "label": null,
               "multi": false,
               "name": "service",
               "options": [
@@ -745,17 +697,13 @@ data:
               "type": "custom"
             },
             {
-              "allValue": null,
               "current": {
                 "selected": true,
                 "text": "read",
                 "value": "Direct|Query"
               },
-              "description": null,
-              "error": null,
               "hide": 0,
               "includeAll": false,
-              "label": null,
               "multi": false,
               "name": "mode",
               "options": [
@@ -795,6 +743,7 @@ data:
         },
         "timezone": "",
         "title": "NGSA - Prometheus",
-        "uid": "J20-83NHf",
-        "version": 1
-        }
+        "uid": "J20-83NJR",
+        "version": 1,
+        "weekStart": ""
+      }
