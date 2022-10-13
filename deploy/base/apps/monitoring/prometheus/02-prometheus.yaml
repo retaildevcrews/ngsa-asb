@@ -177,9 +177,3 @@ spec:
       port: 9090
       protocol: TCP
       targetPort: 9090
-    - name: grpc
-      port: 10901
-      targetPort: 10901
-    - name: http-sidecar
-      port: 10902
-      targetPort: 10902
