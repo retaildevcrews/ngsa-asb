@@ -1,0 +1,2684 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-dashboards-ngsa-az-monitor-perf
+  namespace: monitoring
+  labels:
+    app: grafana
+data:
+  ngsaAzMonitorPerf.json: |-
+        {
+          "annotations": {
+            "list": [
+              {
+                "builtIn": 1,
+                "datasource": {
+                  "type": "datasource",
+                  "uid": "grafana"
+                },
+                "enable": true,
+                "hide": true,
+                "iconColor": "rgba(0, 211, 255, 1)",
+                "name": "Annotations & Alerts",
+                "target": {
+                  "limit": 100,
+                  "matchAny": false,
+                  "tags": [],
+                  "type": "dashboard"
+                },
+                "type": "dashboard"
+              }
+            ]
+          },
+          "editable": true,
+          "fiscalYearStartMonth": 0,
+          "graphTooltip": 0,
+          "id": 6,
+          "iteration": 1659113762960,
+          "links": [],
+          "liveNow": false,
+          "panels": [
+            {
+              "collapsed": false,
+              "datasource": {
+                "type": "grafana-azure-monitor-datasource",
+                "uid": "P1EB995EACC6832D3"
+              },
+              "gridPos": {
+                "h": 1,
+                "w": 24,
+                "x": 0,
+                "y": 0
+              },
+              "id": 4,
+              "panels": [],
+              "title": "Cosmos DB Usage",
+              "type": "row"
+            },
+            {
+              "datasource": {
+                "type": "grafana-azure-monitor-datasource",
+                "uid": "P1EB995EACC6832D3"
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "mappings": [],
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": null
+                      },
+                      {
+                        "color": "red",
+                        "value": 10
+                      }
+                    ]
+                  }
+                },
+                "overrides": []
+              },
+              "gridPos": {
+                "h": 3,
+                "w": 4,
+                "x": 0,
+                "y": 1
+              },
+              "id": 8,
+              "options": {
+                "colorMode": "value",
+                "graphMode": "area",
+                "justifyMode": "auto",
+                "orientation": "auto",
+                "reduceOptions": {
+                  "calcs": [
+                    "mean"
+                  ],
+                  "fields": "",
+                  "values": false
+                },
+                "textMode": "auto"
+              },
+              "pluginVersion": "8.5.5",
+              "targets": [
+                {
+                  "appInsights": {
+                    "dimension": [],
+                    "metricName": "select",
+                    "timeGrain": "auto"
+                  },
+                  "azureLogAnalytics": {
+                    "query": "AzureDiagnostics\n| where ResourceProvider==\"MICROSOFT.DOCUMENTDB\" and Category == \"DataPlaneRequests\" and Resource == \"NGSA-ASB-DEV-COSMOS\"\n| where databaseName_s == \"imdb\"\n| where statusCode_s == 429\n| count",
+                    "resultFormat": "time_series",
+                    "workspace": "$laResourceId"
+                  },
+                  "azureMonitor": {
+                    "aggOptions": [],
+                    "dimensionFilter": "*",
+                    "dimensionFilters": [],
+                    "metricDefinition": "select",
+                    "metricName": "select",
+                    "metricNamespace": "select",
+                    "resourceGroup": "select",
+                    "resourceName": "select",
+                    "timeGrain": "auto",
+                    "timeGrains": [],
+                    "top": "10"
+                  },
+                  "insightsAnalytics": {
+                    "query": "",
+                    "resultFormat": "time_series"
+                  },
+                  "queryType": "Azure Log Analytics",
+                  "refId": "A"
+                }
+              ],
+              "title": "Throttled Requests",
+              "type": "stat"
+            },
+            {
+              "aliasColors": {},
+              "bars": false,
+              "dashLength": 10,
+              "dashes": false,
+              "datasource": {
+                "type": "grafana-azure-monitor-datasource",
+                "uid": "P1EB995EACC6832D3"
+              },
+              "description": "",
+              "fill": 1,
+              "fillGradient": 0,
+              "gridPos": {
+                "h": 7,
+                "w": 17,
+                "x": 4,
+                "y": 1
+              },
+              "hiddenSeries": false,
+              "id": 2,
+              "legend": {
+                "avg": false,
+                "current": false,
+                "max": false,
+                "min": false,
+                "show": true,
+                "total": false,
+                "values": false
+              },
+              "lines": true,
+              "linewidth": 1,
+              "nullPointMode": "null",
+              "options": {
+                "alertThreshold": true
+              },
+              "percentage": false,
+              "pluginVersion": "8.5.5",
+              "pointradius": 2,
+              "points": false,
+              "renderer": "flot",
+              "seriesOverrides": [],
+              "spaceLength": 10,
+              "stack": false,
+              "steppedLine": false,
+              "targets": [
+                {
+                  "appInsights": {
+                    "dimension": [],
+                    "metricName": "select",
+                    "timeGrain": "auto"
+                  },
+                  "azureLogAnalytics": {
+                    "query": "//change this example to create your own time series query\n<table name>                                                              //the table to query (e.g. Usage, Heartbeat, Perf)\n| where $__timeFilter(TimeGenerated)                                      //this is a macro used to show the full chart’s time range, choose the datetime column here\n| summarize count() by <group by column>, bin(TimeGenerated, $__interval) //change “group by column” to a column in your table, such as “Computer”. The $__interval macro is used to auto-select the time grain. Can also use 1h, 5m etc.\n| order by TimeGenerated asc",
+                    "resultFormat": "time_series",
+                    "workspace": "7f7b8792-0860-4fbf-83a1-32018810805e"
+                  },
+                  "azureMonitor": {
+                    "aggOptions": [
+                      "Count"
+                    ],
+                    "aggregation": "Count",
+                    "allowedTimeGrainsMs": [
+                      60000,
+                      300000,
+                      900000,
+                      1800000,
+                      3600000,
+                      21600000,
+                      43200000,
+                      86400000
+                    ],
+                    "dimensionFilter": "*",
+                    "dimensionFilters": [],
+                    "dimensions": [
+                      {
+                        "text": "DatabaseName",
+                        "value": "DatabaseName"
+                      },
+                      {
+                        "text": "CollectionName",
+                        "value": "CollectionName"
+                      },
+                      {
+                        "text": "Region",
+                        "value": "Region"
+                      },
+                      {
+                        "text": "StatusCode",
+                        "value": "StatusCode"
+                      },
+                      {
+                        "text": "OperationType",
+                        "value": "OperationType"
+                      },
+                      {
+                        "text": "Status",
+                        "value": "Status"
+                      }
+                    ],
+                    "metricDefinition": "Microsoft.DocumentDB/databaseAccounts",
+                    "metricName": "TotalRequests",
+                    "metricNamespace": "microsoft.documentdb/databaseaccounts",
+                    "resourceGroup": "rg-ngsa-asb-dev-cosmos",
+                    "resourceName": "ngsa-asb-dev-cosmos",
+                    "timeGrain": "auto",
+                    "timeGrains": [
+                      {
+                        "text": "auto",
+                        "value": "auto"
+                      },
+                      {
+                        "text": "1 minute",
+                        "value": "PT1M"
+                      },
+                      {
+                        "text": "5 minutes",
+                        "value": "PT5M"
+                      },
+                      {
+                        "text": "15 minutes",
+                        "value": "PT15M"
+                      },
+                      {
+                        "text": "30 minutes",
+                        "value": "PT30M"
+                      },
+                      {
+                        "text": "1 hour",
+                        "value": "PT1H"
+                      },
+                      {
+                        "text": "6 hours",
+                        "value": "PT6H"
+                      },
+                      {
+                        "text": "12 hours",
+                        "value": "PT12H"
+                      },
+                      {
+                        "text": "1 day",
+                        "value": "P1D"
+                      }
+                    ],
+                    "top": "10"
+                  },
+                  "hide": false,
+                  "insightsAnalytics": {
+                    "query": "",
+                    "resultFormat": "time_series"
+                  },
+                  "queryType": "Azure Monitor",
+                  "refId": "A"
+                },
+                {
+                  "appInsights": {
+                    "dimension": [],
+                    "metricName": "select",
+                    "timeGrain": "auto"
+                  },
+                  "azureLogAnalytics": {
+                    "query": "//change this example to create your own time series query\n<table name>                                                              //the table to query (e.g. Usage, Heartbeat, Perf)\n| where $__timeFilter(TimeGenerated)                                      //this is a macro used to show the full chart’s time range, choose the datetime column here\n| summarize count() by <group by column>, bin(TimeGenerated, $__interval) //change “group by column” to a column in your table, such as “Computer”. The $__interval macro is used to auto-select the time grain. Can also use 1h, 5m etc.\n| order by TimeGenerated asc",
+                    "resultFormat": "time_series",
+                    "workspace": "7f7b8792-0860-4fbf-83a1-32018810805e"
+                  },
+                  "azureMonitor": {
+                    "aggOptions": [
+                      "Total",
+                      "Average",
+                      "Maximum"
+                    ],
+                    "aggregation": "Total",
+                    "allowedTimeGrainsMs": [
+                      60000,
+                      300000,
+                      900000,
+                      1800000,
+                      3600000,
+                      21600000,
+                      43200000,
+                      86400000
+                    ],
+                    "dimensionFilter": "*",
+                    "dimensionFilters": [],
+                    "dimensions": [
+                      {
+                        "text": "DatabaseName",
+                        "value": "DatabaseName"
+                      },
+                      {
+                        "text": "CollectionName",
+                        "value": "CollectionName"
+                      },
+                      {
+                        "text": "Region",
+                        "value": "Region"
+                      },
+                      {
+                        "text": "StatusCode",
+                        "value": "StatusCode"
+                      },
+                      {
+                        "text": "OperationType",
+                        "value": "OperationType"
+                      },
+                      {
+                        "text": "Status",
+                        "value": "Status"
+                      }
+                    ],
+                    "metricDefinition": "Microsoft.DocumentDB/databaseAccounts",
+                    "metricName": "TotalRequestUnits",
+                    "metricNamespace": "microsoft.documentdb/databaseaccounts",
+                    "resourceGroup": "rg-ngsa-asb-dev-cosmos",
+                    "resourceName": "ngsa-asb-dev-cosmos",
+                    "timeGrain": "auto",
+                    "timeGrains": [
+                      {
+                        "text": "auto",
+                        "value": "auto"
+                      },
+                      {
+                        "text": "1 minute",
+                        "value": "PT1M"
+                      },
+                      {
+                        "text": "5 minutes",
+                        "value": "PT5M"
+                      },
+                      {
+                        "text": "15 minutes",
+                        "value": "PT15M"
+                      },
+                      {
+                        "text": "30 minutes",
+                        "value": "PT30M"
+                      },
+                      {
+                        "text": "1 hour",
+                        "value": "PT1H"
+                      },
+                      {
+                        "text": "6 hours",
+                        "value": "PT6H"
+                      },
+                      {
+                        "text": "12 hours",
+                        "value": "PT12H"
+                      },
+                      {
+                        "text": "1 day",
+                        "value": "P1D"
+                      }
+                    ],
+                    "top": "10"
+                  },
+                  "hide": false,
+                  "insightsAnalytics": {
+                    "query": "",
+                    "resultFormat": "time_series"
+                  },
+                  "queryType": "Azure Monitor",
+                  "refId": "B"
+                }
+              ],
+              "thresholds": [],
+              "timeRegions": [],
+              "title": "Total Requests (ngsa-dev-cosmos)",
+              "tooltip": {
+                "shared": true,
+                "sort": 0,
+                "value_type": "individual"
+              },
+              "type": "graph",
+              "xaxis": {
+                "mode": "time",
+                "show": true,
+                "values": []
+              },
+              "yaxes": [
+                {
+                  "format": "short",
+                  "logBase": 1,
+                  "show": true
+                },
+                {
+                  "format": "short",
+                  "logBase": 1,
+                  "show": true
+                }
+              ],
+              "yaxis": {
+                "align": false
+              }
+            },
+            {
+              "datasource": {
+                "type": "grafana-azure-monitor-datasource",
+                "uid": "P1EB995EACC6832D3"
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "mappings": [],
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": null
+                      }
+                    ]
+                  }
+                },
+                "overrides": []
+              },
+              "gridPos": {
+                "h": 4,
+                "w": 4,
+                "x": 0,
+                "y": 4
+              },
+              "id": 6,
+              "options": {
+                "colorMode": "value",
+                "graphMode": "area",
+                "justifyMode": "auto",
+                "orientation": "auto",
+                "reduceOptions": {
+                  "calcs": [
+                    "mean"
+                  ],
+                  "fields": "",
+                  "values": false
+                },
+                "textMode": "auto"
+              },
+              "pluginVersion": "8.5.5",
+              "targets": [
+                {
+                  "appInsights": {
+                    "dimension": [],
+                    "metricName": "select",
+                    "timeGrain": "auto"
+                  },
+                  "azureLogAnalytics": {
+                    "query": "AzureMetrics \n| where MetricName == \"ProvisionedThroughput\" and Resource == \"NGSA-ASB-DEV-COSMOS\"\n| summarize max(Count) ",
+                    "resultFormat": "time_series",
+                    "workspace": "$laResourceId"
+                  },
+                  "azureMonitor": {
+                    "aggOptions": [],
+                    "aggregation": "",
+                    "dimensionFilter": "*",
+                    "dimensionFilters": [],
+                    "metricDefinition": "select",
+                    "metricName": "select",
+                    "metricNamespace": "select",
+                    "resourceGroup": "ngsa-dev-shared-rg",
+                    "resourceName": "select",
+                    "timeGrain": "",
+                    "timeGrains": [],
+                    "top": "10"
+                  },
+                  "insightsAnalytics": {
+                    "query": "",
+                    "resultFormat": "time_series"
+                  },
+                  "queryType": "Azure Log Analytics",
+                  "refId": "A"
+                }
+              ],
+              "title": "Max Provisioned Throughput",
+              "type": "stat"
+            },
+            {
+              "collapsed": false,
+              "datasource": {
+                "type": "grafana-azure-monitor-datasource",
+                "uid": "P1EB995EACC6832D3"
+              },
+              "gridPos": {
+                "h": 1,
+                "w": 24,
+                "x": 0,
+                "y": 8
+              },
+              "id": 88,
+              "panels": [],
+              "title": "Performance",
+              "type": "row"
+            },
+            {
+              "collapsed": false,
+              "datasource": {
+                "type": "grafana-azure-monitor-datasource",
+                "uid": "P1EB995EACC6832D3"
+              },
+              "gridPos": {
+                "h": 1,
+                "w": 24,
+                "x": 0,
+                "y": 9
+              },
+              "id": 82,
+              "panels": [],
+              "title": "          Server Response Time Percentile",
+              "type": "row"
+            },
+            {
+              "datasource": {
+                "type": "grafana-azure-monitor-datasource",
+                "uid": "P1EB995EACC6832D3"
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "custom": {
+                    "align": "auto",
+                    "displayMode": "auto",
+                    "filterable": false,
+                    "inspect": false
+                  },
+                  "decimals": 2,
+                  "mappings": [],
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": null
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  }
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "AppType"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 107
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Zone"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 111
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "75th"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 114
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "90th"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 137
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "95th"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 121
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "98th"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 87
+                      }
+                    ]
+                  }
+                ]
+              },
+              "gridPos": {
+                "h": 8,
+                "w": 7,
+                "x": 0,
+                "y": 10
+              },
+              "id": 39,
+              "options": {
+                "footer": {
+                  "fields": "",
+                  "reducer": [
+                    "sum"
+                  ],
+                  "show": false
+                },
+                "showHeader": true,
+                "sortBy": []
+              },
+              "pluginVersion": "8.5.5",
+              "targets": [
+                {
+                  "appInsights": {
+                    "dimension": [],
+                    "metricName": "select",
+                    "timeGrain": "auto"
+                  },
+                  "azureLogAnalytics": {
+                    "query": "ngsa_CL\r\n| where $__timeFilter(Date_t) \n   and k_container_s == 'app'\r\n   and k_app_s == 'ngsa-cosmos'\r\n   and LogName_s == \"Ngsa.RequestLog\" \n   and Zone_s has_any ($Zone)\n   and UserAgent_s startswith \"l8r/\"\n\r\n| summarize percentile(Duration_d, 75), percentile(Duration_d, 90), percentile(Duration_d, 95), percentile(Duration_d, 98) by Zone_s, k_app_s\r\n| extend Zone=Zone_s, 75th=round(percentile_Duration_d_75,2), 90th=round(percentile_Duration_d_90,2), 95th=round(percentile_Duration_d_95,2), 98th=round(percentile_Duration_d_98,2), AppType=k_app_s\r\n| project AppType, Zone, 75th, 90th, 95th, 98th\r\n| order by AppType, Zone asc",
+                    "resultFormat": "time_series",
+                    "workspace": "$laResourceId"
+                  },
+                  "azureMonitor": {
+                    "aggOptions": [],
+                    "dimensionFilter": "*",
+                    "dimensionFilters": [],
+                    "metricDefinition": "select",
+                    "metricName": "select",
+                    "metricNamespace": "select",
+                    "resourceGroup": "select",
+                    "resourceName": "select",
+                    "timeGrain": "auto",
+                    "timeGrains": [],
+                    "top": "10"
+                  },
+                  "datasource": {
+                    "type": "grafana-azure-monitor-datasource",
+                    "uid": "P1EB995EACC6832D3"
+                  },
+                  "insightsAnalytics": {
+                    "query": "",
+                    "resultFormat": "time_series"
+                  },
+                  "queryType": "Azure Log Analytics",
+                  "refId": "A"
+                }
+              ],
+              "title": "Server Response Time (ngsa-cosmos)",
+              "type": "table"
+            },
+            {
+              "datasource": {
+                "type": "grafana-azure-monitor-datasource",
+                "uid": "P1EB995EACC6832D3"
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "custom": {
+                    "align": "auto",
+                    "displayMode": "auto",
+                    "filterable": false,
+                    "inspect": false
+                  },
+                  "decimals": 2,
+                  "mappings": [],
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": null
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  }
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "AppType"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 120
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Zone"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 136
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "75th"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 103
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "90th"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 148
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "95th"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 107
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "98th"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 90
+                      }
+                    ]
+                  }
+                ]
+              },
+              "gridPos": {
+                "h": 8,
+                "w": 7,
+                "x": 7,
+                "y": 10
+              },
+              "id": 40,
+              "options": {
+                "footer": {
+                  "fields": "",
+                  "reducer": [
+                    "sum"
+                  ],
+                  "show": false
+                },
+                "showHeader": true,
+                "sortBy": []
+              },
+              "pluginVersion": "8.5.5",
+              "targets": [
+                {
+                  "appInsights": {
+                    "dimension": [],
+                    "metricName": "select",
+                    "timeGrain": "auto"
+                  },
+                  "azureLogAnalytics": {
+                    "query": "ngsa_CL\r\n| where $__timeFilter(Date_t) \n   and k_container_s == 'app'\r\n   and k_app_s == 'ngsa-memory'\r\n   and LogName_s == \"Ngsa.RequestLog\"\n   and Zone_s has_any ($Zone)\n   and UserAgent_s startswith \"l8r/\"\n\r\n| summarize percentile(Duration_d, 75), percentile(Duration_d, 90), percentile(Duration_d, 95), percentile(Duration_d, 98) by Zone_s, k_app_s\r\n| extend Zone=Zone_s, 75th=round(percentile_Duration_d_75,2), 90th=round(percentile_Duration_d_90,2), 95th=round(percentile_Duration_d_95,2), 98th=round(percentile_Duration_d_98,2), AppType=k_app_s\r\n| project AppType, Zone, 75th, 90th, 95th, 98th\r\n| order by AppType, Zone asc",
+                    "resultFormat": "time_series",
+                    "workspace": "$laResourceId"
+                  },
+                  "azureMonitor": {
+                    "aggOptions": [],
+                    "dimensionFilter": "*",
+                    "dimensionFilters": [],
+                    "metricDefinition": "select",
+                    "metricName": "select",
+                    "metricNamespace": "select",
+                    "resourceGroup": "select",
+                    "resourceName": "select",
+                    "timeGrain": "auto",
+                    "timeGrains": [],
+                    "top": "10"
+                  },
+                  "insightsAnalytics": {
+                    "query": "",
+                    "resultFormat": "time_series"
+                  },
+                  "queryType": "Azure Log Analytics",
+                  "refId": "A"
+                }
+              ],
+              "title": "Server Response Time (ngsa-memory)",
+              "type": "table"
+            },
+            {
+              "datasource": {
+                "type": "grafana-azure-monitor-datasource",
+                "uid": "P1EB995EACC6832D3"
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "custom": {
+                    "align": "auto",
+                    "displayMode": "auto",
+                    "filterable": false,
+                    "inspect": false
+                  },
+                  "decimals": 2,
+                  "mappings": [],
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": null
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  }
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "75th"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 81
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "90th"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 86
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "95th"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 130
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "98th"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 112
+                      }
+                    ]
+                  }
+                ]
+              },
+              "gridPos": {
+                "h": 8,
+                "w": 7,
+                "x": 14,
+                "y": 10
+              },
+              "id": 63,
+              "options": {
+                "footer": {
+                  "fields": "",
+                  "reducer": [
+                    "sum"
+                  ],
+                  "show": false
+                },
+                "showHeader": true,
+                "sortBy": []
+              },
+              "pluginVersion": "8.5.5",
+              "targets": [
+                {
+                  "appInsights": {
+                    "dimension": [],
+                    "metricName": "select",
+                    "timeGrain": "auto"
+                  },
+                  "azureLogAnalytics": {
+                    "query": "ngsa_CL\r\n| where $__timeFilter(Date_t) \n   and k_container_s == 'app'\r\n   and k_app_s == 'ngsa-java'\r\n   and LogName_s == \"Ngsa.RequestLog\"\n   and Zone_s has_any ($Zone)\n   and UserAgent_s startswith \"l8r/\"\n\r\n| summarize percentile(Duration_d, 75), percentile(Duration_d, 90), percentile(Duration_d, 95), percentile(Duration_d, 98) by Zone_s, k_app_s\r\n| extend Zone=Zone_s, 75th=round(percentile_Duration_d_75,2), 90th=round(percentile_Duration_d_90,2), 95th=round(percentile_Duration_d_95,2), 98th=round(percentile_Duration_d_98,2), AppType=k_app_s\r\n| project AppType, Zone, 75th, 90th, 95th, 98th\r\n| order by AppType, Zone asc",
+                    "resultFormat": "time_series",
+                    "workspace": "$laResourceId"
+                  },
+                  "azureMonitor": {
+                    "aggOptions": [],
+                    "dimensionFilter": "*",
+                    "dimensionFilters": [],
+                    "metricDefinition": "select",
+                    "metricName": "select",
+                    "metricNamespace": "select",
+                    "resourceGroup": "select",
+                    "resourceName": "select",
+                    "timeGrain": "auto",
+                    "timeGrains": [],
+                    "top": "10"
+                  },
+                  "insightsAnalytics": {
+                    "query": "",
+                    "resultFormat": "time_series"
+                  },
+                  "queryType": "Azure Log Analytics",
+                  "refId": "A"
+                }
+              ],
+              "title": "Server Response Time (ngsa-java)",
+              "type": "table"
+            },
+            {
+              "aliasColors": {},
+              "bars": false,
+              "dashLength": 10,
+              "dashes": false,
+              "datasource": {
+                "type": "grafana-azure-monitor-datasource",
+                "uid": "P1EB995EACC6832D3"
+              },
+              "fill": 1,
+              "fillGradient": 0,
+              "gridPos": {
+                "h": 9,
+                "w": 7,
+                "x": 0,
+                "y": 18
+              },
+              "hiddenSeries": false,
+              "id": 42,
+              "legend": {
+                "avg": false,
+                "current": false,
+                "max": false,
+                "min": false,
+                "show": true,
+                "total": false,
+                "values": false
+              },
+              "lines": true,
+              "linewidth": 1,
+              "nullPointMode": "null",
+              "options": {
+                "alertThreshold": true
+              },
+              "percentage": false,
+              "pluginVersion": "8.5.5",
+              "pointradius": 2,
+              "points": false,
+              "renderer": "flot",
+              "repeat": "Zone",
+              "repeatDirection": "v",
+              "seriesOverrides": [],
+              "spaceLength": 10,
+              "stack": false,
+              "steppedLine": false,
+              "targets": [
+                {
+                  "appInsights": {
+                    "dimension": [],
+                    "metricName": "select",
+                    "timeGrain": "auto"
+                  },
+                  "azureLogAnalytics": {
+                    "query": "ngsa_CL\r\n| where $__timeFilter(Date_t) and Zone_s has_any ($Zone)\n   and k_container_s == \"app\"\r\n   and k_app_s == 'ngsa-cosmos'\r\n\r\n   and LogName_s == \"Ngsa.RequestLog\"\n   and UserAgent_s startswith \"l8r/\"\r\n| summarize percentile(Duration_d, 75), percentile(Duration_d, 90), percentile(Duration_d, 95), percentile(Duration_d, 98) by bin_at(Date_t, 1m, datetime(00:00))\r\n| project-rename Date=Date_t, ResponseTime_75th=percentile_Duration_d_75, ResponseTime_90th=percentile_Duration_d_90,  ResponseTime_95th=percentile_Duration_d_95, ResponseTime_98th=percentile_Duration_d_98\r\n| order by Date asc",
+                    "resultFormat": "time_series",
+                    "workspace": "$laResourceId"
+                  },
+                  "azureMonitor": {
+                    "aggOptions": [],
+                    "dimensionFilter": "*",
+                    "dimensionFilters": [],
+                    "metricDefinition": "select",
+                    "metricName": "select",
+                    "metricNamespace": "select",
+                    "resourceGroup": "select",
+                    "resourceName": "select",
+                    "timeGrain": "auto",
+                    "timeGrains": [],
+                    "top": "10"
+                  },
+                  "datasource": {
+                    "type": "grafana-azure-monitor-datasource",
+                    "uid": "P1EB995EACC6832D3"
+                  },
+                  "insightsAnalytics": {
+                    "query": "",
+                    "resultFormat": "time_series"
+                  },
+                  "queryType": "Azure Log Analytics",
+                  "refId": "A"
+                }
+              ],
+              "thresholds": [],
+              "timeRegions": [],
+              "title": "$Zone Server Response Time (ngsa-cosmos)",
+              "tooltip": {
+                "shared": true,
+                "sort": 0,
+                "value_type": "individual"
+              },
+              "type": "graph",
+              "xaxis": {
+                "mode": "time",
+                "show": true,
+                "values": []
+              },
+              "yaxes": [
+                {
+                  "format": "short",
+                  "logBase": 1,
+                  "show": true
+                },
+                {
+                  "format": "short",
+                  "logBase": 1,
+                  "show": true
+                }
+              ],
+              "yaxis": {
+                "align": false
+              }
+            },
+            {
+              "aliasColors": {},
+              "bars": false,
+              "dashLength": 10,
+              "dashes": false,
+              "datasource": {
+                "type": "grafana-azure-monitor-datasource",
+                "uid": "P1EB995EACC6832D3"
+              },
+              "fill": 1,
+              "fillGradient": 0,
+              "gridPos": {
+                "h": 9,
+                "w": 7,
+                "x": 7,
+                "y": 18
+              },
+              "hiddenSeries": false,
+              "id": 43,
+              "legend": {
+                "avg": false,
+                "current": false,
+                "max": false,
+                "min": false,
+                "show": true,
+                "total": false,
+                "values": false
+              },
+              "lines": true,
+              "linewidth": 1,
+              "nullPointMode": "null",
+              "options": {
+                "alertThreshold": true
+              },
+              "percentage": false,
+              "pluginVersion": "8.5.5",
+              "pointradius": 2,
+              "points": false,
+              "renderer": "flot",
+              "repeat": "Zone",
+              "repeatDirection": "v",
+              "seriesOverrides": [],
+              "spaceLength": 10,
+              "stack": false,
+              "steppedLine": false,
+              "targets": [
+                {
+                  "appInsights": {
+                    "dimension": [],
+                    "metricName": "select",
+                    "timeGrain": "auto"
+                  },
+                  "azureLogAnalytics": {
+                    "query": "ngsa_CL\r\n| where $__timeFilter(Date_t) and Zone_s has_any ($Zone)\n    and k_container_s == \"app\"\r\n   and k_app_s == 'ngsa-memory'\r\n\r\n   and LogName_s == \"Ngsa.RequestLog\"\n   and UserAgent_s startswith \"l8r/\"\r\n| summarize percentile(Duration_d, 75), percentile(Duration_d, 90), percentile(Duration_d, 95), percentile(Duration_d, 98) by bin_at(Date_t, 1m, datetime(00:00))\r\n| project-rename Date=Date_t, ResponseTime_75th=percentile_Duration_d_75, ResponseTime_90th=percentile_Duration_d_90,  ResponseTime_95th=percentile_Duration_d_95, ResponseTime_98th=percentile_Duration_d_98\r\n| order by Date asc",
+                    "resultFormat": "time_series",
+                    "workspace": "$laResourceId"
+                  },
+                  "azureMonitor": {
+                    "aggOptions": [],
+                    "dimensionFilter": "*",
+                    "dimensionFilters": [],
+                    "metricDefinition": "select",
+                    "metricName": "select",
+                    "metricNamespace": "select",
+                    "resourceGroup": "select",
+                    "resourceName": "select",
+                    "timeGrain": "auto",
+                    "timeGrains": [],
+                    "top": "10"
+                  },
+                  "insightsAnalytics": {
+                    "query": "",
+                    "resultFormat": "time_series"
+                  },
+                  "queryType": "Azure Log Analytics",
+                  "refId": "A"
+                }
+              ],
+              "thresholds": [],
+              "timeRegions": [],
+              "title": "$Zone Server Response Time (ngsa-memory)",
+              "tooltip": {
+                "shared": true,
+                "sort": 0,
+                "value_type": "individual"
+              },
+              "type": "graph",
+              "xaxis": {
+                "mode": "time",
+                "show": true,
+                "values": []
+              },
+              "yaxes": [
+                {
+                  "format": "short",
+                  "logBase": 1,
+                  "show": true
+                },
+                {
+                  "format": "short",
+                  "logBase": 1,
+                  "show": true
+                }
+              ],
+              "yaxis": {
+                "align": false
+              }
+            },
+            {
+              "aliasColors": {},
+              "bars": false,
+              "dashLength": 10,
+              "dashes": false,
+              "datasource": {
+                "type": "grafana-azure-monitor-datasource",
+                "uid": "P1EB995EACC6832D3"
+              },
+              "fill": 1,
+              "fillGradient": 0,
+              "gridPos": {
+                "h": 9,
+                "w": 7,
+                "x": 14,
+                "y": 18
+              },
+              "hiddenSeries": false,
+              "id": 64,
+              "legend": {
+                "avg": false,
+                "current": false,
+                "max": false,
+                "min": false,
+                "show": true,
+                "total": false,
+                "values": false
+              },
+              "lines": true,
+              "linewidth": 1,
+              "nullPointMode": "null",
+              "options": {
+                "alertThreshold": true
+              },
+              "percentage": false,
+              "pluginVersion": "8.5.5",
+              "pointradius": 2,
+              "points": false,
+              "renderer": "flot",
+              "repeat": "Zone",
+              "repeatDirection": "v",
+              "seriesOverrides": [],
+              "spaceLength": 10,
+              "stack": false,
+              "steppedLine": false,
+              "targets": [
+                {
+                  "appInsights": {
+                    "dimension": [],
+                    "metricName": "select",
+                    "timeGrain": "auto"
+                  },
+                  "azureLogAnalytics": {
+                    "query": "ngsa_CL\r\n| where $__timeFilter(Date_t) and Zone_s has_any ($Zone)\n    and k_container_s == \"app\"\r\n   and k_app_s == 'ngsa-java'\r\n\r\n   and LogName_s == \"Ngsa.RequestLog\"\n   and UserAgent_s startswith \"l8r/\"\r\n| summarize percentile(Duration_d, 75), percentile(Duration_d, 90), percentile(Duration_d, 95), percentile(Duration_d, 98) by bin_at(Date_t, 1m, datetime(00:00))\r\n| project-rename Date=Date_t, ResponseTime_75th=percentile_Duration_d_75, ResponseTime_90th=percentile_Duration_d_90,  ResponseTime_95th=percentile_Duration_d_95, ResponseTime_98th=percentile_Duration_d_98\r\n| order by Date asc",
+                    "resultFormat": "time_series",
+                    "workspace": "$laResourceId"
+                  },
+                  "azureMonitor": {
+                    "aggOptions": [],
+                    "dimensionFilter": "*",
+                    "dimensionFilters": [],
+                    "metricDefinition": "select",
+                    "metricName": "select",
+                    "metricNamespace": "select",
+                    "resourceGroup": "select",
+                    "resourceName": "select",
+                    "timeGrain": "auto",
+                    "timeGrains": [],
+                    "top": "10"
+                  },
+                  "insightsAnalytics": {
+                    "query": "",
+                    "resultFormat": "time_series"
+                  },
+                  "queryType": "Azure Log Analytics",
+                  "refId": "A"
+                }
+              ],
+              "thresholds": [],
+              "timeRegions": [],
+              "title": "$Zone Server Response Time (ngsa-java)",
+              "tooltip": {
+                "shared": true,
+                "sort": 0,
+                "value_type": "individual"
+              },
+              "type": "graph",
+              "xaxis": {
+                "mode": "time",
+                "show": true,
+                "values": []
+              },
+              "yaxes": [
+                {
+                  "format": "short",
+                  "logBase": 1,
+                  "show": true
+                },
+                {
+                  "format": "short",
+                  "logBase": 1,
+                  "show": true
+                }
+              ],
+              "yaxis": {
+                "align": false
+              }
+            },
+            {
+              "collapsed": false,
+              "datasource": {
+                "type": "grafana-azure-monitor-datasource",
+                "uid": "P1EB995EACC6832D3"
+              },
+              "gridPos": {
+                "h": 1,
+                "w": 24,
+                "x": 0,
+                "y": 36
+              },
+              "id": 84,
+              "panels": [],
+              "title": "          Client Response Time Percentile",
+              "type": "row"
+            },
+            {
+              "datasource": {
+                "type": "grafana-azure-monitor-datasource",
+                "uid": "P1EB995EACC6832D3"
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "custom": {
+                    "align": "auto",
+                    "displayMode": "auto",
+                    "filterable": false,
+                    "inspect": false
+                  },
+                  "decimals": 2,
+                  "mappings": [],
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": null
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  }
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Zone"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 248
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "75th"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 80
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "90th"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 81
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "95th"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 71
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "98th"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 77
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "AppType"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 144
+                      }
+                    ]
+                  }
+                ]
+              },
+              "gridPos": {
+                "h": 8,
+                "w": 7,
+                "x": 0,
+                "y": 37
+              },
+              "id": 45,
+              "options": {
+                "footer": {
+                  "fields": "",
+                  "reducer": [
+                    "sum"
+                  ],
+                  "show": false
+                },
+                "showHeader": true,
+                "sortBy": []
+              },
+              "pluginVersion": "8.5.5",
+              "targets": [
+                {
+                  "appInsights": {
+                    "dimension": [],
+                    "metricName": "select",
+                    "timeGrain": "auto"
+                  },
+                  "azureLogAnalytics": {
+                    "query": "loderunner_CL\r\n| where Server_s contains 'ngsa-cosmos' and $__timeFilter(Date_t) and Zone_s has_any($Zone) and (k_app_s == \"loderunner\" or k_app_s == \"loderunner-clientmode\")\r\n| extend AppType = 'ngsa-cosmos'\r\n| summarize percentile(Duration_d, 75), percentile(Duration_d, 90), percentile(Duration_d, 95), percentile(Duration_d, 98) by Zone_s, AppType\r\n| extend Zone=Zone_s, 75th=round(percentile_Duration_d_75,2), 90th=round(percentile_Duration_d_90,2), 95th=round(percentile_Duration_d_95,2), 98th=round(percentile_Duration_d_98,2), AppType\r\n| project AppType, Zone, 75th, 90th, 95th, 98th\r\n| order by AppType, Zone asc",
+                    "resultFormat": "time_series",
+                    "workspace": "$laResourceId"
+                  },
+                  "azureMonitor": {
+                    "aggOptions": [],
+                    "dimensionFilter": "*",
+                    "dimensionFilters": [],
+                    "metricDefinition": "select",
+                    "metricName": "select",
+                    "metricNamespace": "select",
+                    "resourceGroup": "select",
+                    "resourceName": "select",
+                    "timeGrain": "auto",
+                    "timeGrains": [],
+                    "top": "10"
+                  },
+                  "insightsAnalytics": {
+                    "query": "",
+                    "resultFormat": "time_series"
+                  },
+                  "queryType": "Azure Log Analytics",
+                  "refId": "A"
+                }
+              ],
+              "title": "Client Response Time (ngsa-cosmos)",
+              "type": "table"
+            },
+            {
+              "datasource": {
+                "type": "grafana-azure-monitor-datasource",
+                "uid": "P1EB995EACC6832D3"
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "custom": {
+                    "align": "auto",
+                    "displayMode": "auto",
+                    "filterable": false,
+                    "inspect": false
+                  },
+                  "decimals": 2,
+                  "mappings": [],
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": null
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  }
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Zone"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 345
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "75th"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 51
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "90th"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 54
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "95th"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 64
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "98th"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 59
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "AppType"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 127
+                      }
+                    ]
+                  }
+                ]
+              },
+              "gridPos": {
+                "h": 8,
+                "w": 7,
+                "x": 7,
+                "y": 37
+              },
+              "id": 46,
+              "options": {
+                "footer": {
+                  "fields": "",
+                  "reducer": [
+                    "sum"
+                  ],
+                  "show": false
+                },
+                "showHeader": true,
+                "sortBy": []
+              },
+              "pluginVersion": "8.5.5",
+              "targets": [
+                {
+                  "appInsights": {
+                    "dimension": [],
+                    "metricName": "select",
+                    "timeGrain": "auto"
+                  },
+                  "azureLogAnalytics": {
+                    "query": "loderunner_CL\r\n| where Server_s contains 'ngsa-memory' and $__timeFilter(Date_t) and Zone_s has_any($Zone) and (k_app_s == \"loderunner\" or k_app_s == \"loderunner-clientmode\")\r\n| extend AppType = 'ngsa-memory'\r\n| summarize percentile(Duration_d, 75), percentile(Duration_d, 90), percentile(Duration_d, 95), percentile(Duration_d, 98) by Zone_s, AppType\r\n| extend Zone=Zone_s, 75th=round(percentile_Duration_d_75,2), 90th=round(percentile_Duration_d_90,2), 95th=round(percentile_Duration_d_95,2), 98th=round(percentile_Duration_d_98,2), AppType\r\n| project AppType, Zone, 75th, 90th, 95th, 98th\r\n| order by AppType, Zone asc",
+                    "resultFormat": "time_series",
+                    "workspace": "$laResourceId"
+                  },
+                  "azureMonitor": {
+                    "aggOptions": [],
+                    "dimensionFilter": "*",
+                    "dimensionFilters": [],
+                    "metricDefinition": "select",
+                    "metricName": "select",
+                    "metricNamespace": "select",
+                    "resourceGroup": "select",
+                    "resourceName": "select",
+                    "timeGrain": "auto",
+                    "timeGrains": [],
+                    "top": "10"
+                  },
+                  "insightsAnalytics": {
+                    "query": "",
+                    "resultFormat": "time_series"
+                  },
+                  "queryType": "Azure Log Analytics",
+                  "refId": "A"
+                }
+              ],
+              "title": "Client Response Time (ngsa-memory)",
+              "type": "table"
+            },
+            {
+              "datasource": {
+                "type": "grafana-azure-monitor-datasource",
+                "uid": "P1EB995EACC6832D3"
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "custom": {
+                    "align": "auto",
+                    "displayMode": "auto",
+                    "filterable": false,
+                    "inspect": false
+                  },
+                  "decimals": 2,
+                  "mappings": [],
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": null
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  }
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "AppType"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 88
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Zone"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 318
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "75th"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 75
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "90th"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 71
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "95th"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 80
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "98th"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 70
+                      }
+                    ]
+                  }
+                ]
+              },
+              "gridPos": {
+                "h": 8,
+                "w": 7,
+                "x": 14,
+                "y": 37
+              },
+              "id": 65,
+              "options": {
+                "footer": {
+                  "fields": "",
+                  "reducer": [
+                    "sum"
+                  ],
+                  "show": false
+                },
+                "showHeader": true,
+                "sortBy": []
+              },
+              "pluginVersion": "8.5.5",
+              "targets": [
+                {
+                  "appInsights": {
+                    "dimension": [],
+                    "metricName": "select",
+                    "timeGrain": "auto"
+                  },
+                  "azureLogAnalytics": {
+                    "query": "loderunner_CL\r\n| where Server_s contains 'ngsa-java' and $__timeFilter(Date_t) and Zone_s has_any($Zone) and (k_app_s == \"loderunner\" or k_app_s == \"loderunner-clientmode\")\r\n| extend AppType = 'ngsa-java'\r\n| summarize percentile(Duration_d, 75), percentile(Duration_d, 90), percentile(Duration_d, 95), percentile(Duration_d, 98) by Zone_s, AppType\r\n| extend Zone=Zone_s, 75th=round(percentile_Duration_d_75,2), 90th=round(percentile_Duration_d_90,2), 95th=round(percentile_Duration_d_95,2), 98th=round(percentile_Duration_d_98,2), AppType\r\n| project AppType, Zone, 75th, 90th, 95th, 98th\r\n| order by AppType, Zone asc",
+                    "resultFormat": "time_series",
+                    "workspace": "$laResourceId"
+                  },
+                  "azureMonitor": {
+                    "aggOptions": [],
+                    "dimensionFilter": "*",
+                    "dimensionFilters": [],
+                    "metricDefinition": "select",
+                    "metricName": "select",
+                    "metricNamespace": "select",
+                    "resourceGroup": "select",
+                    "resourceName": "select",
+                    "timeGrain": "auto",
+                    "timeGrains": [],
+                    "top": "10"
+                  },
+                  "insightsAnalytics": {
+                    "query": "",
+                    "resultFormat": "time_series"
+                  },
+                  "queryType": "Azure Log Analytics",
+                  "refId": "A"
+                }
+              ],
+              "title": "Client Response Time (ngsa-java)",
+              "type": "table"
+            },
+            {
+              "aliasColors": {},
+              "bars": false,
+              "dashLength": 10,
+              "dashes": false,
+              "datasource": {
+                "type": "grafana-azure-monitor-datasource",
+                "uid": "P1EB995EACC6832D3"
+              },
+              "fill": 1,
+              "fillGradient": 0,
+              "gridPos": {
+                "h": 8,
+                "w": 7,
+                "x": 0,
+                "y": 45
+              },
+              "hiddenSeries": false,
+              "id": 48,
+              "legend": {
+                "avg": false,
+                "current": false,
+                "max": false,
+                "min": false,
+                "show": true,
+                "total": false,
+                "values": false
+              },
+              "lines": true,
+              "linewidth": 1,
+              "nullPointMode": "null",
+              "options": {
+                "alertThreshold": true
+              },
+              "percentage": false,
+              "pluginVersion": "8.5.5",
+              "pointradius": 2,
+              "points": false,
+              "renderer": "flot",
+              "repeat": "Zone",
+              "repeatDirection": "v",
+              "seriesOverrides": [],
+              "spaceLength": 10,
+              "stack": false,
+              "steppedLine": false,
+              "targets": [
+                {
+                  "appInsights": {
+                    "dimension": [],
+                    "metricName": "select",
+                    "timeGrain": "auto"
+                  },
+                  "azureLogAnalytics": {
+                    "query": "loderunner_CL\r\n| where Server_s contains 'ngsa-cosmos' and $__timeFilter(Date_t) and Zone_s has_any($Zone) and (k_app_s == \"loderunner\" or k_app_s == \"loderunner-clientmode\")\r\n| summarize percentile(Duration_d, 75), percentile(Duration_d, 90), percentile(Duration_d, 95), percentile(Duration_d, 98) by bin_at(Date_t, 1m, datetime(00:00))\r\n| project-rename Date=Date_t, ResponseTime_75th=percentile_Duration_d_75, ResponseTime_90th=percentile_Duration_d_90, ResponseTime_95th=percentile_Duration_d_95, ResponseTime_98th=percentile_Duration_d_98\r\n| order by Date asc",
+                    "resultFormat": "time_series",
+                    "workspace": "$laResourceId"
+                  },
+                  "azureMonitor": {
+                    "aggOptions": [],
+                    "dimensionFilter": "*",
+                    "dimensionFilters": [],
+                    "metricDefinition": "select",
+                    "metricName": "select",
+                    "metricNamespace": "select",
+                    "resourceGroup": "select",
+                    "resourceName": "select",
+                    "timeGrain": "auto",
+                    "timeGrains": [],
+                    "top": "10"
+                  },
+                  "insightsAnalytics": {
+                    "query": "",
+                    "resultFormat": "time_series"
+                  },
+                  "queryType": "Azure Log Analytics",
+                  "refId": "A"
+                }
+              ],
+              "thresholds": [],
+              "timeRegions": [],
+              "title": "$Zone Client Response Time (ngsa-cosmos)",
+              "tooltip": {
+                "shared": true,
+                "sort": 0,
+                "value_type": "individual"
+              },
+              "type": "graph",
+              "xaxis": {
+                "mode": "time",
+                "show": true,
+                "values": []
+              },
+              "yaxes": [
+                {
+                  "format": "short",
+                  "logBase": 1,
+                  "show": true
+                },
+                {
+                  "format": "short",
+                  "logBase": 1,
+                  "show": true
+                }
+              ],
+              "yaxis": {
+                "align": false
+              }
+            },
+            {
+              "aliasColors": {},
+              "bars": false,
+              "dashLength": 10,
+              "dashes": false,
+              "datasource": {
+                "type": "grafana-azure-monitor-datasource",
+                "uid": "P1EB995EACC6832D3"
+              },
+              "fill": 1,
+              "fillGradient": 0,
+              "gridPos": {
+                "h": 8,
+                "w": 7,
+                "x": 7,
+                "y": 45
+              },
+              "hiddenSeries": false,
+              "id": 49,
+              "legend": {
+                "avg": false,
+                "current": false,
+                "max": false,
+                "min": false,
+                "show": true,
+                "total": false,
+                "values": false
+              },
+              "lines": true,
+              "linewidth": 1,
+              "nullPointMode": "null",
+              "options": {
+                "alertThreshold": true
+              },
+              "percentage": false,
+              "pluginVersion": "8.5.5",
+              "pointradius": 2,
+              "points": false,
+              "renderer": "flot",
+              "repeat": "Zone",
+              "repeatDirection": "v",
+              "seriesOverrides": [],
+              "spaceLength": 10,
+              "stack": false,
+              "steppedLine": false,
+              "targets": [
+                {
+                  "appInsights": {
+                    "dimension": [],
+                    "metricName": "select",
+                    "timeGrain": "auto"
+                  },
+                  "azureLogAnalytics": {
+                    "query": "loderunner_CL\r\n| where Server_s contains 'ngsa-memory' and $__timeFilter(Date_t) and Zone_s has_any($Zone) and (k_app_s == \"loderunner\" or k_app_s == \"loderunner-clientmode\")\r\n| summarize percentile(Duration_d, 75), percentile(Duration_d, 90), percentile(Duration_d, 95), percentile(Duration_d, 98) by bin_at(Date_t, 1m, datetime(00:00))\r\n| project-rename Date=Date_t, ResponseTime_75th=percentile_Duration_d_75, ResponseTime_90th=percentile_Duration_d_90, ResponseTime_95th=percentile_Duration_d_95, ResponseTime_98th=percentile_Duration_d_98\r\n| order by Date asc",
+                    "resultFormat": "time_series",
+                    "workspace": "$laResourceId"
+                  },
+                  "azureMonitor": {
+                    "aggOptions": [],
+                    "dimensionFilter": "*",
+                    "dimensionFilters": [],
+                    "metricDefinition": "select",
+                    "metricName": "select",
+                    "metricNamespace": "select",
+                    "resourceGroup": "select",
+                    "resourceName": "select",
+                    "timeGrain": "auto",
+                    "timeGrains": [],
+                    "top": "10"
+                  },
+                  "insightsAnalytics": {
+                    "query": "",
+                    "resultFormat": "time_series"
+                  },
+                  "queryType": "Azure Log Analytics",
+                  "refId": "A"
+                }
+              ],
+              "thresholds": [],
+              "timeRegions": [],
+              "title": "$Zone Client Response Time (ngsa-memory)",
+              "tooltip": {
+                "shared": true,
+                "sort": 0,
+                "value_type": "individual"
+              },
+              "type": "graph",
+              "xaxis": {
+                "mode": "time",
+                "show": true,
+                "values": []
+              },
+              "yaxes": [
+                {
+                  "format": "short",
+                  "logBase": 1,
+                  "show": true
+                },
+                {
+                  "format": "short",
+                  "logBase": 1,
+                  "show": true
+                }
+              ],
+              "yaxis": {
+                "align": false
+              }
+            },
+            {
+              "aliasColors": {},
+              "bars": false,
+              "dashLength": 10,
+              "dashes": false,
+              "datasource": {
+                "type": "grafana-azure-monitor-datasource",
+                "uid": "P1EB995EACC6832D3"
+              },
+              "fill": 1,
+              "fillGradient": 0,
+              "gridPos": {
+                "h": 8,
+                "w": 7,
+                "x": 14,
+                "y": 45
+              },
+              "hiddenSeries": false,
+              "id": 66,
+              "legend": {
+                "avg": false,
+                "current": false,
+                "max": false,
+                "min": false,
+                "show": true,
+                "total": false,
+                "values": false
+              },
+              "lines": true,
+              "linewidth": 1,
+              "nullPointMode": "null",
+              "options": {
+                "alertThreshold": true
+              },
+              "percentage": false,
+              "pluginVersion": "8.5.5",
+              "pointradius": 2,
+              "points": false,
+              "renderer": "flot",
+              "repeat": "Zone",
+              "repeatDirection": "v",
+              "seriesOverrides": [],
+              "spaceLength": 10,
+              "stack": false,
+              "steppedLine": false,
+              "targets": [
+                {
+                  "appInsights": {
+                    "dimension": [],
+                    "metricName": "select",
+                    "timeGrain": "auto"
+                  },
+                  "azureLogAnalytics": {
+                    "query": "loderunner_CL\r\n| where Server_s contains 'ngsa-java' and $__timeFilter(Date_t) and Zone_s has_any($Zone) and (k_app_s == \"loderunner\" or k_app_s == \"loderunner-clientmode\")\r\n| summarize percentile(Duration_d, 75), percentile(Duration_d, 90), percentile(Duration_d, 95), percentile(Duration_d, 98) by bin_at(Date_t, 1m, datetime(00:00))\r\n| project-rename Date=Date_t, ResponseTime_75th=percentile_Duration_d_75, ResponseTime_90th=percentile_Duration_d_90, ResponseTime_95th=percentile_Duration_d_95, ResponseTime_98th=percentile_Duration_d_98\r\n| order by Date asc",
+                    "resultFormat": "time_series",
+                    "workspace": "$laResourceId"
+                  },
+                  "azureMonitor": {
+                    "aggOptions": [],
+                    "dimensionFilter": "*",
+                    "dimensionFilters": [],
+                    "metricDefinition": "select",
+                    "metricName": "select",
+                    "metricNamespace": "select",
+                    "resourceGroup": "select",
+                    "resourceName": "select",
+                    "timeGrain": "auto",
+                    "timeGrains": [],
+                    "top": "10"
+                  },
+                  "insightsAnalytics": {
+                    "query": "",
+                    "resultFormat": "time_series"
+                  },
+                  "queryType": "Azure Log Analytics",
+                  "refId": "A"
+                }
+              ],
+              "thresholds": [],
+              "timeRegions": [],
+              "title": "$Zone Client Response Time (ngsa-java)",
+              "tooltip": {
+                "shared": true,
+                "sort": 0,
+                "value_type": "individual"
+              },
+              "type": "graph",
+              "xaxis": {
+                "mode": "time",
+                "show": true,
+                "values": []
+              },
+              "yaxes": [
+                {
+                  "format": "short",
+                  "logBase": 1,
+                  "show": true
+                },
+                {
+                  "format": "short",
+                  "logBase": 1,
+                  "show": true
+                }
+              ],
+              "yaxis": {
+                "align": false
+              }
+            },
+            {
+              "collapsed": false,
+              "datasource": {
+                "type": "grafana-azure-monitor-datasource",
+                "uid": "P1EB995EACC6832D3"
+              },
+              "gridPos": {
+                "h": 1,
+                "w": 24,
+                "x": 0,
+                "y": 61
+              },
+              "id": 86,
+              "panels": [],
+              "title": "          Client Response Time by category",
+              "type": "row"
+            },
+            {
+              "datasource": {
+                "type": "grafana-azure-monitor-datasource",
+                "uid": "P1EB995EACC6832D3"
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "custom": {
+                    "displayMode": "auto",
+                    "filterable": false,
+                    "inspect": false
+                  },
+                  "decimals": 2,
+                  "mappings": [],
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green"
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  }
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "AppType"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 117
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Category"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 112
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "75th"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 80
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "90th"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 88
+                      }
+                    ]
+                  }
+                ]
+              },
+              "gridPos": {
+                "h": 8,
+                "w": 7,
+                "x": 0,
+                "y": 62
+              },
+              "id": 51,
+              "options": {
+                "footer": {
+                  "fields": "",
+                  "reducer": [
+                    "sum"
+                  ],
+                  "show": false
+                },
+                "showHeader": true,
+                "sortBy": []
+              },
+              "pluginVersion": "8.5.5",
+              "repeat": "Zone",
+              "repeatDirection": "v",
+              "targets": [
+                {
+                  "appInsights": {
+                    "dimension": [],
+                    "metricName": "select",
+                    "timeGrain": "auto"
+                  },
+                  "azureLogAnalytics": {
+                    "query": "loderunner_CL\r\n| where Server_s contains 'ngsa-cosmos' and $__timeFilter(Date_t) and Zone_s has_any($Zone) and (k_app_s == \"loderunner\" or k_app_s == \"loderunner-clientmode\")\r\n| extend AppType = 'ngsa-cosmos'\r\n| summarize percentile(Duration_d, 75), percentile(Duration_d, 90), percentile(Duration_d, 95), percentile(Duration_d, 98) by Category, AppType\r\n| extend 75th=round(percentile_Duration_d_75,2), 90th=round(percentile_Duration_d_90,2), 95th=round(percentile_Duration_d_95,2), 98th=round(percentile_Duration_d_98,2)\r\n| project AppType, Category, 75th, 90th, 95th, 98th\r\n| order by AppType, Category asc",
+                    "resultFormat": "time_series",
+                    "workspace": "$laResourceId"
+                  },
+                  "azureMonitor": {
+                    "aggOptions": [],
+                    "dimensionFilter": "*",
+                    "dimensionFilters": [],
+                    "metricDefinition": "select",
+                    "metricName": "select",
+                    "metricNamespace": "select",
+                    "resourceGroup": "select",
+                    "resourceName": "select",
+                    "timeGrain": "auto",
+                    "timeGrains": [],
+                    "top": "10"
+                  },
+                  "insightsAnalytics": {
+                    "query": "",
+                    "resultFormat": "time_series"
+                  },
+                  "queryType": "Azure Log Analytics",
+                  "refId": "A"
+                }
+              ],
+              "title": "$Zone Client Response Time by Category (ngsa-cosmos)",
+              "type": "table"
+            },
+            {
+              "datasource": {
+                "type": "grafana-azure-monitor-datasource",
+                "uid": "P1EB995EACC6832D3"
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "custom": {
+                    "displayMode": "auto",
+                    "filterable": false,
+                    "inspect": false
+                  },
+                  "decimals": 2,
+                  "mappings": [],
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green"
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  }
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Category"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 92
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "75th"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 80
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "90th"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 65
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "95th"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 134
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "98th"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 89
+                      }
+                    ]
+                  }
+                ]
+              },
+              "gridPos": {
+                "h": 8,
+                "w": 7,
+                "x": 7,
+                "y": 62
+              },
+              "id": 52,
+              "options": {
+                "footer": {
+                  "fields": "",
+                  "reducer": [
+                    "sum"
+                  ],
+                  "show": false
+                },
+                "showHeader": true,
+                "sortBy": []
+              },
+              "pluginVersion": "8.5.5",
+              "repeat": "Zone",
+              "repeatDirection": "v",
+              "targets": [
+                {
+                  "appInsights": {
+                    "dimension": [],
+                    "metricName": "select",
+                    "timeGrain": "auto"
+                  },
+                  "azureLogAnalytics": {
+                    "query": "loderunner_CL\r\n| where Server_s contains 'ngsa-memory' and $__timeFilter(Date_t) and Zone_s has_any($Zone) and (k_app_s == \"loderunner\" or k_app_s == \"loderunner-clientmode\")\r\n| extend AppType = 'ngsa-memory'\r\n| summarize percentile(Duration_d, 75), percentile(Duration_d, 90), percentile(Duration_d, 95), percentile(Duration_d, 98) by Category, AppType\r\n| extend 75th=round(percentile_Duration_d_75,2), 90th=round(percentile_Duration_d_90,2), 95th=round(percentile_Duration_d_95,2), 98th=round(percentile_Duration_d_98,2)\r\n| project AppType, Category, 75th, 90th, 95th, 98th\r\n| order by AppType, Category asc",
+                    "resultFormat": "time_series",
+                    "workspace": "$laResourceId"
+                  },
+                  "azureMonitor": {
+                    "aggOptions": [],
+                    "dimensionFilter": "*",
+                    "dimensionFilters": [],
+                    "metricDefinition": "select",
+                    "metricName": "select",
+                    "metricNamespace": "select",
+                    "resourceGroup": "select",
+                    "resourceName": "select",
+                    "timeGrain": "auto",
+                    "timeGrains": [],
+                    "top": "10"
+                  },
+                  "insightsAnalytics": {
+                    "query": "",
+                    "resultFormat": "time_series"
+                  },
+                  "queryType": "Azure Log Analytics",
+                  "refId": "A"
+                }
+              ],
+              "title": "$Zone Client Response Time by Category (ngsa-memory)",
+              "type": "table"
+            },
+            {
+              "datasource": {
+                "type": "grafana-azure-monitor-datasource",
+                "uid": "P1EB995EACC6832D3"
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "custom": {
+                    "displayMode": "auto",
+                    "filterable": false,
+                    "inspect": false
+                  },
+                  "decimals": 2,
+                  "mappings": [],
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green"
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  }
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "AppType"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 98
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Category"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 114
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "75th"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 76
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "90th"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 141
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "95th"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 147
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "98th"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 116
+                      }
+                    ]
+                  }
+                ]
+              },
+              "gridPos": {
+                "h": 8,
+                "w": 7,
+                "x": 14,
+                "y": 62
+              },
+              "id": 67,
+              "options": {
+                "footer": {
+                  "fields": "",
+                  "reducer": [
+                    "sum"
+                  ],
+                  "show": false
+                },
+                "showHeader": true,
+                "sortBy": []
+              },
+              "pluginVersion": "8.5.5",
+              "repeat": "Zone",
+              "repeatDirection": "v",
+              "targets": [
+                {
+                  "appInsights": {
+                    "dimension": [],
+                    "metricName": "select",
+                    "timeGrain": "auto"
+                  },
+                  "azureLogAnalytics": {
+                    "query": "loderunner_CL\r\n| where Server_s contains 'ngsa-java' and $__timeFilter(Date_t) and Zone_s has_any($Zone) and (k_app_s == \"loderunner\" or k_app_s == \"loderunner-clientmode\")\r\n| extend AppType = 'ngsa-java'\r\n| summarize percentile(Duration_d, 75), percentile(Duration_d, 90), percentile(Duration_d, 95), percentile(Duration_d, 98) by Category, AppType\r\n| extend 75th=round(percentile_Duration_d_75,2), 90th=round(percentile_Duration_d_90,2), 95th=round(percentile_Duration_d_95,2), 98th=round(percentile_Duration_d_98,2)\r\n| project AppType, Category, 75th, 90th, 95th, 98th\r\n| order by AppType, Category asc",
+                    "resultFormat": "time_series",
+                    "workspace": "$laResourceId"
+                  },
+                  "azureMonitor": {
+                    "aggOptions": [],
+                    "dimensionFilter": "*",
+                    "dimensionFilters": [],
+                    "metricDefinition": "select",
+                    "metricName": "select",
+                    "metricNamespace": "select",
+                    "resourceGroup": "select",
+                    "resourceName": "select",
+                    "timeGrain": "auto",
+                    "timeGrains": [],
+                    "top": "10"
+                  },
+                  "insightsAnalytics": {
+                    "query": "",
+                    "resultFormat": "time_series"
+                  },
+                  "queryType": "Azure Log Analytics",
+                  "refId": "A"
+                }
+              ],
+              "title": "$Zone Client Response Time by Category (ngsa-java)",
+              "type": "table"
+            }
+          ],
+          "refresh": false,
+          "schemaVersion": 36,
+          "style": "dark",
+          "tags": [],
+          "templating": {
+            "list": [
+              {
+                "allValue": "",
+                "current": {
+                  "selected": true,
+                  "text": [
+                    "East US",
+                    "West US2"
+                  ],
+                  "value": [
+                    "eastus",
+                    "westus2"
+                  ]
+                },
+                "hide": 0,
+                "includeAll": false,
+                "multi": true,
+                "name": "Zone",
+                "options": [
+                  {
+                    "selected": true,
+                    "text": "East US",
+                    "value": "eastus"
+                  },
+                  {
+                    "selected": true,
+                    "text": "West US2",
+                    "value": "westus2"
+                  }
+                ],
+                "query": "East US: eastus, West US2: westus2",
+                "queryValue": "",
+                "skipUrlSync": false,
+                "type": "custom"
+              },
+              {
+                "current": {
+                  "selected": false,
+                  "text": "/subscriptions/648dcb5a-de1e-48b2-af6b-fe6ef28d355c/resourceGroups/rg-ngsa-asb-dev/providers/Microsoft.OperationalInsights/workspaces/la-aks-3i2qzkkxofr7c",
+                  "value": "/subscriptions/648dcb5a-de1e-48b2-af6b-fe6ef28d355c/resourceGroups/rg-ngsa-asb-dev/providers/Microsoft.OperationalInsights/workspaces/la-aks-3i2qzkkxofr7c"
+                },
+                "hide": 2,
+                "includeAll": false,
+                "multi": false,
+                "name": "laResourceId",
+                "options": [
+                  {
+                    "selected": true,
+                    "text": "/subscriptions/648dcb5a-de1e-48b2-af6b-fe6ef28d355c/resourceGroups/rg-ngsa-asb-dev/providers/Microsoft.OperationalInsights/workspaces/la-aks-3i2qzkkxofr7c",
+                    "value": "/subscriptions/648dcb5a-de1e-48b2-af6b-fe6ef28d355c/resourceGroups/rg-ngsa-asb-dev/providers/Microsoft.OperationalInsights/workspaces/la-aks-3i2qzkkxofr7c"
+                  }
+                ],
+                "query": "/subscriptions/648dcb5a-de1e-48b2-af6b-fe6ef28d355c/resourceGroups/rg-ngsa-asb-dev/providers/Microsoft.OperationalInsights/workspaces/la-aks-3i2qzkkxofr7c",
+                "queryValue": "",
+                "skipUrlSync": false,
+                "type": "custom"
+              }
+            ]
+          },
+          "time": {
+            "from": "now-6h",
+            "to": "now"
+          },
+          "timepicker": {},
+          "timezone": "browser",
+          "title": "NGSA - Azure Monitor - Performance",
+          "uid": "2IRD5FSnp",
+          "version": 2,
+          "weekStart": ""
+        }
