@@ -3,6 +3,8 @@ kind: Kustomization
 resources:
 - ../../base/apps/monitoring/thanos/ # First apply thanos
 - ../../base/apps/monitoring/ # Then apply rest of monitoring
+- grafana/04-grafana-pod-identity.yaml
 patchesStrategicMerge:
   - "thanos/thanos-patch.yaml"
   - "prometheus/prometheus-patch.yaml"
+  - "grafana/grafana-patch.yaml"
