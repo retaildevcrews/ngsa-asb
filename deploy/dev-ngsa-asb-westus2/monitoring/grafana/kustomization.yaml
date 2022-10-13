@@ -1,0 +1,7 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- ../../../base/apps/monitoring/grafana # Then apply rest of monitoring
+- 04-grafana-pod-identity.yaml
+patchesStrategicMerge:
+- "grafana-patch.yaml"
