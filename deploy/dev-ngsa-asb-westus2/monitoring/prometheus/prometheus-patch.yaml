@@ -15,6 +15,18 @@ spec:
       containers:
       - name: prometheus
         image: acraks3i2qzkkxofr7c.azurecr.io/prom/prometheus:v2.30.0
+        args:
+        # Base args
+        - "--config.file=/etc/prometheus/prometheus.yml"
+        - "--storage.tsdb.path=/prometheus/"
+        - "--storage.tsdb.retention.size=3900MB"
+        - "--storage.tsdb.retention.time=7d"
+        - "--enable-feature=expand-external-labels" # for env substitution of external lables in cm
+        # Below args added for thanos
+        - "--storage.tsdb.min-block-duration=2h"
+        - "--storage.tsdb.max-block-duration=2h"
+        - "--web.enable-lifecycle"
+        - "--web.enable-admin-api"
         env:
           - name: PROM_EXT_LABEL_CLUSTER
             value: aks-3i2qzkkxofr7c-westus2

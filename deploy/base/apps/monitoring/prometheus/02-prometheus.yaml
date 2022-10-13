@@ -104,10 +104,6 @@ spec:
             - "--storage.tsdb.path=/prometheus/"
             - "--storage.tsdb.retention.size=3900MB"
             - "--storage.tsdb.retention.time=7d"
-            - "--storage.tsdb.min-block-duration=2h"
-            - "--storage.tsdb.max-block-duration=2h"
-            - "--web.enable-lifecycle"
-            - "--web.enable-admin-api"
             - "--enable-feature=expand-external-labels" # for env substitution of external lables in cm
           env:
           - name: PROM_EXT_LABEL_CLUSTER
