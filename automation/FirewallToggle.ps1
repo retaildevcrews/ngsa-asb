@@ -110,7 +110,83 @@ function Restart-Firewall {
 
     Set-AzFirewall -AzureFirewall $azfw
 }
+function Update-Metric-Alert {
 
+    param (
+        [parameter(Mandatory = $True)]
+        [String]$resourceGroupName,
+        
+        [Parameter(Mandatory = $True)]
+        [String]$ruleName, 
+
+        [Parameter(Mandatory = $True)]
+        [Switch]$enableRule
+    )
+   
+
+    Get-AzMetricAlertRuleV2 -ResourceGroupName $resourceGroupName  -Name $ruleName | Add-AzMetricAlertRuleV2 $enableRule
+}
+
+function Update-Log-Alert {
+
+    param (
+        [parameter(Mandatory = $True)]
+        [String]$resourceGroupName,
+        
+        [Parameter(Mandatory = $True)]
+        [String]$ruleName, 
+
+        [Parameter(Mandatory = $True)]
+        [Switch]$enableRule
+    )
+
+    if($enableRule) {
+        Enable-AzActivityLogAlert -Name $ruleName -ResourceGroupName $resourceGroupName
+    }
+    else {
+        Disable-AzActivityLogAlert -Name $ruleName -ResourceGroupName $resourceGroupName
+    }
+    
+
+}
+
+function Disable-Metric-Alerts {
+    
+    param (
+        [parameter(Mandatory = $True)]
+        [String]$resourceGroupName,
+        
+        [Parameter(Mandatory = $True)]
+        [String]$ruleName
+    )
+
+
+    Update-Metric-Alert $resourceGroupName "asb-pre-centralus-AppEndpointDown" -DisableRule
+    Update-Metric-Alert $resourceGroupName "asb-pre-eastus-AppEndpointDown" -DisableRule
+    Update-Metric-Alert $resourceGroupName "asb-pre-westus-AppEndpointDown" -DisableRule
+
+}
+function Enable-Metric-Alerts {
+
+    param (
+        [parameter(Mandatory = $True)]
+        [String]$resourceGroupName,
+        
+        [Parameter(Mandatory = $True)]
+        [String]$ruleName
+    )
+    param (
+        [parameter(Mandatory = $True)]
+        [String]$resourceGroupName,
+        
+        [Parameter(Mandatory = $True)]
+        [String]$ruleName
+    )
+
+    Update-Metric-Alert $resourceGroupName "asb-pre-centralus-AppEndpointDown" -EnableRule
+    Update-Metric-Alert $resourceGroupName "asb-pre-eastus-AppEndpointDown" -EnableRule
+    Update-Metric-Alert $resourceGroupName "asb-pre-westus-AppEndpointDown" -EnableRule
+}
 
 if ($update -eq "Stop") {
     Stop-Firewall $fw_name $resourceGroupName
@@ -120,5 +196,3 @@ elseif ($update -eq "Start") {
 }
 
 Write-Output "Firewall Status Updated" 
-
-# ToDo: Remove and add alerts as appropriate

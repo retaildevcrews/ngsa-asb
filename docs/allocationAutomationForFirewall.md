@@ -27,7 +27,9 @@ Follow the steps below to assure the prerequisites are installed and up-to-date.
   # check the version of the Azure CLI installed.  
   az version
   # if < than 2.4.0 
-  az upgrade
+  echo "Upgrading to latest version of Azure CLI..."
+  az upgrade --output none 
+  echo "Completed updating Azure CLI version: $(az --version | grep azure-cli | awk '{print $2}')"
 ```
 
 ### Parameters Needed to Proceed
@@ -52,22 +54,23 @@ Follow the steps below to assure the prerequisites are installed and up-to-date.
 ### Install Azure CLI Extension
 
 ``` bash
-  # configure Azure CLI to allow for dynamic installation of 
-  # extensions without prompts
-  az config set extension.use_dynamic_install=yes_without_prompt
-  
+  az config set extension.use_dynamic_install=yes_without_prompt --output none
+    
   # Install or update Azure CLI automation extension
-  if [[ $(az extension list --query "[?name=='automation']") = false ]];
-  then
-    az extension add --name automation
-  else
-    az extension update --name automation
+  if [[ $(az extension list --query "[?name=='automation']")=false ]];
+    then
+      echo "Installing Azure CLI Automation extension..."
+      az extension add --name automation --output none
+      echo "Completed installing Azure CLI Automation extension version: $(az extension list --query "[?name=='automation'].version" -o tsv)."
+    else
+      echo "Updating Azure CLI Automation extension"
+      az extension update --name automation --output none
+      echo "Completed updating Azure CLI Automation extension version: $(az extension list --query "[?name=='automation'].version" -o tsv)."
   fi
-
   # configure Azure CLI to disallow dynamic installation of
   # extensions without prompts
-  az config set extension.use_dynamic_install=yes_prompt
-  ```
+  az config set extension.use_dynamic_install=yes_prompt --output none
+```
 
 ### Create Resource Group
 
@@ -83,40 +86,65 @@ Follow the steps below to assure the prerequisites are installed and up-to-date.
 ### Create Azure Automation Account
 
   ``` bash
-  # Check if account exists, if so ask to change name, else create  
-  if [[ $(az automation account list 
-  --resource-group $AutomationResourceGroup 
-  --query "[?name=='$AutomationAccountName'] | length(@)") > 0 ]]; then
-    echo "$AutomationResourceGroup exists, please review, "
-    echo " and choose a different name if appropriate."
+    echo "Creating Azure Automation Account $AutomationAccountName in Resource Group $AutomationResourceGroupName..."
+    if [[ $(az automation account list --resource-group $AutomationResourceGroupName --query "[?name=='$AutomationAccountName'] | length(@)") > 0 ]];
+    then
+      echo "$AutomationAccountName exists, please review, and choose a different name if appropriate."
 
-  else
-    echo "Creating Resource Group $AutomationResourceGroup..."
+    else
+      echo "Creating Azure Automation Account $AutomationAccountName..."
+      
+      az automation account create --automation-account-name $AutomationAccountName --location $Location --sku $Sku --resource-group $AutomationResourceGroupName
 
-    az automation account create 
-    --automation-account-name $AutomationAccountName 
-    --location $Location 
-    --sku $Sku 
-    --resource-group $AutomationResourceGroup
-fi
+      echo "Complated creating Azure Automation Account $AutomationAccountName."
+  fi
+
+  echo "Completed creating Azure Automation Account $AutomationAccountName in Resource Group $AutomationResourceGroupName."
 ```
 
 ### Create User-Assigned Managed Identity
 
 ``` bash
-  az identity create 
-  --resource-group $AutomationResourceGroup 
-  --name $IdentityName    
+  echo "Creating User-Assigned Managed Identity $IdentityName..."
+  az identity create --resource-group $AutomationResourceGroup --name $IdentityName
+  echo "Completed created User-Assigned Managed Identity $IdentityName in $AutomationResourceGroup."   
 ```
 
 ### Assign Role to User-Assigned Managed Identity
 
 ``` bash
-  az role assignment create 
-  --assignee "$Assignee" 
-  --role "Microsoft.Network/azureFirewalls" 
-  --subscription "$Subscription"
+  echo "Assigning User-Assigned Managed Identity $IdentityName to $Subscription..."
+  az role assignment create --assignee "$IdentityName" --role "Microsoft.Network/azureFirewalls" --subscription "$Subscription"
+  echo "Completed Assigning User-Assigned Managed Identity $IdentityName to $Subscription."
 
+```
+
+### Assign User-Assigned Managed Identity to Automation Account
+
+``` bash
+  echo "Assigning User-Assigned Managed Identity $IdentityName to $AutomationAccountName in $AutomationResourceGroup..."
+  az automation account identity assign --resource-group $AutomationResourceGroup --name $AutomationAccountName --identity $IdentityName
+  echo "Completed assigning User-Assigned Managed Identity $IdentityName to $AutomationAccountName in $AutomationResourceGroup."
+```
+
+### Create Automation Powershell Runbook
+
+``` bash
+  if [[ $(az automation runbook list --resource-group $AutomationResourceGroup --automation-account-name $AutomationAccountName --query "[?name=='$PowerShellRunbookName'] | length(@)") > 0 ]]; then
+        echo "$PowerShellRunbookName exists, please review, and choose a different name if appropriate."
+    else
+        echo "Creating PowerShell Runbook $PowerShellRunbookName in $AutomationResourceGroup for $AutomationAccountName..."
+        az automation runbook create --resource-group $AutomationResourceGroup --automation-account-name $AutomationAccountName --name $PowerShellRunbookName --runbook-type PowerShell --description $PowerShellRunbookDescription --log-progress --log-debug --log-error --log-output --output-folder $PowerShellRunbookOutputFolder
+        echo "Completed creating PowerShell Runbook $PowerShellRunbookName in $AutomationResourceGroup for $AutomationAccountName."
+    fi
+```
+
+### Publish Runbook
+
+``` bash
+  echo "Uploading Runbook Content $RunbookName to $AutomationAccountName in $AutomationResourceGroup..."
+  az automation runbook publish --resource-group $AutomationResourceGroup --automation-account-name $AutomationAccountName --name $RunbookName --type PowerShell --log-progress --description $RunbookDescription --runbook-content   az automation runbook publish --resource-group $AutomationResourceGroup --automation-account-name $AutomationAccountName --name $RunbookName --type PowerShell --log-progress --description $RunbookDescription --runbook-content "./FirewallToggle.ps1"
+  echo "Completed uploading Runbook Content $RunbookName to $AutomationAccountName in $AutomationResourceGroup"
 ```
 
 ### Create Schedule (PowerShell)
@@ -137,162 +165,213 @@ fi
 
 ### Associate Schedule with Runbook
 
-``` azurepowershell
-
-  $automationAccountName = $AutomationAccountName
-  $runbookName = "Firewall-Automation"
-  $scheduleName = "WCNP-DailySchedule"
-
-  $params = @{"resourceGroupName"=$ResourceGroupNameWithFirewall;
-  "vnetName"=$vnetName;
-  "fw_name"=$fireWallName;
-  "pip_name1"=$pip_name1;
-  "pip_name2"=$pip_name2;
-  "pip_name_default"=$pip_name_default;
-  "UAMI"=$UAMI;
-  "update"=$upate;}
-
-  Register-AzAutomationScheduledRunbook 
-  -AutomationAccountName $automationAccountName
-  -Name $runbookName 
-  -ScheduleName $scheduleName 
-  -Parameters $params 
-  -ResourceGroupName $AutomationResourceGroup
-```
-
-### Remove Firewall "affected" Alerts
-
 ``` bash
-
-```
-
-### Restore Firewall "affected" Alerts
-
-``` bash
-
+  echo "Creating schedule for runbook $1 in $AutomationResourceGroup for $AutomationAccountName..."
+  az automation schedule create --resource-group $AutomationResourceGroup --automation-account-name $AutomationAccountName --name $ScheduleName --description $ScheduleDescription --start-time $ScheduleStartTime --expiry-time $ScheduleExpiryTime --frequency $ScheduleFrequency --interval $ScheduleInterval --time-zone $ScheduleTimeZone --advanced-schedule $ScheduleAdvancedSchedule
+  echo "Completed creating schedule for runbook $1 in $AutomationResourceGroup for $AutomationAccountName."
 ```
 
 ### PowerShell Artifact
 
 ``` powershell
     Param(
-        [Parameter(Mandatory)]
-        [String]$resourceGroupName,
-        [Parameter(Mandatory)]
-        [String]$vnetName,
-        [Parameter(Mandatory)]
-        [String]$fw_name,
-        [Parameter(Mandatory)]
-        [String]$pip_name1,
-        [Parameter(Mandatory)]
-        [String]$pip_name2,
-        [Parameter(Mandatory)]
-        [String]$pip_name_default,
-        [Parameter(Mandatory=$True)]
-        [String]$UAMI,
-        [Parameter(Mandatory=$True)]
-        [String]$update
-    )
+    [Parameter(Mandatory)]
+    [String]$resourceGroupName,
 
-    $automationAccount = "rg-nu-ngsa-dev-automation"
+    [Parameter(Mandatory)]
+    [String]$automationAccount,
 
-    # Ensures you do not inherit an AzContext in your runbook
-    Disable-AzContextAutosave -Scope Process | Out-Null
+    [Parameter(Mandatory)]
+    [String]$subscriptionName,
 
-    # Connect using a Managed Service Identity
-    Write-Output "Using system-assigned managed identity"
+    [Parameter(Mandatory)]
+    [String]$vnetName,
+    
+    [Parameter(Mandatory)]
+    [String]$fw_name,
+    
+    [Parameter(Mandatory)]
+    [String]$pip_name1,
+    
+    [Parameter(Mandatory)]
+    [String]$pip_name2,
+    
+    [Parameter(Mandatory)]
+    [String]$pip_name_default,
+    
+    [Parameter(Mandatory = $True)]
+    [String]$UAMI,
+    
+    [Parameter(Mandatory = $True)]
+    [String]$update
+)
 
-    try {
-            $AzureContext = (Connect-AzAccount -Identity).context
-        }
-    catch{
-            Write-Output "There is no system-assigned user identity. Aborting."; 
-            exit
-        }
+# Ensures you do not inherit an AzContext in your runbook
+Write-Output "Disabling AzContext Autosave"
+Disable-AzContextAutosave -Scope Process | Out-Null
+
+# Connect using a Managed Service Identity
+Write-Output "Using system-assigned managed identity"
+
+try {
+    $AzureContext = (Connect-AzAccount -Identity).context
+}
+catch {
+    Write-Output "There is no system-assigned user identity. Aborting."; 
+    exit
+}
+
+# set and store context
+$AzureContext = Set-AzContext -SubscriptionName $subscriptionName -DefaultProfile $AzureContext
+Write-Output "Using user-assigned managed identity"
+
+# Connects using the Managed Service Identity of the named user-assigned managed identity
+$identity = Get-AzUserAssignedIdentity -ResourceGroupName $resourceGroupName -Name $UAMI -DefaultProfile $AzureContext
+
+# validates assignment only, not perms
+if ((Get-AzAutomationAccount -ResourceGroupName $resourceGroupName -Name $automationAccount -DefaultProfile $AzureContext).Identity.UserAssignedIdentities.Values.PrincipalId.Contains($identity.PrincipalId)) {
+    $AzureContext = (Connect-AzAccount -Identity -AccountId $identity.ClientId).context
 
     # set and store context
-    $AzureContext = Set-AzContext -SubscriptionName "jofultz-rdc" `
-        -DefaultProfile $AzureContext
+    $AzureContext = Set-AzContext -SubscriptionName $AzureContext.Subscription -DefaultProfile $AzureContext
+}
+else {
+    Write-Output "Invalid or unassigned user-assigned managed identity"
+    exit
+}
 
-    Write-Output "Using user-assigned managed identity"
 
-    # Connects using the Managed Service Identity of the named user-assigned managed identity
-    $identity = Get-AzUserAssignedIdentity -ResourceGroupName $resourceGroupName `
-      -Name $UAMI -DefaultProfile $AzureContext
+function Stop-Firewall {
 
-    # validates assignment only, not perms
-    if ((Get-AzAutomationAccount -ResourceGroupName $resourceGroupName `
-        -Name $automationAccount `
-        -DefaultProfile $AzureContext).Identity.UserAssignedIdentities.Values.PrincipalId.Contains($identity.PrincipalId))
-      {
-        $AzureContext = (Connect-AzAccount -Identity -AccountId $identity.ClientId).context
+    param (
+        [parameter(Mandatory = $True)]
+        [String]$fw_name,
+        [Parameter(Mandatory = $True)]
+        [String]$resourceGroupName
+    )
 
-        # set and store context
-        $AzureContext = Set-AzContext -SubscriptionName $AzureContext.Subscription -DefaultProfile $AzureContext
-      }
+    Write-Host "Deallocating Firewall....."
+
+    $azfw = Get-AzFirewall -Name $fw_name -ResourceGroupName $resourceGroupName
+    $azfw.Deallocate()
+
+    Set-AzFirewall -AzureFirewall $azfw    
+}
+
+function Restart-Firewall {
+
+    param (
+        [parameter(Mandatory = $True)]
+        [String]$resourceGroupName,
+        [Parameter(Mandatory = $True)]
+        [String]$fw_name, 
+        [parameter(Mandatory = $True)]
+        [String]$vnetName,
+        [Parameter(Mandatory = $True)]
+        [String]$pip_name1, 
+        [parameter(Mandatory = $True)]
+        [String]$pip_name2,
+        [Parameter(Mandatory = $True)]
+        [String]$pip_name_default
+    )
+
+    Write-Host "Allocating Firewall....."
+
+    $azfw = Get-AzFirewall -Name $fw_name -ResourceGroupName $resourceGroupName
+    $vnet = Get-AzVirtualNetwork -ResourceGroupName $resourceGroupName -Name $vnetName
+    $publicip1 = Get-AzPublicIpAddress -Name $pip_name1 -ResourceGroupName $resourceGroupName
+    $publicip2 = Get-AzPublicIpAddress -Name $pip_name2 -ResourceGroupName $resourceGroupName
+    $publicip_default = Get-AzPublicIpAddress -Name $pip_name_default -ResourceGroupName $resourceGroupName
+    $azfw.Allocate($vnet, @($publicip_default, $publicip1, $publicip2))
+
+    Set-AzFirewall -AzureFirewall $azfw
+}
+function Update-Metric-Alert {
+
+    param (
+        [parameter(Mandatory = $True)]
+        [String]$resourceGroupName,
+        
+        [Parameter(Mandatory = $True)]
+        [String]$ruleName, 
+
+        [Parameter(Mandatory = $True)]
+        [Switch]$enableRule
+    )
+   
+
+    Get-AzMetricAlertRuleV2 -ResourceGroupName $resourceGroupName  -Name $ruleName | Add-AzMetricAlertRuleV2 $enableRule
+}
+
+function Update-Log-Alert {
+
+    param (
+        [parameter(Mandatory = $True)]
+        [String]$resourceGroupName,
+        
+        [Parameter(Mandatory = $True)]
+        [String]$ruleName, 
+
+        [Parameter(Mandatory = $True)]
+        [Switch]$enableRule
+    )
+
+    if($enableRule) {
+        Enable-AzActivityLogAlert -Name $ruleName -ResourceGroupName $resourceGroupName
+    }
     else {
-        Write-Output "Invalid or unassigned user-assigned managed identity"
-        exit
-      }
-
-
-    function Stop-Firewall {
-
-        param (
-            [parameter(Mandatory=$True)]
-            [String]$fw_name,
-            [Parameter(Mandatory=$True)]
-            [String]$resourceGroupName
-        )
-
-        Write-Host "Deallocating Firewall....."
-
-        $azfw = Get-AzFirewall -Name $fw_name -ResourceGroupName $resourceGroupName
-        $azfw.Deallocate()
-
-        Set-AzFirewall -AzureFirewall $azfw    
+        Disable-AzActivityLogAlert -Name $ruleName -ResourceGroupName $resourceGroupName
     }
+    
 
-    function Restart-Firewall {
+}
 
-        param (
-            [parameter(Mandatory=$True)]
-            [String]$resourceGroupName,
-            [Parameter(Mandatory=$True)]
-            [String]$fw_name, 
-            [parameter(Mandatory=$True)]
-            [String]$vnetName,
-            [Parameter(Mandatory=$True)]
-            [String]$pip_name1, 
-            [parameter(Mandatory=$True)]
-            [String]$pip_name2,
-            [Parameter(Mandatory=$True)]
-            [String]$pip_name_default
-        )
-
-        Write-Host "Allocating Firewall....."
-
-        $azfw = Get-AzFirewall -Name $fw_name -ResourceGroupName $resourceGroupName
-        $vnet = Get-AzVirtualNetwork -ResourceGroupName $resourceGroupName -Name $vnetName
-        $publicip1 = Get-AzPublicIpAddress -Name $pip_name1 -ResourceGroupName $resourceGroupName
-        $publicip2 = Get-AzPublicIpAddress -Name $pip_name2 -ResourceGroupName $resourceGroupName
-        $publicip_default = Get-AzPublicIpAddress -Name $pip_name_default -ResourceGroupName $resourceGroupName
-        $azfw.Allocate($vnet,@($publicip_default,$publicip1,$publicip2))
-
-        Set-AzFirewall -AzureFirewall $azfw
-    }
+function Disable-Metric-Alerts {
+    
+    param (
+        [parameter(Mandatory = $True)]
+        [String]$resourceGroupName,
+        
+        [Parameter(Mandatory = $True)]
+        [String]$ruleName
+    )
 
 
-    if ($update -eq "Stop") {
-        Stop-Firewall $fw_name $resourceGroupName
-    }
-    elseif($update -eq "Start") {
-        Restart-Firewall $resourceGroupName $fw_name $vnetName $pip_name1 $pip_name2 $pip_name_default
-    }
+    Update-Metric-Alert $resourceGroupName "asb-pre-centralus-AppEndpointDown" -DisableRule
+    Update-Metric-Alert $resourceGroupName "asb-pre-eastus-AppEndpointDown" -DisableRule
+    Update-Metric-Alert $resourceGroupName "asb-pre-westus-AppEndpointDown" -DisableRule
 
-    Write-Output "Firewall Status Updated" 
+}
+function Enable-Metric-Alerts {
 
-    # ToDo: Remove and add alerts as appropriate
+    param (
+        [parameter(Mandatory = $True)]
+        [String]$resourceGroupName,
+        
+        [Parameter(Mandatory = $True)]
+        [String]$ruleName
+    )
+    param (
+        [parameter(Mandatory = $True)]
+        [String]$resourceGroupName,
+        
+        [Parameter(Mandatory = $True)]
+        [String]$ruleName
+    )
+
+    Update-Metric-Alert $resourceGroupName "asb-pre-centralus-AppEndpointDown" -EnableRule
+    Update-Metric-Alert $resourceGroupName "asb-pre-eastus-AppEndpointDown" -EnableRule
+    Update-Metric-Alert $resourceGroupName "asb-pre-westus-AppEndpointDown" -EnableRule
+}
+
+if ($update -eq "Stop") {
+    Stop-Firewall $fw_name $resourceGroupName
+}
+elseif ($update -eq "Start") {
+    Restart-Firewall $resourceGroupName $fw_name $vnetName $pip_name1 $pip_name2 $pip_name_default
+}
+
+Write-Output "Firewall Status Updated" 
 ```
 
 ### Reference
