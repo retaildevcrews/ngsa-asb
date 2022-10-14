@@ -128,8 +128,6 @@ cat templates/monitoring/02-prometheus.yaml | envsubst  > $ASB_GIT_PATH/monitori
 
 ```bash
 
-mkdir -p  $ASB_GIT_PATH/monitoring/thanos
-
 # create thanos querier deployment file
 cat templates/monitoring/thanos/thanos-querier.yaml | envsubst  > $ASB_GIT_PATH/monitoring/thanos/thanos-querier.yaml
 

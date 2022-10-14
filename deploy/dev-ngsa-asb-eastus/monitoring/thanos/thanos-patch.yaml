@@ -9,6 +9,18 @@ spec:
       containers:
         - name: thanos-store
           image: acraks3i2qzkkxofr7c.azurecr.io/thanos/thanos:v0.23.0
+
+---
+
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: thanos-store-grpc-vs
+  namespace: monitoring
+spec:
+  hosts:
+  - thanos-store-grpc-eastus-dev.cse.ms
+
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -21,6 +33,19 @@ spec:
       containers:
         - name: thanos-query
           image: acraks3i2qzkkxofr7c.azurecr.io/thanos/thanos:v0.23.0
+          args:
+            - query
+            - --log.level=debug
+            - --query.auto-downsampling
+            - --query.replica-label=prometheus_replica
+            - --store=thanos-grpc-eastus-dev.cse.ms:443
+            - --store=thanos-store-grpc-eastus-dev.cse.ms:443
+            - --store=thanos-grpc-westus2-dev.cse.ms:443
+            - --grpc-client-tls-secure
+            - --grpc-address=0.0.0.0:10901
+            - --http-address=0.0.0.0:10902
+            - --query.partial-response
+
 ---
 apiVersion: apps/v1
 kind: StatefulSet
