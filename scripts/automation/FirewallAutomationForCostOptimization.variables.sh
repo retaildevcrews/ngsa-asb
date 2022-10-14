@@ -1,0 +1,12 @@
+export AutomationResourceGroupName=rg-trfalls-automation
+export Location=eastus
+export AutomationAccountName=aa-trfalls-automation
+export Sku=Basic
+export IdentityName=mi-trfalls-automation
+export Subscription=jofultz-team
+export PowerShellRunbookName=wcnp-firewall-automation
+export PowerShellRunbookFileName=FirewallToggle.ps1
+export PowerShellRunbookOutputFolder=.
+export Asb_Environment=dev 
+export BaseScheduleNameStart=wcnpfirewallstart
+export BaseScheduleNameStop=wcnpfirewallstop

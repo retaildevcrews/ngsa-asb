@@ -188,11 +188,37 @@ function Enable-Metric-Alerts {
     Update-Metric-Alert $resourceGroupName "asb-pre-westus-AppEndpointDown" -EnableRule
 }
 
+function Disable-Log-Alerts {
+    
+    param (
+        [parameter(Mandatory = $True)]
+        [String]$resourceGroupName)
+
+
+    Update-Log-Alert $resourceGroupName "asb-dev-centralus-AppEndpointDown" -DisableRule
+    Update-Log-Alert $resourceGroupName "asb-dev-eastus-AppEndpointDown" -DisableRule
+    Update-Log-Alert $resourceGroupName "asb-dev-westus-AppEndpointDown" -DisableRule
+
+}
+
+function Enable-Log-Alerts {
+  param (
+        [parameter(Mandatory = $True)]
+        [String]$resourceGroupName)
+    Update-Log-Alert $resourceGroupName "asb-dev-centralus-AppEndpointDown" -EnableRule
+    Update-Log-Alert $resourceGroupName "asb-dev-eastus-AppEndpointDown" -EnableRule
+    Update-Log-Alert $resourceGroupName "asb-dev-westus-AppEndpointDown" -EnableRule
+}
+
 if ($update -eq "Stop") {
     Stop-Firewall $fw_name $resourceGroupName
+    Disable-Metric-Alerts $resourceGroupName
+    Disable-Log-Alerts $resourceGroupName
 }
 elseif ($update -eq "Start") {
     Restart-Firewall $resourceGroupName $fw_name $vnetName $pip_name1 $pip_name2 $pip_name_default
+    Enable-Metric-Alerts $resourceGroupName
+    Enable-Log-Alerts $resourceGroupName
 }
 
 Write-Output "Firewall Status Updated" 
