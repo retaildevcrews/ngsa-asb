@@ -6,7 +6,9 @@ configMapGenerator: # This generates prometheus configMap from prometheus.yml
     files:
     - prometheus.yml # The .data in yaml will have the same key/tag as file name
     options:
-      # TODO: Will it add a suffix everytime there are new changes to configmap??
+      # It seems the hash is generated based on file content.
+      # It will change the suffix everytime there is a change in file (i.e. change in prometheus.yml config file).
+      # Without any changes the hash value will be the same
       # To make sure updated CM immediately reconciles the deployment
       # See: https://kubectl.docs.kubernetes.io/references/kustomize/kustomization/configmapgenerator/#propagating-the-name-suffix
       disableNameSuffixHash: false
