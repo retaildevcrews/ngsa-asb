@@ -35,6 +35,9 @@ chmod +x kubelogin
 sudo mv kubelogin /usr/local/bin/kubelogin
 rm kubelogin-linux-amd64.zip
 
+# Install dyff to make kustomize diff easier
+curl --silent --location https://git.io/JYfAY | sudo bash
+
 # install latest flux in ~/.local/bin
 curl -s https://fluxcd.io/install.sh |  bash -s - ~/.local/bin
 # install flux completions for bash

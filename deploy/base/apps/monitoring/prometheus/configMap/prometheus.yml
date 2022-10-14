@@ -1,0 +1,177 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    cluster: ${PROM_EXT_LABEL_CLUSTER}
+scrape_configs:
+  - job_name: 'ngsa-memory'
+    metrics_path: /metrics
+    kubernetes_sd_configs:
+    - role: pod
+      namespaces:
+        names:
+        - ngsa
+      selectors:
+        - role: "pod"
+          label: "app=ngsa-memory"
+          field: "status.phase=Running"
+    relabel_configs:
+    - source_labels: [ __meta_kubernetes_pod_name ]
+      action: replace
+      target_label: instance
+  - job_name: 'ngsa-cosmos'
+    metrics_path: /metrics
+    kubernetes_sd_configs:
+    - role: pod
+      namespaces:
+        names:
+        - ngsa
+      selectors:
+        - role: "pod"
+          label: "app=ngsa-cosmos"
+          field: "status.phase=Running"
+    relabel_configs:
+    - source_labels: [ __meta_kubernetes_pod_name ]
+      action: replace
+      target_label: instance
+  - job_name: 'ngsa-java'
+    metrics_path: /metrics
+    kubernetes_sd_configs:
+    - role: pod
+      namespaces:
+        names:
+        - ngsa
+      selectors:
+        - role: "pod"
+          label: "app=ngsa-java"
+          field: "status.phase=Running"
+    relabel_configs:
+    - source_labels: [ __meta_kubernetes_pod_name ]
+      action: replace
+      target_label: instance
+  - job_name: 'loderunner-commandmode'
+    metrics_path: /metrics
+    kubernetes_sd_configs:
+    - role: pod
+      namespaces:
+        names:
+        - loderunner
+      selectors:
+        - role: "pod"
+          label: "app=loderunner"
+          field: "status.phase=Running"
+    relabel_configs:
+    - source_labels: [ __meta_kubernetes_pod_name ]
+      action: replace
+      target_label: instance
+  - job_name: 'fluentbit'
+    metrics_path: /api/v1/metrics/prometheus
+    kubernetes_sd_configs:
+    - role: pod
+      namespaces:
+        names:
+        - fluentbit
+      selectors:
+        - role: "pod"
+          label: "app.kubernetes.io/name=fluentbit"
+          field: "status.phase=Running"
+    relabel_configs:
+    - source_labels: [ __meta_kubernetes_pod_name ]
+      action: replace
+      target_label: instance
+  - job_name: 'flux-helm-controller'
+    metrics_path: /metrics
+    kubernetes_sd_configs:
+    - role: pod
+      namespaces:
+        names:
+        - flux-system
+      selectors:
+        - role: "pod"
+          label: "app=helm-controller"
+          field: "status.phase=Running"
+    relabel_configs:
+    - source_labels: [__meta_kubernetes_pod_phase]
+      action: keep
+      regex: Running
+    - source_labels: [ __meta_kubernetes_pod_container_port_name ]
+      action: keep
+      regex: http-prom
+    - source_labels: [__meta_kubernetes_namespace]
+      action: replace
+      target_label: namespace
+    - source_labels: [ __meta_kubernetes_pod_name ]
+      action: replace
+      target_label: pod
+  - job_name: 'flux-kustomize-controller'
+    metrics_path: /metrics
+    kubernetes_sd_configs:
+    - role: pod
+      namespaces:
+        names:
+        - flux-system
+      selectors:
+        - role: "pod"
+          label: "app=kustomize-controller"
+          field: "status.phase=Running"
+    relabel_configs:
+    - source_labels: [__meta_kubernetes_pod_phase]
+      action: keep
+      regex: Running
+    - source_labels: [ __meta_kubernetes_pod_container_port_name ]
+      action: keep
+      regex: http-prom
+    - source_labels: [__meta_kubernetes_namespace]
+      action: replace
+      target_label: namespace
+    - source_labels: [ __meta_kubernetes_pod_name ]
+      action: replace
+      target_label: pod
+  - job_name: 'flux-notification-controller'
+    metrics_path: /metrics
+    kubernetes_sd_configs:
+    - role: pod
+      namespaces:
+        names:
+        - flux-system
+      selectors:
+        - role: "pod"
+          label: "app=notification-controller"
+          field: "status.phase=Running"
+    relabel_configs:
+    - source_labels: [__meta_kubernetes_pod_phase]
+      action: keep
+      regex: Running
+    - source_labels: [ __meta_kubernetes_pod_container_port_name ]
+      action: keep
+      regex: http-prom
+    - source_labels: [__meta_kubernetes_namespace]
+      action: replace
+      target_label: namespace
+    - source_labels: [ __meta_kubernetes_pod_name ]
+      action: replace
+      target_label: pod
+  - job_name: 'flux-source-controller'
+    metrics_path: /metrics
+    kubernetes_sd_configs:
+    - role: pod
+      namespaces:
+        names:
+        - flux-system
+      selectors:
+        - role: "pod"
+          label: "app=source-controller"
+          field: "status.phase=Running"
+    relabel_configs:
+    - source_labels: [__meta_kubernetes_pod_phase]
+      action: keep
+      regex: Running
+    - source_labels: [ __meta_kubernetes_pod_container_port_name ]
+      action: keep
+      regex: http-prom
+    - source_labels: [__meta_kubernetes_namespace]
+      action: replace
+      target_label: namespace
+    - source_labels: [ __meta_kubernetes_pod_name ]
+      action: replace
+      target_label: pod

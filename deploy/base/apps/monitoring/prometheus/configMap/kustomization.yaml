@@ -1,0 +1,16 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+configMapGenerator: # This generates prometheus configMap from prometheus.yml
+  - name: prometheus-server-conf
+    namespace: monitoring
+    files:
+    - prometheus.yml # The .data in yaml will have the same key/tag as file name
+    options:
+      # It seems the hash is generated based on file content.
+      # It will change the suffix everytime there is a change in file (i.e. change in prometheus.yml config file).
+      # Without any changes the hash value will be the same
+      # To make sure updated CM immediately reconciles the deployment
+      # See: https://kubectl.docs.kubernetes.io/references/kustomize/kustomization/configmapgenerator/#propagating-the-name-suffix
+      disableNameSuffixHash: false
+      labels:
+        name: prometheus-server-conf

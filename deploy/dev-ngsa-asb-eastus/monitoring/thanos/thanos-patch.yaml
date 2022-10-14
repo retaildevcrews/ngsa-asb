@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+    name: thanos-store
+    namespace: monitoring
+spec:
+  template:
+    spec:
+      containers:
+        - name: thanos-store
+          image: acraks3i2qzkkxofr7c.azurecr.io/thanos/thanos:v0.23.0
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: thanos-query
+    namespace: monitoring
+spec:
+  template:
+    spec:
+      containers:
+        - name: thanos-query
+          image: acraks3i2qzkkxofr7c.azurecr.io/thanos/thanos:v0.23.0
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+    name: thanos-compactor
+    namespace: monitoring
+spec:
+  template:
+    spec:
+      containers:
+        - name: thanos-compactor
+          image: acraks3i2qzkkxofr7c.azurecr.io/thanos/thanos:v0.23.0
