@@ -140,7 +140,7 @@ function Update-Log-Alert {
         [Switch]$enableRule
     )
 
-    if($enableRule) {
+    if ($enableRule) {
         Enable-AzActivityLogAlert -Name $ruleName -ResourceGroupName $resourceGroupName
     }
     else {
@@ -202,7 +202,7 @@ function Disable-Log-Alerts {
 }
 
 function Enable-Log-Alerts {
-  param (
+    param (
         [parameter(Mandatory = $True)]
         [String]$resourceGroupName)
     Update-Log-Alert $resourceGroupName "asb-dev-centralus-AppEndpointDown" -EnableRule
