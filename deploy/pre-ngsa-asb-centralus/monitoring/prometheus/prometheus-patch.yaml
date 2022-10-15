@@ -1,0 +1,14 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prometheus-deployment
+  namespace: monitoring
+spec:
+  template:
+    spec:
+      containers:
+      - name: prometheus
+        image: acraksfykg5bqasutle.azurecr.io/prom/prometheus:v2.30.0
+        env:
+          - name: PROM_EXT_LABEL_CLUSTER
+            value: aks-fykg5bqasutle-centralus

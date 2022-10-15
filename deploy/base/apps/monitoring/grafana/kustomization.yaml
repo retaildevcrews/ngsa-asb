@@ -1,0 +1,16 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+# Dashboards
+- dashboards/flux-cluster.yaml
+- dashboards/flux-control-plane.yaml
+- dashboards/ngsa-az-blocked-traffic.yaml
+- dashboards/ngsa-az-monitor-perf.yaml
+- dashboards/ngsa-az-monitor-rel.yaml
+- dashboards/ngsa-fluentbit.yaml
+- dashboards/ngsa-prometheus.yaml
+# Grafana deployment files
+- 01-grafana-config.yaml
+- 02-grafana-config-datasources.yaml
+- 03-grafana-config-dashboards.yaml
+- 05-grafana.yaml
