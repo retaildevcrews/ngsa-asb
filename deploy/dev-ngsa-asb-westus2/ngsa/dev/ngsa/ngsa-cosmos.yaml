@@ -19,8 +19,8 @@ spec:
       labels:
         aadpodidbinding: ngsa-asb-ngsa-id
         app: ngsa-cosmos
-        deploy: 22-10-17-18-06-46
-        version: beta-2210-17-18
+        deploy: 22-10-17-19-54-27
+        version: beta-2210-17-19
         sidecar.istio.io/inject: "true"
     spec:
       containers:
