@@ -5,7 +5,7 @@ function collectInputParameters()
   echo $1
   if [ -z $1 ]; then
     echo "Please provide the Cluster Admin ID when calling this script" 1>&2
-    echo "This command can be retrieved by running ./getClusterAdminIDforDeployment.sh from your local machine (not CodeSpaces)" 1>&2
+    echo "This command can be retrieved by running ./clusterCreation/getClusterAdminIDforDeployment.sh from your local machine (not CodeSpaces)" 1>&2
     exit 1
   else 
     export ASB_CLUSTER_ADMIN_ID=$1

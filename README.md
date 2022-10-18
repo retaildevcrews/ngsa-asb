@@ -23,7 +23,7 @@ NGSA AKS Secure Base line uses the Patterns and Practices AKS Secure Baseline re
 
 Infrastruture Setup is separated into two steps that must be run sequentially
 
-1. run `./scripts/getClusterAdminIDforDeployment.sh` from a local machine. This will fail if run in CodeSpaces. Requires az cli installation.
+1. run `./scripts/clusterCreation/getClusterAdminIDforDeployment.sh` from a local machine. This will fail if run in CodeSpaces. Requires az cli installation.
 
 2. run output of first script in a CodeSpaces instance. This will guide you to deploy a new environment. This will only work inside CodeSpaces.
 

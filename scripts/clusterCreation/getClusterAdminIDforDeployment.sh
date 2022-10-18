@@ -63,4 +63,4 @@ GetClusterAdminID
 CheckSubscriptionAccess
 echo "Checking Subsciption and Admin Group Permissions Complete"
 echo "Continue to follow setup in CodeSpaces"
-echo "Once in CodeSpaces enter the following command: ./scripts/deployASB.sh $ASB_CLUSTER_ADMIN_ID"
+echo "Once in CodeSpaces enter the following command: ./scripts/clusterCreation/deployASB.sh $ASB_CLUSTER_ADMIN_ID"
