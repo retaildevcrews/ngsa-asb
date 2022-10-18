@@ -53,8 +53,7 @@ Enter Deployment Name: " ASB_DEPLOYMENT_NAME
 
 function setDeploymentRegion()
 {
-  echo "Getting Azure Locations..."
-  azure_locations=( $(az account list-locations --query [].id -o tsv) )
+  azure_locations=( "australiaeast" "centralus" "eastus" "eastus2" "japaneast" "northeurope" "southcentralus" "southeastasia" "uksouth" "westeurope" "westus2")
   location_selections=( "${azure_locations[@]##*/}" )
 
   # Hub Location Prompt
