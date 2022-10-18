@@ -23,10 +23,9 @@ function collectInputParameters()
 function setDeploymentName()
 {
   function isValidDeploymentName() {
-    [[ $1 =~ ^[a-z]([a-z]|\d){2,7}$ ]]
+    [[ $1 =~ ^[a-z]([a-z]|\d){2,8}$ ]]
   }
-  requirements="* Deployment Name is very particular and won't fail for about an hour
-* we recommend a short a name to total length of 8 or less
+  requirements="* Deployment Name Requirements:
 * must be lowercase
 * must start with a-z
 * must only be a-z or 0-9
