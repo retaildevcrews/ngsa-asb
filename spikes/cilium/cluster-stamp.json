@@ -1223,7 +1223,7 @@
                         "scaleSetEvictionPolicy": "Delete",
                         "orchestratorVersion": "[parameters('kubernetesVersion')]",
                         "enableNodePublicIP": false,
-                        "maxPods": 30,
+                        "maxPods": 100,
                         "availabilityZones": [
                             "1",
                             "2",
@@ -1250,7 +1250,7 @@
                         "scaleSetEvictionPolicy": "Delete",
                         "orchestratorVersion": "[parameters('kubernetesVersion')]",
                         "enableNodePublicIP": false,
-                        "maxPods": 30,
+                        "maxPods": 100,
                         "availabilityZones": [
                             "1",
                             "2",
