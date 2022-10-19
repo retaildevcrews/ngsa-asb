@@ -140,7 +140,6 @@ function PublishRunbook(){
   echo
 }
 
-
 function main(){
   echo "Starting Azure Automation Infrastructure creation script..."
   echo
