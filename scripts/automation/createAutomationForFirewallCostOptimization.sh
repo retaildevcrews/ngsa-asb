@@ -1,50 +1,46 @@
 #!/bin/bash
 
-function CollectInputParameters(){
-  if [[ "$#" -ne 10 ]]; then
-      echo "You passed in "$#" parameters.  10 are required."
-      exit 1
-  else 
-    export AutomationResourceGroupName=$1
-    export Location=$2
-    export AutomationAccountName=$3
-    export Subscription=$4
-    export ASBResourceGroupCore=$5
-    export IdentityName=$6
-    export Sku=$7
-    export PowerShellRunbookFileName=$8
-    export PowerShellRunbookName=$9
-    export PowerShellRunbookDescription=${10}
-  fi
+ function CollectInputParameters(){
+  source ./scripts/automation/firewallAutomationForCostOptimization.variables.sh
+
 }
 
 function SetSubscription(){
-  echo "Setting subscription to $Subscription..."
-  az account set --subscription $Subscription --output none
-  echo "Completed setting Subscription to $Subscriptiond."
+  echo
+  echo "Setting ASB_FW_Subscription_Id to $ASB_FW_Subscription_Id..."
+
+  az account set --subscription $ASB_FW_Subscription_Id --output none
+  
+  echo "Completed setting ASB_FW_Subscription_Id to $ASB_FW_Subscription_Id."
   echo
 }
 
 function UpgradeAzureCLI() {
   # upgrade to latest version of Azure CLI
   echo "Upgrading to latest version of Azure CLI..."
-  az upgrade --output none 
-  echo "Completed updating Azure CLI version: $(az --version | grep azure-cli | awk '{print $2}')"
+
+  az upgrade --output none --yes --only-show-errors
+
+  echo "Completed upgrading to latest version of Azure CLI."
   echo
 }
 
 function AddAzureCLIExtension() {
-  az config set extension.use_dynamic_install=yes_without_prompt --output none
+  az config set extension.use_dynamic_install=yes_without_prompt --output none --only-show-errors
     
   # Install or update Azure CLI automation extension
-  if [[ $(az extension list --query "[?name=='automation']")=false ]];
-  then
+  if [[ $(az extension list --query "[?name=='automation']")=false ]]; then
     echo "Installing Azure CLI Automation extension..."
-    az extension add --name automation --output none
+
+    az extension add --name automation --output none --only-show-errors
+
     echo "Completed installing Azure CLI Automation extension version: $(az extension list --query "[?name=='automation'].version" -o tsv)."
+
   else
     echo "Updating Azure CLI Automation extension"
-    az extension update --name automation --output none
+
+    az extension update --name automation --output none --only-show-errors
+
     echo "Completed updating Azure CLI Automation extension version: $(az extension list --query "[?name=='automation'].version" -o tsv)."
   fi
   # configure Azure CLI to disallow dynamic installation of
@@ -55,85 +51,92 @@ function AddAzureCLIExtension() {
 
 function CreateResourceGroup(){
   function CreateGroup(){
-    echo "Creating Resource Group $AutomationResourceGroupName..."
-    if [ $(az group exists --name $AutomationResourceGroupName) = true ]; then 
-      echo "Resource Group $AutomationResourceGroupName already exists."
+    echo "Creating Resource Group ..."
+    if [ $(az group exists --name $ASB_FW_Resource_Group_Name_for_Automation) = true ]; then 
+      echo "Resource Group $ASB_FW_Resource_Group_Name_for_Automation already exists."
       exit;
+  
     else
-      echo "Creating resource group $AutomationResourceGroupName in $Location..."
-      az group create -n $AutomationResourceGroupName -l $Location  --output none
-      echo "Completed creating resource group $AutomationResourceGroupName in $Location."
+      echo "Creating resource group $ASB_FW_Resource_Group_Name_for_Automation in $ASB_FW_Location..."
+      az group create -n $ASB_FW_Resource_Group_Name_for_Automation -l $ASB_FW_Location --output none
+      echo "Completed creating resource group $ASB_FW_Resource_Group_Name_for_Automation in $ASB_FW_Location."
     fi
   }
+  
   echo "Creating Resource Groups..."
-  CreateGroup $AutomationResourceGroupName $Location
+  
+  CreateGroup $ASB_FW_Resource_Group_Name_for_Automation $ASB_FW_Location
+
   echo "Completed Creating Resource Groups."
   echo
 }
 
 function CreateAzureAutomationAccount(){
-  echo "Creating Azure Automation Account $AutomationAccountName in Resource Group $AutomationResourceGroupName..."
-  if [[ $(az automation account list --resource-group $AutomationResourceGroupName --query "[?name=='$AutomationAccountName'] | length(@)") > 0 ]]; then
-      echo "$AutomationAccountName exists, please review, and choose a different name if appropriate."
+  echo "Creating Azure Automation Account $ASB_FW_Automation_Account_Name in Resource Group $ASB_FW_Resource_Group_Name_for_Automation..."
+  
+  if [[ $(az automation account list --resource-group $ASB_FW_Resource_Group_Name_for_Automation --query "[?name=='$ASB_FW_Automation_Account_Name'] | length(@)") > 0 ]]; then
+      echo "$ASB_FW_Automation_Account_Name exists, please review, and choose a different name if appropriate."
       exit;
 
   else
-      echo "Creating Azure Automation Account $AutomationAccountName..."
+      echo "Creating Azure Automation Account $ASB_FW_Automation_Account_Name..."
       
-      az automation account create --automation-account-name $AutomationAccountName --location $Location --sku $Sku --resource-group $AutomationResourceGroupName  --output none
-      echo "Complated creating Azure Automation Account $AutomationAccountName."
+      az automation account create --automation-account-name $ASB_FW_Automation_Account_Name --location $ASB_FW_Location --sku $ASB_FW_Sku --resource-group $ASB_FW_Resource_Group_Name_for_Automation  --output none
+      echo "Complated creating Azure Automation Account $ASB_FW_Automation_Account_Name."
   fi
-  echo "Completed creating Azure Automation Account $AutomationAccountName in Resource Group $AutomationResourceGroupName."
+  echo "Completed creating Azure Automation Account $ASB_FW_Automation_Account_Name in Resource Group $ASB_FW_Resource_Group_Name_for_Automation."
   echo
 }
 
 function CreateUserAssignedManagedIdentity(){
-  echo "Creating User-Assigned Managed Identity $IdentityName in $AutomationResourceGroupName..."
-  az identity create --resource-group $AutomationResourceGroupName --name $IdentityName  --output none
-  echo "Completed created User-Assigned Managed Identity $IdentityName in $AutomationResourceGroupName."
+  echo "Creating User-Assigned Managed Identity $ASB_FW_Identity_Name in $ASB_FW_Resource_Group_Name_for_Automation..."
+
+  az identity create --resource-group $ASB_FW_Resource_Group_Name_for_Automation --name $ASB_FW_Identity_Name  --output none
+
+  echo "Completed created User-Assigned Managed Identity $ASB_FW_Identity_Name in $ASB_FW_Resource_Group_Name_for_Automation."
   echo
 }
 
 function AssignUserAssignedManagedIdentity(){
-  export Identity=$(az identity list -o tsv --query "[].{id:id, principalId: principalId} | [? contains(id, $IdentityName]".id)
-  export PrincipalId=$(az identity list -o tsv --query "[].{id:id, principalId: principalId} | [? contains(id, $IdentityName]".principalId)
+  export Identity=$(az identity list -o tsv --query "[].{id:id, principalId: principalId} | [? contains(id, $ASB_FW_Identity_Name]".id)
+  export PrincipalId=$(az identity list -o tsv --query "[].{id:id, principalId: principalId} | [? contains(id, $ASB_FW_Identity_Name]".principalId)
   export RoleName=$(az role definition list -o tsv --query "[].{roleName:roleName} | [? contains(roleName, Network Contributor].roleName")
 
-  echo "Assigning User-Assigned Managed Identity $IdentityName to $Subscription in resource group $AutomationResourceGroupName..."
-  az role assignment create --assignee-object-id $PrincipalId --role "Network Contributor" --subscription $Subscription  --output none
-  echo "Completed Assigning User-Assigned Managed Identity $IdentityName to $Subscription in resource group $AutomationResourceGroupName."
+  echo "Assigning User-Assigned Managed Identity $ASB_FW_Identity_Name to $ASB_FW_Subscription_Id in resource group $ASB_FW_Resource_Group_Name_for_Automation..."
+  az role assignment create --assignee-object-id $PrincipalId --role "Network Contributor" --ASB_FW_Subscription_Id $ASB_FW_Subscription_Id  --output none
+  echo "Completed Assigning User-Assigned Managed Identity $ASB_FW_Identity_Name to $ASB_FW_Subscription_Id in resource group $ASB_FW_Resource_Group_Name_for_Automation."
   echo
 }
 
 function CreateAzureAutomationPowerShellRunbook(){
-  if [[ $(az automation runbook list --resource-group $AutomationResourceGroupName --automation-account-name $AutomationAccountName --query "[?name=='$PowerShellRunbookName'] | length(@)") > 0 ]]; then
-      echo "$PowerShellRunbookName exists, please review, and choose a different name if appropriate."
+  if [[ $(az automation runbook list --resource-group $ASB_FW_Resource_Group_Name_for_Automation --automation-account-name $ASB_FW_Automation_Account_Name --query "[?name=='$ASB_FW_PowerShell_Runbook_Name'] | length(@)") > 0 ]]; then
+      echo "$ASB_FW_PowerShell_Runbook_Name exists, please review, and choose a different name if appropriate."
   else
-      echo "Creating PowerShell Runbook $PowerShellRunbookName in $AutomationResourceGroupName for $AutomationAccountName..."
-      az automation runbook create --resource-group $AutomationResourceGroupName --automation-account-name $AutomationAccountName --name $PowerShellRunbookName --type "PowerShell" --description "$PowerShellRunbookDescription"  --output none
-      echo "Completed creating PowerShell Runbook $PowerShellRunbookName in $AutomationResourceGroupName for $AutomationAccountName."
+      echo "Creating PowerShell Runbook $ASB_FW_PowerShell_Runbook_Name in $ASB_FW_Resource_Group_Name_for_Automation for $ASB_FW_Automation_Account_Name..."
+      az automation runbook create --resource-group $ASB_FW_Resource_Group_Name_for_Automation --automation-account-name $ASB_FW_Automation_Account_Name --name $ASB_FW_PowerShell_Runbook_Name --type "PowerShell" --description "$ASB_FW_PowerShell_Runbook_Description"  --output none
+      echo "Completed creating PowerShell Runbook $ASB_FW_PowerShell_Runbook_Name in $ASB_FW_Resource_Group_Name_for_Automation for $ASB_FW_Automation_Account_Name."
   fi
   echo
 }
 
 function UpdateRunbook(){
-  echo "Uploading Runbook Content from $PowerShellRunbookFileName to $PowerShellRunbookName to $AutomationAccountName Automation Account in $AutomationResourceGroupName resource group..."
+  echo "Uploading Runbook Content from $ASB_FW_PowerShell_Runbook_File_Name to $ASB_FW_PowerShell_Runbook_Name to $ASB_FW_Automation_Account_Name Automation Account in $ASB_FW_Resource_Group_Name_for_Automation resource group..."
     
   export repositoryName=$(basename -s .git `git config --get remote.origin.url`)    
-  export file=$(cat "scripts/automation/$PowerShellRunbookFileName")
+  export file=$(cat "scripts/automation/$ASB_FW_PowerShell_Runbook_File_Name")
 
-  az automation runbook replace-content --automation-account-name $AutomationAccountName --resource-group $AutomationResourceGroupName --name $PowerShellRunbookName --content @"scripts/automation/$PowerShellRunbookFileName"
+  az automation runbook replace-content --automation-account-name $ASB_FW_Automation_Account_Name --resource-group $ASB_FW_Resource_Group_Name_for_Automation --name $ASB_FW_PowerShell_Runbook_Name --content @"scripts/automation/$ASB_FW_PowerShell_Runbook_File_Name"
     
-  echo "Completed uploading Runbook Content from $PowerShellRunbookFileName to $PowerShellRunbookName to $AutomationAccountName Automation Account in $AutomationResourceGroupName resource group." 
+  echo "Completed uploading Runbook Content from $ASB_FW_PowerShell_Runbook_File_Name to $ASB_FW_PowerShell_Runbook_Name to $ASB_FW_Automation_Account_Name Automation Account in $ASB_FW_Resource_Group_Name_for_Automation resource group." 
   echo
 }
 
 function PublishRunbook(){
-  echo "Publishing Runbook Content from $PowerShellRunbookFileName to $PowerShellRunbookName to $AutomationAccountName Automation Account in $AutomationResourceGroupName resource group..."
+  echo "Publishing Runbook Content from $ASB_FW_PowerShell_Runbook_File_Name to $ASB_FW_PowerShell_Runbook_Name to $ASB_FW_Automation_Account_Name Automation Account in $ASB_FW_Resource_Group_Name_for_Automation resource group..."
 
-  az automation runbook publish --resource-group $AutomationResourceGroupName --automation-account-name $AutomationAccountName --name $PowerShellRunbookName
+  az automation runbook publish --resource-group $ASB_FW_Resource_Group_Name_for_Automation --automation-account-name $ASB_FW_Automation_Account_Name --name $ASB_FW_PowerShell_Runbook_Name
     
-  echo "Completed publishing Runbook Content from $PowerShellRunbookFileName to $PowerShellRunbookName to $AutomationAccountName Automation Account in $AutomationResourceGroupName resource group." 
+  echo "Completed publishing Runbook Content from $ASB_FW_PowerShell_Runbook_File_Name to $ASB_FW_PowerShell_Runbook_Name to $ASB_FW_Automation_Account_Name Automation Account in $ASB_FW_Resource_Group_Name_for_Automation resource group." 
   echo
 }
 
@@ -141,7 +144,7 @@ function PublishRunbook(){
 function main(){
   echo "Starting Azure Automation Infrastructure creation script..."
   echo
-  CollectInputParameters $1 $2 $3 $4 $5 $6 $7 $8 $9 ${10}
+  CollectInputParameters
   UpgradeAzureCLI
   AddAzureCLIExtension
   SetSubscription
@@ -156,7 +159,7 @@ function main(){
 }
 
 start_time="$(date -u +%s)"
-main $1 $2 $3 $4 $5 $6 $7 $8 $9 ${10}
+main
 end_time="$(date -u +%s)"
 
 elapsed="$(($end_time-$start_time))"

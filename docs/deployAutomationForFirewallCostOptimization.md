@@ -2,6 +2,12 @@
 
 Azure Firewall has [costs (Azure Firewall pricing link)](https://azure.microsoft.com/en-gb/pricing/details/azure-firewall/#pricing) associated with it which can be optimized by allocating and de-allocating the firewall when appropriate.  Below describes the mechanism to implement an Azure Automation Runbook that will allocate and de-allocate the firewall on a schedule as well as enable and disable the alerts associated with this activity to minimize nonessential systems communications.
 
+## Acronym List
+
+| Term | Acronym | Notes |
+| :---- | :----: | :---- |
+| Commandline Interface | CLI | | 
+|  |  |  |
 ## Prerequisites
 
 Before proceeding verify  the environment is configured correct to execute the commands necessary below
@@ -12,37 +18,59 @@ Before proceeding verify  the environment is configured correct to execute the c
 
 - Azure CLI Extension for Monitor [Install Azure CLI Extensions](https://learn.microsoft.com/en-us/cli/azure/azure-cli-extensions-list)
 
-- Azure Powershell modules for Linux [Install Modules](/allocationAutomationForFirewall.md#Install-Powershell-Modules)
+- *Azure Powershell modules for Linux* [Install Modules](/allocationAutomationForFirewall.md#Install-Powershell-Modules)
 
-### Set Subscription & Tenant
+*The Azure CLI Automation extension is in an experimental stage.  Currently it does not implement all functionality needed.  As a result the the Az Module, specifically for automation and authentication can be used at the time of writing.*
 
-Replace the $1 with subscription name.
+- [*Azure CLI Extension - Automation*](https://github.com/Azure/azure-cli-extensions/tree/main/src/automation)
+- [Azure PowerShell Az Modules](https://learn.microsoft.com/en-us/powershell/azure/install-az-ps?view=azps-9.0.0)
+
+## Installation Instructions
+
+Once all prerequisites have been installed and updated the following steps will illistrate establishing the environment for enabling and disabling the Azure Firewall.  
+
+### 1. Set Subscription & Tenant
+
+Authenticate into the correct tenant and subscription.  Below is the Azure Commandline Interface (CLI)
 
 ``` bash
-echo "Setting subscription to $1 and Tenant Id to $2..."
-az account set --subscription $1 --TenantId $2
-echo "Completed setting Subscription to $1 and Tenant Id to $2."
+
+echo "Setting subscription to $subscription in tenant $tenantId..."
+
+az login --tenant $tenantId
+az account set --subscription $subscription
+
+echo "Completed setting subscription to $subscription in tenant $tenantId."
+
 ```
 
 ### Install Powershell Modules
 
-The following command should be executed from the Codespaces environment to ensure the modules are installed.  These commands can be executed from an authenticated Azure Powershell terminal.
+The following command should be executed from the Codespace terminal to ensure the modules are installed.  These commands can be executed from an authenticated Azure Powershell terminal from within the Azure Codespace environment.
 
-#### PowerShell Modules
+#### 3. PowerShell Modules
 
 ```PowerShell
-Install-Module -Name Az.Automation -Force
-Import-Module -Name Az.Automation -Force
 
-Install-Module -Name Az.Monitor -Force
-Import-Module -Name Az.Monitor -Force
+Write-Host "Installing & Importing Azure Powershell Az Module for Automation."
+
+Install-Module -Name Az.Automation -Force | out-null
+Import-Module -Name Az.Automation -Force | out-null
+
+Write-Host "Installing & Importing Azure Powershell Az Module for Monitor."
+
+Install-Module -Name Az.Monitor -Force | out-null
+Import-Module -Name Az.Monitor -Force | out-null
+
+Write-Host "Completed installing & importing Azure Powershell Az Modules for Authentication and Monitor."
+
 ```
 
-### Install Azure CLI Assets
+### 4. Install Azure CLI Assets
 
 Follow the steps below to assure the prerequisites are installed and up-to-date and all necessary extensions are installed.
 
-#### Azure CLI Upgrade
+### 5. Azure CLI Upgrade
 
 ```bash
 # check the version of the Azure CLI installed.  
@@ -54,20 +82,26 @@ echo "Completed updating "
 echo "Azure CLI version: $(az --version | grep azure-cli | awk '{print $2}""
 ```
 
-#### Azure CLI Extensions
+### 6. Azure CLI Extensions
 
 ```bash
 az config set extension.use_dynamic_install=yes_without_prompt --output none
     
 # Install or update Azure CLI automation extension
 if [[ $(az extension list --query "[?name=='automation']")=false ]]; then
+
   echo "Installing Azure CLI Automation extension..."
+
   az extension add --name automation --output none
+  
   echo "Completed installing Azure CLI Automation extension version:"
   echo "$(az extension list --query "[?name=='automation'].version" -o tsv)."
+
 else
   echo "Updating Azure CLI Automation extension"
+
   az extension update --name automation --output none
+
   echo "Completed updating Azure CLI Automation extension version:"
   echo "$(az extension list --query "[?name=='automation'].version" -o tsv)."
 fi
@@ -75,6 +109,34 @@ fi
 # extensions without prompts
 az config set extension.use_dynamic_install=yes_prompt --output none
 ```
+
+### Parameters Needed to Proceed
+
+| Parameter Name | Example Value | Rules for Naming |
+| -------------- | :-----------: | ---------------- |
+||||
+| ASB_FW_TenantId | 72f988bf-86f1-41af-91ab-2d7cd011db47 ||
+| ASB_FW_SubscriptionId | 3b25180b-416b-4b73-92e2-8668f62075d5 |  |
+| ASB_FW_Sku | Basic |  |
+| ASB_FW_Automation_Resource_Group_Name | rg-trfalls-firewall-automation |  |
+| ASB_FW_Resource_Group_Core | rg-centraus-hub-dev |  |
+| ASB_FW_Location | eastus |  |
+| ASB_FW_Automation_Account_Name | aa-trfalls-automation |  |
+| ASB_FW_PowerShell_Runbook_Name | rb-trfalls-firewall-automation |  |
+| ASB_FW_PowerShell_Runbook_File_Name | firewallAutomationForCostOptimization.ps1 |  |
+| ASB_FW_Identity_Name | mi-trfalls-firewall-automation |  |
+| ASB_FW_PowerShell_Runbook_Description | This runbook automates the allocation and de-allocation of a firewall for the purposes of scheduling." # Description for the runbook. |  |
+| ASB_FW_PowerShell_Runbook_Output_Folder | . |  |
+| ASB_FW_Environment | dev |  |
+| ASB_FW_Base_Schedule_Name_Start | wcnp-fw-start- |  |
+| ASB_FW_Base_Schedule_Name_Stop | wcnp-fw-stop- |  |
+| AssigneeObjectId              | 00000000-0000-0000-0000-000000000000 | [Az Role Assignment Assignee-Object-Id](https://learn.microsoft.com/en-us/cli/azure/role/assignment?view=azure-cli-latest#az-role-assignment-create-optional-parameters)                                                                                                                                                                                                              |
+| vnetName                      |           vnet-cetntral-hub          | Found in the portal.                                                                                                                                                                                                                                                                                                                                                        |
+| firewallName                  |             fw-centralus             | Found in the portal.                                                                                                                                                                                                                                                                                                                                                        |
+| pip_name1                     |          pip-fw-centralus-01         | Found in the portal.                                                                                                                                                                                                                                                                                                                                                        |
+| pip_name2                     |          pip-fw-centralus-02         | Found in the portal.                                                                                                                                                                                                                                                                                                                                                        |
+| pip_name_default              |       pip-fw-centralus-default       | Found in the portal.                                                                                                                                                                                                                                                                                                                                                        |
+| UAMI                          |    mi-ngsa-firewall-automation-dev   | User-Assigned Managed Identity name.
 
 ## Infrastructure & Assets Creation List
 
@@ -87,25 +149,7 @@ The following infrastructure assets should be established in the subscription wi
 |  3. | User-Assigned Managed Identity            | [link](https://learn.microsoft.com/en-us/azure/active-directory/managed-identities-azure-resources/how-manage-user-assigned-managed-identities?pivots=identity-mi-methods-azcli) | Create an identity for the Automation Account.                                                                                                                              |
 |  4. | Automation Runbook with Powershell        |                                      [link](https://learn.microsoft.com/en-us/azure/automation/automation-runbook-types#powershell-runbooks)                                     | Create a Runbook of type Powershell.                                                                                                                                        |
 |  5. | Powershell Content in Runbook             |                               [link](https://learn.microsoft.com/en-us/powershell/module/az.automation/import-azautomationrunbook?view=azps-8.3.0)                               | Upload [pre-defined Powershell content](../automation/FirewallToggle.ps1) into the Runbook body.                                                                            |
-|  6. | Automation Schedule(s) _using Powershell_ |                               [link](https://learn.microsoft.com/en-us/powershell/module/az.automation/import-azautomationrunbook?view=azps-8.3.0)                               | Create the schedules that will execute the Firewall automation.  These had to be created using Powershell instead of the Azure CLI.  No equivalent behavior has been found. |
-
-### Parameters Needed to Proceed
-
-| Parameter Name                |             Example Value            | Rules for Naming                                                                                                                                                                                                                                                                                                                                                            |
-| ----------------------------- | :----------------------------------: | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| AutomationResourceGroupName   |        rg-ngsa-automation-dev        | prefix with 'rg-' </br> suffix with environment abbreviation '-dev'                                                                                                                                                                                                                                                                                                           |
-| Location                      |                eastus                | [Azure CLI command to get total list of location names](https://learn.microsoft.com/en-us/cli/azure/account?view=azure-cli-latest#az-account-list-locations)                                                                                                                                                                                                                |
-| AutomationAccountName         |    aa-ngsa-firewall-automation-dev   | 1. 6-50 Alphanumerics and hyphens.</br>  2. Start with letter and end with alphanumeric.6-50. </br>  3. Alphanumerics and hyphens.</br>  4. Start with letter and end with alphanumeric.</br>[Link to documentation](https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftautomation)|
-| Sku                           |                 Basic                | Set this to 'Basic'                                                                                                                                                                                                                                                                                                                                                         |
-| AssigneeObjectId              | 00000000-0000-0000-0000-000000000000 | [Az Role Assignment Assignee-Object-Id](https://learn.microsoft.com/en-us/cli/azure/role/assignment?view=azure-cli-latest#az-role-assignment-create-optional-parameters)                                                                                                                                                                                                    |
-| Subscription                  |             jofultz-team             | The subscription should be set to the name of the subscription with the Azure Firewall to be automated.                                                                                                                                                                                                                                                                     |
-| ResourceGroupNameWithFirewall |           ngsa-asb-dev-hub           | The NGSA Azure Firewall is located in the resource group suffixed with '-hub'.                                                                                                                                                                                                                                                                                              |
-| vnetName                      |           vnet-cetntral-hub          | Found in the portal.                                                                                                                                                                                                                                                                                                                                                        |
-| firewallName                  |             fw-centralus             | Found in the portal.                                                                                                                                                                                                                                                                                                                                                        |
-| pip_name1                     |          pip-fw-centralus-01         | Found in the portal.                                                                                                                                                                                                                                                                                                                                                        |
-| pip_name2                     |          pip-fw-centralus-02         | Found in the portal.                                                                                                                                                                                                                                                                                                                                                        |
-| pip_name_default              |       pip-fw-centralus-default       | Found in the portal.                                                                                                                                                                                                                                                                                                                                                        |
-| UAMI                          |    mi-ngsa-firewall-automation-dev   | User-Assigned Managed Identity name.                                                                                                                                                                                                                                                                                                                                        |
+|  6. | Automation Schedule(s) _using Powershell_ |                               [link](https://learn.microsoft.com/en-us/powershell/module/az.automation/import-azautomationrunbook?view=azps-8.3.0)                               | Create the schedules that will execute the Firewall automation.  These had to be created using Powershell instead of the Azure CLI.  No equivalent behavior has been found. |                                |
 
 ### Create Resource Group
 
@@ -196,6 +240,7 @@ echo "Completed uploading Runbook Content from $PowerShellRunbookFileName to $Po
 ``` -->
 
 ```powershell
+
   source ./automation/variables.ps1
   Connect-AzAccount -UseDeviceAuth
   Select-AzSubscription -SubscriptionName $Env:Subscription
@@ -206,7 +251,9 @@ echo "Completed uploading Runbook Content from $PowerShellRunbookFileName to $Po
   New-AzAutomationSchedule -AutomationAccountName $Env:AutomationAccountName -Name "$Env:BaseScheduleNameStart$Env:Asb_Environment" -StartTime $StartTime -ExpiryTime $EndTime -DayInterval 1 -ResourceGroupName $Env:AutomationResourceGroupName
 
   New-AzAutomationSchedule -AutomationAccountName $Env:AutomationAccountName -Name "$Env:BaseScheduleNameStop$Env:Asb_Environment" -StartTime $StartTime -ExpiryTime $EndTime -DayInterval 1 -ResourceGroupName $Env:AutomationResourceGroupName
+
 ```
+# TODO: prefix environment variables.  
 
 ### Associate Schedule with Runbook
 
@@ -214,235 +261,6 @@ echo "Completed uploading Runbook Content from $PowerShellRunbookFileName to $Po
     Register-AzAutomationScheduledRunbook -AutomationAccountName $Env:AutomationAccountName -RunbookName $Env:PowerShellRunbookName -ScheduleName "$Env:BaseScheduleNameStart$Env:Asb_Environment" -ResourceGroupName $Env:AutomationResourceGroupName -Parameters @{"resourceGroupName"="$Env:AutomationResourceGroupName";"automationAccount"="$Env:AutomationAccountName";"subscriptionName"="$Env:Subscription";"vnetName"="vnet-cetntral-hub";"fw_name"="fw-centralus";"pip_name1"="pip-fw-centralus-01";"pip_name2"="pip-fw-centralus-02";"pip_name_default"="pip-fw-centralus-default";"UAMI"="$Env:IdentityName";"update"="start"}
 
     Register-AzAutomationScheduledRunbook -AutomationAccountName $Env:AutomationAccountName -RunbookName $Env:PowerShellRunbookName -ScheduleName "$Env:BaseScheduleNameStop$Env:Asb_Environment" -ResourceGroupName $Env:AutomationResourceGroupName -Parameters @{"resourceGroupName"="$Env:AutomationResourceGroupName";"automationAccount"="$Env:AutomationAccountName";"subscriptionName"="$Env:Subscription";"vnetName"="vnet-cetntral-hub";"fw_name"="fw-centralus";"pip_name1"="pip-fw-centralus-01";"pip_name2"="pip-fw-centralus-02";"pip_name_default"="pip-fw-centralus-default";"UAMI"="$Env:IdentityName";"update"="stop"}
-```
-
-### PowerShell Artifact
-
-```powershell
-  Param(
-      [Parameter(Mandatory)]
-      [String]$resourceGroupName,
-
-      [Parameter(Mandatory)]
-      [String]$automationAccount,
-
-      [Parameter(Mandatory)]
-      [String]$subscriptionName,
-
-      [Parameter(Mandatory)]
-      [String]$vnetName,
-      
-      [Parameter(Mandatory)]
-      [String]$fw_name,
-      
-      [Parameter(Mandatory)]
-      [String]$pip_name1,
-      
-      [Parameter(Mandatory)]
-      [String]$pip_name2,
-      
-      [Parameter(Mandatory)]
-      [String]$pip_name_default,
-      
-      [Parameter(Mandatory = $True)]
-      [String]$UAMI,
-      
-      [Parameter(Mandatory = $True)]
-      [String]$update
-  )
-
-  # Ensures you do not inherit an AzContext in your runbook
-  Write-Output "Disabling AzContext Autosave"
-  Disable-AzContextAutosave -Scope Process | Out-Null
-
-  # Connect using a Managed Service Identity
-  Write-Output "Using system-assigned managed identity"
-
-  try {
-      $AzureContext = (Connect-AzAccount -Identity).context
-  }
-  catch {
-      Write-Output "There is no system-assigned user identity. Aborting."; 
-      exit
-  }
-
-  # set and store context
-  $AzureContext = Set-AzContext -SubscriptionName $subscriptionName -DefaultProfile $AzureContext
-  Write-Output "Using user-assigned managed identity"
-
-  # Connects using the Managed Service Identity of the named user-assigned managed identity
-  $identity = Get-AzUserAssignedIdentity -ResourceGroupName $resourceGroupName -Name $UAMI -DefaultProfile $AzureContext
-
-  # validates assignment only, not perms
-  if ((Get-AzAutomationAccount -ResourceGroupName $resourceGroupName -Name $automationAccount -DefaultProfile $AzureContext).Identity.UserAssignedIdentities.Values.PrincipalId.Contains($identity.PrincipalId)) {
-      $AzureContext = (Connect-AzAccount -Identity -AccountId $identity.ClientId).context
-
-      # set and store context
-      $AzureContext = Set-AzContext -SubscriptionName $AzureContext.Subscription -DefaultProfile $AzureContext
-  }
-  else {
-      Write-Output "Invalid or unassigned user-assigned managed identity"
-      exit
-  }
-
-
-  function Stop-Firewall {
-
-      param (
-          [parameter(Mandatory = $True)]
-          [String]$fw_name,
-          [Parameter(Mandatory = $True)]
-          [String]$resourceGroupName
-      )
-
-      Write-Host "De-allocating Firewall....."
-
-      $azfw = Get-AzFirewall -Name $fw_name -ResourceGroupName $resourceGroupName
-      $azfw.Deallocate()
-
-      Set-AzFirewall -AzureFirewall $azfw    
-  }
-
-  function Restart-Firewall {
-
-      param (
-          [parameter(Mandatory = $True)]
-          [String]$resourceGroupName,
-          [Parameter(Mandatory = $True)]
-          [String]$fw_name, 
-          [parameter(Mandatory = $True)]
-          [String]$vnetName,
-          [Parameter(Mandatory = $True)]
-          [String]$pip_name1, 
-          [parameter(Mandatory = $True)]
-          [String]$pip_name2,
-          [Parameter(Mandatory = $True)]
-          [String]$pip_name_default
-      )
-
-      Write-Host "Allocating Firewall....."
-
-      $azfw = Get-AzFirewall -Name $fw_name -ResourceGroupName $resourceGroupName
-      $vnet = Get-AzVirtualNetwork -ResourceGroupName $resourceGroupName -Name $vnetName
-      $publicip1 = Get-AzPublicIpAddress -Name $pip_name1 -ResourceGroupName $resourceGroupName
-      $publicip2 = Get-AzPublicIpAddress -Name $pip_name2 -ResourceGroupName $resourceGroupName
-      $publicip_default = Get-AzPublicIpAddress -Name $pip_name_default -ResourceGroupName $resourceGroupName
-      $azfw.Allocate($vnet, @($publicip_default, $publicip1, $publicip2))
-
-      Set-AzFirewall -AzureFirewall $azfw
-  }
-  function Update-Metric-Alert {
-
-      param (
-          [parameter(Mandatory = $True)]
-          [String]$resourceGroupName,
-          
-          [Parameter(Mandatory = $True)]
-          [String]$ruleName, 
-
-          [Parameter(Mandatory = $True)]
-          [Switch]$enableRule
-      )
-    
-
-      Get-AzMetricAlertRuleV2 -ResourceGroupName $resourceGroupName  -Name $ruleName | Add-AzMetricAlertRuleV2 $enableRule
-  }
-
-  function Update-Log-Alert {
-
-      param (
-          [parameter(Mandatory = $True)]
-          [String]$resourceGroupName,
-          
-          [Parameter(Mandatory = $True)]
-          [String]$ruleName, 
-
-          [Parameter(Mandatory = $True)]
-          [Switch]$enableRule
-      )
-
-      if($enableRule) {
-          Enable-AzActivityLogAlert -Name $ruleName -ResourceGroupName $resourceGroupName
-      }
-      else {
-          Disable-AzActivityLogAlert -Name $ruleName -ResourceGroupName $resourceGroupName
-      }
-      
-
-  }
-
-  function Disable-Metric-Alerts {
-      
-      param (
-          [parameter(Mandatory = $True)]
-          [String]$resourceGroupName,
-          
-          [Parameter(Mandatory = $True)]
-          [String]$ruleName
-      )
-
-
-      Update-Metric-Alert $resourceGroupName "asb-pre-centralus-AppEndpointDown" -DisableRule
-      Update-Metric-Alert $resourceGroupName "asb-pre-eastus-AppEndpointDown" -DisableRule
-      Update-Metric-Alert $resourceGroupName "asb-pre-westus-AppEndpointDown" -DisableRule
-
-  }
-  function Enable-Metric-Alerts {
-
-      param (
-          [parameter(Mandatory = $True)]
-          [String]$resourceGroupName,
-          
-          [Parameter(Mandatory = $True)]
-          [String]$ruleName
-      )
-      param (
-          [parameter(Mandatory = $True)]
-          [String]$resourceGroupName,
-          
-          [Parameter(Mandatory = $True)]
-          [String]$ruleName
-      )
-
-      Update-Metric-Alert $resourceGroupName "asb-pre-centralus-AppEndpointDown" -EnableRule
-      Update-Metric-Alert $resourceGroupName "asb-pre-eastus-AppEndpointDown" -EnableRule
-      Update-Metric-Alert $resourceGroupName "asb-pre-westus-AppEndpointDown" -EnableRule
-  }
-
-  function Disable-Log-Alerts {
-      
-      param (
-          [parameter(Mandatory = $True)]
-          [String]$resourceGroupName)
-
-
-      Update-Log-Alert $resourceGroupName "asb-dev-centralus-AppEndpointDown" -DisableRule
-      Update-Log-Alert $resourceGroupName "asb-dev-eastus-AppEndpointDown" -DisableRule
-      Update-Log-Alert $resourceGroupName "asb-dev-westus-AppEndpointDown" -DisableRule
-
-  }
-
-  function Enable-Log-Alerts {
-    param (
-          [parameter(Mandatory = $True)]
-          [String]$resourceGroupName)
-      Update-Log-Alert $resourceGroupName "asb-dev-centralus-AppEndpointDown" -EnableRule
-      Update-Log-Alert $resourceGroupName "asb-dev-eastus-AppEndpointDown" -EnableRule
-      Update-Log-Alert $resourceGroupName "asb-dev-westus-AppEndpointDown" -EnableRule
-  }
-
-  if ($update -eq "Stop") {
-      Stop-Firewall $fw_name $resourceGroupName
-      Disable-Metric-Alerts $resourceGroupName
-      Disable-Log-Alerts $resourceGroupName
-  }
-  elseif ($update -eq "Start") {
-      Restart-Firewall $resourceGroupName $fw_name $vnetName $pip_name1 $pip_name2 $pip_name_default
-      Enable-Metric-Alerts $resourceGroupName
-      Enable-Log-Alerts $resourceGroupName
-  }
-
-  Write-Output "Firewall Status Updated" 
 ```
 
 ### Reference
