@@ -93,6 +93,8 @@ function setDeploymentRegion()
   if [ $dns_list_count != 0 ]; then >&2 echo "DNS Records Already Set With $ASB_SPOKE_LOCATION Spoke Location and $ASB_ENV Environment
   Restart Script With Different Values"; exit 1; fi
 
+  export ASB_ORG_APP_ID_NAME="BU0001G0001"
+
   export ASB_SCRIPT_STEP=checkoutBranch
   # Save environment variables
   ./saveenv.sh -y
