@@ -8,7 +8,7 @@
 function SetSubscription(){
   echo
   echo "Setting ASB_FW_Subscription_Id to $ASB_FW_Subscription_Id..."
-
+  az login --tenant
   az account set --subscription $ASB_FW_Subscription_Id --output none
   
   echo "Completed setting ASB_FW_Subscription_Id to $ASB_FW_Subscription_Id."

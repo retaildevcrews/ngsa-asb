@@ -2,12 +2,6 @@
 
 Azure Firewall has [costs (Azure Firewall pricing link)](https://azure.microsoft.com/en-gb/pricing/details/azure-firewall/#pricing) associated with it which can be optimized by allocating and de-allocating the firewall when appropriate.  Below describes the mechanism to implement an Azure Automation Runbook that will allocate and de-allocate the firewall on a schedule as well as enable and disable the alerts associated with this activity to minimize nonessential systems communications.
 
-## Acronym List
-
-| Term | Acronym | Notes |
-| :---- | :----: | :---- |
-| Commandline Interface | CLI | | 
-|  |  |  |
 ## Prerequisites
 
 Before proceeding verify  the environment is configured correct to execute the commands necessary below
@@ -27,7 +21,57 @@ Before proceeding verify  the environment is configured correct to execute the c
 
 ## Installation Instructions
 
-Once all prerequisites have been installed and updated the following steps will illistrate establishing the environment for enabling and disabling the Azure Firewall.  
+### BASH Variables
+
+The BASH variables are exported into environment variables.  
+
+``` bash
+export ASB_FW_Tenant_Id='' # Tenant Id for the onmicrosoft.com tenant
+export ASB_FW_Subscription_Id='' # Suscription Id for Jofultz-Team
+export ASB_FW_Resource_Group_Name_for_Automation='' # Resource Group that houses all the automation resources.
+export ASB_FW_Resource_Group_Name_with_Firewall='' # Resource Group that houses the firewall to be automated.
+export ASB_FW_Location='' # Location for resource creation
+export ASB_FW_Automation_Account_Name='' # Name for automation account created
+export ASB_FW_Sku='Basic' # Sku for the Automation Account
+export ASB_FW_PowerShell_Runbook_Name='' # Powershell based runbook name.
+export ASB_FW_PowerShell_Runbook_File_Name='' # Powershell based runbook file name.
+export ASB_FW_Identity_Name='' # Managed Identity name.
+export ASB_FW_PowerShell_Runbook_Description=''
+export ASB_FW_PowerShell_Runbook_Output_Folder='.'
+export ASB_FW_Environment=''
+export ASB_FW_Base_Schedule_Name='asb-firewall-automation'
+
+```
+
+### Automated Scripts to Run
+BEFORE continuing please make sure all requirements have been met in the section labeled [prerequisites]("#-prerequisites").
+
+1. [Create Automation Infrastructure (BASH script)]("./scripts/automation/createautimationForFirewallCostOptimization.sh")
+   - The [createAutomationForFirewallCostOptimization.sh]("./scripts/automation/createautimationForFirewallCostOptimization.sh") script "dot sources" the [firewallAutomationForCostOptimization.variables.sh]("./scripts/automation/cfirewallAutomationForCostOptimization.variables.sh").  This file must to be adjusted for the specifics of the execution.  Currently it is not populated save the default for Sku.  See ["BASH Variables for details"]("#-bash-variables").
+
+
+## Detail of What is Happening in the Scripts
+
+Below will detail what is being executed within the script files for further understanding.  This section is informational only.
+
+### 1. Adjsut Variables for Current Values
+
+The file [firewallAutomationForCostOptimization.variables.sh]("./scripts/automation/cfirewallAutomationForCostOptimization.variables.sh") must be adjusted to include relevant values.  
+
+- ASB_FW_Tenant_Id=''
+- ASB_FW_Subscription_Id=''
+- ASB_FW_Resource_Group_Name_for_Automation=''
+- ASB_FW_Resource_Group_Name_with_Firewall=''
+- ASB_FW_Location='' 
+- ASB_FW_Automation_Account_Name=''
+- ASB_FW_Sku='Basic'
+- ASB_FW_PowerShell_Runbook_Name=''
+- ASB_FW_PowerShell_Runbook_File_Name=''
+- ASB_FW_Identity_Name=''
+- ASB_FW_PowerShell_Runbook_Description=''
+- ASB_FW_PowerShell_Runbook_Output_Folder='.'
+- ASB_FW_Environment=''
+- ASB_FW_Base_Schedule_Name='asb-firewall-automation'
 
 ### 1. Set Subscription & Tenant
 
@@ -74,12 +118,16 @@ Follow the steps below to assure the prerequisites are installed and up-to-date 
 
 ```bash
 # check the version of the Azure CLI installed.  
+
 az version
 # if < than 2.4.0 
 echo "Upgrading to latest version of Azure CLI..."
+
 az upgrade --output none 
+
 echo "Completed updating "
 echo "Azure CLI version: $(az --version | grep azure-cli | awk '{print $2}""
+
 ```
 
 ### 6. Azure CLI Extensions
@@ -115,28 +163,28 @@ az config set extension.use_dynamic_install=yes_prompt --output none
 | Parameter Name | Example Value | Rules for Naming |
 | -------------- | :-----------: | ---------------- |
 ||||
-| ASB_FW_TenantId | 72f988bf-86f1-41af-91ab-2d7cd011db47 ||
-| ASB_FW_SubscriptionId | 3b25180b-416b-4b73-92e2-8668f62075d5 |  |
+| ASB_FW_TenantId | 00000000-0000-0000-0000-000000000000 ||
+| ASB_FW_SubscriptionId | 00000000-0000-0000-0000-000000000000 |  |
 | ASB_FW_Sku | Basic |  |
-| ASB_FW_Automation_Resource_Group_Name | rg-trfalls-firewall-automation |  |
-| ASB_FW_Resource_Group_Core | rg-centraus-hub-dev |  |
+| ASB_FW_Automation_Resource_Group_Name | rg-asb-firewall-automation |  |
+| ASB_FW_Resource_Group_Core | rg-ngsa-asb-dev-hub |  |
 | ASB_FW_Location | eastus |  |
-| ASB_FW_Automation_Account_Name | aa-trfalls-automation |  |
-| ASB_FW_PowerShell_Runbook_Name | rb-trfalls-firewall-automation |  |
+| ASB_FW_Automation_Account_Name | aa-asb-firewall-automation |  |
+| ASB_FW_PowerShell_Runbook_Name | rb-asb-firewall-automation |  |
 | ASB_FW_PowerShell_Runbook_File_Name | firewallAutomationForCostOptimization.ps1 |  |
-| ASB_FW_Identity_Name | mi-trfalls-firewall-automation |  |
-| ASB_FW_PowerShell_Runbook_Description | This runbook automates the allocation and de-allocation of a firewall for the purposes of scheduling." # Description for the runbook. |  |
+| ASB_FW_Identity_Name | mi-asb-firewall-automation |  |
+| ASB_FW_PowerShell_Runbook_Description | This runbook automates the allocation and de-allocation of a firewall for the purposes of scheduling." | Description of Runbook |
 | ASB_FW_PowerShell_Runbook_Output_Folder | . |  |
 | ASB_FW_Environment | dev |  |
-| ASB_FW_Base_Schedule_Name_Start | wcnp-fw-start- |  |
-| ASB_FW_Base_Schedule_Name_Stop | wcnp-fw-stop- |  |
+| ASB_FW_Base_Schedule_Name_Start | asb-fw-start- |  |
+| ASB_FW_Base_Schedule_Name_Stop | asb-fw-stop- |  |
 | AssigneeObjectId              | 00000000-0000-0000-0000-000000000000 | [Az Role Assignment Assignee-Object-Id](https://learn.microsoft.com/en-us/cli/azure/role/assignment?view=azure-cli-latest#az-role-assignment-create-optional-parameters)                                                                                                                                                                                                              |
 | vnetName                      |           vnet-cetntral-hub          | Found in the portal.                                                                                                                                                                                                                                                                                                                                                        |
 | firewallName                  |             fw-centralus             | Found in the portal.                                                                                                                                                                                                                                                                                                                                                        |
 | pip_name1                     |          pip-fw-centralus-01         | Found in the portal.                                                                                                                                                                                                                                                                                                                                                        |
 | pip_name2                     |          pip-fw-centralus-02         | Found in the portal.                                                                                                                                                                                                                                                                                                                                                        |
 | pip_name_default              |       pip-fw-centralus-default       | Found in the portal.                                                                                                                                                                                                                                                                                                                                                        |
-| UAMI                          |    mi-ngsa-firewall-automation-dev   | User-Assigned Managed Identity name.
+| UAMI                          |    mi-asb-firewall-automation-dev   | User-Assigned Managed Identity name.
 
 ## Infrastructure & Assets Creation List
 
@@ -253,14 +301,28 @@ echo "Completed uploading Runbook Content from $PowerShellRunbookFileName to $Po
   New-AzAutomationSchedule -AutomationAccountName $Env:AutomationAccountName -Name "$Env:BaseScheduleNameStop$Env:Asb_Environment" -StartTime $StartTime -ExpiryTime $EndTime -DayInterval 1 -ResourceGroupName $Env:AutomationResourceGroupName
 
 ```
-# TODO: prefix environment variables.  
 
 ### Associate Schedule with Runbook
 
 ```powershell
-    Register-AzAutomationScheduledRunbook -AutomationAccountName $Env:AutomationAccountName -RunbookName $Env:PowerShellRunbookName -ScheduleName "$Env:BaseScheduleNameStart$Env:Asb_Environment" -ResourceGroupName $Env:AutomationResourceGroupName -Parameters @{"resourceGroupName"="$Env:AutomationResourceGroupName";"automationAccount"="$Env:AutomationAccountName";"subscriptionName"="$Env:Subscription";"vnetName"="vnet-cetntral-hub";"fw_name"="fw-centralus";"pip_name1"="pip-fw-centralus-01";"pip_name2"="pip-fw-centralus-02";"pip_name_default"="pip-fw-centralus-default";"UAMI"="$Env:IdentityName";"update"="start"}
+Write-Host "Registering an Azure Automation Schedule to a Automation Runbook..."
+  $error.Clear()
 
-    Register-AzAutomationScheduledRunbook -AutomationAccountName $Env:AutomationAccountName -RunbookName $Env:PowerShellRunbookName -ScheduleName "$Env:BaseScheduleNameStop$Env:Asb_Environment" -ResourceGroupName $Env:AutomationResourceGroupName -Parameters @{"resourceGroupName"="$Env:AutomationResourceGroupName";"automationAccount"="$Env:AutomationAccountName";"subscriptionName"="$Env:Subscription";"vnetName"="vnet-cetntral-hub";"fw_name"="fw-centralus";"pip_name1"="pip-fw-centralus-01";"pip_name2"="pip-fw-centralus-02";"pip_name_default"="pip-fw-centralus-default";"UAMI"="$Env:IdentityName";"update"="stop"}
+  $params = @{}
+  $params.Add("resource_Group_Name_with_Firewall", "$Resource_Group_Name_with_Firewall")
+  $params.Add("resource_Group_Name_for_Automation", "$Resource_Group_Name_for_Automation")
+  $params.Add("automation_Account_Name", "$Automation_Account_Name")
+  $params.Add("subscription_Name","$subscription_Name")
+  $params.Add("vnet_Name", "$vnet_Name")
+  $params.Add("firewall_Name", "$firewall_Name")
+  $params.Add("pip_Name1", "$pip_Name_1")
+  $params.Add("pip_Name2", "$pip_Name_2")
+  $params.Add("pip_Name_Default", "$pip_Name_Default")
+  $params.Add("managed_Identity_Name", "$managed_Identity_Name")
+  $params.Add("action", "$action")
+
+  Register-AzAutomationScheduledRunbook -Parameters $params -ResourceGroupName $Resource_Group_Name_for_Automation -AutomationAccountName $Automation_Account_Name -RunbookName $powerShell_Runbook_Name -ScheduleName $schedule_Name
+  Write-Host "Completed registering an Azure Automation Schedule to a Automation Runbook."
 ```
 
 ### Reference
