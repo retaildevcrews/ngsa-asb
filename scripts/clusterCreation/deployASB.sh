@@ -53,7 +53,7 @@ Enter Deployment Name: " ASB_DEPLOYMENT_NAME
 
 function setDeploymentRegion()
 {
-  azure_locations=( "australiaeast" "centralus" "eastus" "eastus2" "japaneast" "northeurope" "southcentralus" "southeastasia" "uksouth" "westeurope" "westus2")
+  azure_locations=( "australiaeast" "centralus" "eastus" "eastus2" "japaneast" "northeurope" "southcentralus" "southeastasia" "uksouth" "westeurope" "westus2" "WestUS3" )
   location_selections=( "${azure_locations[@]##*/}" )
 
   # Hub Location Prompt
@@ -264,7 +264,7 @@ function deployHubAndSpoke()
   ./saveenv.sh -y
 
   # Invoke Next Step In Setup
-  $ASB_SCRIPT_STEP
+  # $ASB_SCRIPT_STEP
 }
 
 function deployAks()
