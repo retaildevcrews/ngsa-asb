@@ -21,7 +21,7 @@ function GetClusterAdminID(){
         done
     fi
 
-    export ASB_CLUSTER_ADMIN_GROUP=4-co
+    export ASB_CLUSTER_ADMIN_GROUP=ADC-ADM
 
     echo "Type Cluster Admin Group Name (Press Enter to accept default of $ASB_CLUSTER_ADMIN_GROUP):"
     read ans
@@ -45,11 +45,11 @@ function CheckSubscriptionAccess(){
     # Check if owner or contributor for subscription
     subscription_id=$(az account show --query id -o tsv)
     userId=$(az ad signed-in-user show --query id -o tsv)
-    userRoleInSubscriptions=$(az role assignment list --assignee $userId --query [].roleDefinitionName -o tsv)
+    groupRoleInSubscriptions=$(az role assignment list --assignee $ASB_CLUSTER_ADMIN_ID --query '[].roleDefinitionName' -o tsv)
     desiredRoles=("Owner" "Contributor")
-    for userRoleInSubscription in ${userRoleInSubscriptions[@]}; do
+    for roleInSubscription in ${groupRoleInSubscriptions[@]}; do
         for desiredRole in ${desiredRoles[@]}; do
-            if [[ $desiredRole == $userRoleInSubscription ]]; then
+            if [[ $desiredRole == $roleInSubscription ]]; then
                 export doesUserHaveDesiredRole=true
             fi
         done
