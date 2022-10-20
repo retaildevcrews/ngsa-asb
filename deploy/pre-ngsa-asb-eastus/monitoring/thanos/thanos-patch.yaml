@@ -8,7 +8,7 @@ spec:
     spec:
       containers:
         - name: thanos-store
-          image: acraks3i2qzkkxofr7c.azurecr.io/thanos/thanos:v0.23.0
+          image: acraksfykg5bqasutle.azurecr.io/thanos/thanos:v0.23.0
 
 ---
 
@@ -19,7 +19,7 @@ metadata:
   namespace: monitoring
 spec:
   hosts:
-  - thanos-store-grpc-eastus-dev.cse.ms
+  - thanos-store-grpc-eastus-pre.cse.ms
 
 ---
 apiVersion: apps/v1
@@ -32,15 +32,16 @@ spec:
     spec:
       containers:
         - name: thanos-query
-          image: acraks3i2qzkkxofr7c.azurecr.io/thanos/thanos:v0.23.0
+          image: acraksfykg5bqasutle.azurecr.io/thanos/thanos:v0.23.0
           args:
             - query
             - --log.level=debug
             - --query.auto-downsampling
             - --query.replica-label=prometheus_replica
-            - --store=thanos-grpc-eastus-dev.cse.ms:443
-            - --store=thanos-store-grpc-eastus-dev.cse.ms:443
-            - --store=thanos-grpc-westus2-dev.cse.ms:443
+            - --store=thanos-grpc-eastus-pre.cse.ms:443
+            - --store=thanos-store-grpc-eastus-pre.cse.ms:443
+            - --store=thanos-grpc-westus2-pre.cse.ms:443
+            - --store=thanos-grpc-centralus-pre.cse.ms:443
             - --grpc-client-tls-secure
             - --grpc-address=0.0.0.0:10901
             - --http-address=0.0.0.0:10902
@@ -57,4 +58,4 @@ spec:
     spec:
       containers:
         - name: thanos-compactor
-          image: acraks3i2qzkkxofr7c.azurecr.io/thanos/thanos:v0.23.0
+          image: acraksfykg5bqasutle.azurecr.io/thanos/thanos:v0.23.0
