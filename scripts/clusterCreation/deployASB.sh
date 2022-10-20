@@ -205,7 +205,7 @@ function createResourceGroups()
   
   echo "Completed Creating Resource Groups."
 
-  export ASB_SCRIPT_STEP=deployHubAndSpoke
+  export ASB_SCRIPT_STEP=deployDefaultHub
   # Save environment variables
   ./saveenv.sh -y
 
@@ -213,11 +213,11 @@ function createResourceGroups()
   $ASB_SCRIPT_STEP
 }
 
-function deployHubAndSpoke()
+function deployDefaultHub()
 {
   start_time=$(date +%s.%3N)
 
-  echo "Deploying Hub and Spoke..."
+  echo "Deploying Default Hub..."
 
   # Create hub network
   az deployment group create \
@@ -227,6 +227,26 @@ function deployHubAndSpoke()
     -c --query name
 
   export ASB_HUB_VNET_ID=$(az deployment group show -g $ASB_RG_HUB -n hub-default --query properties.outputs.hubVnetId.value -o tsv)
+
+  if [ -z $ASB_HUB_VNET_ID ]; then echo "Step deployDefaultHub failed" 1>&2; exit 1; fi
+
+  end_time=$(date +%s.%3N)
+  elapsed=$(echo "scale=3; $end_time - $start_time" | bc)
+  echo "Completed Deploying Default Hub. ($elapsed)"
+
+  export ASB_SCRIPT_STEP=deployDefaultSpoke
+  # Save environment variables
+  ./saveenv.sh -y
+
+  # Invoke Next Step In Setup
+  $ASB_SCRIPT_STEP
+}
+
+function deployDefaultSpoke()
+{
+  start_time=$(date +%s.%3N)
+
+  echo "Deploying Default Spoke..."
 
   # Set spoke ip address prefix
   export ASB_SPOKE_IP_PREFIX="10.240"
@@ -247,6 +267,26 @@ function deployHubAndSpoke()
   # Get nodepools subnet id from spoke
   export ASB_NODEPOOLS_SUBNET_ID=$(az deployment group show -g $ASB_RG_SPOKE -n spoke-$ASB_ORG_APP_ID_NAME --query properties.outputs.nodepoolSubnetResourceIds.value -o tsv)
 
+  if [ -z $ASB_NODEPOOLS_SUBNET_ID ]; then echo "Step deployDefaultSpoke failed" 1>&2; exit 1; fi
+
+  end_time=$(date +%s.%3N)
+  elapsed=$(echo "scale=3; $end_time - $start_time" | bc)
+  echo "Completed Deploying Default Spoke. ($elapsed)"
+
+  export ASB_SCRIPT_STEP=deployHubRegionA
+  # Save environment variables
+  ./saveenv.sh -y
+
+  # Invoke Next Step In Setup
+  $ASB_SCRIPT_STEP
+}
+
+function deployHubRegionA()
+{
+  start_time=$(date +%s.%3N)
+
+  echo "Deploying Hub Region A..."
+
   # Create Region A hub network
   az deployment group create \
     -g $ASB_RG_HUB \
@@ -257,16 +297,18 @@ function deployHubAndSpoke()
   # Get spoke vnet id
   export ASB_SPOKE_VNET_ID=$(az deployment group show -g $ASB_RG_SPOKE -n spoke-$ASB_ORG_APP_ID_NAME --query properties.outputs.clusterVnetResourceId.value -o tsv)
 
+  if [ -z $ASB_SPOKE_VNET_ID ]; then echo "Step deployHubRegionA failed" 1>&2; exit 1; fi
+
   end_time=$(date +%s.%3N)
   elapsed=$(echo "scale=3; $end_time - $start_time" | bc)
-  echo "Completed Deploying Hub and Spoke. ($elapsed)"
+  echo "Completed Deploying Hub Region A. ($elapsed)"
 
   export ASB_SCRIPT_STEP=deployAks
   # Save environment variables
   ./saveenv.sh -y
 
   # Invoke Next Step In Setup
-  # $ASB_SCRIPT_STEP
+  $ASB_SCRIPT_STEP
 }
 
 function deployAks()
@@ -310,12 +352,18 @@ function deployAks()
       targetVnetResourceId=${ASB_SPOKE_VNET_ID} \
       -c --query name
 
+
+  # Get cluster name
+  export ASB_AKS_NAME=$(az deployment group show -g $ASB_RG_CORE -n cluster-${ASB_DEPLOYMENT_NAME}-${ASB_CLUSTER_LOCATION} --query properties.outputs.aksClusterName.value -o tsv)
+
+  if [ -z $ASB_AKS_NAME ]; then echo "Step deployAks failed" 1>&2; exit 1; fi
+
   end_time=$(date +%s.%3N)
   elapsed=$(echo "scale=3; $end_time - $start_time" | bc)
 
   echo "Completed Deploying AKS. ($elapsed)"
 
-  export ASB_SCRIPT_STEP=validateAks
+  export ASB_SCRIPT_STEP=getClusterContext
 
   # Save environment variables
   ./saveenv.sh -y
@@ -324,12 +372,9 @@ function deployAks()
   $ASB_SCRIPT_STEP
 }
 
-function validateAks()
+function getClusterContext()
 {
-  echo "Deploying AKS..."
-
-  # Get cluster name
-  export ASB_AKS_NAME=$(az deployment group show -g $ASB_RG_CORE -n cluster-${ASB_DEPLOYMENT_NAME}-${ASB_CLUSTER_LOCATION} --query properties.outputs.aksClusterName.value -o tsv)
+  echo "Getting Cluster Context..."
 
   # Get AKS credentials
   az aks get-credentials -g $ASB_RG_CORE -n $ASB_AKS_NAME
@@ -344,7 +389,7 @@ function validateAks()
   # Check the pods
   kubectl get pods -A
 
-  echo "Completed Deploying AKS."
+  echo "Completed Getting Cluster Context."
 
   export ASB_SCRIPT_STEP=setAksVariables
   # Save environment variables
