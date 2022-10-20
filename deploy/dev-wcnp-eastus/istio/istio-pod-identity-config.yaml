@@ -5,8 +5,8 @@ metadata:
   namespace: istio-system
 spec:
   type: 0
-  resourceID: 
-  clientID: 
+  resourceID: /subscriptions/5dc45b2f-bf13-4281-b763-a53f57290aa3/resourceGroups/rg-wcnp-dev/providers/Microsoft.ManagedIdentity/userAssignedIdentities/podmi-ingress-controller
+  clientID: 51f32449-99df-4b9b-a8b7-0e347ab19f37
 ---
 apiVersion: aadpodidentity.k8s.io/v1
 kind: AzureIdentityBinding
@@ -27,7 +27,7 @@ spec:
   provider: azure
   parameters:
     usePodIdentity: "true"
-    keyvaultName:  
+    keyvaultName: kv-aks-jxdthrti3j3qu 
     objects:  |
       array:
         - |
