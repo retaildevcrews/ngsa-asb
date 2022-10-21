@@ -3,4 +3,5 @@ kind: Kustomization
 resources:
   - 01-namespace.yaml
   - 03-akv-secrets-store-csi.yaml
+  - 04-aad-pod-identity.yaml
   - 05-kured.yaml
