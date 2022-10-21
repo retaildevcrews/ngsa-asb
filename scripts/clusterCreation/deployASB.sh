@@ -334,9 +334,8 @@ function validateAks()
   # Get AKS credentials
   az aks get-credentials -g $ASB_RG_CORE -n $ASB_AKS_NAME
 
-  # Rename context for simplicity
-  kubectl config rename-context $ASB_AKS_NAME $ASB_DEPLOYMENT_NAME-${ASB_CLUSTER_LOCATION}
-
+  kubelogin convert-kubeconfig -l azurecli
+  
   # Check the nodes
   # Requires Azure login
   kubectl get nodes
@@ -478,6 +477,7 @@ function pushToGit()
   $ASB_SCRIPT_STEP
 }
 
+# TODO: Automate creation of flux-init directory ASB_FLUX_INIT_DIR
 function deployFlux()
 {
   echo "Deploying Flux.."
