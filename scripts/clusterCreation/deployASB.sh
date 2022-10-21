@@ -205,7 +205,7 @@ function createResourceGroups()
   
   echo "Completed Creating Resource Groups."
 
-  export ASB_SCRIPT_STEP=deployDefaultHub
+  export ASB_SCRIPT_STEP=deployHubAndSpoke
   # Save environment variables
   ./saveenv.sh -y
 
@@ -213,11 +213,11 @@ function createResourceGroups()
   $ASB_SCRIPT_STEP
 }
 
-function deployDefaultHub()
+function deployHubAndSpoke()
 {
   start_time=$(date +%s.%3N)
 
-  echo "Deploying Default Hub..."
+  echo "Deploying Hub and Spoke..."
 
   # Create hub network
   az deployment group create \
@@ -227,26 +227,6 @@ function deployDefaultHub()
     -c --query name
 
   export ASB_HUB_VNET_ID=$(az deployment group show -g $ASB_RG_HUB -n hub-default --query properties.outputs.hubVnetId.value -o tsv)
-
-  if [ -z $ASB_HUB_VNET_ID ]; then echo "Step deployDefaultHub failed" 1>&2; exit 1; fi
-
-  end_time=$(date +%s.%3N)
-  elapsed=$(echo "scale=3; $end_time - $start_time" | bc)
-  echo "Completed Deploying Default Hub. ($elapsed)"
-
-  export ASB_SCRIPT_STEP=deployDefaultSpoke
-  # Save environment variables
-  ./saveenv.sh -y
-
-  # Invoke Next Step In Setup
-  $ASB_SCRIPT_STEP
-}
-
-function deployDefaultSpoke()
-{
-  start_time=$(date +%s.%3N)
-
-  echo "Deploying Default Spoke..."
 
   # Set spoke ip address prefix
   export ASB_SPOKE_IP_PREFIX="10.240"
@@ -267,26 +247,6 @@ function deployDefaultSpoke()
   # Get nodepools subnet id from spoke
   export ASB_NODEPOOLS_SUBNET_ID=$(az deployment group show -g $ASB_RG_SPOKE -n spoke-$ASB_ORG_APP_ID_NAME --query properties.outputs.nodepoolSubnetResourceIds.value -o tsv)
 
-  if [ -z $ASB_NODEPOOLS_SUBNET_ID ]; then echo "Step deployDefaultSpoke failed" 1>&2; exit 1; fi
-
-  end_time=$(date +%s.%3N)
-  elapsed=$(echo "scale=3; $end_time - $start_time" | bc)
-  echo "Completed Deploying Default Spoke. ($elapsed)"
-
-  export ASB_SCRIPT_STEP=deployHubRegionA
-  # Save environment variables
-  ./saveenv.sh -y
-
-  # Invoke Next Step In Setup
-  $ASB_SCRIPT_STEP
-}
-
-function deployHubRegionA()
-{
-  start_time=$(date +%s.%3N)
-
-  echo "Deploying Hub Region A..."
-
   # Create Region A hub network
   az deployment group create \
     -g $ASB_RG_HUB \
@@ -297,18 +257,16 @@ function deployHubRegionA()
   # Get spoke vnet id
   export ASB_SPOKE_VNET_ID=$(az deployment group show -g $ASB_RG_SPOKE -n spoke-$ASB_ORG_APP_ID_NAME --query properties.outputs.clusterVnetResourceId.value -o tsv)
 
-  if [ -z $ASB_SPOKE_VNET_ID ]; then echo "Step deployHubRegionA failed" 1>&2; exit 1; fi
-
   end_time=$(date +%s.%3N)
   elapsed=$(echo "scale=3; $end_time - $start_time" | bc)
-  echo "Completed Deploying Hub Region A. ($elapsed)"
+  echo "Completed Deploying Hub and Spoke. ($elapsed)"
 
   export ASB_SCRIPT_STEP=deployAks
   # Save environment variables
   ./saveenv.sh -y
 
   # Invoke Next Step In Setup
-  $ASB_SCRIPT_STEP
+  # $ASB_SCRIPT_STEP
 }
 
 function deployAks()
@@ -352,18 +310,12 @@ function deployAks()
       targetVnetResourceId=${ASB_SPOKE_VNET_ID} \
       -c --query name
 
-
-  # Get cluster name
-  export ASB_AKS_NAME=$(az deployment group show -g $ASB_RG_CORE -n cluster-${ASB_DEPLOYMENT_NAME}-${ASB_CLUSTER_LOCATION} --query properties.outputs.aksClusterName.value -o tsv)
-
-  if [ -z $ASB_AKS_NAME ]; then echo "Step deployAks failed" 1>&2; exit 1; fi
-
   end_time=$(date +%s.%3N)
   elapsed=$(echo "scale=3; $end_time - $start_time" | bc)
 
   echo "Completed Deploying AKS. ($elapsed)"
 
-  export ASB_SCRIPT_STEP=getClusterContext
+  export ASB_SCRIPT_STEP=validateAks
 
   # Save environment variables
   ./saveenv.sh -y
@@ -372,9 +324,12 @@ function deployAks()
   $ASB_SCRIPT_STEP
 }
 
-function getClusterContext()
+function validateAks()
 {
-  echo "Getting Cluster Context..."
+  echo "Deploying AKS..."
+
+  # Get cluster name
+  export ASB_AKS_NAME=$(az deployment group show -g $ASB_RG_CORE -n cluster-${ASB_DEPLOYMENT_NAME}-${ASB_CLUSTER_LOCATION} --query properties.outputs.aksClusterName.value -o tsv)
 
   # Get AKS credentials
   az aks get-credentials -g $ASB_RG_CORE -n $ASB_AKS_NAME
@@ -389,7 +344,7 @@ function getClusterContext()
   # Check the pods
   kubectl get pods -A
 
-  echo "Completed Getting Cluster Context."
+  echo "Completed Deploying AKS."
 
   export ASB_SCRIPT_STEP=setAksVariables
   # Save environment variables
@@ -535,10 +490,10 @@ function deployFlux()
   # Goto the ACR in Azure Portal -> Networking -> Add your client IP -> Save
 
   # Import all Flux images to private ACR
-  grep 'image:' deploy/bootstrap/flux-system/gotk-components.yaml | awk -F'azurecr.io' '{print $2}' | xargs -I_ az acr import --source "ghcr.io_" -n $ASB_ACR_NAME
+  grep 'image:' flux-init/base/gotk-components.yaml | awk '{print $2}' | xargs -I_ az acr import --source "_" -n $ASB_ACR_NAME
 
   # Setup flux base system (replace bootstrap folder with dev-bootstrap for dev env)
-  kubectl create -k deploy/bootstrap/flux-system/
+  kubectl create -k ${ASB_FLUX_INIT_DIR}
   # Note: If flux v2 exists in cluster, use "kubectl apply -k"
   # Note: if "kubectl create/apply -k" fails once (sometimes CRD takes some time to be injected into the API), then simply reapply
 
