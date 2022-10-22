@@ -7,12 +7,13 @@ patches:
   - patch: |
         - op: replace
           path: "/spec/servers/0/hosts"
-          value: 
+          value:
           - "ngsa/ngsa-memory-centralus-pre.cse.ms"
           - "ngsa/ngsa-cosmos-centralus-pre.cse.ms"
           - "ngsa/ngsa-java-centralus-pre.cse.ms"
           - "monitoring/grafana-centralus-pre.cse.ms"
-          - "loderunner/loderunner-centralus-pre.cse.ms"            
+          - "monitoring/thanos-grpc-centralus-pre.cse.ms"
+          - "loderunner/loderunner-centralus-pre.cse.ms"
 
         - op: add
           path: "/spec/servers/0/tls"
@@ -32,11 +33,11 @@ patches:
 
         - op: replace
           path: "/spec/components/ingressGateways/0/k8s/resources/requests/cpu"
-          value: 50m  
+          value: 50m
 
         - op: replace
           path: "/spec/components/ingressGateways/0/k8s/resources/requests/memory"
-          value: 128M  
+          value: 128M
 
         - op: replace
           path: "/spec/components/ingressGateways/0/k8s/service/loadBalancerIP"
@@ -62,7 +63,7 @@ patches:
   - patch: |
         - op: replace
           path: "/spec/parameters/keyvaultName"
-          value: "kv-aks-fykg5bqasutle"   
+          value: "kv-aks-fykg5bqasutle"
     target:
       kind: SecretProviderClass
       name: istio-ingress-tls-secret-csi-akv
