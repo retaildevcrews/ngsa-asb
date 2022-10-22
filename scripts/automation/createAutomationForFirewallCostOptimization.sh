@@ -8,7 +8,7 @@
 function SetSubscription(){
   echo
   echo "Setting ASB_FW_Subscription_Id to $ASB_FW_Subscription_Id..."
-  az login --tenant
+  az login --tenant $ASB_FW_Tenant_Id --output none
   az account set --subscription $ASB_FW_Subscription_Id --output none
   
   echo "Completed setting ASB_FW_Subscription_Id to $ASB_FW_Subscription_Id."
@@ -97,13 +97,38 @@ function CreateUserAssignedManagedIdentity(){
   echo
 }
 
-function AssignUserAssignedManagedIdentity(){
-  export Identity=$(az identity list -o tsv --query "[].{id:id, principalId: principalId} | [? contains(id, $ASB_FW_Identity_Name]".id)
-  export PrincipalId=$(az identity list -o tsv --query "[].{id:id, principalId: principalId} | [? contains(id, $ASB_FW_Identity_Name]".principalId)
-  export RoleName=$(az role definition list -o tsv --query "[].{roleName:roleName} | [? contains(roleName, Network Contributor].roleName")
 
-  echo "Assigning User-Assigned Managed Identity $ASB_FW_Identity_Name to $ASB_FW_Subscription_Id in resource group $ASB_FW_Resource_Group_Name_for_Automation..."
-  az role assignment create --assignee-object-id $PrincipalId --role "Network Contributor" --ASB_FW_Subscription_Id $ASB_FW_Subscription_Id  --output none
+
+# Retries a command on failure.
+# $1 - the max number of attempts
+# $2... - the command to run
+retry() {
+    local -r -i max_attempts="$1"; shift
+    local -r cmd="$@"
+    local -i attempt_num=1
+
+    until $cmd
+    do
+        if (( $attempt_num == $max_attempts ))
+        then
+            echo "Attempt $attempt_num failed and there are no more attempts left!"
+            return 1
+        else
+            echo "Attempt $attempt_num failed! Trying again in $attempt_num seconds..."
+            sleep $(( $attempt_num++ ))
+        fi
+    done
+}
+
+
+function AssignUserAssignedManagedIdentity(){
+  export Identity=$(az identity list --resource-group "${ASB_FW_Resource_Group_Name_for_Automation}" --query "[?name=='$ASB_FW_Identity_Name'].{name:name,principalId:principalId}|[0].principalId" --output tsv)
+
+  echo "Assigning User-Assigned Managed Identity $ASB_FW_Identity_Name to $ASB_FW_Subscription_Id in resource group $ASB_FW_Resource_Group_Name_for_Automation with ID $Identity..."
+
+  az role assignment create --assignee-object-id "${Identity}" --assignee-principal-type 'ServicePrincipal' --role 'Contributor' --subscription "${ASB_FW_Subscription_Id}" --output none
+  az role assignment create --assignee-object-id "${Identity}" --assignee-principal-type 'ServicePrincipal' --role 'Monitoring Contributor' --subscription "${ASB_FW_Subscription_Id}" --output none
+  
   echo "Completed Assigning User-Assigned Managed Identity $ASB_FW_Identity_Name to $ASB_FW_Subscription_Id in resource group $ASB_FW_Resource_Group_Name_for_Automation."
   echo
 }
@@ -151,6 +176,9 @@ function main(){
   CreateAzureAutomationAccount
   CreateAzureAutomationPowerShellRunbook
   CreateUserAssignedManagedIdentity
+  
+  retry 5 AssignUserAssignedManagedIdentity
+  
   UpdateRunbook
   PublishRunbook
   echo "Azure Automation Infrastructure creation script complete."
