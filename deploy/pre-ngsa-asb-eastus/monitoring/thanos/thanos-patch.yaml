@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+    name: thanos-store
+    namespace: monitoring
+spec:
+  template:
+    spec:
+      containers:
+        - name: thanos-store
+          image: acraksfykg5bqasutle.azurecr.io/thanos/thanos:v0.23.0
+
+---
+
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: thanos-store-grpc-vs
+  namespace: monitoring
+spec:
+  hosts:
+  - thanos-store-grpc-eastus-pre.cse.ms
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: thanos-query
+    namespace: monitoring
+spec:
+  template:
+    spec:
+      containers:
+        - name: thanos-query
+          image: acraksfykg5bqasutle.azurecr.io/thanos/thanos:v0.23.0
+          args:
+            - query
+            - --log.level=debug
+            - --query.auto-downsampling
+            - --query.replica-label=prometheus_replica
+            - --store=thanos-grpc-eastus-pre.cse.ms:443
+            - --store=thanos-store-grpc-eastus-pre.cse.ms:443
+            - --store=thanos-grpc-westus2-pre.cse.ms:443
+            - --store=thanos-grpc-centralus-pre.cse.ms:443
+            - --grpc-client-tls-secure
+            - --grpc-address=0.0.0.0:10901
+            - --http-address=0.0.0.0:10902
+            - --query.partial-response
+
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+    name: thanos-compactor
+    namespace: monitoring
+spec:
+  template:
+    spec:
+      containers:
+        - name: thanos-compactor
+          image: acraksfykg5bqasutle.azurecr.io/thanos/thanos:v0.23.0
