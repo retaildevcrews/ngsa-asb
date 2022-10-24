@@ -2,12 +2,14 @@
 
 ## Summary
 
-After deploying your clusters using the AKS Secure Baseline method outlined in this repository, [Azure Front Door](https://azure.microsoft.com/en-us/products/frontdoor/#documentation) can also be used as a global load balancer for your deployed apps. For example, if you have ***ngsa-memory*** deployed on different clusters in different regions, each with a distinct public endpoint, i.e., ***ngsa-memory-eastus-dev.cse.ms*** and ***ngsa-memory-westus2-dev.cse.ms*** you can create a single front end (***ngsa-memory-dev.cse.ms***, perhaps) for both instances using Azure Front Door. The Azure CLI setup instructions to create and deploy Azure Front Door as a global load balancer are included below. In summary, we
+After deploying your clusters using the AKS Secure Baseline method outlined in this repository, [Azure Front Door](https://azure.microsoft.com/en-us/products/frontdoor/#documentation) can also be used as a global load balancer for your deployed apps. For example, if you have ***ngsa-memory*** deployed on different clusters in different regions, each with a distinct public endpoint, i.e., ***ngsa-memory-eastus-dev.cse.ms*** and ***ngsa-memory-westus2-dev.cse.ms*** you can create a single front end (***ngsa-memory-dev.cse.ms***, perhaps) for both instances using Azure Front Door. The Azure CLI setup instructions to create and deploy Azure Front Door as a global load balancer are included below, using ngsa-memory as an example. In summary, we
 
 - create and configure the Azure Front Door resource
 - create a front end endpoint
 - create a backend pool and add all backend addresses to it
 - create a routing rule to connect the front end endpoint to the backend pool
+
+Steps 2, 4, 5 and 6 shown below will need to be repeated for every additional application (e.g., loderunner, ngsa-java, ngsa-cosmos) we want to set up with a global front end endpoint through Front Door.
 
 ## Step 1: Create the Azure Front Door resource
 
