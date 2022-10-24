@@ -141,13 +141,12 @@ function CreateAzureAutomationAccount(){
 function CreateAzureAutomationPowerShellRunbook(){
   # Arguments: 
     # parameter position 1 = rubbook Name
-    # parameter position 2 = runbook Description
-    # parameter position 3 = Automation Resource Group
-    # parameter position 4 = Automation Account Name
+    # parameter position 2 = Automation Resource Group
+    # parameter position 3 = Automation Account Name
 
-      echo "Creating PowerShell Runbook $1 in $3 for $4..."
+      echo "Creating PowerShell Runbook $1 in $2 for $3..."
 
-      pwsh -command "Install-Module -Name Az.Automation; New-AzAutomationRunbook -Type 'PowerSHell' -AutomationAccountName "${4}" -Name "${1}" -ResourceGroupName "${3}";"
+      pwsh -command "Install-Module -Name Az.Automation; New-AzAutomationRunbook -Type 'PowerShell' -AutomationAccountName "${3}" -Name "${1}" -ResourceGroupName "${2}";"
 
       echo "Completed creating PowerShell Runbook $1 in $3 for $4."
   
@@ -278,7 +277,7 @@ function main(){
 
   CreateAzureAutomationAccount $automationAccountName $automationResourceGroup $ASB_FW_Location $ASB_FW_Sku
 
-  CreateAzureAutomationPowerShellRunbook $runbookName $runbookDescription $automationResourceGroup $automationAccountName
+  CreateAzureAutomationPowerShellRunbook $runbookName $automationResourceGroup $automationAccountName
 
   UpdateAzureAutomationAccountToAllowSystemAssignedIdentity $automationAccountName $automationResourceGroup $subscriptionId $ASB_FW_Tenant_Id $userAssignedManagedIdentityName $automationAccountPrincipalId
 
