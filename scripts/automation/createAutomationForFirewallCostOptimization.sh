@@ -122,7 +122,7 @@ function CreateAzureAutomationAccount(){
   echo
   echo "Creating Azure Automation Account $1 in Resource Group $2..."
   
-  if [[ $(az automation account list --resource-group $2 --query "[?name=='$1'] | length(@)") > 0 ]]; then
+  if [[ $(az automation account list --resource-group $2 --query "[?name=='$1']") ]]; then
   
       echo "$1 exists, please review, and choose a different name if appropriate."
       exit;
@@ -130,9 +130,9 @@ function CreateAzureAutomationAccount(){
   else
     echo "Creating Azure Automation Account $1..."
      
-    az automation account create --automation-account-name $1 --location $3 --sku $4 --resource-group $2 --output none
+    $(az automation account create --automation-account-name "${1}" --location "${3}" --sku "${4}" --resource-group "${2}" --output none)
           
-    echo "Complated creating Azure Automation Account $1."
+    echo "Completed creating Azure Automation Account $1."
   fi
 
   echo "Completed creating Azure Automation Account $1 in Resource Group $2."
@@ -146,17 +146,12 @@ function CreateAzureAutomationPowerShellRunbook(){
     # parameter position 3 = Automation Resource Group
     # parameter position 4 = Automation Account Name
 
- echo
-  if [[ $(az automation runbook list --automation-account-name "${4}" --resource-group "${3}" --query "[?name=='${1}']") ]]; then
-      
-      echo "Runbook $1 exists, please review, and choose a different name if appropriate."
-  else
       echo "Creating PowerShell Runbook $1 in $3 for $4..."
 
-      $(az automation runbook create --automation-account-name "${4}" --resource-group "${3}" --name "${1}" --type "PowerShell" --output none)
+      pwsh -command "Install-Module -Name Az.Automation; New-AzAutomationRunbook -Type 'PowerSHell' -AutomationAccountName "${4}" -Name "${1}" -ResourceGroupName "${3}";"
 
       echo "Completed creating PowerShell Runbook $1 in $3 for $4."
-  fi
+  
   echo
 }
 
@@ -168,7 +163,7 @@ function CreateUserAssignedManagedIdentity(){
   echo
   echo "Creating User-Assigned Managed Identity $1 in resource group $2..."
 
-  $(az identity create --resource-group "${2}" --name "${1}" --output none_
+  $(az identity create --resource-group "${2}" --name "${1}" --output none)
 
   echo "Completed created User-Assigned Managed Identity $1 in resource group $2."
   echo
