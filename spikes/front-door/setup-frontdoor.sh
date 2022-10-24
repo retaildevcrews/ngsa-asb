@@ -129,6 +129,15 @@ az network front-door routing-rule create   --resource-group $ASB_FD_RG_NAME \
                                             --forwarding-protocol "HttpsOnly" \
                                             --disabled false
 
+# add http to https routing rule
+az network front-door routing-rule create   --resource-group $ASB_FD_RG_NAME \
+                                            --front-door-name $ASB_FD_NAME \
+                                            --name ${ASB_FD_BACK_ROUTING_RULE_NAME}-http-to-https \
+                                            --frontend-endpoints $ASB_FD_FRONT_END_NAME \
+                                            --route-type "Redirect" \
+                                            --redirect-type "Found" \
+                                            --redirect-protocol "HttpsOnly" \
+                                            --disabled false
 
 
 # delete default backend pool and routing rule: AT END
