@@ -38,6 +38,41 @@ Param (
     [String]$Environment
 )
 
+
+[String]$Tenant_Id,
+[String]$Subscription_Name,
+
+[String]$ASB_FW_Base_NSGA_Name,
+[String]$ASB_FW_Base_Automation_System_Name,
+[String]$ASB_FW_Environment,
+[String]$ASB_FW_Location,
+[String]$ASB_FW_PowerShell_Runbook_File_Name,
+[String]$ASB_FW_Sku,
+[String]$PowerShell_Runbook_Name,
+[String]$ASB_FW_PowerShell_Runbook_Description,
+
+
+[String]$Vnet_Name,
+[String]$Firewall_Name,
+[String]$PIP_Name1,
+[String]$PIP_Name2,
+[String]$PIP_Name_Default,
+[String]$Managed_Identity_Name,
+[String]$Base_Schedule_Name,
+[String]$Environment
+
+
+# export ASB_FW_Tenant_Id='72f988bf-86f1-41af-91ab-2d7cd011db47' # Tenant Id for the onmicrosoft.com tenant
+# export ASB_FW_Subscription_Name='jofultz-wcnp' # Suscription Id for Jofultz-Team
+# export ASB_FW_Base_NSGA_Name='rg-ngsa-asb'
+# export ASB_FW_Base_Automation_System_Name='asb-firewall-automation'
+# export ASB_FW_Environment='dev'
+# export ASB_FW_PowerShell_Runbook_File_Name='firewallAutomationForCostOptimization.Runbook.ps1' # Powershell based runbook file name.
+# export ASB_FW_Sku='Basic' # Sku for the Automation Account
+# export ASB_FW_Location='westus' # Location for resource creation
+# export ASB_FW_PowerShell_Runbook_Description='This runbook automates the allocation and de-allocation of a firewall for the purposes of scheduling.' # Description for the runbook.
+
+
 $stop_Time = (Get-Date "21:00:00").AddHours(+4).AddDays(1)
 $start_Time = (Get-Date "06:00:00").AddHours(+4).AddDays(1)
 $end_Time = (Get-Date $start_Time).AddYears(3)
@@ -185,10 +220,7 @@ New-Schedule -Automation_Account_Name $Automation_Account_Name -Resource_Group_N
 Edit-ScheduleAndRunbook -Resource_Group_Name_with_Firewall $Resource_Group_Name_with_Firewall -Resource_Group_Name_for_Automation $Resource_Group_Name_for_Automation -resource_Group_Name_with_Alerts $resource_Group_Name_For_Alerts -tenant_Id $Tenant_Id -schedule_Name $start_Action_Name -powerShell_Runbook_Name $PowerShell_Runbook_Name -Automation_Account_Name $Automation_Account_Name -subscription_Id $Subscription_Id -subscription_Name $Subscription_Name -vnet_Name $Vnet_Name -firewall_Name $Firewall_Name -pip_Name_1 $PIP_Name1 -pip_Name_2 $PIP_Name2 -pip_Name_Default $PIP_Name_Default -managed_Identity_Name $Managed_Identity_Name -action "start"
 Edit-ScheduleAndRunbook -Resource_Group_Name_with_Firewall $Resource_Group_Name_with_Firewall -Resource_Group_Name_for_Automation $Resource_Group_Name_for_Automation -resource_Group_Name_with_Alerts $resource_Group_Name_For_Alerts -tenant_Id $Tenant_Id -schedule_Name $stop_Action_Name -powerShell_Runbook_Name $PowerShell_Runbook_Name -Automation_Account_Name $Automation_Account_Name -subscription_Id $Subscription_Id -subscription_Name $Subscription_Name -vnet_Name $Vnet_Name -firewall_Name $Firewall_Name -pip_Name_1 $PIP_Name1 -pip_Name_2 $PIP_Name2 -pip_Name_Default $PIP_Name_Default -managed_Identity_Name $Managed_Identity_Name -action "stop"
 
-#Broken call issues an error of 'Long running operation failed with status 'BadRequest'.
-#manual publish step needed.  
-# Publish-AzAutomationRunbook -AutomationAccountName $Automation_Account_Name  -Name $PowerShell_Runbook_Name -ResourceGroupName $Resource_Group_Name_for_Automation
-
+#Publish-AzAutomationRunbook -AutomationAccountName $Automation_Account_Name  -Name $PowerShell_Runbook_Name -ResourceGroupName $Resource_Group_Name_for_Automation
 
 # Disable the schedule after creation
 Set-AzAutomationSchedule -AutomationAccountName $Automation_Account_Name -Name $start_Action_Name -IsEnabled $false -ResourceGroupName $Resource_Group_Name_for_Automation

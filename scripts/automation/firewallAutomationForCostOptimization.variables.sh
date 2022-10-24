@@ -1,14 +1,21 @@
 export ASB_FW_Tenant_Id='72f988bf-86f1-41af-91ab-2d7cd011db47' # Tenant Id for the onmicrosoft.com tenant
-export ASB_FW_Subscription_Id='648dcb5a-de1e-48b2-af6b-fe6ef28d355c' # Suscription Id for Jofultz-Team
-export ASB_FW_Resource_Group_Name_for_Automation='rg-asb-firewall-automation' # Resource Group that houses all the automation resources.
-export ASB_FW_Resource_Group_Name_with_Firewall='rg-ngsa-asb-dev-hub' # Resource Group that houses the firewall to be automated.
-export ASB_FW_Location='westus' # Location for resource creation
-export ASB_FW_Automation_Account_Name='aa-asb-firewall-automation' # Name for automation account created
-export ASB_FW_Sku='Basic' # Sku for the Automation Account
-export ASB_FW_PowerShell_Runbook_Name='rb-asb-firewall-automation' # Powershell based runbook name.
-export ASB_FW_PowerShell_Runbook_File_Name='firewallAutomationForCostOptimization.Runbook.ps1' # Powershell based runbook file name.
-export ASB_FW_Identity_Name='mi-asb-firewall-automation' # Managed Identity name.
-export ASB_FW_PowerShell_Runbook_Description='This runbook automates the allocation and de-allocation of a firewall for the purposes of scheduling.' # Description for the runbook.
-export ASB_FW_PowerShell_Runbook_Output_Folder='.'
+export ASB_FW_Subscription_Name='jofultz-wcnp' # Suscription Id for Jofultz-Team
+export ASB_FW_Base_NSGA_Name='ngsa-asb'
+export ASB_FW_Base_Automation_System_Name='firewall-automation'
 export ASB_FW_Environment='dev'
-export ASB_FW_Base_Schedule_Name='asb-firewall'
+export ASB_FW_PowerShell_Runbook_File_Name='firewallAutomationForCostOptimization.Runbook.ps1' # Powershell based runbook file name.
+export ASB_FW_Sku='Basic' # Sku for the Automation Account
+export ASB_FW_Location='westus' # Location for resource creation
+export ASB_FW_PowerShell_Runbook_Description='This runbook automates the allocation and de-allocation of a firewall for the purposes of scheduling.' # Description for the runbook.
+
+echo
+echo "-------------------------------------------------------------------"
+echo "         Environment Variables for ASB Firewall Automation         "
+echo "-------------------------------------------------------------------"
+echo
+env | grep ^ASB_FW_ | while read kv; do echo "${kv}"; done
+echo
+echo "-------------------------------------------------------------------"
+echo "         Environment Variables for ASB Firewall Automation         "
+echo "-------------------------------------------------------------------"
+echo
