@@ -2,7 +2,7 @@
 
 ## Summary
 
-After deploying your clusters using the AKS Secure Baseline method outlined in this repository, [Azure Front Door](https://azure.microsoft.com/en-us/products/frontdoor/#documentation) can also be used as a global load balancer for your deployed apps. For example, if you have ***ngsa-memory*** deployed on different clusters in different regions, each with a distinct public endpoint, i.e., ***ngsa-memory-eastus-dev.cse.ms*** and ***ngsa-memory-westus2-dev.cse.ms*** you can create a single front end (***ngsa-memory-dev***, perhaps) for both instances using Azure Front Door. The Azure CLI setup instructions to create and deploy Azure Front Door as a global load balancer are included below. In summary, we
+After deploying your clusters using the AKS Secure Baseline method outlined in this repository, [Azure Front Door](https://azure.microsoft.com/en-us/products/frontdoor/#documentation) can also be used as a global load balancer for your deployed apps. For example, if you have ***ngsa-memory*** deployed on different clusters in different regions, each with a distinct public endpoint, i.e., ***ngsa-memory-eastus-dev.cse.ms*** and ***ngsa-memory-westus2-dev.cse.ms*** you can create a single front end (***ngsa-memory-dev.cse.ms***, perhaps) for both instances using Azure Front Door. The Azure CLI setup instructions to create and deploy Azure Front Door as a global load balancer are included below. In summary, we
 
 - create and configure the Azure Front Door resource
 - create a front end endpoint
@@ -12,7 +12,7 @@ After deploying your clusters using the AKS Secure Baseline method outlined in t
 ## Step 1: Create the Azure Front Door resource
 
 ```bash
-# create resource group for front door
+# create resource group for Front Door
 export ASB_ENV=dev
 export ASB_FD_ROOT_NAME=ngsa
 export ASB_FD_NAME=${ASB_FD_ROOT_NAME}-${ASB_ENV}
@@ -36,8 +36,10 @@ az network front-door create \
 
 ## Step 2: Create DNS record set
 
+The Azure Front Door URL is automatically generated when the Front Door resource is created. It can be seen on the Azure Front Door resource's overview page in the Azure portal. The record set name is the URL name we want to assign to our global front end. Both of these values will be needed to create the CNAME DNS record set for our global front end endpoint.
+
 ```bash
-# create CNAME record aliased to Azure front door URL
+# create CNAME record aliased to Azure Front Door URL
 export ASB_CNAME_RECORD_SET_NAME=${ASB_FD_ROOT_NAME}-${ASB_NGSA_APP}-${ASB_ENV}
 export ASB_CNAME=${ASB_FD_NAME}.azurefd.net
 az network dns record-set cname create --name $ASB_CNAME_RECORD_SET_NAME
@@ -50,7 +52,9 @@ az network dns record-set cname set-record --cname $ASB_CNAME
                                            --zone-name $ASB_DNS_ZONE
 ```
 
-## Step 3: Create WAF policy and associate it with front door
+## Step 3: Create WAF policy and associate it with Front Door
+
+We can create a web access firewall (WAF) policy and assign it to our Front Door resource. Any of several managed rule sets can also be added to the WAF policy. In this example, the default rule set is applied. To see the available managed rule sets, use the Azure CLI command `az network front-door waf-policy managed-rule-definition list`. To see managed rule sets already added to the WAF policy, use the Azure CLI command `az network front-door waf-policy managed-rules list --policy-name [policyName] --resource-group [frontDoorResourceGroup]`.
 
 ```bash
 # create WAF policy - Policy name rules: [a-z,A-Z]
@@ -77,7 +81,7 @@ az network front-door update \
     --set frontendEndpoints[0].webApplicationFirewallPolicyLink='{"id":"'${ASB_FD_WAF_POLICY_ID}'"}'
 ```
 
-## Step 4: Create front end
+## Step 4: Create front end endpoint
 
 ```bash
 # add front end
@@ -89,6 +93,7 @@ az network front-door frontend-endpoint create --front-door-name $ASB_FD_NAME \
                                                --resource-group $ASB_FD_RG_NAME \
                                                --waf-policy $ASB_FD_WAF_POLICY_ID
 
+# enable https
 az network front-door frontend-endpoint enable-https --front-door-name $ASB_FD_NAME \
                                                      --name $ASB_FD_FRONT_END_NAME \
                                                      --resource-group $ASB_FD_RG_NAME
@@ -96,11 +101,14 @@ az network front-door frontend-endpoint enable-https --front-door-name $ASB_FD_N
 
 ## Step 5: Create back end pool
 
+Create the pool of backend endpoints and set up a health probe and weight-based load balancing for them.
+
 ```bash
 # add backend pool
 export ASB_FD_PROBE_NAME=probe-${ASB_FD_FRONT_END_NAME}
 export ASB_FD_LB_NAME=lb-${ASB_FD_FRONT_END_NAME}
 export ASB_FD_BACK_END_POOL_NAME=backend-${ASB_FD_FRONT_END_NAME}
+
 # - health probe
 az network front-door probe create  --resource-group $ASB_FD_RG_NAME \
                                     --front-door-name $ASB_FD_NAME \
@@ -110,6 +118,7 @@ az network front-door probe create  --resource-group $ASB_FD_RG_NAME \
                                     --probeMethod GET \
                                     --protocol https \
                                     --enabled Enabled
+
 # - load balancer
 az network front-door load-balancing create --resource-group $ASB_FD_RG_NAME \
                                     --front-door-name $ASB_FD_NAME \
@@ -131,7 +140,7 @@ az network front-door backend-pool create   --resource-group $ASB_FD_RG_NAME \
                                             --weight 50 \
                                             --disabled false
 
-# - (OPTIONAL) add additional backends to backend pool
+# - (OPTIONAL) add additional backend addresses to backend pool
 # - Repeat with updated address for as many back ends need to be connected to the new front end endpoint
 export ASB_FD_LOCATION2=westus2
 export ASB_FD_BACKEND_ADDRESS2=${ASB_FD_ROOT_NAME}-${ASB_NGSA_APP}-${ASB_FD_LOCATION2}-${ASB_ENV}.${ASB_DNS_ZONE}
@@ -146,7 +155,7 @@ az network front-door backend-pool backend add --resource-group $ASB_FD_RG_NAME 
                                             --disabled false
 ```
 
-## Step 6: Create routing rule to link front end endoint to backend pool
+## Step 6: Create routing rule to link front end endpoint to backend pool
 
 ```bash
 # add routing rule
@@ -174,7 +183,7 @@ az network front-door routing-rule create   --resource-group $ASB_FD_RG_NAME \
 
 ## Step 7: Delete default routing rules and backend pools
 
-The front door resource requires at least one routing rule and one backend pool. A default instance of each is created when the front door resource is created. These can be deleted after our custom routing rule(s) and backend pool(s) have been created.
+The Front Door resource requires at least one routing rule and one backend pool. A default instance of each is therefore created when the Front Door resource is created. These can be deleted after our custom routing rule(s) and backend pool(s) have been created.
 
 ```bash
 # delete default backend pool and routing rule: 
