@@ -7,11 +7,13 @@ patches:
   - patch: |
         - op: replace
           path: "/spec/servers/0/hosts"
-          value: 
+          value:
             - "ngsa/ngsa-memory-eastus-dev.cse.ms"
             - "ngsa/ngsa-cosmos-eastus-dev.cse.ms"
             - "ngsa/ngsa-java-eastus-dev.cse.ms"
             - "monitoring/grafana-eastus-dev.cse.ms"
+            - "monitoring/thanos-grpc-eastus-dev.cse.ms"
+            - "monitoring/thanos-store-grpc-eastus-dev.cse.ms"
             - "loderunner/loderunner-eastus-dev.cse.ms"
             - "harbor/harbor-core-eastus-dev.cse.ms"
 
@@ -33,11 +35,11 @@ patches:
 
         - op: replace
           path: "/spec/components/ingressGateways/0/k8s/resources/requests/cpu"
-          value: 500m  
+          value: 500m
 
         - op: replace
           path: "/spec/components/ingressGateways/0/k8s/resources/requests/memory"
-          value: 256M  
+          value: 256M
 
         - op: replace
           path: "/spec/components/ingressGateways/0/k8s/service/loadBalancerIP"
@@ -45,7 +47,7 @@ patches:
 
         - op: add
           path: "/spec/meshConfig"
-          value: 
+          value:
             accessLogEncoding: JSON
             accessLogFile: "/dev/stdout"
             accessLogFormat: |
@@ -98,7 +100,7 @@ patches:
   - patch: |
         - op: replace
           path: "/spec/parameters/keyvaultName"
-          value: "kv-aks-3i2qzkkxofr7c"   
+          value: "kv-aks-3i2qzkkxofr7c"
     target:
       kind: SecretProviderClass
       name: istio-ingress-tls-secret-csi-akv

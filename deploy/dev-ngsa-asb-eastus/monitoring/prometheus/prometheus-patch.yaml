@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prometheus-deployment
+  namespace: monitoring
+spec:
+  template:
+    spec:
+      containers:
+      - name: prometheus
+        image: acraks3i2qzkkxofr7c.azurecr.io/prom/prometheus:v2.30.0
+        env:
+          - name: PROM_EXT_LABEL_CLUSTER
+            value: aks-3i2qzkkxofr7c-eastus
+      - name: thanos
+        image: acraks3i2qzkkxofr7c.azurecr.io/thanos/thanos:v0.23.0
+
+---
+
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: thanos-grpc-vs
+  namespace: monitoring
+spec:
+  hosts:
+  - thanos-grpc-eastus-dev.cse.ms
