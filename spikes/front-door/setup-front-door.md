@@ -14,7 +14,7 @@ After deploying your clusters using the AKS Secure Baseline method outlined in t
 ```bash
 # create resource group for front door
 export ASB_ENV=dev
-export ASB_FD_ROOT_NAME=fdauto-ngsa
+export ASB_FD_ROOT_NAME=ngsa
 export ASB_FD_NAME=${ASB_FD_ROOT_NAME}-${ASB_ENV}
 export ASB_FD_RG_NAME=rg-front-door-${ASB_FD_NAME}
 export ASB_FD_LOCATION=centralus
@@ -53,8 +53,9 @@ az network dns record-set cname set-record --cname $ASB_CNAME
 ## Step 3: Create WAF policy and associate it with front door
 
 ```bash
-# create WAF policy
-export ASB_FD_WAF_POLICY_NAME=fdautoFrontDoorWAFPolicy
+# create WAF policy - Policy name rules: [a-z,A-Z]
+export ASB_FD_WAF_POLICY_NAME=myFrontDoorWAFPolicy
+
 az network front-door waf-policy create \
     --name $ASB_FD_WAF_POLICY_NAME \
     --resource-group $ASB_FD_RG_NAME  \
@@ -158,6 +159,16 @@ az network front-door routing-rule create   --resource-group $ASB_FD_RG_NAME \
                                             --route-type "Forward" \
                                             --accepted-protocols "Https" \
                                             --forwarding-protocol "HttpsOnly" \
+                                            --disabled false
+
+# add http to https routing rule
+az network front-door routing-rule create   --resource-group $ASB_FD_RG_NAME \
+                                            --front-door-name $ASB_FD_NAME \
+                                            --name ${ASB_FD_BACK_ROUTING_RULE_NAME}-http-to-https \
+                                            --frontend-endpoints $ASB_FD_FRONT_END_NAME \
+                                            --route-type "Redirect" \
+                                            --redirect-type "Found" \
+                                            --redirect-protocol "HttpsOnly" \
                                             --disabled false
 ```
 
