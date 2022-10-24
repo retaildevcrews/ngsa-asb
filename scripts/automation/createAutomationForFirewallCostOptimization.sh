@@ -122,11 +122,10 @@ function CreateAzureAutomationAccount(){
   echo
   echo "Creating Azure Automation Account $1 in Resource Group $2..."
   
-  if [[ $(az automation account list --resource-group $2 --query "[?name=='$1']") ]]; then
+  if [[ $(az automation account list --resource-group "${2}" --query "[?name=='${1}'] | length(@)") > 0 ]]; then
   
       echo "$1 exists, please review, and choose a different name if appropriate."
       exit;
-
   else
     echo "Creating Azure Automation Account $1..."
      
