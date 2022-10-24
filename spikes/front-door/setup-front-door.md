@@ -141,7 +141,7 @@ az network front-door backend-pool create   --resource-group $ASB_FD_RG_NAME \
                                             --disabled false
 
 # - (OPTIONAL) add additional backend addresses to backend pool
-# - Repeat with updated address for as many back ends need to be connected to the new front end endpoint
+# - Repeat with updated address for as many back ends as you need to connect to the new front end endpoint
 export ASB_FD_LOCATION2=westus2
 export ASB_FD_BACKEND_ADDRESS2=${ASB_FD_ROOT_NAME}-${ASB_NGSA_APP}-${ASB_FD_LOCATION2}-${ASB_ENV}.${ASB_DNS_ZONE}
 az network front-door backend-pool backend add --resource-group $ASB_FD_RG_NAME \
