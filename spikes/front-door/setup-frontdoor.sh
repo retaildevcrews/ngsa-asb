@@ -55,7 +55,12 @@ az network front-door update \
     --name $ASB_FD_NAME \
     --resource-group $ASB_FD_RG_NAME \
     --set frontendEndpoints[0].webApplicationFirewallPolicyLink='{"id":"'${ASB_FD_WAF_POLICY_ID}'"}'
-
+    
+# Note: If you are running these commands in Ubuntu, the command above should be updated to:
+# az network front-door update \
+#     --name $ASB_FD_NAME \
+#     --resource-group $ASB_FD_RG_NAME \
+#     --set frontendEndpoints[0].webApplicationFirewallPolicyLink='{"id":"'${ASB_FD_WAF_POLICY_ID}'"}'
 
 # add front end
 export ASB_FD_FRONT_END_NAME=$ASB_CNAME_RECORD_SET_NAME
