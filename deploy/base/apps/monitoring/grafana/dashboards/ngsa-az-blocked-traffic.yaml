@@ -110,7 +110,7 @@ data:
                   },
                   "queryType": "Azure Log Analytics",
                   "refId": "A",
-                  "subscription": "648dcb5a-de1e-48b2-af6b-fe6ef28d355c"
+                  "subscription": "5dc45b2f-bf13-4281-b763-a53f57290aa3"
                 }
               ],
               "timeFrom": null,
@@ -195,7 +195,7 @@ data:
                   },
                   "queryType": "Azure Log Analytics",
                   "refId": "A",
-                  "subscription": "648dcb5a-de1e-48b2-af6b-fe6ef28d355c"
+                  "subscription": "5dc45b2f-bf13-4281-b763-a53f57290aa3"
                 }
               ],
               "thresholds": [],
@@ -321,7 +321,7 @@ data:
                   },
                   "queryType": "Azure Log Analytics",
                   "refId": "A",
-                  "subscription": "648dcb5a-de1e-48b2-af6b-fe6ef28d355c"
+                  "subscription": "5dc45b2f-bf13-4281-b763-a53f57290aa3"
                 }
               ],
               "timeFrom": null,
@@ -406,7 +406,7 @@ data:
                   },
                   "queryType": "Azure Log Analytics",
                   "refId": "A",
-                  "subscription": "648dcb5a-de1e-48b2-af6b-fe6ef28d355c"
+                  "subscription": "5dc45b2f-bf13-4281-b763-a53f57290aa3"
                 }
               ],
               "thresholds": [],
@@ -532,7 +532,7 @@ data:
                   },
                   "queryType": "Azure Log Analytics",
                   "refId": "A",
-                  "subscription": "648dcb5a-de1e-48b2-af6b-fe6ef28d355c"
+                  "subscription": "5dc45b2f-bf13-4281-b763-a53f57290aa3"
                 }
               ],
               "timeFrom": null,
@@ -617,7 +617,7 @@ data:
                   },
                   "queryType": "Azure Log Analytics",
                   "refId": "A",
-                  "subscription": "648dcb5a-de1e-48b2-af6b-fe6ef28d355c"
+                  "subscription": "5dc45b2f-bf13-4281-b763-a53f57290aa3"
                 }
               ],
               "thresholds": [],
@@ -722,7 +722,7 @@ data:
                   "azureLogAnalytics": {
                     "query": "AzureDiagnostics\r\n| where $__timeFilter(TimeGenerated)\n  and Category == \"ApplicationGatewayFirewallLog\"\r\n  and ResourceProvider == \"MICROSOFT.NETWORK\"\r\n  and action_s == \"Blocked\"\r\n| summarize count() by Resource, hostname_s, requestUri_s, Message\n| project count_, Resource, hostname_s, requestUri_s, Message",
                     "resultFormat": "table",
-                    "workspace": "128a9fb0-cbb6-4730-8a8b-1c540b62315c"
+                    "workspace": "369b22b4-74d1-4d51-aa0d-5aff2e25fed8"
                   },
                   "azureMonitor": {
                     "aggOptions": [],
@@ -743,7 +743,7 @@ data:
                   },
                   "queryType": "Azure Log Analytics",
                   "refId": "A",
-                  "subscription": "648dcb5a-de1e-48b2-af6b-fe6ef28d355c"
+                  "subscription": "5dc45b2f-bf13-4281-b763-a53f57290aa3"
                 }
               ],
               "timeFrom": null,
@@ -807,7 +807,7 @@ data:
                   "azureLogAnalytics": {
                     "query": "AzureDiagnostics\r\n| where $__timeFilter(TimeGenerated)\n  and Category == \"ApplicationGatewayFirewallLog\"\r\n  and ResourceProvider == \"MICROSOFT.NETWORK\"\r\n  and action_s == \"Blocked\"\n| summarize count() by bin_at(TimeGenerated, $__interval, datetime(00:00))\n| order by TimeGenerated asc\r\n",
                     "resultFormat": "time_series",
-                    "workspace": "128a9fb0-cbb6-4730-8a8b-1c540b62315c"
+                    "workspace": "369b22b4-74d1-4d51-aa0d-5aff2e25fed8"
                   },
                   "azureMonitor": {
                     "aggOptions": [],
@@ -828,7 +828,7 @@ data:
                   },
                   "queryType": "Azure Log Analytics",
                   "refId": "A",
-                  "subscription": "648dcb5a-de1e-48b2-af6b-fe6ef28d355c"
+                  "subscription": "5dc45b2f-bf13-4281-b763-a53f57290aa3"
                 }
               ],
               "thresholds": [],

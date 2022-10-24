@@ -38,4 +38,4 @@ spec:
           objectName: appgw-ingress-internal-aks-ingress-key
           objectAlias: tls.key
           objectType: secret
-    tenantId: 72f988bf-86f1-41af-91ab-2d7cd011db47
+    tenantId: 16b3c013-d300-468d-ac64-7eda0820b6d3

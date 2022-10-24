@@ -8,7 +8,7 @@ spec:
     spec:
       containers:
         - name: thanos-store
-          image: acraks3i2qzkkxofr7c.azurecr.io/thanos/thanos:v0.23.0
+          image: acraksjxdthrti3j3qu.azurecr.io/thanos/thanos:v0.23.0
 
 ---
 
@@ -32,7 +32,7 @@ spec:
     spec:
       containers:
         - name: thanos-query
-          image: acraks3i2qzkkxofr7c.azurecr.io/thanos/thanos:v0.23.0
+          image: acraksjxdthrti3j3qu.azurecr.io/thanos/thanos:v0.23.0
           args:
             - query
             - --log.level=debug
@@ -57,4 +57,4 @@ spec:
     spec:
       containers:
         - name: thanos-compactor
-          image: acraks3i2qzkkxofr7c.azurecr.io/thanos/thanos:v0.23.0
+          image: acraksjxdthrti3j3qu.azurecr.io/thanos/thanos:v0.23.0

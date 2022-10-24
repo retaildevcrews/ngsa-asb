@@ -8,12 +8,12 @@ spec:
     spec:
       containers:
       - name: prometheus
-        image: acraks3i2qzkkxofr7c.azurecr.io/prom/prometheus:v2.30.0
+        image: acraksjxdthrti3j3qu.azurecr.io/prom/prometheus:v2.30.0
         env:
           - name: PROM_EXT_LABEL_CLUSTER
-            value: aks-3i2qzkkxofr7c-eastus
+            value: aks-jxdthrti3j3qu-eastus
       - name: thanos
-        image: acraks3i2qzkkxofr7c.azurecr.io/thanos/thanos:v0.23.0
+        image: acraksjxdthrti3j3qu.azurecr.io/thanos/thanos:v0.23.0
 
 ---
 

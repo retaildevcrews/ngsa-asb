@@ -2362,8 +2362,8 @@ data:
               {
                 "current": {
                   "selected": false,
-                  "text": "/subscriptions/648dcb5a-de1e-48b2-af6b-fe6ef28d355c/resourceGroups/rg-ngsa-asb-dev/providers/Microsoft.OperationalInsights/workspaces/la-aks-3i2qzkkxofr7c",
-                  "value": "/subscriptions/648dcb5a-de1e-48b2-af6b-fe6ef28d355c/resourceGroups/rg-ngsa-asb-dev/providers/Microsoft.OperationalInsights/workspaces/la-aks-3i2qzkkxofr7c"
+                  "text": "/subscriptions/5dc45b2f-bf13-4281-b763-a53f57290aa3/resourceGroups/rg-wcnp-dev/providers/Microsoft.OperationalInsights/workspaces/la-aks-jxdthrti3j3qu",
+                  "value": "/subscriptions/5dc45b2f-bf13-4281-b763-a53f57290aa3/resourceGroups/rg-wcnp-dev/providers/Microsoft.OperationalInsights/workspaces/la-aks-jxdthrti3j3qu"
                 },
                 "hide": 2,
                 "includeAll": false,
@@ -2372,11 +2372,11 @@ data:
                 "options": [
                   {
                     "selected": true,
-                    "text": "/subscriptions/648dcb5a-de1e-48b2-af6b-fe6ef28d355c/resourceGroups/rg-ngsa-asb-dev/providers/Microsoft.OperationalInsights/workspaces/la-aks-3i2qzkkxofr7c",
-                    "value": "/subscriptions/648dcb5a-de1e-48b2-af6b-fe6ef28d355c/resourceGroups/rg-ngsa-asb-dev/providers/Microsoft.OperationalInsights/workspaces/la-aks-3i2qzkkxofr7c"
+                    "text": "/subscriptions/5dc45b2f-bf13-4281-b763-a53f57290aa3/resourceGroups/rg-wcnp-dev/providers/Microsoft.OperationalInsights/workspaces/la-aks-jxdthrti3j3qu",
+                    "value": "/subscriptions/5dc45b2f-bf13-4281-b763-a53f57290aa3/resourceGroups/rg-wcnp-dev/providers/Microsoft.OperationalInsights/workspaces/la-aks-jxdthrti3j3qu"
                   }
                 ],
-                "query": "/subscriptions/648dcb5a-de1e-48b2-af6b-fe6ef28d355c/resourceGroups/rg-ngsa-asb-dev/providers/Microsoft.OperationalInsights/workspaces/la-aks-3i2qzkkxofr7c",
+                "query": "/subscriptions/5dc45b2f-bf13-4281-b763-a53f57290aa3/resourceGroups/rg-wcnp-dev/providers/Microsoft.OperationalInsights/workspaces/la-aks-jxdthrti3j3qu",
                 "skipUrlSync": false,
                 "type": "custom"
               }

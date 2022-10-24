@@ -25,9 +25,9 @@ data:
                   "cloudName": "azuremonitor",
                   "logAnalyticsClientId": "d26fa2ad-c0c1-42ce-8989-6a8c5d207e06",
                   "logAnalyticsDefaultWorkspace": "${AZURE_LA_WORKSPACE}",
-                  "logAnalyticsTenantId": "72f988bf-86f1-41af-91ab-2d7cd011db47",
-                  "subscriptionId": "648dcb5a-de1e-48b2-af6b-fe6ef28d355c",
-                  "tenantId": "72f988bf-86f1-41af-91ab-2d7cd011db47"
+                  "logAnalyticsTenantId": "16b3c013-d300-468d-ac64-7eda0820b6d3",
+                  "subscriptionId": "5dc45b2f-bf13-4281-b763-a53f57290aa3",
+                  "tenantId": "16b3c013-d300-468d-ac64-7eda0820b6d3"
               },
               "secureJsonData": {
                 "clientSecret": "$AZURE_MONITOR_CLIENT_SECRET"
