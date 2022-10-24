@@ -25,13 +25,13 @@ az network front-door create \
 # create CNAME record aliased to Azure front door URL
 export ASB_CNAME_RECORD_SET_NAME=${ASB_FD_ROOT_NAME}-${ASB_NGSA_APP}-${ASB_ENV}
 export ASB_CNAME=${ASB_FD_NAME}.azurefd.net
-az network dns record-set cname create --name $ASB_CNAME_RECORD_SET_NAME
-                                       --resource-group $ASB_DNS_ZONE_RG
+az network dns record-set cname create --name $ASB_CNAME_RECORD_SET_NAME \
+                                       --resource-group $ASB_DNS_ZONE_RG \
                                        --zone-name $ASB_DNS_ZONE
 
-az network dns record-set cname set-record --cname $ASB_CNAME
-                                           --record-set-name $ASB_CNAME_RECORD_SET_NAME
-                                           --resource-group $ASB_DNS_ZONE_RG
+az network dns record-set cname set-record --cname $ASB_CNAME \
+                                           --record-set-name $ASB_CNAME_RECORD_SET_NAME \
+                                           --resource-group $ASB_DNS_ZONE_RG \
                                            --zone-name $ASB_DNS_ZONE
 
 # create WAF policy
