@@ -6,8 +6,8 @@ metadata:
   namespace: loderunner
 spec:
   type: 0
-  resourceID: /subscriptions/648dcb5a-de1e-48b2-af6b-fe6ef28d355c/resourcegroups/rg-ngsa-asb-dev/providers/Microsoft.ManagedIdentity/userAssignedIdentities/ngsa-asb-loderunner-id
-  clientID: e73668c7-f031-4210-868f-81af377a0570
+  resourceID: /subscriptions/5dc45b2f-bf13-4281-b763-a53f57290aa3/resourcegroups/rg-wcnp-dev/providers/Microsoft.ManagedIdentity/userAssignedIdentities/wcnp-loderunner-id
+  clientID: e59cbfe0-24f4-4a60-a6ef-16c538b90683
 
 ---
 

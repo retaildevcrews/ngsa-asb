@@ -89,7 +89,7 @@ data:
                   "azureLogAnalytics": {
                     "query": "AzureDiagnostics\r\n| where $__timeFilter(TimeGenerated)\n  and Category == \"AzureFirewallNetworkRule\"\r\n  and msg_s has \"Deny\"\r\n| parse msg_s with Protocol \" request from \" SourceIP \":\" SourcePort \" to \" DestinationIP \":\" DestinationPort \". Action: \" Action \".\" *\r\n| summarize count() by SourceIP, DestinationIP, Resource, Protocol\n| project count_, SourceIP, DestinationIP, Resource, Protocol\n",
                     "resultFormat": "table",
-                    "workspace": "22bc55d2-a7f2-4041-a3e8-7351d5cda3c4"
+                    "workspace": "aeb911c4-ed27-45c6-8fa9-b9b2657e425b"
                   },
                   "azureMonitor": {
                     "aggOptions": [],
@@ -174,7 +174,7 @@ data:
                   "azureLogAnalytics": {
                     "query": "AzureDiagnostics\r\n| where $__timeFilter(TimeGenerated)\n  and Category == \"AzureFirewallNetworkRule\"\r\n  and msg_s has \"Deny\"\r\n| summarize count() by bin_at(TimeGenerated, $__interval, datetime(00:00))\r\n| order by TimeGenerated asc",
                     "resultFormat": "time_series",
-                    "workspace": "22bc55d2-a7f2-4041-a3e8-7351d5cda3c4"
+                    "workspace": "aeb911c4-ed27-45c6-8fa9-b9b2657e425b"
                   },
                   "azureMonitor": {
                     "aggOptions": [],
@@ -300,7 +300,7 @@ data:
                   "azureLogAnalytics": {
                     "query": "AzureDiagnostics\r\n| where $__timeFilter(TimeGenerated)\n  and Category == \"AzureFirewallApplicationRule\"\r\n  and msg_s has \"Deny\"\r\n| parse msg_s with Protocol \" request from \" SourceIP \":\" SourcePort \" to \" Destination \":\" DestinationPort \". Action: \" Action \". \" Reason\n\r\n| summarize count() by SourceIP, Destination, Resource, Reason\n| project count_, SourceIP, Destination, Resource, Reason",
                     "resultFormat": "table",
-                    "workspace": "22bc55d2-a7f2-4041-a3e8-7351d5cda3c4"
+                    "workspace": "aeb911c4-ed27-45c6-8fa9-b9b2657e425b"
                   },
                   "azureMonitor": {
                     "aggOptions": [],
@@ -385,7 +385,7 @@ data:
                   "azureLogAnalytics": {
                     "query": "AzureDiagnostics\r\n| where $__timeFilter(TimeGenerated)\n  and Category == \"AzureFirewallApplicationRule\"\r\n  and msg_s has \"Deny\"\r\n| summarize count() by bin_at(TimeGenerated, $__interval, datetime(00:00))\r\n| order by TimeGenerated asc",
                     "resultFormat": "time_series",
-                    "workspace": "22bc55d2-a7f2-4041-a3e8-7351d5cda3c4"
+                    "workspace": "aeb911c4-ed27-45c6-8fa9-b9b2657e425b"
                   },
                   "azureMonitor": {
                     "aggOptions": [],
@@ -511,7 +511,7 @@ data:
                   "azureLogAnalytics": {
                     "query": "AzureDiagnostics\r\n| where $__timeFilter(TimeGenerated)\n  and Category == \"NetworkSecurityGroupEvent\"\r\n  and type_s == \"block\"\r\n\r\n| summarize count() by Resource, ruleName_s, primaryIPv4Address_s, direction_s\n| project count_, Resource, ruleName_s, primaryIPv4Address_s, direction_s",
                     "resultFormat": "time_series",
-                    "workspace": "22bc55d2-a7f2-4041-a3e8-7351d5cda3c4"
+                    "workspace": "aeb911c4-ed27-45c6-8fa9-b9b2657e425b"
                   },
                   "azureMonitor": {
                     "aggOptions": [],
@@ -596,7 +596,7 @@ data:
                   "azureLogAnalytics": {
                     "query": "AzureDiagnostics\r\n| where $__timeFilter(TimeGenerated)\n  and Category == \"NetworkSecurityGroupEvent\"\r\n  and type_s == \"block\"\r\n| summarize count() by bin_at(TimeGenerated, $__interval, datetime(00:00)), direction_s\r\n| order by TimeGenerated asc\n",
                     "resultFormat": "time_series",
-                    "workspace": "22bc55d2-a7f2-4041-a3e8-7351d5cda3c4"
+                    "workspace": "aeb911c4-ed27-45c6-8fa9-b9b2657e425b"
                   },
                   "azureMonitor": {
                     "aggOptions": [],
