@@ -5,8 +5,8 @@ metadata:
   namespace: ngsa
 spec:
   type: 0
-  resourceID: /subscriptions/648dcb5a-de1e-48b2-af6b-fe6ef28d355c/resourcegroups/rg-ngsa-asb-dev/providers/Microsoft.ManagedIdentity/userAssignedIdentities/ngsa-asb-ngsa-id
-  clientID: ed1c4c70-e050-48c6-b864-ea1f8695054e
+  resourceID: /subscriptions/5dc45b2f-bf13-4281-b763-a53f57290aa3/resourcegroups/rg-wcnp-dev/providers/Microsoft.ManagedIdentity/userAssignedIdentities/wcnp-ngsa-id
+  clientID: f6e69e97-5e96-4e7f-a17a-303554e064f1
 
 ---
 
