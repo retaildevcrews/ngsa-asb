@@ -4,9 +4,9 @@ param (
     [Parameter(Mandatory)]
     [String]$resource_Group_Name_with_Alerts="rg-ngsa-asb-dev",
     [Parameter(Mandatory)]
-    [String]$resource_Group_Name_for_Automation="rg-asb-firewall-automation",
+    [String]$resource_Group_Name_for_Automation="rg-asb-firewall-automation-dev",
     [Parameter(Mandatory)]
-    [String]$automation_Account_Name="aa-asb-firewall-automation",
+    [String]$automation_Account_Name="aa-asb-firewall-automation-dev",
     [Parameter(Mandatory)]
     [String]$tenant_Id="72f988bf-86f1-41af-91ab-2d7cd011db47",
     [Parameter(Mandatory)]
@@ -22,7 +22,7 @@ param (
     [Parameter(Mandatory)]
     [String]$pip_Name_Default="pip-fw-eastus-default",
     [Parameter(Mandatory)]
-    [String]$managed_Identity_Name="mi-asb-firewall-automation",
+    [String]$managed_Identity_Name="mi-asb-firewall-automation-dev",
     [Parameter(Mandatory)]
     [String]$action="start",
     [Parameter(Mandatory)]

@@ -5,72 +5,35 @@ Param (
     [Parameter(Mandatory)]
     [String]$Subscription_Name,
     [Parameter(Mandatory)]
-    [String]$Subscription_Id,
+    [String]$Base_NSGA_Name,
     [Parameter(Mandatory)]
-    [String]$Resource_Group_Name_for_Automation,
+    [String]$Base_Autmation_System_Name,
     [Parameter(Mandatory)]
-    [String]$Resource_Group_Name_for_Alerts,
+    [String]$Environment,
     [Parameter(Mandatory)]
-    [String]$Resource_Group_Name_with_Firewall,
-    [Parameter(Mandatory)]
-    [String]$Location,
-    [Parameter(Mandatory)]
-    [String]$Automation_Account_Name,
+    [String]$RunbookFileName,
     [Parameter(Mandatory)]
     [String]$Sku,
     [Parameter(Mandatory)]
-    [String]$PowerShell_Runbook_Name,
+    [String]$Location,
     [Parameter(Mandatory)]
-    [String]$Vnet_Name,
-    [Parameter(Mandatory)]
-    [String]$Firewall_Name,
-    [Parameter(Mandatory)]
-    [String]$PIP_Name1,
-    [Parameter(Mandatory)]
-    [String]$PIP_Name2,
-    [Parameter(Mandatory)]
-    [String]$PIP_Name_Default,
-    [Parameter(Mandatory)]
-    [String]$Managed_Identity_Name,
-    [Parameter(Mandatory)]
-    [String]$Base_Schedule_Name,
-    [Parameter(Mandatory)]
-    [String]$Environment
+    [String]$RunbookDescription
 )
 
+$automationResourceGroup = "rg-" + $Base_NSGA_Name + "-" + $Base_Autmation_System_Name + "-" + $Environment
+$firewallResourceGroup = "rg-" + $Base_NSGA_Name + "-" + $Environment + "-hub"
+$alertsResourceGroup = "rg-" + $Base_NSGA_Name + "-" + $Environment
+$automationAccountName = "aa-" + $Base_NSGA_Name + "-" + $Base_Autmation_System_Name + "-" + $Environment
+$runbookName = "rb-" + $Base_NSGA_Name + "-" + $Base_Autmation_System_Name + "-" + $Environment
+$managedIdentityName = "mi-" + $Base_NSGA_Name + "-" + $Base_Autmation_System_Name + "-" + $Environment
 
-[String]$Tenant_Id,
-[String]$Subscription_Name,
+$vnetName = "vnet-" + $Location + "-hub"
 
-[String]$ASB_FW_Base_NSGA_Name,
-[String]$ASB_FW_Base_Automation_System_Name,
-[String]$ASB_FW_Environment,
-[String]$ASB_FW_Location,
-[String]$ASB_FW_PowerShell_Runbook_File_Name,
-[String]$ASB_FW_Sku,
-[String]$PowerShell_Runbook_Name,
-[String]$ASB_FW_PowerShell_Runbook_Description,
-
-
-[String]$Vnet_Name,
-[String]$Firewall_Name,
-[String]$PIP_Name1,
-[String]$PIP_Name2,
-[String]$PIP_Name_Default,
-[String]$Managed_Identity_Name,
-[String]$Base_Schedule_Name,
-[String]$Environment
-
-
-# export ASB_FW_Tenant_Id='72f988bf-86f1-41af-91ab-2d7cd011db47' # Tenant Id for the onmicrosoft.com tenant
-# export ASB_FW_Subscription_Name='jofultz-wcnp' # Suscription Id for Jofultz-Team
-# export ASB_FW_Base_NSGA_Name='rg-ngsa-asb'
-# export ASB_FW_Base_Automation_System_Name='asb-firewall-automation'
-# export ASB_FW_Environment='dev'
-# export ASB_FW_PowerShell_Runbook_File_Name='firewallAutomationForCostOptimization.Runbook.ps1' # Powershell based runbook file name.
-# export ASB_FW_Sku='Basic' # Sku for the Automation Account
-# export ASB_FW_Location='westus' # Location for resource creation
-# export ASB_FW_PowerShell_Runbook_Description='This runbook automates the allocation and de-allocation of a firewall for the purposes of scheduling.' # Description for the runbook.
+$firewallName = "fw-" + $Location
+$publicIpName1 = "pip-fw-" + $Location + "-01"
+$publicIpName2 = "pip-fw-" + $Location + "-02"
+$publicIpNameDefault = "pip-fw-" + $Location + "-default"
+$baseScheduleName = "as-" + $Base_NSGA_Name + "-" + $Base_Autmation_System_Name + "-" + $Environment
 
 
 $stop_Time = (Get-Date "21:00:00").AddHours(+4).AddDays(1)
@@ -123,9 +86,6 @@ function Edit-ScheduleAndRunbook {
       
     [Parameter(Mandatory)]
     [String]$Automation_Account_Name,
-      
-    [Parameter(Mandatory)]
-    [String]$subscription_Id,
 
     [Parameter(Mandatory)]
     [String]$tenant_Id,
@@ -143,16 +103,19 @@ function Edit-ScheduleAndRunbook {
     [String]$firewall_Name,
       
     [Parameter(Mandatory)]
-    [String]$pip_Name_1,
+    [String]$pip_Name1,
       
     [Parameter(Mandatory)]
-    [String]$pip_Name_2,
+    [String]$pip_Name2,
       
     [Parameter(Mandatory)]
     [String]$pip_Name_Default,
       
     [Parameter(Mandatory)]
     [String]$managed_Identity_Name,
+
+    [Parameter(Mandatory)]
+    [String]$Location,
       
     [Parameter(Mandatory)]
     [String]$action
@@ -167,26 +130,26 @@ Write-Host "Registering an Azure Automation Schedule to a Automation Runbook..."
   $params.Add("resource_Group_Name_for_Automation", "$Resource_Group_Name_for_Automation") 
   $params.Add("automation_Account_Name", "$Automation_Account_Name")  
   $params.Add("tenant_Id", "$tenant_Id")
-  $params.Add("resource_Group_Name_with_Alerts", "$Resource_Group_Name_for_Alerts")
+  $params.Add("resource_Group_Name_with_Alerts", "$Resource_Group_Name_with_Alerts")
   $params.Add("subscription_Name", "$subscription_Name")
   $params.Add("vnet_Name", "$vnet_Name")
   $params.Add("firewall_Name", "$firewall_Name")
-  $params.Add("pip_Name1", "$pip_Name_1")
-  $params.Add("pip_Name2", "$pip_Name_2")
+  $params.Add("pip_Name1", "$pip_Name1")
+  $params.Add("pip_Name2", "$pip_Name2")
   $params.Add("pip_Name_Default", "$pip_Name_Default")
   $params.Add("managed_Identity_Name", "$managed_Identity_Name")
+  $params.Add("environment", "$Environment")
   $params.Add("action", "$action")
+  $params.Add("location", "$Location")
 
   Register-AzAutomationScheduledRunbook -Parameters $params -ResourceGroupName $Resource_Group_Name_for_Automation -AutomationAccountName $Automation_Account_Name -RunbookName $powerShell_Runbook_Name -ScheduleName $schedule_Name
-  
-  Publish-AzAutomationRunbook -AutomationAccountName $Automation_Account_Name -Name $powerShell_Runbook_Name -ResourceGroupName $Resource_Group_Name_for_Automation
   
   Write-Host "Completed registering an Azure Automation Schedule to a Automation Runbook."
 }
 
 function Authenticate{  
   Connect-AzAccount -UseDeviceAuth  
-  Set-AzContext -Subscription $Subscription_Id
+  Set-AzContext -Subscription $Subscription_Name
 }
 
 function Import-Modules{
@@ -207,29 +170,21 @@ Authenticate
 
 Import-Modules
 
-$schedule_Name = $Base_Schedule_Name + "-" + $Environment
+$start_Action_Name = $baseScheduleName + "-start"
+$stop_Action_Name = $baseScheduleName + "-stop"
 
-Write-Host $schedule_Name
+New-Schedule -Automation_Account_Name $automationAccountName -Resource_Group_Name_for_Automation $automationResourceGroup -schedule_Name $start_Action_Name -start_Time $start_Time -end_Time $end_Time
+New-Schedule -Automation_Account_Name $automationAccountName -Resource_Group_Name_for_Automation $automationResourceGroup -schedule_Name $stop_Action_Name -start_Time $stop_Time -end_Time $stop_Time
 
-$start_Action_Name = $schedule_Name + "-start"
-$stop_Action_Name = $schedule_Name + "-stop"
+Edit-ScheduleAndRunbook -Resource_Group_Name_with_Firewall $firewallResourceGroup -Location $Location -Resource_Group_Name_for_Automation $automationResourceGroup -resource_Group_Name_with_Alerts $alertsResourceGroup -tenant_Id $Tenant_Id -schedule_Name $start_Action_Name -powerShell_Runbook_Name $runbookName -Automation_Account_Name $automationAccountName -subscription_Name $Subscription_Name -vnet_Name $vnetName -firewall_Name $firewallName -pip_Name1 $publicIpName1 -pip_Name2 $publicIpName2 -pip_Name_Default $publicIpNameDefault -managed_Identity_Name $managedIdentityName -action "start"
+Edit-ScheduleAndRunbook -Resource_Group_Name_with_Firewall $firewallResourceGroup -Location $Location -Resource_Group_Name_for_Automation $automationResourceGroup -resource_Group_Name_with_Alerts $alertsResourceGroup -tenant_Id $Tenant_Id -schedule_Name $stop_Action_Name -powerShell_Runbook_Name $runbookName -Automation_Account_Name $automationAccountName -subscription_Name $Subscription_Name -vnet_Name $vnetName -firewall_Name $firewallName -pip_Name1 $publicIpName1 -pip_Name2 $publicIpName2 -pip_Name_Default $publicIpNameDefault -managed_Identity_Name $managedIdentityName -action "stop"
 
-New-Schedule -Automation_Account_Name $Automation_Account_Name -Resource_Group_Name_for_Automation $Resource_Group_Name_for_Automation -schedule_Name $start_Action_Name -start_Time $start_Time -end_Time $end_Time
-New-Schedule -Automation_Account_Name $Automation_Account_Name -Resource_Group_Name_for_Automation $Resource_Group_Name_for_Automation -schedule_Name $stop_Action_Name -start_Time $stop_Time -end_Time $stop_Time
-
-Edit-ScheduleAndRunbook -Resource_Group_Name_with_Firewall $Resource_Group_Name_with_Firewall -Resource_Group_Name_for_Automation $Resource_Group_Name_for_Automation -resource_Group_Name_with_Alerts $resource_Group_Name_For_Alerts -tenant_Id $Tenant_Id -schedule_Name $start_Action_Name -powerShell_Runbook_Name $PowerShell_Runbook_Name -Automation_Account_Name $Automation_Account_Name -subscription_Id $Subscription_Id -subscription_Name $Subscription_Name -vnet_Name $Vnet_Name -firewall_Name $Firewall_Name -pip_Name_1 $PIP_Name1 -pip_Name_2 $PIP_Name2 -pip_Name_Default $PIP_Name_Default -managed_Identity_Name $Managed_Identity_Name -action "start"
-Edit-ScheduleAndRunbook -Resource_Group_Name_with_Firewall $Resource_Group_Name_with_Firewall -Resource_Group_Name_for_Automation $Resource_Group_Name_for_Automation -resource_Group_Name_with_Alerts $resource_Group_Name_For_Alerts -tenant_Id $Tenant_Id -schedule_Name $stop_Action_Name -powerShell_Runbook_Name $PowerShell_Runbook_Name -Automation_Account_Name $Automation_Account_Name -subscription_Id $Subscription_Id -subscription_Name $Subscription_Name -vnet_Name $Vnet_Name -firewall_Name $Firewall_Name -pip_Name_1 $PIP_Name1 -pip_Name_2 $PIP_Name2 -pip_Name_Default $PIP_Name_Default -managed_Identity_Name $Managed_Identity_Name -action "stop"
-
-#Publish-AzAutomationRunbook -AutomationAccountName $Automation_Account_Name  -Name $PowerShell_Runbook_Name -ResourceGroupName $Resource_Group_Name_for_Automation
+Publish-AzAutomationRunbook -AutomationAccountName $automationAccountName -Name $runbookName -ResourceGroupName $automationResourceGroup
 
 # Disable the schedule after creation
-Set-AzAutomationSchedule -AutomationAccountName $Automation_Account_Name -Name $start_Action_Name -IsEnabled $false -ResourceGroupName $Resource_Group_Name_for_Automation
-Set-AzAutomationSchedule -AutomationAccountName $Automation_Account_Name -Name $stop_Action_Name  -IsEnabled $false -ResourceGroupName $Resource_Group_Name_for_Automation
+Set-AzAutomationSchedule -AutomationAccountName $automationAccountName -Name $start_Action_Name -IsEnabled $false -ResourceGroupName $automationResourceGroup
+Set-AzAutomationSchedule -AutomationAccountName $automationAccountName -Name $stop_Action_Name  -IsEnabled $false -ResourceGroupName $automationResourceGroup
 
 # Enable the schedule after creation
-Set-AzAutomationSchedule -AutomationAccountName $Automation_Account_Name -Name $start_Action_Name -IsEnabled $true -ResourceGroupName $Resource_Group_Name_for_Automation
-Set-AzAutomationSchedule -AutomationAccountName $Automation_Account_Name -Name $stop_Action_Name  -IsEnabled $true -ResourceGroupName $Resource_Group_Name_for_Automation
-
-# Disable the schedule after creation
-# Set-AzAutomationSchedule -AutomationAccountName $Automation_Account_Name -Name $start_Action_Name -IsEnabled $false -ResourceGroupName $Resource_Group_Name_for_Automation
-# Set-AzAutomationSchedule -AutomationAccountName $Automation_Account_Name -Name $stop_Action_Name  -IsEnabled $false -ResourceGroupName $Resource_Group_Name_for_Automation
+#Set-AzAutomationSchedule -AutomationAccountName $Automation_Account_Name -Name $start_Action_Name -IsEnabled $true -ResourceGroupName $Resource_Group_Name_for_Automation
+#Set-AzAutomationSchedule -AutomationAccountName $Automation_Account_Name -Name $stop_Action_Name  -IsEnabled $true -ResourceGroupName $Resource_Group_Name_for_Automation

@@ -186,8 +186,9 @@ function UpdateAzureAutomationAccountToAllowSystemAssignedIdentity() {
   appRoleName='Managed Identity Operator' # For example, MyApi.Read.All
 
   pwsh --command "Connect-AzAccount -UseDeviceAuthentication -Tenant $4 -Subscription $3; Set-AzAutomationAccount -AssignUserIdentity /subscriptions/$3/resourcegroups/$2/providers/Microsoft.ManagedIdentity/userAssignedIdentities/$5 -ResourceGroupName $2 -Name $1 -AssignSystemIdentity;"
-  #  New-AzureADUserAppRoleAssignment -ObjectId $6 -appoleName "$appRoleName" -PrincipalId $6;
 
+  $(az role assignment create --assignee "${6}" --role "{$appRoleName}" --scope "/subscriptions/${3}/resourcegroups/${2}/providers/Microsoft.Automation/automationAccounts/${1}" --output none)
+    
   echo "Completed assigning role Managed Identity Operator to the System Assigned Identity for automation account $1 in resource group $2, within subscription id $3."
   echo
 }
@@ -251,8 +252,8 @@ function main(){
   local runbookName="rb-${ASB_FW_Base_NSGA_Name}-${ASB_FW_Base_Automation_System_Name}-${ASB_FW_Environment}"
   local runbookDescription="${ASB_FW_PowerShell_Runbook_Description}"
   local runbookFileName="${ASB_FW_PowerShell_Runbook_File_Name}"
-  local runbookFilePath='/scripts/automation/'
-  local runbookFilePathAndName="${runbookFilePath}${runbookFileName}"
+  local runbookFilePath="./scripts/automation/"
+  local runbookFilePathAndName=@"${runbookFilePath}${runbookFileName}"
 
   echo
   echo "-------------------------------------------------------------------"
@@ -270,6 +271,7 @@ function main(){
   CreateResourceGroup $automationResourceGroup $ASB_FW_Location
 
   local automationAccountName="aa-${ASB_FW_Base_NSGA_Name}-${ASB_FW_Base_Automation_System_Name}-${ASB_FW_Environment}"
+  local automationAccountPrincipalId=$(az identity list --resource-group "${automationResourceGroup}" --query "[?name=='${automationAccountName}'].{name:name,principalId:principalId}|[0].principalId" --output tsv)
 
   local userAssignedManagedIdentityName="mi-${ASB_FW_Base_NSGA_Name}-${ASB_FW_Base_Automation_System_Name}-${ASB_FW_Environment}"
 
