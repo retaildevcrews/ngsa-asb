@@ -137,10 +137,6 @@ Before proceeding verify  the environment is configured correct to execute the c
 
 6. LInk the Runbook to the schedules
  
-## Scripts
-
-## Installation Instructions
-
 ### BASH Variables
 
 The BASH variables are exported into environment variables.  
@@ -168,7 +164,6 @@ BEFORE continuing please make sure all requirements have been met in the section
 
 1. [Create Automation Infrastructure (BASH script)]("./scripts/automation/createautimationForFirewallCostOptimization.sh")
    - The [createAutomationForFirewallCostOptimization.sh]("./scripts/automation/createautimationForFirewallCostOptimization.sh") script "dot sources" the [firewallAutomationForCostOptimization.variables.sh]("./scripts/automation/cfirewallAutomationForCostOptimization.variables.sh").  This file must to be adjusted for the specifics of the execution.  Currently it is not populated save the default for Sku.  See ["BASH Variables for details"]("#-bash-variables").
-
 
 ## Detail of What is Happening in the Scripts
 
