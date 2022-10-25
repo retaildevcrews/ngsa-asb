@@ -2,7 +2,9 @@
 
 Azure Firewall has [costs (Azure Firewall pricing link)](https://azure.microsoft.com/en-gb/pricing/details/azure-firewall/#pricing) associated with it which can be optimized by allocating and de-allocating the firewall when appropriate.  Below describes the mechanism to implement an Azure Automation Runbook that will allocate and de-allocate the firewall on a schedule as well as enable and disable the alerts associated with this activity to minimize nonessential systems communications.
 
-## Prerequisites
+## Before Beginning
+
+### Prerequisites
 
 Before proceeding verify  the environment is configured correct to execute the commands necessary below
 
@@ -14,22 +16,185 @@ Before proceeding verify  the environment is configured correct to execute the c
 
 - *Azure Powershell modules for Linux* [Install Modules](/allocationAutomationForFirewall.md#Install-Powershell-Modules)
 
-*The Azure CLI Automation extension is in an experimental stage.  Currently it does not implement all functionality needed.  As a result the the Az Module, specifically for automation and authentication can be used at the time of writing.*
+*The Azure CLI Automation extension is in an experimental stage.  Currently it does not implement all functionality needed.  As a result the the Az Module, specifically for automation, monitoring,  and authentication can be used at the time of writing.*
 
 - [*Azure CLI Extension - Automation*](https://github.com/Azure/azure-cli-extensions/tree/main/src/automation)
 - [Azure PowerShell Az Modules](https://learn.microsoft.com/en-us/powershell/azure/install-az-ps?view=azps-9.0.0)
 
-## Portal
+### Parameters Needed to Proceed
 
-1. Create a resource group within the subscription and tenant that contains the firewalls.  This new resource group will house three resources.
-   
-   example resource group name: 'rg-asb-firewall-automation-dev'.
+#### Parameters for Bash Execution
+
+| Parameter Name | Example Value | Script Needed For |
+| -------------- | :-----------: | ---------------- |
+| ASB_FW_TenantId | 00000000-0000-0000-0000-000000000000 | bash |
+| ASB_FW_SubscriptionId | 00000000-0000-0000-0000-000000000000 | bash  |
+| ASB_FW_Sku | Basic | bash |
+| ASB_FW_Location | eastus | bash  |
+| ASB_FW_PowerShell_Runbook_File_Name | firewallAutomationForCostOptimization.ps1 | bash |
+| ASB_FW_PowerShell_Runbook_Description | This runbook automates the allocation and de-allocation of a firewall for the purposes of scheduling. | bash |
+| ASB_FW_Environment | dev | bash |
+| firewallName        |             fw-centralus             | bash |
+
+#### Parameters for PowerShell Execution
+
+| Parameter Name | Example Value | Script Needed For |
+| -------------- | :-----------: | ---------------- |
+|Tenant_Id|00000000-0000-0000-0000-000000000000| PowerShell |
+|Subscription_Name|| PowerShell |
+|Subscription_Id|00000000-0000-0000-0000-000000000000| PowerShell |
+|Resource_Group_Name_for_Automation|rg-ngsa-asb-firewall-automation-dev| PowerShell |
+|Resource_Group_Name_with_Firewall|rg-ngsa-asb-dev-hub| PowerShell |
+|Resource_Group_Name_with_Alerts|rg-ngsa-asb-dev| PowerShell |
+|Location|westus| PowerShell |
+|Automation_Account_Name|aa-ngsa-asb-firewall-automation-dev| PowerShell |
+|Sku|Basic| PowerShell |
+|PowerShell_Runbook_Name|rb-ngsa-asb=firewall-automation-dev| PowerShell |
+|Vnet_Name|vnet-eastus-hub| PowerShell |
+|Firewall_Name|fw-eastus| PowerShell |
+|PIP_Name1|pip-fw-eastus-01| PowerShell |
+|PIP_Name2|pip-fw-eastus-02| PowerShell |
+|PIP_Name_Default|pip-fw-eastus-default| PowerShell |
+|Managed_Identity_Name|mi-ngsa-asb-firewall-automation-dev| PowerShell |
+|Base_Schedule_Name|as-ngsa-asb-firewall-automation-dev| PowerShell |
+|Environment|dev| PowerShell |
+
+### Infrastructure & Assets Creation List
+
+The following infrastructure assets should be established in the subscription with the Azure Firewall(s) to be managed once all aspects of this document are fulfilled.  Though six (6) items are listed, technically one (1) item is an import of content to the body of the Azure Automation Runbook so this item will not show up in the portal without deeper investigation.  
+
+|     | Resource                                  |                                                                                       Links                                                                                      | Description                                                                                                                                                                 |
+| :-: | :---------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+|  1. | Resource Group                            |                                                 [link](https://learn.microsoft.com/en-us/cli/azure/manage-azure-groups-azure-cli)                                                | Create "sibling" resource group in subscription for Azure Automation infrastructure.                                                                                        |
+|  2. | Automation Account                        |                     [link](https://learn.microsoft.com/en-us/azure/templates/microsoft.automation/automationaccounts?pivots=deployment-language-arm-template)                    | Create an Automation Account that will execute the automation.                                                                                                              |
+|  3. | User-Assigned Managed Identity            | [link](https://learn.microsoft.com/en-us/azure/active-directory/managed-identities-azure-resources/how-manage-user-assigned-managed-identities?pivots=identity-mi-methods-azcli) | Create an identity for the Automation Account.                                                                                                                              |
+|  4. | Automation Runbook with Powershell        |                                      [link](https://learn.microsoft.com/en-us/azure/automation/automation-runbook-types#powershell-runbooks)                                     | Create a Runbook of type Powershell.                                                                                                                                        |
+|  5. | Powershell Content in Runbook             |                               [link](https://learn.microsoft.com/en-us/powershell/module/az.automation/import-azautomationrunbook?view=azps-8.3.0)                               | Upload [pre-defined Powershell content](../automation/FirewallToggle.ps1) into the Runbook body.                                                                            |
+|  6. | Automation Schedule(s) *using Powershell* |                               [link](https://learn.microsoft.com/en-us/powershell/module/az.automation/import-azautomationrunbook?view=azps-8.3.0)                               | Create the schedules that will execute the Firewall automation.  These had to be created using Powershell instead of the Azure CLI.  No equivalent behavior has been found. |                                |
+
+### Resources Created When Complete
 
    1. Azure user-assigned Managed Identity
    2. Azure Automation Account
    3. Azure PowerShell Runbook
+  
+<img src="./assets/automation/listOfResourcesInResourceGroup.png" alt="List of resources that will be created when complete." />
 
-   ```azurecli
+## Choosing the Installation Method
+
+The instructions below show three manners to accomplish the same objective.  
+
+Choose **ONLY** one.
+
+1. [Portal](#portal) - Using the Azure Portal to create all artifacts
+2. [CLI & Az PowerShell Modules](#azure-cli-and-az-powershell-modules) - Using a terminal and executing the PowerShell and Bash CLI commands interactively
+3. Executing the Bash and PowerShell Scripts Provided.  
+
+### Portal
+
+Note if you chose a "portal based installation" please follow the instructions below.  
+
+Create a resource group within the subscription and tenant that contains the firewalls.  This new resource group will house three resources as shown below.
+
+<img src="./assets/automation/createResourceGroup1Portal.png" alt="Create a new Resource Group" />
+
+#### Create User-Assigned Managed Identity
+
+Navigate to the newly created resource group and click the "+" to add a new resource
+
+Search for "User Assigned Managed Identity".
+
+<img src="./assets/automation/createUserAssginedManagedIdentityPortal.png" alt="Create a User-Assigned Managed Identity for the Automation" />
+
+Fill out the "Create User Assigned Managed Identity" Basics tab information as depicted below.  
+
+<img src="./assets/automation/createUserAssignedManagedIdentity1Portal.png" alt="Create a User-Assigned Managed Identity for the Automation" />
+
+Click Create.
+
+##### Adding Roles to the User-Assigned Managed Identity
+
+Navigate to the resource group we created above.  
+
+Click on the user-assigned Managed Identity created named *'mi-nsga-asb-firewall-automation-dev'*
+
+<img src="./assets/automation/automationResourceGroupListPortal.png" alt="Automation Resource Group" />
+
+Click on the portal blade "Access Control (IAM)
+
+Click "Add Role Assignment"
+
+<img src="./assets/automation/AccessControlforManagedIdentitywithAddRoleAssignemnt.png" alt="Click Add Role Assignment" />
+
+<img src="./assets/automation/managedIdentityRoleSelection.png" alt="Select Contributor, and Managed Identity Contributor Roles" />
+
+Select 'Contributor' or 'Managed Identity Contributor'.  Both roles need to be added
+
+<img src="./assets/automation/managedIdentityMemberPick1.png" alt="Click Add Role Assignment" />
+
+Locate the user-assigned managed identity created earlier from the list 'mi-ngsa-asb-firewall-automation-dev'
+
+<img src="./assets/automation/managedIdentityMemberPick2.png" alt="Click Add Role Assignment" />
+
+Click "create" to complete.  Repeat tis process for the role not done the first time until both the 'Contributor and the "Managed Identity Contributor" roles are added.
+
+#### Create Azure Automation Account
+
+Navigate the the newly created resource group 'rg-ngsa-asb-firewall-automation-dev' and click the "+" icon to add a resource to the resource group.  Search for "Automation".  
+
+<img src="./assets/automation/createAutomatioonAccountPortal.png" alt="Create an Automation Account" />
+
+Once selected fill out the tabs for the "Create an Automation Account" screens.  
+
+<img src="./assets/automation/createAutomationAccount1Portal.png" alt="Create a User-Assigned Managed Identity for the Automation" />
+
+automation account name: 'aa-ngsa-asb-firewall-automation-dev' Note, slightly different from the image above.
+
+<img src="./assets/automation/createAutomationAccount2Portal.png" alt="Create a User-Assigned Managed Identity for the Automation" />
+
+Select both the system-assigned, as well as the user-assigned managed identities check boxes as well as select the 'mi-ngsa-asb-firewall-automation-dev' managed identity to associate it with the Automation Account.
+
+Click create when finished.  
+
+#### Create Automation PowerShell Runbook
+
+<img src="./assets/automation/createAutmationRunbook1Portal.png" alt="Create a User-Assigned Managed Identity for the Automation" />
+
+Navigate to the automation account created, 'aa-ngsa-asb-firewall-automation-dev' and select the 'Runbook' blade, and "Create a runbook.  
+
+<img src="./assets/automation/createAutmationRunbook2Portal.png" alt="Create a User-Assigned Managed Identity for the Automation" />
+
+Create an Azure Powershell Runbook from the Azure Portal within the Automation Resource Group or using the Azure CLI
+
+Use the portal UX upload the Powershell runbook file located in the scripts/automation directory
+
+#### Create Automation Schedules
+
+<img src="./assets/automation/createAutmationAccountSchedule1Portal.png" alt="Create a User-Assigned Managed Identity for the Automation" />
+
+Select the "Schedules" blade on the left side of the Autoamtion Account screen.
+
+<img src="./assets/automation/createRunbookSchedule1Portal.png" alt="Create a User-Assigned Managed Identity for the Automation" />
+
+Establish the schedule desired for the firewall automation.  The Schedule decides for this implementation was to turn the development firewall off at 10:00 PM EST and back on at 6:00 AM EST.  
+
+<img src="./assets/automation/editRunbookScheduleLinked1Portal.png" alt="Create a User-Assigned Managed Identity for the Automation" />
+
+Link the runbook and the schedule
+
+<img src="./assets/automation/endAutomationScheduleLinked1Portal.png" alt="Create a User-Assigned Managed Identity for the Automation" />
+
+Once linked, the defaulted values located within the Runbook will be visible.  
+
+### Azure CLI & Az PowerShell Modules
+
+#### Create the Resource Group with the Azure CLI
+
+The following commands authenticate a user to a specified tenant and then switches into the desired subscription.  
+
+Once authentication and authorization is established the Azure CLI is used to create a resource group.  
+
+   ```bash
 
     # Log into the tenant
     az login --tenant {tenant Id}
@@ -42,11 +207,33 @@ Before proceeding verify  the environment is configured correct to execute the c
 
    ```
 
-2. Create an Azure Automation Account within the portal or via the CLI command listed below.
+#### Create User-Assigned Managed Identity with Azure CLI and PowerShell
 
-  example Azure Automation Account name: 'aa-asb-firewall-automation-dev'
+Creates the Azure user-assigned managed identity and adds the permissions needed.
 
-  ```azurecli
+``` bash
+
+# Log into the tenant
+az login --tenant {tenant Id}
+
+# Set the subscription desired    
+az account set --subscription {subscription name}
+
+az identity create --resource-group {automation resource group name} --name {user-assigned managed identity name}
+
+# The Az CLI commands for this errored at the time of writing so pwsh was used.
+# Assigns the system-assigned user identity
+pwsh --command "Connect-AzAccount -UseDeviceAuthentication -Tenant {tenant id} -Subscription {subscription Id}; Set-AzAutomationAccount -AssignUserIdentity /subscriptions/{subscription Id}/resourcegroups/{automation resource group name}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/{user-assigned managed identity name} -ResourceGroupName {automation resource group name} -Name {automation account name} -AssignSystemIdentity;"
+
+# assigns the role
+az role assignment create --assignee-object-id {user-assigned managed identity principal id} --assignee-principal-type 'ServicePrincipal' --role 'Monitoring Contributor' --subscription {subscription name}
+
+# assigns the role
+az role assignment create --assignee-object-id {user-assigned managed identity principal id} --assignee-principal-type 'ServicePrincipal' --role 'Contributor' --subscription {subscription name}
+
+```
+
+```bash
   
     # Log into the tenant
     az login --tenant {tenant Id}
@@ -58,58 +245,70 @@ Before proceeding verify  the environment is configured correct to execute the c
 
   ```
 
-  1. Navigate it the "Identity" blade in the Azure portal for the Azure Automation Account.
-  2. Enable system-assigned Managed Identity
-  3. Save.  (for now)
+The Azure CLI command for this action was causing errors at the time of writing this.  The following command allows for creating a PowerShell "shell" so that the Az PowerShell module can be used.  
 
-3. Create an Azure user-assigned Managed Identity within the Azure Portal or the Azure CLI.  
+```bash
 
-  example Azure user-assigned Managed Identity Account name: 'mi-asb-firewall-automation-dev'
-
-   ``` azurecli
-
-    # Log into the tenant
+# Log into the tenant
     az login --tenant {tenant Id}
 
     # Set the subscription desired    
     az account set --subscription {subscription name}
-
-    az identity create --resource-group {automation resource group name} --name {user-assigned managed identity name}
-
-  # a name for our azure ad app
-  appName="{automation account name}-application"
-
-  # The name of the app role that the managed identity should be assigned to.
-  appRoleName='Managed Identity Operator' # For example, MyApi.Read.All
-
-  pwsh --command "Connect-AzAccount -UseDeviceAuthentication -Tenant {tenant id} -Subscription {subscription Id}; Set-AzAutomationAccount -AssignUserIdentity /subscriptions/{subscription Id}/resourcegroups/{automation resource group name}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/{user-assigned managed identity name} -ResourceGroupName {automation resource group name} -Name {automation account name} -AssignSystemIdentity;"
-
-  az role assignment create --assignee-object-id {user-assigned managed identity principal id} --assignee-principal-type 'ServicePrincipal' --role 'Monitoring Contributor' --subscription {subscription name}
-  az role assignment create --assignee-object-id {user-assigned managed identity principal id} --assignee-principal-type 'ServicePrincipal' --role 'Contributor' --subscription {subscription name}
-
-   ```
-
-   1. Enable "system-assigned managed identity" for the automation account.
-      1. This identity will require "Managed Identity Contributor" permissions to allow it access to a user-assigned managed identity created in the subsequently steps.
-
-4. Create an Azure Powershell Runbook from the Azure Portal within the Automation Resource Group or using the Azure CLI
-   1. If the portal is used use the portal UX to upload the Powershell runbook file located in the scripts/automation directory 
-
-  example Azure Runbook name: 'rb-asb-firewall-automation-dev'
-
-  The Azure CLI command for this action was causing errors at the time of writing this.  The following command allows for creating a PowerShell "shell" so that the Az PowerShell module can be used.  
-
-  ```azurecli
   
-    pwsh -command "Install-Module -Name Az.Automation; New-AzAutomationRunbook -Type 'PowerShell' -AutomationAccountName {automation account name} -Name {runbook name} -ResourceGroupName {automation resource group name};"
+pwsh -command "Install-Module -Name Az.Automation; New-AzAutomationRunbook -Type 'PowerShell' -AutomationAccountName {automation account name} -Name {runbook name} -ResourceGroupName {automation resource group name};"
 
-    az automation runbook replace-content --automation-account-name {automation account name} --resource-group {automation resource group name} --name {runbook name} --content @"{path to runbook file}"
+az automation runbook replace-content --automation-account-name {automation account name} --resource-group {automation resource group name} --name {runbook name} --content @"{path to runbook file}"
 
-  ```
+```
 
-5. Create Automation Account Schedule
+#### Create Automation Account
 
-  ```azurepowershell
+``` bash
+# Log into the tenant
+az login --tenant {tenant Id}
+
+# Set the subscription desired    
+az account set --subscription {subscription name}
+
+# Create automation account
+az automation account create --automation-account-name {automation account name} --location {location} --sku 'Basic' --resource-group {automation resource group name}
+
+```
+
+##### Assign user-assigned Managed Identity to Automation Account
+
+``` bash
+
+# a name for our azure ad app
+appName="{automation account name}-application"
+
+# The name of the app role that the managed identity should be assigned to.
+appRoleName='Managed Identity Operator' # For example, MyApi.Read.All
+
+#turn on system-assigned managed identity 
+pwsh --command "Connect-AzAccount -UseDeviceAuthentication -Tenant {tenant id} -Subscription {subscription id}; Set-AzAutomationAccount -AssignUserIdentity /subscriptions/{subscription id}/resourcegroups/{automation resource group name}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/{user-assigned managed identity name} -ResourceGroupName {automation resource group name} -Name {automation account name} -AssignSystemIdentity;"
+
+#assign role
+az role assignment create --assignee {automation account principal id} --role 'Managed Identity Operator' --scope "/subscriptions/{subscription id}/resourcegroups/{automation resource group name}/providers/Microsoft.Automation/automationAccounts/{automation account name}"
+
+```
+
+#### Create Automation PowerShell Runbook Artifacts
+
+``` bash
+# Log into the tenant
+az login --tenant {tenant Id}
+
+# Set the subscription desired    
+az account set --subscription {subscription name}
+
+pwsh -command "Install-Module -Name Az.Automation; New-AzAutomationRunbook -Type 'PowerShell' -AutomationAccountName {automation account name} -Name {runbook name} -ResourceGroupName {automation resource group name};"
+
+```
+
+#### Create Automation Schedule and Link Runbook
+
+  ```bash
     
     New-AzAutomationSchedule -AutomationAccountName $Automation_Account_Name -Name $schedule_Name -StartTime $start_Time -ExpiryTime $end_Time -DayInterval 1 -ResourceGroupName $Resource_Group_Name_for_Automation
 
@@ -135,315 +334,94 @@ Before proceeding verify  the environment is configured correct to execute the c
 
   ```
 
-6. LInk the Runbook to the schedules
- 
-### BASH Variables
+<img src="./assets/automation/endAutomationScheduleLinked1Portal.png" alt="Create a User-Assigned Managed Identity for the Automation" />
+
+<img src="./assets/automation/createAutmationAccountSchedule1Portal.png" alt="Create a User-Assigned Managed Identity for the Automation" />
+
+<img src="./assets/automation/editRunbookScheduleLinked1Portal.png" alt="Create a User-Assigned Managed Identity for the Automation" />
+
+<img src="./assets/automation/endAutomationScheduleLinked1Portal.png" alt="Create a User-Assigned Managed Identity for the Automation" />
+
+1. LInk the Runbook to the schedules
+
+### ADVANCED - Automated Scripts to Run
+
+BEFORE continuing please make sure all requirements have been met in the section labeled [prerequisites]("#-prerequisites").
+
+1. [Create Automation Infrastructure (BASH script)]("./scripts/automatoin/createAutomationForFirewallCostOptimization.sh")
+  
+  The [createAutomationForFirewallCostOptimization.sh]("./scripts/automation/createautimationForFirewallCostOptimization.sh") script "dot sources" the [firewallAutomationForCostOptimization.variables.sh]("./scripts/automation/cfirewallAutomationForCostOptimization.variables.sh").  
+  *This file must to be adjusted for the specifics of the execution.*
+
+#### BASH Variables
 
 The BASH variables are exported into environment variables.  
 
 ``` bash
-export ASB_FW_Tenant_Id='' # Tenant Id for the onmicrosoft.com tenant
-export ASB_FW_Subscription_Id='' # Suscription Id for Jofultz-Team
-export ASB_FW_Resource_Group_Name_for_Automation='' # Resource Group that houses all the automation resources.
-export ASB_FW_Resource_Group_Name_with_Firewall='' # Resource Group that houses the firewall to be automated.
-export ASB_FW_Location='' # Location for resource creation
-export ASB_FW_Automation_Account_Name='' # Name for automation account created
-export ASB_FW_Sku='Basic' # Sku for the Automation Account
-export ASB_FW_PowerShell_Runbook_Name='' # Powershell based runbook name.
-export ASB_FW_PowerShell_Runbook_File_Name='' # Powershell based runbook file name.
-export ASB_FW_Identity_Name='' # Managed Identity name.
-export ASB_FW_PowerShell_Runbook_Description=''
-export ASB_FW_PowerShell_Runbook_Output_Folder='.'
-export ASB_FW_Environment=''
-export ASB_FW_Base_Schedule_Name='asb-firewall-automation'
+# Tenant Id for the onmicrosoft.com tenant
+export ASB_FW_Tenant_Id=''
+export ASB_FW_Subscription_Name=''
+export ASB_FW_Base_NSGA_Name='ngsa-asb'
+export ASB_FW_Base_Automation_System_Name='firewall-automation'
+export ASB_FW_Environment='dev'
+export ASB_FW_PowerShell_Runbook_File_Name='firewallAutomationForCostOptimization.Runbook.ps1'
+export ASB_FW_Sku='Basic'
+export ASB_FW_Location='westus'
+export ASB_FW_PowerShell_Runbook_Description='This runbook allocates and de-allocates specific firewalls.  It also enables and disables specific metric and log alerts associated with such activities.'
 
 ```
-
-### Automated Scripts to Run
-BEFORE continuing please make sure all requirements have been met in the section labeled [prerequisites]("#-prerequisites").
-
-1. [Create Automation Infrastructure (BASH script)]("./scripts/automation/createautimationForFirewallCostOptimization.sh")
-   - The [createAutomationForFirewallCostOptimization.sh]("./scripts/automation/createautimationForFirewallCostOptimization.sh") script "dot sources" the [firewallAutomationForCostOptimization.variables.sh]("./scripts/automation/cfirewallAutomationForCostOptimization.variables.sh").  This file must to be adjusted for the specifics of the execution.  Currently it is not populated save the default for Sku.  See ["BASH Variables for details"]("#-bash-variables").
-
-## Detail of What is Happening in the Scripts
 
 Below will detail what is being executed within the script files for further understanding.  This section is informational only.
 
-### 1. Adjsut Variables for Current Values
+#### Adjust Variables
 
-The file [firewallAutomationForCostOptimization.variables.sh]("./scripts/automation/cfirewallAutomationForCostOptimization.variables.sh") must be adjusted to include relevant values.  
+The file [firewallAutomationForCostOptimization.variables.sh]("./scripts/automation/cfirewallAutomationForCostOptimization.variables.sh") must be adjusted to include relevant values.
 
-- ASB_FW_Tenant_Id=''
-- ASB_FW_Subscription_Id=''
-- ASB_FW_Resource_Group_Name_for_Automation=''
-- ASB_FW_Resource_Group_Name_with_Firewall=''
-- ASB_FW_Location='' 
-- ASB_FW_Automation_Account_Name=''
-- ASB_FW_Sku='Basic'
-- ASB_FW_PowerShell_Runbook_Name=''
-- ASB_FW_PowerShell_Runbook_File_Name=''
-- ASB_FW_Identity_Name=''
-- ASB_FW_PowerShell_Runbook_Description=''
-- ASB_FW_PowerShell_Runbook_Output_Folder='.'
-- ASB_FW_Environment=''
-- ASB_FW_Base_Schedule_Name='asb-firewall-automation'
+*Sensitive values such as subscription Id have been omitted*
 
-### 1. Set Subscription & Tenant
+``` bash
+ASB_FW_Tenant_Id=''
+ASB_FW_Subscription_Name=''
+ASB_FW_Base_NSGA_Name='ngsa-asb'
+ASB_FW_Base_Automation_System_Name='firewall-automation'
+ASB_FW_Environment='dev'
+ASB_FW_PowerShell_Runbook_File_Name='firewallAutomationForCostOptimization.Runbook.ps1'
+ASB_FW_Sku='Basic'
+ASB_FW_Location='westus'
+ASB_FW_PowerShell_Runbook_Description='This runbook automates the allocation and de-allocation of a firewall for the purposes of scheduling.'
 
-Authenticate into the correct tenant and subscription.  Below is the Azure Commandline Interface (CLI)
+```
+
+#### Executing Script
+
+Once the variables are adjusted the script must be run from Visual Studio Code (thick client) using Codespaces.  the script does not require input parameters because they are provided in the variable file mentioned above.
 
 ``` bash
 
-echo "Setting subscription to $subscription in tenant $tenantId..."
-
-az login --tenant $tenantId
-az account set --subscription $subscription
-
-echo "Completed setting subscription to $subscription in tenant $tenantId."
+  ./createAutomationForFirewallCostOptimization.sh
 
 ```
 
-### Install Powershell Modules
+To create the schedules execute the PowerShell script createSchedulesFirewallAutomationForCostOptimization.ps1.  This script must be executed in Codespaces as well, and must have parameters passed to it.  
 
-The following command should be executed from the Codespace terminal to ensure the modules are installed.  These commands can be executed from an authenticated Azure Powershell terminal from within the Azure Codespace environment.
+``` PowerShell
 
-#### 3. PowerShell Modules
-
-```PowerShell
-
-Write-Host "Installing & Importing Azure Powershell Az Module for Automation."
-
-Install-Module -Name Az.Automation -Force | out-null
-Import-Module -Name Az.Automation -Force | out-null
-
-Write-Host "Installing & Importing Azure Powershell Az Module for Monitor."
-
-Install-Module -Name Az.Monitor -Force | out-null
-Import-Module -Name Az.Monitor -Force | out-null
-
-Write-Host "Completed installing & importing Azure Powershell Az Modules for Authentication and Monitor."
-
-```
-
-### 4. Install Azure CLI Assets
-
-Follow the steps below to assure the prerequisites are installed and up-to-date and all necessary extensions are installed.
-
-### 5. Azure CLI Upgrade
-
-```bash
-# check the version of the Azure CLI installed.  
-
-az version
-# if < than 2.4.0 
-echo "Upgrading to latest version of Azure CLI..."
-
-az upgrade --output none 
-
-echo "Completed updating "
-echo "Azure CLI version: $(az --version | grep azure-cli | awk '{print $2}""
+createSchedulesFirewallAutomationForCostOptimization.ps1 
+    -Tenant_Id '{tenant id}' 
+    -Subscription_Name '{subscription name}' 
+    -Subscription_Id '{subscription id}' 
+    -Resource_Group_Name_for_Automation 'rg-ngsa-asb-firewall-automation-dev' -Resource_Group_Name_with_Firewall 'rg-ngsa-asb-dev-hub' 
+    -Location 'westus' 
+    -Automation_Account_Name 'aa-ngsa-asb-firewall-automation-dev' 
+    -Sku 'Basic' 
+    -PowerShell_Runbook_Name 'rb-ngsa-asb-firewall-automation-dev' 
+    -Vnet_Name 'vnet-eastus-hub' 
+    -Firewall_Name 'fw-eastus' 
+    -PIP_Name1 'pip-fw-eastus-01' 
+    -PIP_Name2 'pip-fw-eastus-02' 
+    -PIP_Name_Default 'pip-fw-eastus-default' 
+    -Managed_Identity_Name 'mi-ngsa-asb-firewall-automation-dev' 
+    -Base_Schedule_Name 'as-ngsa-asb-firewall-automation-dev' 
+    -Environment 'dev'
 
 ```
-
-### 6. Azure CLI Extensions
-
-```bash
-az config set extension.use_dynamic_install=yes_without_prompt --output none
-    
-# Install or update Azure CLI automation extension
-if [[ $(az extension list --query "[?name=='automation']")=false ]]; then
-
-  echo "Installing Azure CLI Automation extension..."
-
-  az extension add --name automation --output none
-  
-  echo "Completed installing Azure CLI Automation extension version:"
-  echo "$(az extension list --query "[?name=='automation'].version" -o tsv)."
-
-else
-  echo "Updating Azure CLI Automation extension"
-
-  az extension update --name automation --output none
-
-  echo "Completed updating Azure CLI Automation extension version:"
-  echo "$(az extension list --query "[?name=='automation'].version" -o tsv)."
-fi
-# configure Azure CLI to disallow dynamic installation of
-# extensions without prompts
-az config set extension.use_dynamic_install=yes_prompt --output none
-```
-
-### Parameters Needed to Proceed
-
-| Parameter Name | Example Value | Rules for Naming |
-| -------------- | :-----------: | ---------------- |
-||||
-| ASB_FW_TenantId | 00000000-0000-0000-0000-000000000000 ||
-| ASB_FW_SubscriptionId | 00000000-0000-0000-0000-000000000000 |  |
-| ASB_FW_Sku | Basic |  |
-| ASB_FW_Automation_Resource_Group_Name | rg-asb-firewall-automation |  |
-| ASB_FW_Resource_Group_Core | rg-ngsa-asb-dev-hub |  |
-| ASB_FW_Location | eastus |  |
-| ASB_FW_Automation_Account_Name | aa-asb-firewall-automation |  |
-| ASB_FW_PowerShell_Runbook_Name | rb-asb-firewall-automation |  |
-| ASB_FW_PowerShell_Runbook_File_Name | firewallAutomationForCostOptimization.ps1 |  |
-| ASB_FW_Identity_Name | mi-asb-firewall-automation |  |
-| ASB_FW_PowerShell_Runbook_Description | This runbook automates the allocation and de-allocation of a firewall for the purposes of scheduling." | Description of Runbook |
-| ASB_FW_PowerShell_Runbook_Output_Folder | . |  |
-| ASB_FW_Environment | dev |  |
-| ASB_FW_Base_Schedule_Name_Start | asb-fw-start- |  |
-| ASB_FW_Base_Schedule_Name_Stop | asb-fw-stop- |  |
-| AssigneeObjectId              | 00000000-0000-0000-0000-000000000000 | [Az Role Assignment Assignee-Object-Id](https://learn.microsoft.com/en-us/cli/azure/role/assignment?view=azure-cli-latest#az-role-assignment-create-optional-parameters)                                                                                                                                                                                                              |
-| vnetName                      |           vnet-cetntral-hub          | Found in the portal.                                                                                                                                                                                                                                                                                                                                                        |
-| firewallName                  |             fw-centralus             | Found in the portal.                                                                                                                                                                                                                                                                                                                                                        |
-| pip_name1                     |          pip-fw-centralus-01         | Found in the portal.                                                                                                                                                                                                                                                                                                                                                        |
-| pip_name2                     |          pip-fw-centralus-02         | Found in the portal.                                                                                                                                                                                                                                                                                                                                                        |
-| pip_name_default              |       pip-fw-centralus-default       | Found in the portal.                                                                                                                                                                                                                                                                                                                                                        |
-| UAMI                          |    mi-asb-firewall-automation-dev   | User-Assigned Managed Identity name.
-
-## Infrastructure & Assets Creation List
-
-The following infrastructure assets should be established in the subscription with the Azure Firewall(s) to be managed once all aspects of this document are fulfilled.  Though six (6) items are listed, technically one (1) item is an import of content to the body of the Azure Automation Runbook so this item will not show up in the portal without deeper investigation.  
-
-|     | Resource                                  |                                                                                       Links                                                                                      | Description                                                                                                                                                                 |
-| :-: | :---------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-|  1. | Resource Group                            |                                                 [link](https://learn.microsoft.com/en-us/cli/azure/manage-azure-groups-azure-cli)                                                | Create "sibling" resource group in subscription for Azure Automation infrastructure.                                                                                        |
-|  2. | Automation Account                        |                     [link](https://learn.microsoft.com/en-us/azure/templates/microsoft.automation/automationaccounts?pivots=deployment-language-arm-template)                    | Create an Automation Account that will execute the automation.                                                                                                              |
-|  3. | User-Assigned Managed Identity            | [link](https://learn.microsoft.com/en-us/azure/active-directory/managed-identities-azure-resources/how-manage-user-assigned-managed-identities?pivots=identity-mi-methods-azcli) | Create an identity for the Automation Account.                                                                                                                              |
-|  4. | Automation Runbook with Powershell        |                                      [link](https://learn.microsoft.com/en-us/azure/automation/automation-runbook-types#powershell-runbooks)                                     | Create a Runbook of type Powershell.                                                                                                                                        |
-|  5. | Powershell Content in Runbook             |                               [link](https://learn.microsoft.com/en-us/powershell/module/az.automation/import-azautomationrunbook?view=azps-8.3.0)                               | Upload [pre-defined Powershell content](../automation/FirewallToggle.ps1) into the Runbook body.                                                                            |
-|  6. | Automation Schedule(s) _using Powershell_ |                               [link](https://learn.microsoft.com/en-us/powershell/module/az.automation/import-azautomationrunbook?view=azps-8.3.0)                               | Create the schedules that will execute the Firewall automation.  These had to be created using Powershell instead of the Azure CLI.  No equivalent behavior has been found. |                                |
-
-### Create Resource Group
-
-```bash
-#Check if automation resource group exists, and create it if it does not.
-if [[ $(az group exists --name $AutomationResourceGroupName)=false ]]; then
-  az group create --name $AutomationResourceGroupName --location $Location
-fi
-```
-
-### Create Azure Automation Account
-
-```bash
-echo "Creating Azure Automation Account $AutomationAccountName in Resource Group $AutomationResourceGroupName..."
-if [[ $(az automation account list --resource-group $AutomationResourceGroupName --query "[?name=='$AutomationAccountName'] | length(@)") > 0 ]]; then
-    echo "$AutomationAccountName exists, please review, and choose a different name if appropriate."
-
-else
-    echo "Creating Azure Automation Account $AutomationAccountName..."
-    
-    az automation account create --automation-account-name $AutomationAccountName --location $Location --sku $Sku --resource-group $AutomationResourceGroupName
-
-    echo "Completed creating Azure Automation Account $AutomationAccountName."
-fi
-
-echo "Completed creating Azure Automation Account $AutomationAccountName in Resource Group $AutomationResourceGroupName."
-```
-
-### Create User-Assigned Managed Identity
-
-```bash
-echo "Creating User-Assigned Managed Identity $IdentityName in $AutomationResourceGroupName..."
-az identity create --resource-group $AutomationResourceGroupName --name $IdentityName
-echo "Completed created User-Assigned Managed Identity $IdentityName in $AutomationResourceGroupName."
-```
-
-### Assign Role to User-Assigned Managed Identity
-
-```bash
-export Identity=$(az identity list -o tsv --query "[].{id:id, principalId: principalId} | [? contains(id, $IdentityName]".id)
-
-export PrincipalId=$(az identity list -o tsv --query "[].{id:id, principalId: principalId} | [? contains(id, $IdentityName]".principalId)
-
-export RoleName=$(az role definition list -o tsv --query "[].{roleName:roleName} | [? contains(roleName, Network Contributor].roleName")
-
-echo "Assigning User-Assigned Managed Identity $IdentityName to $Subscription in resource group $AutomationResourceGroupName..."
-az role assignment create --assignee-object-id $PrincipalId --role "Network Contributor" --subscription $Subscription
-echo "Completed Assigning User-Assigned Managed Identity $IdentityName to $Subscription in resource group $AutomationResourceGroupName."$AutomationResourceGroupName."
-```
-
-### Create Automation Powershell Runbook
-
-```bash
-if [[ $(az automation runbook list --resource-group $AutomationResourceGroupName --automation-account-name $AutomationAccountName --query "[?name=='$PowerShellPowerShellRunbookName'] | length(@)") > 0 ]]; then
-    echo "$PowerShellPowerShellRunbookName exists, please review, and choose a different name if appropriate."
-else
-    echo "Creating PowerShell Runbook $PowerShellPowerShellRunbookName in $AutomationResourceGroupName for $AutomationAccountName..."
-    az automation runbook create --resource-group $AutomationResourceGroupName --automation-account-name $AutomationAccountName --name $PowerShellPowerShellRunbookName --runbook-type PowerShell --description $PowerShellRunbookDescription
-    echo "Completed creating PowerShell Runbook $PowerShellPowerShellRunbookName in $AutomationResourceGroupName for $AutomationAccountName."
-fi
-```
-
-### Publish Runbook
-
-```bash
-echo "Uploading Runbook Content from $PowerShellRunbookFileName to $PowerShellRunbookName to $AutomationAccountName in $AutomationResourceGroupName..."
-  
-export repositoryName=$(basename -s .git `git config --get remote.origin.url`)
-  
-export file=$(cat automation/$PowerShellRunbookFileName) 
-
-az automation runbook replace-content --automation-account-name $AutomationAccountName --resource-group $AutomationResourceGroupName --name $PowerShellRunbookName --content $file
-
-az automation runbook publish --resource-group $AutomationResourceGroupName --automation-account-name $AutomationAccountName --name $PowerShellRunbookName
-  
-echo "Completed uploading Runbook Content from $PowerShellRunbookFileName to $PowerShellRunbookName to $AutomationAccountName in $AutomationResourceGroupName" 
-```
-
-### Create Schedule (PowerShell)
-
-<!-- ```bash
-# echo "Creating Schedule for $PowerShellRunbookName controlled by $AutomationAccountName automation account, in $AutomationResourceGroupName recourse group..."
-  
-#  az automation  --automation-account-name $AutomationAccountName --resource-group $AutomationResourceGroupName --name $PowerShellRunbookName --content $file
- 
-  
-# echo "Completed Creating Schedule for $PowerShellRunbookName controlled by $AutomationAccountName automation account, in $AutomationResourceGroupName recourse group."
-``` -->
-
-```powershell
-
-  source ./automation/variables.ps1
-  Connect-AzAccount -UseDeviceAuth
-  Select-AzSubscription -SubscriptionName $Env:Subscription
-
-  $StartTime = Get-Date "13:00:00"
-  $EndTime = $StartTime.AddYears(3)
-
-  New-AzAutomationSchedule -AutomationAccountName $Env:AutomationAccountName -Name "$Env:BaseScheduleNameStart$Env:Asb_Environment" -StartTime $StartTime -ExpiryTime $EndTime -DayInterval 1 -ResourceGroupName $Env:AutomationResourceGroupName
-
-  New-AzAutomationSchedule -AutomationAccountName $Env:AutomationAccountName -Name "$Env:BaseScheduleNameStop$Env:Asb_Environment" -StartTime $StartTime -ExpiryTime $EndTime -DayInterval 1 -ResourceGroupName $Env:AutomationResourceGroupName
-
-```
-
-### Associate Schedule with Runbook
-
-```powershell
-Write-Host "Registering an Azure Automation Schedule to a Automation Runbook..."
-  $error.Clear()
-
-  $params = @{}
-  $params.Add("resource_Group_Name_with_Firewall", "$Resource_Group_Name_with_Firewall")
-  $params.Add("resource_Group_Name_for_Automation", "$Resource_Group_Name_for_Automation")
-  $params.Add("automation_Account_Name", "$Automation_Account_Name")
-  $params.Add("subscription_Name","$subscription_Name")
-  $params.Add("vnet_Name", "$vnet_Name")
-  $params.Add("firewall_Name", "$firewall_Name")
-  $params.Add("pip_Name1", "$pip_Name_1")
-  $params.Add("pip_Name2", "$pip_Name_2")
-  $params.Add("pip_Name_Default", "$pip_Name_Default")
-  $params.Add("managed_Identity_Name", "$managed_Identity_Name")
-  $params.Add("action", "$action")
-
-  Register-AzAutomationScheduledRunbook -Parameters $params -ResourceGroupName $Resource_Group_Name_for_Automation -AutomationAccountName $Automation_Account_Name -RunbookName $powerShell_Runbook_Name -ScheduleName $schedule_Name
-  Write-Host "Completed registering an Azure Automation Schedule to a Automation Runbook."
-```
-
-### Reference
-
-- [Microsoft - FAQ - How can I stop and start azure firewalls](https://learn.microsoft.com/en-us/azure/firewall/firewall-faq#how-can-i-stop-and-start-azure-firewall)
-- [WCNP - Automated FW malloc & free](https://github.com/retaildevcrews/wcnp/issues/1003)
-- [WCNP - Migrate Infrastructure](https://github.com/retaildevcrews/wcnp/issues/815)
-- [Microsoft - Automation Services - Azure Automation](https://learn.microsoft.com/en-us/azure/automation/automation-services#azure-automation)
-- [Microsoft - Create Automation PowerShell RunBook using managed identity](https://learn.microsoft.com/en-us/azure/automation/learn/powershell-runbook-managed-identity)
