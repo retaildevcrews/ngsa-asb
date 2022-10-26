@@ -459,8 +459,6 @@ function pushToGit()
 
   git commit -m "added cluster config"
 
-  # Add and push Flux branch and repo info
-  git add deploy/bootstrap/flux-system/
   # Note: if separate bootstrap folder (dev-bootstrap) for dev env exists, then replace `bootstrap` with `dev-bootstrap`
   # git add deploy/dev-bootstrap/flux-system/
   git commit -m "added flux bootstrap config"
@@ -469,10 +467,32 @@ function pushToGit()
 
   echo "Completed Pushing To Github."
 
-  export ASB_SCRIPT_STEP=deployFlux
+  export ASB_SCRIPT_STEP=prepFluentBit
   # Save environment variables
   ./saveenv.sh -y
 
+  # Invoke Next Step In Setup
+  $ASB_SCRIPT_STEP
+}
+
+function prepFluentBit()
+{
+  echo "Importing Fluentbit Image..."
+
+   # Import FluentBit image into ACR
+  az acr import --source docker.io/fluent/fluent-bit:1.9.5 -n $ASB_ACR_NAME 
+
+  echo "Creating secrets to authenticate with log analytics..."
+
+  # Create secrets to authenticate with log analytics
+  kubectl create secret generic fluentbit-secrets --from-literal=WorkspaceId=$(az monitor log-analytics workspace show -g $ASB_RG_CORE -n $ASB_LA_NAME --query customerId -o tsv)   --from-literal=SharedKey=$(az monitor log-analytics workspace get-shared-keys -g $ASB_RG_CORE -n $ASB_LA_NAME --query primarySharedKey -o tsv) -n fluentbit
+  
+  echo "Completed importing Fluentbit Image"
+
+  export ASB_SCRIPT_STEP=deployFlux
+  # Save environment variables
+  ./saveenv.sh -y
+    
   # Invoke Next Step In Setup
   $ASB_SCRIPT_STEP
 }
@@ -514,18 +534,6 @@ function deployFlux()
   # List all flux kustmization in the cluster
   # It also shows the state of each kustomization
   flux get kustomizations -A
-
-  # Reconcile (sync) one individual kustomization
-  flux reconcile kustomization -n ngsa ngsa # note the namespace `-n ngsa`
-
-  # Reconcile (sync) all flux kustomization in the cluster
-  flux get kustomizations -A --no-header | awk -F' ' '{printf "%s -n %s\n",$2, $1}' | xargs -L 1 -I_ sh -c "flux reconcile kustomization _"
-
-  # Suspend one flux kustomization from reconciliation (sync)
-  # flux suspend kustomization -n ngsa ngsa # note the namespace `-n ngsa`
-
-  # Suspend the git source from updating (should suspend any updates from the git repo)
-  # flux suspend source git asb-repo-flux
 
   echo "Completed Deploying Flux."
 
