@@ -3,4 +3,4 @@ kind: Kustomization
 resources:
   - istio-gateway.yaml
   - istio-ingress.yaml
-  - istio-pod-identity-config.yaml
+  # - istio-pod-identity-config.yaml
