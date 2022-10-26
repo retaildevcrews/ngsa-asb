@@ -85,7 +85,7 @@
             "timeGrain": "auto"
           },
           "azureLogAnalytics": {
-            "query": "AzureDiagnostics\n| where ResourceProvider==\"MICROSOFT.DOCUMENTDB\" and Category == \"DataPlaneRequests\" and Resource == \"NGSA-ASB-DEV-COSMOS\"\n| where databaseName_s == \"imdb\"\n| where statusCode_s == 429\n| count",
+            "query": "AzureDiagnostics\n| where ResourceProvider==\"MICROSOFT.DOCUMENTDB\" and Category == \"DataPlaneRequests\" and Resource == \"WCNP-DEV-COSMOS\"\n| where databaseName_s == \"imdb\"\n| where statusCode_s == 429\n| count",
             "resultFormat": "time_series",
             "workspace": "6e15e078-3857-48e1-b64c-9791741a5968"
           },
@@ -238,8 +238,8 @@
             "metricDefinition": "Microsoft.DocumentDB/databaseAccounts",
             "metricName": "TotalRequests",
             "metricNamespace": "microsoft.documentdb/databaseaccounts",
-            "resourceGroup": "rg-ngsa-asb-dev-cosmos",
-            "resourceName": "ngsa-asb-dev-cosmos",
+            "resourceGroup": "rg-wcnp-dev-cosmos",
+            "resourceName": "wcnp-dev-cosmos",
             "timeGrain": "auto",
             "timeGrains": [
               {
@@ -349,8 +349,8 @@
             "metricDefinition": "Microsoft.DocumentDB/databaseAccounts",
             "metricName": "TotalRequestUnits",
             "metricNamespace": "microsoft.documentdb/databaseaccounts",
-            "resourceGroup": "rg-ngsa-asb-dev-cosmos",
-            "resourceName": "ngsa-asb-dev-cosmos",
+            "resourceGroup": "rg-wcnp-dev-cosmos",
+            "resourceName": "wcnp-dev-cosmos",
             "timeGrain": "auto",
             "timeGrains": [
               {
@@ -491,7 +491,7 @@
             "timeGrain": "auto"
           },
           "azureLogAnalytics": {
-            "query": "AzureMetrics \n| where MetricName == \"ProvisionedThroughput\" and Resource == \"NGSA-ASB-DEV-COSMOS\"\n| summarize max(Count) ",
+            "query": "AzureMetrics \n| where MetricName == \"ProvisionedThroughput\" and Resource == \"WCNP-DEV-COSMOS\"\n| summarize max(Count) ",
             "resultFormat": "time_series",
             "workspace": "6e15e078-3857-48e1-b64c-9791741a5968"
           },

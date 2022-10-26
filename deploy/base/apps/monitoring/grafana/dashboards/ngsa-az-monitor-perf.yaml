@@ -110,7 +110,7 @@ data:
                     "timeGrain": "auto"
                   },
                   "azureLogAnalytics": {
-                    "query": "AzureDiagnostics\n| where ResourceProvider==\"MICROSOFT.DOCUMENTDB\" and Category == \"DataPlaneRequests\" and Resource == \"NGSA-ASB-DEV-COSMOS\"\n| where databaseName_s == \"imdb\"\n| where statusCode_s == 429\n| count",
+                    "query": "AzureDiagnostics\n| where ResourceProvider==\"MICROSOFT.DOCUMENTDB\" and Category == \"DataPlaneRequests\" and Resource == \"WCNP-DEV-COSMOS\"\n| where databaseName_s == \"imdb\"\n| where statusCode_s == 429\n| count",
                     "resultFormat": "time_series",
                     "workspace": "$laResourceId"
                   },
@@ -241,7 +241,7 @@ data:
                     "metricName": "TotalRequests",
                     "metricNamespace": "microsoft.documentdb/databaseaccounts",
                     "resourceGroup": "rg-wcnp-dev-cosmos",
-                    "resourceName": "ngsa-asb-dev-cosmos",
+                    "resourceName": "wcnp-dev-cosmos",
                     "timeGrain": "auto",
                     "timeGrains": [
                       {
@@ -351,7 +351,7 @@ data:
                     "metricName": "TotalRequestUnits",
                     "metricNamespace": "microsoft.documentdb/databaseaccounts",
                     "resourceGroup": "rg-wcnp-dev-cosmos",
-                    "resourceName": "ngsa-asb-dev-cosmos",
+                    "resourceName": "wcnp-dev-cosmos",
                     "timeGrain": "auto",
                     "timeGrains": [
                       {
@@ -482,7 +482,7 @@ data:
                     "timeGrain": "auto"
                   },
                   "azureLogAnalytics": {
-                    "query": "AzureMetrics \n| where MetricName == \"ProvisionedThroughput\" and Resource == \"NGSA-ASB-DEV-COSMOS\"\n| summarize max(Count) ",
+                    "query": "AzureMetrics \n| where MetricName == \"ProvisionedThroughput\" and Resource == \"WCNP-DEV-COSMOS\"\n| summarize max(Count) ",
                     "resultFormat": "time_series",
                     "workspace": "$laResourceId"
                   },
