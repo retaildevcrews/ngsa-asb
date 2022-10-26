@@ -497,8 +497,10 @@ function deployFlux()
   # Note: If flux v2 exists in cluster, use "kubectl apply -k"
   # Note: if "kubectl create/apply -k" fails once (sometimes CRD takes some time to be injected into the API), then simply reapply
 
+  # Create new variable to reference the correct path of deployment files
+  export ASB_DEPLOYMENT_PATH=deploy/$ASB_ENV-ngsa-asb-$ASB_SPOKE_LOCATION
   # Setup zone specific deployment
-  kubectl apply -f $ASB_GIT_PATH/flux-kustomization/${ASB_CLUSTER_LOCATION}-kustomization.yaml
+  kubectl apply -f $ASB_DEPLOYMENT_PATH/flux-kustomization/${ASB_CLUSTER_LOCATION}-${ASB_ENV}-kustomization.yaml
 
   # 🛑 Check the pods until everything is running
   kubectl get pods -n flux-system
