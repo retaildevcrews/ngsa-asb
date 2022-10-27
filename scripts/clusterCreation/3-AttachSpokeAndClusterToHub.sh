@@ -128,7 +128,20 @@ function deployAks()
   # Set cluster location by choosing the closest pair - not all regions support ASB.
   # Note: Cluster location must be the same as spoke location
   export ASB_CLUSTER_LOCATION=${ASB_SPOKE_LOCATION}
-  export ASB_CLUSTER_GEO_LOCATION=westus
+
+  echo "Geo Location Pairings Can Be Found Here: https://learn.microsoft.com/en-us/azure/availability-zones/cross-region-replication-azure#azure-cross-region-replication-pairings-for-all-geographies"
+  # Cluster Geo Location Prompt
+  PS3="Select Cluster Geo Location: "
+  select ASB_CLUSTER_GEO_LOCATION in "${location_selections[@]}"
+  do
+    if [[ "$ASB_CLUSTER_GEO_LOCATION" ]]; then
+      echo "Location Selected: $ASB_CLUSTER_GEO_LOCATION"
+      break
+    else
+      echo "Number Not In Range, Try Again"
+    fi
+  done
+  export ASB_CLUSTER_GEO_LOCATION=$ASB_CLUSTER_GEO_LOCATION
 
   # This section takes 15-20 minutes
 
@@ -388,7 +401,8 @@ function deployFlux()
 }
 
 function showNextSteps(){
-  echo "All Complete! Continue with https://github.com/retaildevcrews/ngsa-asb#deploying-ngsa-applications. (Deploying NGSA Applications)"
+  echo "All Complete! Continue with https://github.com/retaildevcrews/ngsa-asb#deploying-ngsa-applications. (Deploying NGSA Applications)
+  If you wish to add another cluster/spoke, follow this readme: docs/deployAdditionalCluster.md"
 }
 
 if test -f .current-deployment; then
