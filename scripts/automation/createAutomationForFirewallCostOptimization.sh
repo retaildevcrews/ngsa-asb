@@ -283,7 +283,7 @@ function main(){
 
   CreateAzureAutomationAccount $automationAccountName $automationResourceGroup $ASB_FW_Location $ASB_FW_Sku
 
-  local automationAccountPrincipalId=$(az identity list --resource-group "${automationResourceGroup}" --query "[?name=='${automationAccountName}'].{name:name,principalId:principalId}|[0].principalId" --output tsv)
+  local automationAccountPrincipalId=$(az automation account list --resource-group "${automationResourceGroup}" --query "[?name=='${automationAccountName}'].identity.{principalId:principalId}|[0].principalId" --output tsv)
 
   CreateAzureAutomationPowerShellRunbook $runbookName $automationResourceGroup $automationAccountName $ASB_FW_Tenant_Id $subscriptionId
 
