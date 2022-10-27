@@ -143,10 +143,13 @@ function CreateAzureAutomationPowerShellRunbook(){
     # parameter position 1 = rubbook Name
     # parameter position 2 = Automation Resource Group
     # parameter position 3 = Automation Account Name
+    # parameter position 4 = Tenant Id
+    # parameter position 5 = Subscription Id
+    
 
       echo "Creating PowerShell Runbook $1 in $2 for $3..."
 
-      pwsh -command "Install-Module -Name Az.Automation; New-AzAutomationRunbook -Type 'PowerShell' -AutomationAccountName "${3}" -Name "${1}" -ResourceGroupName "${2}";"
+      pwsh -command "Install-Module -Name Az.Automation; Connect-AzAccount -UseDeviceAuthentication -Tenant $4 -Subscription $5; New-AzAutomationRunbook -Type 'PowerShell' -AutomationAccountName "${3}" -Name "${1}" -ResourceGroupName "${2}";"
 
       echo "Completed creating PowerShell Runbook $1 in $3 for $4."
   
@@ -271,19 +274,21 @@ function main(){
   CreateResourceGroup $automationResourceGroup $ASB_FW_Location
 
   local automationAccountName="aa-${ASB_FW_Base_NSGA_Name}-${ASB_FW_Base_Automation_System_Name}-${ASB_FW_Environment}"
-  local automationAccountPrincipalId=$(az identity list --resource-group "${automationResourceGroup}" --query "[?name=='${automationAccountName}'].{name:name,principalId:principalId}|[0].principalId" --output tsv)
-
+  
   local userAssignedManagedIdentityName="mi-${ASB_FW_Base_NSGA_Name}-${ASB_FW_Base_Automation_System_Name}-${ASB_FW_Environment}"
 
   CreateUserAssignedManagedIdentity $userAssignedManagedIdentityName $automationResourceGroup
 
+  local identityPrincipalId=$(az identity list --resource-group "${automationResourceGroup}" --query "[?name=='${userAssignedManagedIdentityName}'].{name:name,principalId:principalId}|[0].principalId" --output tsv)
+
   CreateAzureAutomationAccount $automationAccountName $automationResourceGroup $ASB_FW_Location $ASB_FW_Sku
 
-  CreateAzureAutomationPowerShellRunbook $runbookName $automationResourceGroup $automationAccountName
+  local automationAccountPrincipalId=$(az identity list --resource-group "${automationResourceGroup}" --query "[?name=='${automationAccountName}'].{name:name,principalId:principalId}|[0].principalId" --output tsv)
+
+  CreateAzureAutomationPowerShellRunbook $runbookName $automationResourceGroup $automationAccountName $ASB_FW_Tenant_Id $subscriptionId
 
   UpdateAzureAutomationAccountToAllowSystemAssignedIdentity $automationAccountName $automationResourceGroup $subscriptionId $ASB_FW_Tenant_Id $userAssignedManagedIdentityName $automationAccountPrincipalId
 
-  local identityPrincipalId=$(az identity list --resource-group "${automationResourceGroup}" --query "[?name=='${userAssignedManagedIdentityName}'].{name:name,principalId:principalId}|[0].principalId" --output tsv)
 
   AssignIdentityRole $identityPrincipalId $userAssignedManagedIdentityName $automationResourceGroup $ASB_FW_Subscription_Name "ServicePrincipal" "Monitoring Contributor"
   AssignIdentityRole $identityPrincipalId $userAssignedManagedIdentityName $automationResourceGroup $ASB_FW_Subscription_Name "ServicePrincipal" "Contributor"  

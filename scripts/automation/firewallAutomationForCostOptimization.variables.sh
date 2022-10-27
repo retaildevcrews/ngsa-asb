@@ -1,5 +1,5 @@
-export ASB_FW_Tenant_Id='' # Tenant Id for the onmicrosoft.com tenant
-export ASB_FW_Subscription_Name='' # Suscription Id for Jofultz-Team
+export ASB_FW_Tenant_Id='72f988bf-86f1-41af-91ab-2d7cd011db47' # Tenant Id for the onmicrosoft.com tenant
+export ASB_FW_Subscription_Name='jofultz-team' # Suscription Id for Jofultz-Team
 export ASB_FW_Base_NSGA_Name='ngsa-asb'
 export ASB_FW_Base_Automation_System_Name='firewall-automation'
 export ASB_FW_Environment='dev'
