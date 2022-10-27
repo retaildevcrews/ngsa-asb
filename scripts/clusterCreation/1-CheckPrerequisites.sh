@@ -47,7 +47,16 @@ function CheckSubscriptionAccess(){
     userId=$(az ad signed-in-user show --query id -o tsv)
     userRolesInSubscription=$(az role assignment list --assignee $userId --query '[].roleDefinitionName' -o tsv)
     groupRolesInSubscription=$(az role assignment list --assignee $ASB_CLUSTER_ADMIN_ID --query '[].roleDefinitionName' -o tsv)
-    desiredRoles=("Owner" "Contributor")
+    desiredRoles=("Owner" "Contributor") # TODO: Ideally check if user has permissions to create Managed Identities in Subscription
+    for roleInSubscription in ${userRolesInSubscription[@]}; do
+        for desiredRole in ${desiredRoles[@]}; do
+            if [[ $desiredRole == $roleInSubscription ]]; then
+                export doesUserHaveDesiredRole=true
+            fi
+        done
+    done
+
+    # Also check if user has Contribute/Owner Access Through Group
     for roleInSubscription in ${groupRolesInSubscription[@]}; do
         for desiredRole in ${desiredRoles[@]}; do
             if [[ $desiredRole == $roleInSubscription ]]; then
