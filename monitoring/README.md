@@ -51,7 +51,7 @@ az storage account create \
 az storage container create \
   --name metrics \
   --account-name $ASB_THANOS_STORAGE_ACCOUNT_NAME \
-  --account-key "$(az storage account keys list -g $ASB_RG_CORE -n $ASB_THANOS_STORAGE_ACCOUNT_NAME --query [0].value -o tsv)"
+  --account-key "$(az storage account keys list -g $ASB_RG_CORE -n $ASB_THANOS_STORAGE_ACCOUNT_NAME --query "[0].value" -o tsv)"
 
 # Save environment variables
 ./saveenv.sh
