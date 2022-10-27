@@ -489,6 +489,40 @@ function prepFluentBit()
   
   echo "Completed importing Fluentbit Image"
 
+  # import Prometheus into ACR
+  az acr import --source docker.io/prom/prometheus:v2.30.0 -n $ASB_ACR_NAME
+
+  # import Grafana into ACR
+  az acr import --source docker.io/grafana/grafana:8.5.5 -n $ASB_ACR_NAME
+
+  # import Thanos into ACR
+  az acr import --source quay.io/thanos/thanos:v0.23.0 -n $ASB_ACR_NAME
+
+
+  export ASB_SCRIPT_STEP=prepMonitoring
+  # Save environment variables
+  ./saveenv.sh -y
+    
+  # Invoke Next Step In Setup
+  $ASB_SCRIPT_STEP
+}
+
+
+function prepMonitoring()
+{
+  echo "Importing prometheus Image..."
+
+  # import Prometheus into ACR
+  az acr import --source docker.io/prom/prometheus:v2.30.0 -n $ASB_ACR_NAME
+
+  echo "Importing grafana Image..."
+  # import Grafana into ACR
+  az acr import --source docker.io/grafana/grafana:8.5.5 -n $ASB_ACR_NAME
+
+  echo "Importing thanos Image..."
+  # import Thanos into ACR
+  az acr import --source quay.io/thanos/thanos:v0.23.0 -n $ASB_ACR_NAME
+
   export ASB_SCRIPT_STEP=deployFlux
   # Save environment variables
   ./saveenv.sh -y
@@ -496,6 +530,7 @@ function prepFluentBit()
   # Invoke Next Step In Setup
   $ASB_SCRIPT_STEP
 }
+
 
 # TODO: Automate creation of flux-init directory ASB_FLUX_INIT_DIR
 function deployFlux()
