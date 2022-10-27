@@ -244,9 +244,16 @@ az network application-gateway http-settings create -g $ASB_RG_CORE --gateway-na
   -n "$ASB_APP_DNS_NAME-httpsettings" --port 443 --protocol Https --cookie-based-affinity Disabled --connection-draining-timeout 0 \
   --timeout 20 --host-name-from-backend-pool true --enable-probe --probe "probe-$ASB_APP_DNS_NAME"
 
+export MAX_RULE_PRIORITY=$(az network application-gateway rule list -g $ASB_RG_CORE --gateway-name $ASB_APP_GW_NAME --query "max([].priority)")
+
+export ABS_HTTPS_REDIRECT_RULE_PRIORITY=$(($MAX_RULE_PRIORITY+1))
+
+# Verify that the new prority is correct.
+echo $ABS_HTTPS_REDIRECT_RULE_PRIORITY
+
 az network application-gateway rule create -g $ASB_RG_CORE --gateway-name $ASB_APP_GW_NAME \
   -n "$ASB_APP_DNS_NAME-routing-rule" --address-pool $ASB_APP_DNS_FULL_NAME \
-  --http-settings "$ASB_APP_DNS_NAME-httpsettings" --http-listener "listener-$ASB_APP_DNS_NAME"
+  --http-settings "$ASB_APP_DNS_NAME-httpsettings" --http-listener "listener-$ASB_APP_DNS_NAME" --priority $ABS_HTTPS_REDIRECT_RULE_PRIORITY
 
 # set http redirection
 # create listener for HTTP (80), HTTPS redirect config and HTTPS redirect routing rule
@@ -257,9 +264,16 @@ az network application-gateway redirect-config create -g $ASB_RG_CORE --gateway-
   -n "https-redirect-config-$ASB_APP_DNS_NAME" -t "Permanent" --include-path true \
   --include-query-string true --target-listener "listener-$ASB_APP_DNS_NAME"
 
+export MAX_RULE_PRIORITY=$(az network application-gateway rule list -g $ASB_RG_CORE --gateway-name $ASB_APP_GW_NAME --query "max([].priority)")
+
+export ABS_HTTPS_REDIRECT_RULE_PRIORITY=$(($MAX_RULE_PRIORITY+1))
+
+# Verify that the new prority is correct.
+echo $ABS_HTTPS_REDIRECT_RULE_PRIORITY
+
 az network application-gateway rule create -g $ASB_RG_CORE --gateway-name $ASB_APP_GW_NAME \
   -n "https-redirect-$ASB_APP_DNS_NAME-routing-rule" --http-listener "http-listener-$ASB_APP_DNS_NAME" \
-  --redirect-config "https-redirect-config-$ASB_APP_DNS_NAME"
+  --redirect-config "https-redirect-config-$ASB_APP_DNS_NAME" --priority $ABS_HTTPS_REDIRECT_RULE_PRIORITY
 
 ```
 
