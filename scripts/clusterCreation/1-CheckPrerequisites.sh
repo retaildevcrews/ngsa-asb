@@ -45,9 +45,10 @@ function CheckSubscriptionAccess(){
     # Check if owner or contributor for subscription
     subscription_id=$(az account show --query id -o tsv)
     userId=$(az ad signed-in-user show --query id -o tsv)
-    groupRoleInSubscriptions=$(az role assignment list --assignee $ASB_CLUSTER_ADMIN_ID --query '[].roleDefinitionName' -o tsv)
+    userRolesInSubscription=$(az role assignment list --assignee $userId --query '[].roleDefinitionName' -o tsv)
+    groupRolesInSubscription=$(az role assignment list --assignee $ASB_CLUSTER_ADMIN_ID --query '[].roleDefinitionName' -o tsv)
     desiredRoles=("Owner" "Contributor")
-    for roleInSubscription in ${groupRoleInSubscriptions[@]}; do
+    for roleInSubscription in ${groupRolesInSubscription[@]}; do
         for desiredRole in ${desiredRoles[@]}; do
             if [[ $desiredRole == $roleInSubscription ]]; then
                 export doesUserHaveDesiredRole=true
@@ -62,5 +63,4 @@ function CheckSubscriptionAccess(){
 GetClusterAdminID
 CheckSubscriptionAccess
 echo "Checking Subsciption and Admin Group Permissions Complete"
-echo "Continue to follow setup in CodeSpaces"
-echo "Once in CodeSpaces enter the following command: ./scripts/clusterCreation/deployASB.sh $ASB_CLUSTER_ADMIN_ID"
+echo "Continue Setup By Creating A Hub: ./scripts/clusterCreation/2-CreateHub.sh $ASB_CLUSTER_ADMIN_ID"
