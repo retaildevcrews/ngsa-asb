@@ -329,6 +329,10 @@ az network application-gateway rule create -g $ASB_RG_CORE --gateway-name $ASB_A
 
 ```
 
+## Deploy Azure Front Door
+
+Instructions to deploy Azure Front Door to support global front end endpoints for your deployed apps (ngsa-memory, ngsa-cosmos, ngsa-java, loderunner, etc.) can be found [here](./docs/deployFrontDoor.md).
+
 ## Deploy WASM sidecar filter
 
 The following instructions will help you get started to deploy a sidecar filter for ngsa-cosmos
