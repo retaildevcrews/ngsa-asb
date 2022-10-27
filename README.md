@@ -1,29 +1,93 @@
 # NGSA AKS Secure Baseline
 
-* [Introduction](#introduction)
-* [Setup Infrastructure](#setup-infrastructure)
-* [Deploying NGSA Applications](#deploying-ngsa-applications)
-* [Deploying LodeRunner Applications](#deploying-loderunner-applications)
-* [Deploy Fluent Bit](#deploy-fluent-bit)
-* [Deploy Grafana and Prometheus](#deploy-grafana-and-prometheus)
-* [Leveraging Subdomains for App Endpoints](#leveraging-subdomains-for-app-endpoints)
-* [Deploy WASM sidecar filter](#deploy-wasm-sidecar-filter)
-* [Deploying Multiple Clusters Using Existing Network](#deploying-multiple-clusters-using-existing-network)
-* [Resetting the Cluster](#resetting-the-cluster)
-* [Delete Azure Resources](#delete-azure-resources)
+- [NGSA AKS Secure Baseline](#ngsa-aks-secure-baseline)
+  - [Introduction](#introduction)
+    - [Before Beginning](#before-beginning)
+      - [Connecting to the Correct Tenant & Setting the Correct Subscription Context](#connecting-to-the-correct-tenant--setting-the-correct-subscription-context)
+        - [PowerShell Az Modules](#powershell-az-modules)
+        - [Azure ClI](#azure-cli)
+  - [Setup Infrastructure](#setup-infrastructure)
+  - [Infrastucture Setup During Each Script](#infrastucture-setup-during-each-script)
+    - [2-CreateHub.sh](#2-createhubsh)
+    - [3-AttachSpokeAndClusterToHub.sh](#3-attachspokeandclustertohubsh)
+  - [Deploying NGSA Applications](#deploying-ngsa-applications)
+    - [🛑 Prerequisite - Setup Cosmos DB in secure baseline](#-prerequisite---setup-cosmos-db-in-secure-baseline)
+    - [Create managed identity for NGSA app](#create-managed-identity-for-ngsa-app)
+    - [AAD pod identity setup for ngsa-app](#aad-pod-identity-setup-for-ngsa-app)
+  - [Deploying LodeRunner Applications](#deploying-loderunner-applications)
+    - [🛑 Prerequisite - Setup Cosmos DB in secure baseline.](#-prerequisite---setup-cosmos-db-in-secure-baseline-1)
+    - [Create managed identity for LodeRunner app](#create-managed-identity-for-loderunner-app)
+    - [AAD pod identity setup for loderunner-app](#aad-pod-identity-setup-for-loderunner-app)
+  - [Deploy Fluent Bit](#deploy-fluent-bit)
+  - [Deploy Grafana and Prometheus](#deploy-grafana-and-prometheus)
+  - [Leveraging Subdomains for App Endpoints](#leveraging-subdomains-for-app-endpoints)
+    - [Motivation](#motivation)
+    - [Create a subdomain endpoint](#create-a-subdomain-endpoint)
+      - [Create app gateway resources](#create-app-gateway-resources)
+  - [Deploy Azure Front Door](#deploy-azure-front-door)
+  - [Deploy WASM sidecar filter](#deploy-wasm-sidecar-filter)
+  - [Deploying Multiple Clusters Using Existing Network](#deploying-multiple-clusters-using-existing-network)
+  - [Resetting the cluster](#resetting-the-cluster)
+  - [Adding resource locks to resource groups](#adding-resource-locks-to-resource-groups)
+  - [Delete Azure Resources](#delete-azure-resources)
+    - [Random Notes](#random-notes)
+    - [Run Checkov scan](#run-checkov-scan)
 
 ## Introduction
 
-NGSA AKS Secure Base line uses the Patterns and Practices AKS Secure Baseline reference implementation located [here](https://github.com/mspnp/aks-secure-baseline).
+NGSA AKS Secure Base line uses the Patterns & Practices (PnP) AKS Secure Baseline [reference implementation]('https://github.com/mspnp/aks-secure-baseline').  
 
-* Please refer to the PnP repo as the `upstream repo`
-* Please use Codespaces
+### Before Beginning
+
+Before proceeding, please make sure the PnP material is familiar.  This will help the person creating the environment understand why specific underlying architectural and design decisions were made.
+
+* Please refer to the PnP repo as the `upstream repo`.
+* Please use Codespaces when executing these instructions.
+
+When authenticating the the Azure portal, either via the Azure CLI or the Az PowerShell modules it is important to use the correct Tenant Id for the tenant desired as well as it is important to set the correct subscription context.  This ensures that in this "one to many" tenant world the correct tenant is utilized each time.  Examples using both implementations are bellow.
+
+#### Connecting to the Correct Tenant & Setting the Correct Subscription Context
+
+##### PowerShell Az Modules
+
+```powershell
+# Connecting to Azure
+Connect-AzAccount -Tenant '{Tenant Id}' --output table
+
+```
+
+Set the subscription passing in either subscription id or name.  
+
+```powershell
+# Install Az Modules
+Install-Module -Name Az --output table
+
+# Set the Azure PowerShell context using piping
+Get-AzSubscription -Subscription '{Subscription Id or Name}' | Set-AzContext -Name 'MyContext'
+
+```
+
+##### Azure ClI
+
+``` bash
+
+# Connecting to Azure
+az login --tenant '{Tenant Id}'
+
+```
+
+```bash
+
+# change the active subscription using the subscription name
+az account set --subscription "{Subscription Id or Name}" --output table
+
+```
 
 ## Setup Infrastructure
 
 Infrastruture Setup is separated into two steps that must be run sequentially
 
-1. run `./scripts/clusterCreation/1-CheckPrerequisites.sh` from a local machine. This will fail if run in CodeSpaces. Requires az cli installation.
+1. run [`./scripts/clusterCreation/1-CheckPrerequisites.sh`]('../../../scripts/clusterCreation/1-CheckPrerequisites.sh') from a local machine. This will fail if run in CodeSpaces. Requires az cli installation.
 
 2. run output of first script in a CodeSpaces instance. This will guide you to deploy a new environment. This will only work inside CodeSpaces.
 
