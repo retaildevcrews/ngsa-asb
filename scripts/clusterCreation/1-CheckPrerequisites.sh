@@ -69,7 +69,16 @@ function CheckSubscriptionAccess(){
     Elevated Privileges are: $(IFS=, ; echo "${desiredRoles[*]}")"; exit 1; else echo "You have elevated permission to this subscription."; fi
 }
 
+function CheckDnsZoneExists(){
+    echo "Checking if DNS Zone Exists..."
+    dnsZones=$(az network dns zone list -g dns-rg --query '[].name' -o tsv)
+    if [ -z $dnsZones ]; then >&2 echo "dns-rg Resource Group doesn't exist or contain any DNS Zones"; exit 1; fi
+    echo "Completed Checking if DNS Zone Exists."
+
+}
+
 GetClusterAdminID
 CheckSubscriptionAccess
+CheckDnsZoneExists
 echo "Checking Subsciption and Admin Group Permissions Complete"
 echo "Continue Setup By Creating A Hub: ./scripts/clusterCreation/2-CreateHub.sh $ASB_CLUSTER_ADMIN_ID"
