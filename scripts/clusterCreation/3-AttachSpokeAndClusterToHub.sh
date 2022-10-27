@@ -197,10 +197,7 @@ function getClusterContext()
   # Get AKS credentials
   az aks get-credentials -g $ASB_RG_CORE -n $ASB_AKS_NAME
 
-  # Rename context for simplicity
-  # kubectl config rename-context $ASB_AKS_NAME $ASB_DEPLOYMENT_NAME-${ASB_CLUSTER_LOCATION}
-
-  # TODO: kubelogin
+  kubelogin convert-kubeconfig -l azurecli
 
   # Check the nodes
   # Requires Azure login
@@ -335,6 +332,29 @@ function pushToGit()
 
   echo "Completed Pushing To Github."
 
+  export ASB_SCRIPT_STEP=deployFluxPrerequisites
+  # Save environment variables
+  ./saveenv.sh -y
+
+  # Invoke Next Step In Setup
+  $ASB_SCRIPT_STEP
+}
+
+function deployFluxPrerequisites()
+{
+  echo "Deploying Flux Prerequisites..."
+  echo "Importing Fluentbit Image..."
+
+  # Import Flux Dependencies To ACR
+  az acr import --source docker.io/fluent/fluent-bit:1.9.5 -n $ASB_ACR_NAME
+  az acr import --source docker.io/prom/prometheus:v2.30.0 -n $ASB_ACR_NAME
+  az acr import --source docker.io/grafana/grafana:8.5.5 -n $ASB_ACR_NAME
+  az acr import --source quay.io/thanos/thanos:v0.23.0 -n $ASB_ACR_NAME
+
+  echo "Creating secrets to authenticate with log analytics..."
+  # Create secrets to authenticate with log analytics
+  kubectl create secret generic fluentbit-secrets --from-literal=WorkspaceId=$(az monitor log-analytics workspace show -g $ASB_RG_CORE -n $ASB_LA_NAME --query customerId -o tsv)   --from-literal=SharedKey=$(az monitor log-analytics workspace get-shared-keys -g $ASB_RG_CORE -n $ASB_LA_NAME --query primarySharedKey -o tsv) -n fluentbit
+
   export ASB_SCRIPT_STEP=deployFlux
   # Save environment variables
   ./saveenv.sh -y
@@ -342,6 +362,8 @@ function pushToGit()
   # Invoke Next Step In Setup
   $ASB_SCRIPT_STEP
 }
+
+
 
 function deployFlux()
 {
@@ -355,15 +377,15 @@ function deployFlux()
   # Goto the ACR in Azure Portal -> Networking -> Add your client IP -> Save
 
   # Import all Flux images to private ACR
-  grep 'image:' deploy/bootstrap/flux-system/gotk-components.yaml | awk -F'azurecr.io' '{print $2}' | xargs -I_ az acr import --source "ghcr.io_" -n $ASB_ACR_NAME
+  grep 'image:' flux-init/base/gotk-components.yaml | awk '{print $2}' | xargs -I_ az acr import --source "_" -n $ASB_ACR_NAME
 
   # Setup flux base system (replace bootstrap folder with dev-bootstrap for dev env)
-  kubectl create -k deploy/bootstrap/flux-system/
+  kubectl create -k ${ASB_FLUX_INIT_DIR}
   # Note: If flux v2 exists in cluster, use "kubectl apply -k"
   # Note: if "kubectl create/apply -k" fails once (sometimes CRD takes some time to be injected into the API), then simply reapply
 
   # Setup zone specific deployment
-  kubectl apply -f $ASB_GIT_PATH/flux-kustomization/${ASB_CLUSTER_LOCATION}-kustomization.yaml
+  kubectl apply -f $ASB_DEPLOYMENT_PATH/flux-kustomization/${ASB_CLUSTER_LOCATION}-kustomization.yaml
 
   # 🛑 Check the pods until everything is running
   kubectl get pods -n flux-system
@@ -377,18 +399,6 @@ function deployFlux()
   # List all flux kustmization in the cluster
   # It also shows the state of each kustomization
   flux get kustomizations -A
-
-  # Reconcile (sync) one individual kustomization
-  flux reconcile kustomization -n ngsa ngsa # note the namespace `-n ngsa`
-
-  # Reconcile (sync) all flux kustomization in the cluster
-  flux get kustomizations -A --no-header | awk -F' ' '{printf "%s -n %s\n",$2, $1}' | xargs -L 1 -I_ sh -c "flux reconcile kustomization _"
-
-  # Suspend one flux kustomization from reconciliation (sync)
-  # flux suspend kustomization -n ngsa ngsa # note the namespace `-n ngsa`
-
-  # Suspend the git source from updating (should suspend any updates from the git repo)
-  # flux suspend source git asb-repo-flux
 
   echo "Completed Deploying Flux."
 

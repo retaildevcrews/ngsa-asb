@@ -196,14 +196,6 @@ LodeRunner Application can be deployed into the cluster using two different appr
 ## Deploy Fluent Bit
 
 ```bash
-# Import image into ACR
-az acr import --source docker.io/fluent/fluent-bit:1.9.5 -n $ASB_ACR_NAME
-
-# Create namespace
-kubectl create ns fluentbit
-
-# Create secrets to authenticate with log analytics
-kubectl create secret generic fluentbit-secrets --from-literal=WorkspaceId=$(az monitor log-analytics workspace show -g $ASB_RG_CORE -n $ASB_LA_NAME --query customerId -o tsv)   --from-literal=SharedKey=$(az monitor log-analytics workspace get-shared-keys -g $ASB_RG_CORE -n $ASB_LA_NAME --query primarySharedKey -o tsv) -n fluentbit
 
 # Load required yaml
 
