@@ -23,11 +23,83 @@ NGSA AKS Secure Base line uses the Patterns and Practices AKS Secure Baseline re
 
 Infrastruture Setup is separated into two steps that must be run sequentially
 
-1. run `./scripts/clusterCreation/getClusterAdminIDforDeployment.sh` from a local machine. This will fail if run in CodeSpaces. Requires az cli installation.
+1. run `./scripts/clusterCreation/1-CheckPrerequisites.sh` from a local machine. This will fail if run in CodeSpaces. Requires az cli installation.
 
 2. run output of first script in a CodeSpaces instance. This will guide you to deploy a new environment. This will only work inside CodeSpaces.
 
 If you would like to restart deployment you can delete current deployment file: `rm .current-deployment`
+
+## Infrastucture Setup During Each Script
+
+### 2-CreateHub.sh
+
+| Deployment File  | Resource Type                            | Name                                   | Resource Group |
+| ---------------- | ---------------------------------------- | -------------------------------------- | -------------- |
+| hub-default.json | Microsoft.OperationalInsights/workspaces | la-hub-${ASB\_HUB\_LOCATION}-${RANDOM} | $ASB\_RG\_HUB  |
+| hub-default.json | Microsoft.Network/networkSecurityGroups  | nsg-${ASB\_HUB\_LOCATION}-bastion      | $ASB\_RG\_HUB  |
+| hub-default.json | Microsoft.Network/virtualNetworks        | vnet-${ASB\_HUB\_LOCATION}-hub         | $ASB\_RG\_HUB  |
+| hub-default.json | Microsoft.Network/publicIpAddresses      | pip-fw-${ASB\_HUB\_LOCATION}-\*        | $ASB\_RG\_HUB  |
+| hub-default.json | Microsoft.Network/firewallPolicies       | fw-policies-base                       | $ASB\_RG\_HUB  |
+| hub-default.json | Microsoft.Network/firewallPolicies       | fw-policies-${ASB\_HUB\_LOCATION}      | $ASB\_RG\_HUB  |
+| hub-default.json | Microsoft.Network/azureFirewalls         | fw-${ASB\_HUB\_LOCATION}               | $ASB\_RG\_HUB  |
+
+### 3-AttachSpokeAndClusterToHub.sh
+
+| Deployment File    | Resource Type                                                              | Name                                                               | Resource Group  |
+| ------------------ | -------------------------------------------------------------------------- | ------------------------------------------------------------------ | --------------- |
+| spoke-default.json | Microsoft.Network/routeTables                                              | route-to-${ASB\_SPOKE\_LOCATION}-hub-fw                            | $ASB\_RG\_SPOKE |
+| spoke-default.json | Microsoft.Network/networkSecurityGroups                                    | nsg-vnet-spoke-BU0001G0001-00-aksilbs                              | $ASB\_RG\_SPOKE |
+| spoke-default.json | Microsoft.Network/networkSecurityGroups                                    | nsg-vnet-spoke-BU0001G0001-00-appgw                                | $ASB\_RG\_SPOKE |
+| spoke-default.json | Microsoft.Network/networkSecurityGroups                                    | nsg-vnet-spoke-BU0001G0001-00-nodepools                            | $ASB\_RG\_SPOKE |
+| spoke-default.json | Microsoft.Network/virtualNetworks                                          | vnet-spoke-BU0001G0001-00                                          | $ASB\_RG\_SPOKE |
+| spoke-default.json | microsoft.network/virtualnetworks/virtualnetworkpeerings                   | vnet-fw-${ASB\_HUB\_LOCATION}-hub/hub-to-vnet-spoke-BU0001G0001-00 | $ASB\_RG\_HUB   |
+| spoke-default.json | Microsoft.Network/publicIpAddresses                                        | pip-${ASB\_DEPLOYMENT\_NAME}-BU0001G0001-00                        | $ASB\_RG\_SPOKE |
+| hub-regionA.json   | Microsoft.OperationalInsights/workspaces                                   | la-hub-${ASB\_HUB\_LOCATION}-${RANDOM}                             | $ASB\_RG\_HUB   |
+| hub-regionA.json   | Microsoft.Network/networkSecurityGroups                                    | nsg-${ASB\_HUB\_LOCATION}-bastion                                  | $ASB\_RG\_HUB   |
+| hub-regionA.json   | Microsoft.Network/virtualNetworks                                          | vnet-${ASB\_HUB\_LOCATION}-hub                                     | $ASB\_RG\_HUB   |
+| hub-regionA.json   | Microsoft.Network/publicIpAddresses                                        | pip-fw-${ASB\_HUB\_LOCATION}-\*                                    | $ASB\_RG\_HUB   |
+| hub-regionA.json   | Microsoft.Network/firewallPolicies                                         | fw-policies-base                                                   | $ASB\_RG\_HUB   |
+| hub-regionA.json   | Microsoft.Network/firewallPolicies                                         | fw-policies-${ASB\_HUB\_LOCATION}                                  | $ASB\_RG\_HUB   |
+| hub-regionA.json   | Microsoft.Network/azureFirewalls                                           | fw-${ASB\_HUB\_LOCATION}                                           | $ASB\_RG\_HUB   |
+| hub-regionA.json   | Microsoft.Network/ipGroups                                                 | ipg-${ASB\_HUB\_LOCATION}-AksNodepools                             | $ASB\_RG\_HUB   |
+| cluster-stamp.json | Microsoft.ManagedIdentity/userAssignedIdentities                           |                                                                    | $ASB\_RG\_CORE  |
+| cluster-stamp.json | Microsoft.ManagedIdentity/userAssignedIdentities                           | mi-appgateway-frontend                                             | $ASB\_RG\_CORE  |
+| cluster-stamp.json | Microsoft.ManagedIdentity/userAssignedIdentities                           | podmi-ingress-controller                                           | $ASB\_RG\_CORE  |
+| cluster-stamp.json | Microsoft.KeyVault/vaults                                                  |                                                                    | $ASB\_RG\_CORE  |
+| cluster-stamp.json | Microsoft.Network/privateEndpoints                                         | nodepools-to-akv                                                   | $ASB\_RG\_CORE  |
+| cluster-stamp.json | Microsoft.Network/privateDnsZones                                          |                                                                    | $ASB\_RG\_CORE  |
+| cluster-stamp.json | Microsoft.Network/privateDnsZones                                          |                                                                    | $ASB\_RG\_CORE  |
+| cluster-stamp.json | Microsoft.Network/privateDnsZones                                          |                                                                    | $ASB\_RG\_CORE  |
+| cluster-stamp.json | Microsoft.Network/applicationGateways                                      |                                                                    | $ASB\_RG\_CORE  |
+| cluster-stamp.json | Microsoft.Resources/deployments                                            |                                                                    | $ASB\_RG\_CORE  |
+| cluster-stamp.json | Microsoft.Resources/deployments                                            |                                                                    | $ASB\_RG\_CORE  |
+| cluster-stamp.json | Microsoft.OperationalInsights/workspaces                                   |                                                                    | $ASB\_RG\_CORE  |
+| cluster-stamp.json | Microsoft.Insights/scheduledQueryRules                                     |                                                                    | $ASB\_RG\_CORE  |
+| cluster-stamp.json | microsoft.insights/activityLogAlerts                                       |                                                                    | $ASB\_RG\_CORE  |
+| cluster-stamp.json | Microsoft.OperationsManagement/solutions                                   |                                                                    | $ASB\_RG\_CORE  |
+| cluster-stamp.json | Microsoft.OperationsManagement/solutions                                   |                                                                    | $ASB\_RG\_CORE  |
+| cluster-stamp.json | Microsoft.ContainerRegistry/registries                                     |                                                                    | $ASB\_RG\_CORE  |
+| cluster-stamp.json | Microsoft.Network/privateEndpoints                                         |                                                                    | $ASB\_RG\_CORE  |
+| cluster-stamp.json | Microsoft.ContainerService/managedClusters                                 |                                                                    | $ASB\_RG\_CORE  |
+| cluster-stamp.json | Microsoft.Insights/metricAlerts                                            |                                                                    | $ASB\_RG\_CORE  |
+| cluster-stamp.json | Microsoft.Insights/metricAlerts                                            |                                                                    | $ASB\_RG\_CORE  |
+| cluster-stamp.json | Microsoft.Insights/metricAlerts                                            |                                                                    | $ASB\_RG\_CORE  |
+| cluster-stamp.json | Microsoft.Insights/metricAlerts                                            |                                                                    | $ASB\_RG\_CORE  |
+| cluster-stamp.json | Microsoft.Insights/metricAlerts                                            |                                                                    | $ASB\_RG\_CORE  |
+| cluster-stamp.json | Microsoft.Insights/metricAlerts                                            |                                                                    | $ASB\_RG\_CORE  |
+| cluster-stamp.json | Microsoft.Insights/metricAlerts                                            |                                                                    | $ASB\_RG\_CORE  |
+| cluster-stamp.json | Microsoft.Insights/metricAlerts                                            |                                                                    | $ASB\_RG\_CORE  |
+| cluster-stamp.json | Microsoft.Insights/metricAlerts                                            |                                                                    | $ASB\_RG\_CORE  |
+| cluster-stamp.json | Microsoft.Insights/metricAlerts                                            |                                                                    | $ASB\_RG\_CORE  |
+| cluster-stamp.json | Microsoft.Insights/metricAlerts                                            |                                                                    | $ASB\_RG\_CORE  |
+| cluster-stamp.json | Microsoft.Insights/metricAlerts                                            |                                                                    | $ASB\_RG\_CORE  |
+| cluster-stamp.json | Microsoft.ManagedIdentity/userAssignedIdentities/providers/roleAssignments | $ASB\_RG\_CORE                                                     |
+| cluster-stamp.json | Microsoft.Authorization/policyAssignments                                  |                                                                    | $ASB\_RG\_CORE  |
+| cluster-stamp.json | Microsoft.Authorization/policyAssignments                                  |                                                                    | $ASB\_RG\_CORE  |
+| cluster-stamp.json | Microsoft.Authorization/policyAssignments                                  |                                                                    | $ASB\_RG\_CORE  |
+| cluster-stamp.json | Microsoft.Authorization/policyAssignments                                  |                                                                    | $ASB\_RG\_CORE  |
+| cluster-stamp.json | Microsoft.Authorization/policyAssignments                                  |                                                                    | $ASB\_RG\_CORE  |
+| cluster-stamp.json | Microsoft.Authorization/policyAssignments                                  |                                                                    | $ASB\_RG\_CORE  |
 
 ## Deploying NGSA Applications
 
