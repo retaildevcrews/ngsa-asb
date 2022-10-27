@@ -51,7 +51,7 @@ az storage account create \
 az storage container create \
   --name metrics \
   --account-name $ASB_THANOS_STORAGE_ACCOUNT_NAME \
-  --account-key "$(az storage account keys list -g $ASB_RG_CORE -n $ASB_THANOS_STORAGE_ACCOUNT_NAME --query [0].value -o tsv)"
+  --account-key "$(az storage account keys list -g $ASB_RG_CORE -n $ASB_THANOS_STORAGE_ACCOUNT_NAME --query "[0].value" -o tsv)"
 
 # Save environment variables
 ./saveenv.sh
@@ -65,7 +65,7 @@ The Thanos configuration has a secret for accessing the storage account. This wi
 ```bash
 
 # Generate secret config from template and save to keyvault
-THANOS_KV_SET_COMMAND='AZURE_STORAGE_ACCOUNT_KEY=$(az storage account keys list -g $ASB_RG_CORE -n $ASB_THANOS_STORAGE_ACCOUNT_NAME --query [0].value -o tsv) envsubst < monitoring/template/thanos-storage-config.yaml.tmpl'
+THANOS_KV_SET_COMMAND='AZURE_STORAGE_ACCOUNT_KEY=$(az storage account keys list -g $ASB_RG_CORE -n $ASB_THANOS_STORAGE_ACCOUNT_NAME --query "[0].value" -o tsv) envsubst < monitoring/template/thanos-storage-config.yaml.tmpl'
 az keyvault secret set --name "thanos-storage-config" --vault-name $ASB_KV_NAME --value "$(eval $THANOS_KV_SET_COMMAND)"
 
 ```
