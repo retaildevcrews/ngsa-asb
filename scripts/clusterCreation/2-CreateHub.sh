@@ -10,13 +10,13 @@ function collectInputParameters()
   else 
     export ASB_CLUSTER_ADMIN_ID=$1
 
-    export ASB_SCRIPT_STEP=setDeploymentName
+    export ASB_HUB_STEP=setDeploymentName
 
       # Save environment variables
     ./saveenv.sh -y
 
     # Invoke Next Step In Setup
-    $ASB_SCRIPT_STEP
+    $ASB_HUB_STEP
   fi
 }
 
@@ -48,7 +48,7 @@ Enter Deployment Name: " ASB_DEPLOYMENT_NAME
 
   export ASB_RG_NAME=${ASB_DEPLOYMENT_NAME}-${ASB_ENV}
 
-  #setDeploymentRegion
+  setDeploymentRegion
 }
 
 function setDeploymentRegion()
@@ -72,12 +72,12 @@ function setDeploymentRegion()
 
   export ASB_ORG_APP_ID_NAME="BU0001G0001"
 
-  export ASB_SCRIPT_STEP=checkoutBranch
+  export ASB_HUB_STEP=checkoutBranch
   # Save environment variables
   ./saveenv.sh -y
 
   # Invoke Next Step In Setup
-  $ASB_SCRIPT_STEP
+  $ASB_HUB_STEP
 }
 
 function checkoutBranch()
@@ -87,12 +87,12 @@ function checkoutBranch()
   git checkout -b $ASB_RG_NAME
   git push -u origin $ASB_RG_NAME
 
-  export ASB_SCRIPT_STEP=getAadValues
+  export ASB_HUB_STEP=getAadValues
   # Save environment variables
   ./saveenv.sh -y
 
   # Invoke Next Step In Setup
-  $ASB_SCRIPT_STEP
+  $ASB_HUB_STEP
 }
 
 function getAadValues()
@@ -107,12 +107,12 @@ function getAadValues()
 
   echo "Completed Getting AAD Values."
 
-  export ASB_SCRIPT_STEP=setVariablesForDeployment
+  export ASB_HUB_STEP=setVariablesForDeployment
   # Save environment variables
   ./saveenv.sh -y
 
   # Invoke Next Step In Setup
-  $ASB_SCRIPT_STEP
+  $ASB_HUB_STEP
 }
 
 function setVariablesForDeployment()
@@ -129,12 +129,12 @@ function setVariablesForDeployment()
 
   echo "Completed Getting AAD Values."
 
-  export ASB_SCRIPT_STEP=createResourceGroups
+  export ASB_HUB_STEP=createResourceGroups
   # Save environment variables
   ./saveenv.sh -y
 
   # Invoke Next Step In Setup
-  $ASB_SCRIPT_STEP
+  $ASB_HUB_STEP
 }
 
 function createResourceGroups()
@@ -156,12 +156,12 @@ function createResourceGroups()
   
   echo "Completed Creating Resource Groups."
 
-  export ASB_SCRIPT_STEP=deployDefaultHub
+  export ASB_HUB_STEP=deployDefaultHub
   # Save environment variables
   ./saveenv.sh -y
 
   # Invoke Next Step In Setup
-  $ASB_SCRIPT_STEP
+  $ASB_HUB_STEP
 }
 
 function deployDefaultHub()
@@ -185,12 +185,12 @@ function deployDefaultHub()
   elapsed=$(echo "scale=3; $end_time - $start_time" | bc)
   echo "Completed Deploying Default Hub. ($elapsed)"
 
-  export ASB_SCRIPT_STEP=showNextSteps
+  export ASB_HUB_STEP=showNextSteps
   # Save environment variables
   ./saveenv.sh -y
 
   # Invoke Next Step In Setup
-  $ASB_SCRIPT_STEP
+  $ASB_HUB_STEP
 }
 function showNextSteps(){
   echo "Completed Deploying Hub"
@@ -201,10 +201,10 @@ if test -f .current-deployment; then
   if test -f $(cat .current-deployment); then
     source $(cat .current-deployment)
   else
-    export ASB_SCRIPT_STEP=collectInputParameters
+    export ASB_HUB_STEP=collectInputParameters
   fi
 else
-  export ASB_SCRIPT_STEP=collectInputParameters
+  export ASB_HUB_STEP=collectInputParameters
 fi
 
 # Validate script being run from CodeSpaces
@@ -222,5 +222,7 @@ else
   exit 1
 fi
 
+echo "Starting script at step: $ASB_HUB_STEP"
+
 #start at step
-$ASB_SCRIPT_STEP $1
+$ASB_HUB_STEP $1

@@ -39,12 +39,12 @@ function getSpokeVariables(){
   elapsed=$(echo "scale=3; $end_time - $start_time" | bc)
   echo "Completed Getting Spoke Variables. ($elapsed)"
 
-  export ASB_SCRIPT_STEP=deployDefaultSpoke
+  export ASB_SPOKE_STEP=deployDefaultSpoke
   # Save environment variables
   ./saveenv.sh -y
 
   # Invoke Next Step In Setup
-  $ASB_SCRIPT_STEP
+  $ASB_SPOKE_STEP
 }
 
 function deployDefaultSpoke()
@@ -78,12 +78,12 @@ function deployDefaultSpoke()
   elapsed=$(echo "scale=3; $end_time - $start_time" | bc)
   echo "Completed Deploying Default Spoke. ($elapsed)"
 
-  export ASB_SCRIPT_STEP=deployHubRegionA
+  export ASB_SPOKE_STEP=deployHubRegionA
   # Save environment variables
   ./saveenv.sh -y
 
   # Invoke Next Step In Setup
-  $ASB_SCRIPT_STEP
+  $ASB_SPOKE_STEP
 }
 
 function deployHubRegionA()
@@ -108,12 +108,12 @@ function deployHubRegionA()
   elapsed=$(echo "scale=3; $end_time - $start_time" | bc)
   echo "Completed Deploying Hub Region A. ($elapsed)"
 
-  export ASB_SCRIPT_STEP=deployAks
+  export ASB_SPOKE_STEP=deployAks
   # Save environment variables
   ./saveenv.sh -y
 
   # Invoke Next Step In Setup
-  $ASB_SCRIPT_STEP
+  $ASB_SPOKE_STEP
 }
 
 function deployAks()
@@ -181,13 +181,13 @@ function deployAks()
 
   echo "Completed Deploying AKS. ($elapsed)"
 
-  export ASB_SCRIPT_STEP=getClusterContext
+  export ASB_SPOKE_STEP=getClusterContext
 
   # Save environment variables
   ./saveenv.sh -y
 
   # Invoke Next Step In Setup
-  $ASB_SCRIPT_STEP
+  $ASB_SPOKE_STEP
 }
 
 function getClusterContext()
@@ -208,12 +208,12 @@ function getClusterContext()
 
   echo "Completed Getting Cluster Context."
 
-  export ASB_SCRIPT_STEP=setAksVariables
+  export ASB_SPOKE_STEP=setAksVariables
   # Save environment variables
   ./saveenv.sh -y
 
   # Invoke Next Step In Setup
-  $ASB_SCRIPT_STEP
+  $ASB_SPOKE_STEP
 }
 
 function setAksVariables()
@@ -249,12 +249,12 @@ function setAksVariables()
 
   echo "Completed Setting AKS Variables."
 
-  export ASB_SCRIPT_STEP=createDnsRecord
+  export ASB_SPOKE_STEP=createDnsRecord
   # Save environment variables
   ./saveenv.sh -y
 
   # Invoke Next Step In Setup
-  $ASB_SCRIPT_STEP
+  $ASB_SPOKE_STEP
 }
 
 function createDnsRecord()
@@ -266,12 +266,12 @@ function createDnsRecord()
 
   echo "Completed Creating Public DNS A Record."
 
-  export ASB_SCRIPT_STEP=createDeploymentFiles
+  export ASB_SPOKE_STEP=createDeploymentFiles
   # Save environment variables
   ./saveenv.sh -y
 
   # Invoke Next Step In Setup
-  $ASB_SCRIPT_STEP
+  $ASB_SPOKE_STEP
 }
 
 function createDeploymentFiles()
@@ -298,12 +298,12 @@ function createDeploymentFiles()
 
   echo "Completed Creating Deployment Files."
 
-  export ASB_SCRIPT_STEP=pushToGit
+  export ASB_SPOKE_STEP=pushToGit
   # Save environment variables
   ./saveenv.sh -y
 
   # Invoke Next Step In Setup
-  $ASB_SCRIPT_STEP
+  $ASB_SPOKE_STEP
 }
 
 function pushToGit()
@@ -332,12 +332,12 @@ function pushToGit()
 
   echo "Completed Pushing To Github."
 
-  export ASB_SCRIPT_STEP=deployFluxPrerequisites
+  export ASB_SPOKE_STEP=deployFluxPrerequisites
   # Save environment variables
   ./saveenv.sh -y
 
   # Invoke Next Step In Setup
-  $ASB_SCRIPT_STEP
+  $ASB_SPOKE_STEP
 }
 
 function deployFluxPrerequisites()
@@ -355,12 +355,12 @@ function deployFluxPrerequisites()
   # Create secrets to authenticate with log analytics
   kubectl create secret generic fluentbit-secrets --from-literal=WorkspaceId=$(az monitor log-analytics workspace show -g $ASB_RG_CORE -n $ASB_LA_NAME --query customerId -o tsv)   --from-literal=SharedKey=$(az monitor log-analytics workspace get-shared-keys -g $ASB_RG_CORE -n $ASB_LA_NAME --query primarySharedKey -o tsv) -n fluentbit
 
-  export ASB_SCRIPT_STEP=deployFlux
+  export ASB_SPOKE_STEP=deployFlux
   # Save environment variables
   ./saveenv.sh -y
 
   # Invoke Next Step In Setup
-  $ASB_SCRIPT_STEP
+  $ASB_SPOKE_STEP
 }
 
 
@@ -402,12 +402,12 @@ function deployFlux()
 
   echo "Completed Deploying Flux."
 
-  export ASB_SCRIPT_STEP=showNextSteps
+  export ASB_SPOKE_STEP=showNextSteps
   # Save environment variables
   ./saveenv.sh -y
 
   # Invoke Next Step In Setup
-  $ASB_SCRIPT_STEP
+  $ASB_SPOKE_STEP
 }
 
 function showNextSteps(){
@@ -419,10 +419,10 @@ if test -f .current-deployment; then
   if test -f $(cat .current-deployment); then
     source $(cat .current-deployment)
   else
-    export ASB_SCRIPT_STEP=getSpokeVariables
+    export ASB_SPOKE_STEP=getSpokeVariables
   fi
 else
-  export ASB_SCRIPT_STEP=getSpokeVariables
+  export ASB_SPOKE_STEP=getSpokeVariables
 fi
 
 # Validate script being run from CodeSpaces
@@ -440,5 +440,10 @@ else
   exit 1
 fi
 
-#start at step
-$ASB_SCRIPT_STEP $1
+if [[ $1 == $ASB_RG_HUB ]]; then
+  echo "Starting script at step: $ASB_SPOKE_STEP"
+  #start at step
+  $ASB_SPOKE_STEP $1
+else
+  >&2 echo "Your saved environment variables do not support attaching to selected hub"; exit 1;
+fi
