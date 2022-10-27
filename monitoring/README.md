@@ -168,6 +168,8 @@ az keyvault set-policy --secret-permissions set --object-id $(az ad signed-in-us
 # Set grafana AAD client secrets
 az keyvault secret set -o table --vault-name $ASB_KV_NAME --name "grafana-aad-client-secret" --value [insert CLIENT_SECRET]
 
+az keyvault secret set -o table --vault-name $ASB_KV_NAME --name "grafana-azure-monitor-client-secret" --value [insert CLIENT_SECRET]
+
 # set grafana AAD ids
 export ASB_GRAFANA_SP_CLIENT_ID=[insert CLIENT_ID]
 export ASB_GRAFANA_SP_TENANT_ID=[insert TENANT_ID]
