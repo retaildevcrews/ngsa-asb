@@ -45,11 +45,15 @@ NGSA AKS Secure Base line uses the Patterns & Practices (PnP) AKS Secure Baselin
 Before proceeding, please make sure the PnP material is familiar.  This will help the person creating the environment understand why specific underlying architectural and design decisions were made.
 
 * Please refer to the PnP repo as the `upstream repo`.
-* Please use Codespaces when executing these instructions.
+* Please use Codespaces when executing these instructions.  
+ 
+These instructions are meant for new deployments, and require the use of Codespaces from within "thick-client" Visual Studio Code.
 
-When authenticating the the Azure portal, either via the Azure CLI or the Az PowerShell modules it is important to use the correct Tenant Id for the tenant desired as well as it is important to set the correct subscription context.  This ensures that in this "one to many" tenant world the correct tenant is utilized each time.  Examples using both implementations are bellow.
+Errors will occur if a browser-based instance of Codespaces is used due to group policy that are set.  Though a user can authenticate using "device code" decorations to the authentication this can result in errors if specific group policies are in place.  
 
 #### Connecting to the Correct Tenant & Setting the Correct Subscription Context
+
+When authenticating the the Azure portal, either via the Azure CLI or the Az PowerShell modules it is important to use the correct Tenant Id for the tenant desired as well as it is important to set the correct subscription context.  This ensures that in this "one to many" tenant world the correct tenant is utilized each time.  Examples using both implementations are bellow.
 
 ##### PowerShell Az Modules
 
