@@ -44,9 +44,9 @@ NGSA AKS Secure Base line uses the Patterns & Practices (PnP) AKS Secure Baselin
 
 Before proceeding, please ensure the PnP material is familiar.  This will help by giving  specific underlying architectural and design decisions knowledge.
 
-* Please refer to the PnP repo as the `upstream repo`.
-* Please use Codespaces when executing these instructions.  
- 
+- Please refer to the PnP repo as the `upstream repo`.
+- Please use Codespaces when executing these instructions.  
+
 These instructions are meant for new deployments, and require the use of Codespaces from within Visual Studio Code proper; not a browser-based rendering.
 
 When using browser-based Visual Studio Code sessions the switch for "use device code" is needed.  When using Visual Studio Code proper with a Codespace session the user can authenticate passing in the tenant id, and not using a secondary browser.  This allows for satisfy the group policies that cause issues when using the browser based authentication.
@@ -210,11 +210,11 @@ az keyvault set-policy -n $ASB_KV_NAME --object-id $ASB_NGSA_MI_PRINCIPAL_ID --s
 
 NGSA Application can be deployed into the cluster using two different approaches:
 
-* [Deploy using yaml with FluxCD](./docs/deployNgsaYaml.md)
+- [Deploy using yaml with FluxCD](./docs/deployNgsaYaml.md)
 
-* [Deploy using AutoGitops with FluxCD](https://github.com/bartr/autogitops)
+- [Deploy using AutoGitops with FluxCD](https://github.com/bartr/autogitops)
 
-  * AutoGitOps is reccomended for a full CI/CD integration. For this approach the application repository must be autogitops enabled.
+  - AutoGitOps is reccomended for a full CI/CD integration. For this approach the application repository must be autogitops enabled.
 
 ## Deploying LodeRunner Applications
 
@@ -258,11 +258,11 @@ az keyvault secret set -o table --vault-name $ASB_KV_NAME --name "CosmosLRCollec
 
 LodeRunner Application can be deployed into the cluster using two different approaches:
 
-* [Deploy using yaml with FluxCD](./docs/deployLodeRunnerYaml.md)
+- [Deploy using yaml with FluxCD](./docs/deployLodeRunnerYaml.md)
 
-* [Deploy using AutoGitops with FluxCD](https://github.com/bartr/autogitops)
+- [Deploy using AutoGitops with FluxCD](https://github.com/bartr/autogitops)
 
-  * AutoGitOps is reccomended for a full CI/CD integration. For this approach the application repository must be autogitops enabled.
+  - AutoGitOps is reccomended for a full CI/CD integration. For this approach the application repository must be autogitops enabled.
 
 ## Deploy Fluent Bit
 
