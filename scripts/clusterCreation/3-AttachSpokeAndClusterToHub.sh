@@ -343,7 +343,6 @@ function pushToGit()
 function deployFluxPrerequisites()
 {
   echo "Deploying Flux Prerequisites..."
-  echo "Importing Fluentbit Image..."
 
   # Import Flux Dependencies To ACR
   az acr import --source docker.io/fluent/fluent-bit:1.9.5 -n $ASB_ACR_NAME
@@ -362,8 +361,6 @@ function deployFluxPrerequisites()
   # Invoke Next Step In Setup
   $ASB_SPOKE_STEP
 }
-
-
 
 function deployFlux()
 {
