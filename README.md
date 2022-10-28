@@ -1,475 +1,154 @@
 # NGSA AKS Secure Baseline
 
-* [Introduction](#introduction)
-* [Setting up Infrastructure](#setting-up-infrastructure)
-* [Deploying Hub and Spoke Networks](#deploying-hub-and-spoke-networks)
-* [Deploy Azure Kubernetes Service](#deploy-azure-kubernetes-service)
-* [Create Deployment Files](#create-deployment-files)
-* [Deploy Flux](#deploy-flux)
-* [Deploying NGSA Applications](#deploying-ngsa-applications)
-* [Deploying LodeRunner Applications](#deploying-loderunner-applications)
-* [Deploy Fluent Bit](#deploy-fluent-bit)
-* [Deploy Grafana and Prometheus](#deploy-grafana-and-prometheus)
-* [Leveraging Subdomains for App Endpoints](#leveraging-subdomains-for-app-endpoints)
-* [Deploy WASM sidecar filter](#deploy-wasm-sidecar-filter)
-* [Deploying Multiple Clusters Using Existing Network](#deploying-multiple-clusters-using-existing-network)
-* [Resetting the Cluster](#resetting-the-cluster)
-* [Delete Azure Resources](#delete-azure-resources)
+## Table of Contents (TOC)
+
+- [NGSA AKS Secure Baseline](#ngsa-aks-secure-baseline)
+  - [Table of Contents (TOC)](#table-of-contents-toc)
+  - [Introduction](#introduction)
+    - [Before Beginning](#before-beginning)
+      - [Connecting to the Correct Tenant & Setting the Correct Subscription Context](#connecting-to-the-correct-tenant--setting-the-correct-subscription-context)
+        - [PowerShell Az Modules](#powershell-az-modules)
+        - [Azure ClI](#azure-cli)
+  - [Setup Infrastructure](#setup-infrastructure)
+  - [Infrastructure Setup During Each Script](#infrastructure-setup-during-each-script)
+    - [2-CreateHub.sh](#2-createhubsh)
+    - [3-AttachSpokeAndClusterToHub.sh](#3-attachspokeandclustertohubsh)
+  - [Deploying NGSA Applications](#deploying-ngsa-applications)
+    - [🛑 Prerequisite - Setup Cosmos DB in secure baseline](#-prerequisite---setup-cosmos-db-in-secure-baseline)
+    - [Create managed identity for NGSA app](#create-managed-identity-for-ngsa-app)
+    - [AAD pod identity setup for ngsa-app](#aad-pod-identity-setup-for-ngsa-app)
+  - [Deploying LodeRunner Applications](#deploying-loderunner-applications)
+    - [🛑 Prerequisite - Setup Cosmos DB in secure baseline.](#-prerequisite---setup-cosmos-db-in-secure-baseline-1)
+    - [Create managed identity for LodeRunner app](#create-managed-identity-for-loderunner-app)
+    - [AAD pod identity setup for loderunner-app](#aad-pod-identity-setup-for-loderunner-app)
+  - [Deploy Fluent Bit](#deploy-fluent-bit)
+  - [Deploy Grafana and Prometheus](#deploy-grafana-and-prometheus)
+  - [Leveraging Subdomains for App Endpoints](#leveraging-subdomains-for-app-endpoints)
+    - [Motivation](#motivation)
+    - [Create a subdomain endpoint](#create-a-subdomain-endpoint)
+      - [Create app gateway resources](#create-app-gateway-resources)
+  - [Deploy Azure Front Door](#deploy-azure-front-door)
+  - [Deploy WASM sidecar filter](#deploy-wasm-sidecar-filter)
+  - [Deploying Multiple Clusters Using Existing Network](#deploying-multiple-clusters-using-existing-network)
+  - [Resetting the cluster](#resetting-the-cluster)
+  - [Adding resource locks to resource groups](#adding-resource-locks-to-resource-groups)
+  - [Delete Azure Resources](#delete-azure-resources)
+    - [Random Notes](#random-notes)
+    - [Run Checkov scan](#run-checkov-scan)
 
 ## Introduction
 
-NGSA AKS Secure Base line uses the Patterns and Practices AKS Secure Baseline reference implementation located [here](https://github.com/mspnp/aks-secure-baseline).
+NGSA AKS Secure Base line uses the Patterns & Practices (PnP) AKS Secure Baseline [reference implementation]('https://github.com/mspnp/aks-secure-baseline').  
 
-* Please refer to the PnP repo as the `upstream repo`
-* Please use Codespaces
+### Before Beginning
 
-## Prerequisites
+Before proceeding, please ensure the PnP material is familiar.  This will help by giving  specific underlying architectural and design decisions knowledge.
 
-* Access to a subscription with Owner role and User Access Administrator role
+- Please refer to the PnP repo as the `upstream repo`.
+- Please use Codespaces when executing these instructions.  
 
-## Setting up Infrastructure
+To continue with this setup, you must execute the scripts using CodeSpaces through a [local VS Code instance](https://docs.github.com/en/codespaces/developing-in-codespaces/using-github-codespaces-in-visual-studio-code). The reason you must use CodeSpaces is because the tooling is already setup to easily run the script and because it depends on DNS secrets being injected by CodeSpaces.
 
-```bash
-🛑 Run these commands one at a time. Note that the 'az ad' commands will not work in Codespaces due to a Conditional Access Policy on Azure Active Directory in the Microsoft tenant. Such commands should be run locally, and the responses saved to variables in Codespaces when necessary. If you are not working in Codespaces, then some environment variables will need to be copied from Codespaces to your local environment. The steps that need to be altered depending on the environment you are working in have been highlighted with additional instructions.
+Running CodeSpaces through a local VS Code instance is required as you can then login to the Azure CLI without using a device code. Logging in with a device code is the only way to login using CodeSpaces through the browser. When logging in with a device code, some commands (i.e. Active Directory calls) required to excute the setup scripts will not work due to conditional access policies.
 
-# Login to your Azure subscription
-az login --use-device-code
+#### Connecting to the Correct Tenant & Setting the Correct Subscription Context
 
-# Verify you are in the correct subscription and you are the owner
-# Use az account set -s <sub> to change the sub if required
-# Tenant ID should be 72f988bf-86f1-41af-91ab-2d7cd011db47
-az account show -o table
-```
+When authenticating with the Azure portal with the [Azure CLI]('https://learn.microsoft.com/en-us/cli/azure/authenticate-azure-cli') it is important to use the correct Tenant Id for the tenant desired as well as it is important to set the correct subscription context.  This ensures that in this "one to many" tenant world the correct tenant is utilized each time.
 
-### Verify the security group
+##### Azure ClI Login
 
 ```bash
-# Set your security group name
-export ASB_CLUSTER_ADMIN_GROUP=4-co
 
-# Verify you are a member of the security group
-az ad group member check -g $ASB_CLUSTER_ADMIN_GROUP --member-id $(az ad signed-in-user show --query id -o tsv) --query value -o tsv
+# Connecting to Azure with specific tenant (e.g. microsoft.onmicrosoft.com)
+az login --tenant '{Tenant Id}'
 
-🛑 # If you are setting up the infrastructure in Codespaces you will need to run this az ad command locally
-# - Ensure that you are logged into the same subscription locally as you are in Codespaces
-# - in Codespaces, echo the command above: 
-# -   echo "az ad group member check -g $ASB_CLUSTER_ADMIN_GROUP --member-id $(az ad signed-in-user show --query id -o tsv) --query value -o tsv"
-# - copy the output and run it locally
-```
-
-### Set Deployment Short Name
-
-> Deployment Name is used in resource naming to provide unique names
-
-* Deployment Name is very particular and won't fail for about an hour
-  * we recommend a short a name to total length of 8 or less
-  * must be lowercase
-  * must start with a-z
-  * must only be a-z or 0-9
-  * max length is 8
-  * min length is 3
-
-```bash
-🛑 Set your deployment name per the above rules
-
-# Set the deployment name
-# export ASB_DEPLOYMENT_NAME=[starts with a-z, [a-z,0-9], max length 8]
-export ASB_DEPLOYMENT_NAME=[e.g 'ngsatest']
-
-# examples: pre, test, stage, prod, and dev
-export ASB_ENV=[eg: 'dev']
-export ASB_RG_NAME=${ASB_DEPLOYMENT_NAME}-${ASB_ENV}
+# change the active subscription using the subscription name
+az account set --subscription "{Subscription Id or Name}"
 
 ```
 
-```bash
-# Make sure the resource group does not exist
-az group list -o table | grep $ASB_DEPLOYMENT_NAME
-
-# Make sure the branch does not exist
-git branch -a | grep $ASB_RG_NAME
-
-# If either exists, choose a different deployment name and try again
-```
-
-🛑 Set Org App ID
-
-```bash
-# Org App ID e.g BU0001A0008
-# export ASB_ORG_APP_ID_NAME=[starts with a-z, [a-z,0-9], min length 5, max length 11]
-export ASB_ORG_APP_ID_NAME="BU0001G0001"
-```
-
-### Create git branch
-
-```bash
-# Create a branch for your cluster
-# Do not change the branch name from $ASB_RG_NAME
-git checkout -b $ASB_RG_NAME
-git push -u origin $ASB_RG_NAME
-```
-
-### Choose your deployment region
-
-```bash
-🛑 Only choose one pair from the below block
-
-# Set for deployment of resources. Cluster region will be set in a different step
-export ASB_HUB_LOCATION=centralus
-export ASB_SPOKE_LOCATION=centralus
-```
-
-```bash
-# We are using 'dns-rg' for triplets
-export ASB_DNS_ZONE_RG=dns-rg
-export ASB_DNS_ZONE=cse.ms
-
-# Make sure the DNS record does not exist
-az network dns record-set a list -g $ASB_DNS_ZONE_RG -z $ASB_DNS_ZONE -o table | grep "$ASB_SPOKE_LOCATION-$ASB_ENV"
-
-# If any records exist, choose a different deployment region and try again
-```
-
-### Save your work in-progress
-
-```bash
-# Install kubectl and kubelogin
-sudo az aks install-cli
-
-# Run the saveenv.sh script at any time to save ASB_* variables to ASB_DEPLOYMENT_NAME.asb.env
-
-./saveenv.sh -y
-
-# If your terminal environment gets cleared, you can source the file to reload the environment variables
-# source ${ASB_DEPLOYMENT_NAME}.asb.env
-```
-
-### Validate environment variables
-
-```bash
-# Validate deployment name is set up
-echo $ASB_DEPLOYMENT_NAME
-
-# Verify the correct subscription
-az account show -o table
-
-🛑 # These environment variables are already set in Codespaces enviroment for "cse.ms". If you are setting up the infrastructure locally, 
-# you need to copy and get these environment variables and their values from Codespaces and save them locally:
-# In Codespaces:
-# - echo $APP_GW_CERT_CSMS 
-# - echo $INGRESS_CERT_CSMS
-# - echo $INGRESS_KEY_CSMS
-# Locally 
-# - APP_GW_CERT_CSMS=[output from echo command]
-# - INGRESS_CERT_CSMS=[output from echo command]
-# - INGRESS_KEY_CSMS=[output from echo command]
-
-# Check certificates
-if [ -z $APP_GW_CERT_CSMS ]; then echo "App Gateway cert not set correctly"; fi
-if [ -z $INGRESS_CERT_CSMS ]; then echo "Ingress cert not set correctly"; fi
-if [ -z $INGRESS_KEY_CSMS ]; then echo "Ingress key not set correctly"; fi
-```
-
-### AAD
-
-```bash
-# Export Subscription ID
-export ASB_SUBSCRIPTION_ID=$(az account show --query id -o tsv)
-
-# Export AAD env vars
-export ASB_TENANT_ID=$(az account show --query tenantId -o tsv)
-
-# Get AAD cluster admin group
-export ASB_CLUSTER_ADMIN_ID=$(az ad group show -g $ASB_CLUSTER_ADMIN_GROUP --query id -o tsv)
-🛑 # If you are setting up the infrastructure in Codespaces you will need to run this az ad command locally
-# - Ensure that you are logged into the same subscription locally as you are in Codespaces
-# - in Codespaces, echo the command above: 
-# -   echo "az ad group show -g $ASB_CLUSTER_ADMIN_GROUP --query objectId -o tsv"
-# - copy the output and run it locally
-# - save the output from the local run
-# - export ASB_CLUSTER_ADMIN_ID=[output copied from local run]  
-
-# Verify AAD admin group
-echo $ASB_CLUSTER_ADMIN_GROUP
-echo $ASB_CLUSTER_ADMIN_ID
-```
-
-### Set variables for deployment
-
-```bash
-# Set GitOps repo
-export ASB_GIT_REPO=$(git remote get-url origin)
-export ASB_GIT_BRANCH=$ASB_RG_NAME
-export ASB_GIT_PATH=deploy/$ASB_ENV-$ASB_DEPLOYMENT_NAME-$ASB_SPOKE_LOCATION
-
-# Set default domain suffix
-# app endpoints will use subdomain from this domain suffix
-export ASB_DOMAIN_SUFFIX=${ASB_SPOKE_LOCATION}-${ASB_ENV}.${ASB_DNS_ZONE}
-
-# Resource group names
-export ASB_RG_CORE=rg-${ASB_RG_NAME}
-export ASB_RG_HUB=rg-${ASB_RG_NAME}-hub
-export ASB_RG_SPOKE=rg-${ASB_RG_NAME}-spoke
-
-# Save environment variables
-./saveenv.sh -y
-```
-
-### Create Resource Groups
-
-```bash
-az group create -n $ASB_RG_CORE -l $ASB_HUB_LOCATION
-az group create -n $ASB_RG_HUB -l $ASB_HUB_LOCATION
-az group create -n $ASB_RG_SPOKE -l $ASB_SPOKE_LOCATION
-```
-
-## Deploying Hub and Spoke Networks
-
-> Complete setup takes about an hour
-
-```bash
-# Create hub network
-az deployment group create \
-  -g $ASB_RG_HUB \
-  -f networking/hub-default.json \
-  -p location=${ASB_HUB_LOCATION} \
-  -c --query name
-
-export ASB_HUB_VNET_ID=$(az deployment group show -g $ASB_RG_HUB -n hub-default --query properties.outputs.hubVnetId.value -o tsv)
-
-# Set spoke ip address prefix
-export ASB_SPOKE_IP_PREFIX="10.240"
-
-# Create spoke network
-az deployment group create \
-  -n spoke-$ASB_ORG_APP_ID_NAME \
-  -g $ASB_RG_SPOKE \
-  -f networking/spoke-default.json \
-  -p deploymentName=${ASB_DEPLOYMENT_NAME} \
-     hubLocation=${ASB_HUB_LOCATION} \
-     hubVnetResourceId=${ASB_HUB_VNET_ID} \
-     orgAppId=${ASB_ORG_APP_ID_NAME} \
-     spokeIpPrefix=${ASB_SPOKE_IP_PREFIX} \
-     spokeLocation=${ASB_SPOKE_LOCATION} \
-  -c --query name
-
-# Get nodepools subnet id from spoke
-export ASB_NODEPOOLS_SUBNET_ID=$(az deployment group show -g $ASB_RG_SPOKE -n spoke-$ASB_ORG_APP_ID_NAME --query properties.outputs.nodepoolSubnetResourceIds.value -o tsv)
-
-# Create Region A hub network
-az deployment group create \
-  -g $ASB_RG_HUB \
-  -f networking/hub-regionA.json \
-  -p location=${ASB_HUB_LOCATION} nodepoolSubnetResourceIds="['${ASB_NODEPOOLS_SUBNET_ID}']" \
-  -c --query name
-
-# Get spoke vnet id
-export ASB_SPOKE_VNET_ID=$(az deployment group show -g $ASB_RG_SPOKE -n spoke-$ASB_ORG_APP_ID_NAME --query properties.outputs.clusterVnetResourceId.value -o tsv)
-
-./saveenv.sh -y
-```
-
-## Deploy Azure Kubernetes Service
-
-```bash
-# Validate that you are using the correct vnet for cluster deployment
-echo $ASB_SPOKE_VNET_ID
-echo $ASB_ORG_APP_ID_NAME
-
-# Set cluster location by choosing the closest pair - not all regions support ASB.
-# Note: Cluster location must be the same as spoke location
-export ASB_CLUSTER_LOCATION=${ASB_SPOKE_LOCATION}
-export ASB_CLUSTER_GEO_LOCATION=westus
-
-# This section takes 15-20 minutes
-
-# Set Kubernetes Version
-export ASB_K8S_VERSION=1.23.8
-
-# Create AKS
-az deployment group create -g $ASB_RG_CORE \
-  -f cluster/cluster-stamp.json \
-  -n cluster-${ASB_DEPLOYMENT_NAME}-${ASB_CLUSTER_LOCATION} \
-  -p appGatewayListenerCertificate=${APP_GW_CERT_CSMS} \
-     asbDomainSuffix=${ASB_DOMAIN_SUFFIX} \
-     asbDnsName=${ASB_SPOKE_LOCATION}-${ASB_ENV} \
-     asbDnsZone=${ASB_DNS_ZONE} \
-     aksIngressControllerCertificate="$(echo $INGRESS_CERT_CSMS | base64 -d)" \
-     aksIngressControllerKey="$(echo $INGRESS_KEY_CSMS | base64 -d)" \
-     clusterAdminAadGroupObjectId=${ASB_CLUSTER_ADMIN_ID} \
-     deploymentName=${ASB_DEPLOYMENT_NAME} \
-     geoRedundancyLocation=${ASB_CLUSTER_GEO_LOCATION} \
-     hubVnetResourceId=${ASB_HUB_VNET_ID} \
-     k8sControlPlaneAuthorizationTenantId=${ASB_TENANT_ID} \
-     kubernetesVersion=${ASB_K8S_VERSION} \
-     location=${ASB_CLUSTER_LOCATION} \
-     nodepoolsRGName=${ASB_RG_NAME} \
-     orgAppId=${ASB_ORG_APP_ID_NAME} \
-     targetVnetResourceId=${ASB_SPOKE_VNET_ID} \
-     -c --query name
-```
-
-### AKS Validation
-
-```bash
-# Get cluster name
-export ASB_AKS_NAME=$(az deployment group show -g $ASB_RG_CORE -n cluster-${ASB_DEPLOYMENT_NAME}-${ASB_CLUSTER_LOCATION} --query properties.outputs.aksClusterName.value -o tsv)
-
-# Get AKS credentials
-az aks get-credentials -g $ASB_RG_CORE -n $ASB_AKS_NAME
-
-# Authenticate Kubectl
-kubelogin convert-kubeconfig -l azurecli
-
-# Rename context for simplicity
-kubectl config rename-context $ASB_AKS_NAME $ASB_DEPLOYMENT_NAME-${ASB_CLUSTER_LOCATION}
-
-# Check the nodes
-# Requires Azure login
-kubectl get nodes
-
-# Check the pods
-kubectl get pods -A
-```
-
-### Set AKS environment variables
-
-```bash
-
-# Set public ip address resource name
-export ASB_PIP_NAME='pip-'$ASB_DEPLOYMENT_NAME'-'$ASB_ORG_APP_ID_NAME'-00'
-
-# Get the public IP of our App gateway
-export ASB_AKS_PIP=$(az network public-ip show -g $ASB_RG_SPOKE --name $ASB_PIP_NAME --query ipAddress -o tsv)
-
-# Get the AKS Ingress Controller Managed Identity details.
-export ASB_ISTIO_RESOURCE_ID=$(az deployment group show -g $ASB_RG_CORE -n cluster-${ASB_DEPLOYMENT_NAME}-${ASB_CLUSTER_LOCATION} --query properties.outputs.aksIngressControllerPodManagedIdentityResourceId.value -o tsv)
-export ASB_ISTIO_CLIENT_ID=$(az deployment group show -g $ASB_RG_CORE -n cluster-${ASB_DEPLOYMENT_NAME}-${ASB_CLUSTER_LOCATION} --query properties.outputs.aksIngressControllerPodManagedIdentityClientId.value -o tsv)
-export ASB_POD_MI_ID=$(az identity show -n podmi-ingress-controller -g $ASB_RG_CORE --query principalId -o tsv)
-
-# Get the name of Azure Container Registry
-export ASB_ACR_NAME=$(az deployment group show -g $ASB_RG_CORE -n cluster-${ASB_DEPLOYMENT_NAME}-${ASB_CLUSTER_LOCATION}  --query properties.outputs.containerRegistryName.value -o tsv)
-
-# Get Log Analytics Name
-export ASB_LA_NAME=$(az deployment group show -g $ASB_RG_CORE -n cluster-${ASB_DEPLOYMENT_NAME}-${ASB_HUB_LOCATION} --query properties.outputs.logAnalyticsName.value -o tsv)
-
-# Get Log Analytics Workspace ID
-export ASB_LA_WORKSPACE_ID=$(az monitor log-analytics workspace show -g $ASB_RG_CORE -n $ASB_LA_NAME --query customerId -o tsv)
-
-# Get the name of KeyVault
-export ASB_KV_NAME=$(az deployment group show -g $ASB_RG_CORE -n cluster-${ASB_DEPLOYMENT_NAME}-${ASB_CLUSTER_LOCATION} --query properties.outputs.keyVaultName.value -o tsv)
-
-# Config certificate names
-export ASB_INGRESS_CERT_NAME=appgw-ingress-internal-aks-ingress-tls
-export ASB_INGRESS_KEY_NAME=appgw-ingress-internal-aks-ingress-key
-
-
-./saveenv.sh -y
-```
-
-### Create Public DNS A record
-
-```bash
-# Create public DNS record for ngsa-memory
-az network dns record-set a add-record -g $ASB_DNS_ZONE_RG -z $ASB_DNS_ZONE -n "ngsa-memory-${ASB_SPOKE_LOCATION}-${ASB_ENV}" -a $ASB_AKS_PIP --query fqdn
-```
-
-## Create Deployment Files
-
-```bash
-mkdir -p $ASB_GIT_PATH/istio
-
-# istio pod identity config
-cat templates/istio/istio-pod-identity-config.yaml | envsubst > $ASB_GIT_PATH/istio/istio-pod-identity-config.yaml
-
-# istio gateway config
-cat templates/istio/istio-gateway.yaml | envsubst > $ASB_GIT_PATH/istio/istio-gateway.yaml
-
-# istio ingress config
-cat templates/istio/istio-ingress.yaml | envsubst > $ASB_GIT_PATH/istio/istio-ingress.yaml
-
-# GitOps (flux v2)
-rm -f deploy/bootstrap/flux-system/gotk-repo.yaml
-cat templates/flux-system/gotk-repo.yaml | envsubst  >| deploy/bootstrap/flux-system/gotk-repo.yaml
-# Note: if separate bootstrap folder (dev-bootstrap) for dev env exists, then replace `bootstrap` with `dev-bootstrap`
-# rm -f deploy/dev-bootstrap/flux-system/gotk-repo.yaml
-# cat templates/flux-system/gotk-repo.yaml | envsubst  >| deploy/dev-bootstrap/flux-system/gotk-repo.yaml
-```
-
-### Push to GitHub
-
-> The setup process creates 4 new files
->
-> GitOps will not work unless these files are merged into your branch
-
-```bash
-# Check deltas - there should be 4 new files
-git status
-
-# Push to your branch istio changes
-git add $ASB_GIT_PATH/istio/istio-pod-identity-config.yaml
-git add $ASB_GIT_PATH/istio/istio-gateway.yaml
-git add $ASB_GIT_PATH/istio/istio-ingress.yaml
-
-git commit -m "added cluster config"
-
-# Add and push Flux branch and repo info
-git add deploy/bootstrap/flux-system/
-# Note: if separate bootstrap folder (dev-bootstrap) for dev env exists, then replace `bootstrap` with `dev-bootstrap`
-# git add deploy/dev-bootstrap/flux-system/
-git commit -m "added flux bootstrap config"
-
-git push
-```
-
-## Deploy Flux
-
-> ASB uses `Flux v2` for `GitOps`.
->
-> Details on the directory structure used for flux can be found [here](./docs/FluxDirStructure.md).
-
-Before deploying flux we need to import the flux images to ACR.
-
-> Make sure your IP is added to ACR for image push access.
-> Goto the ACR in Azure Portal -> Networking -> Add your client IP -> Save
-
-```bash
-# Import all Flux images to private ACR
-grep 'image:' deploy/bootstrap/flux-system/gotk-components.yaml | awk -F'azurecr.io' '{print $2}' | xargs -I_ az acr import --source "ghcr.io_" -n $ASB_ACR_NAME
-
-# Setup flux base system (replace bootstrap folder with dev-bootstrap for dev env)
-kubectl create -k deploy/bootstrap/flux-system/
-# Note: If flux v2 exists in cluster, use "kubectl apply -k"
-# Note: if "kubectl create/apply -k" fails once (sometimes CRD takes some time to be injected into the API), then simply reapply
-
-# Setup zone specific deployment
-kubectl apply -f $ASB_GIT_PATH/flux-kustomization/${ASB_CLUSTER_LOCATION}-kustomization.yaml
-
-# 🛑 Check the pods until everything is running
-kubectl get pods -n flux-system
-
-# Check flux syncing git repo logs
-kubectl logs -n flux-system -l app=source-controller
-
-# Check flux syncing kustomization logs
-kubectl logs -n flux-system -l app=kustomize-controller
-
-# List all flux kustmization in the cluster
-# It also shows the state of each kustomization
-flux get kustomizations -A
-
-# Reconcile (sync) one individual kustomization
-flux reconcile kustomization -n ngsa ngsa # note the namespace `-n ngsa`
-
-# Reconcile (sync) all flux kustomization in the cluster
-flux get kustomizations -A --no-header | awk -F' ' '{printf "%s -n %s\n",$2, $1}' | xargs -L 1 -I_ sh -c "flux reconcile kustomization _"
-
-# Suspend one flux kustomization from reconciliation (sync)
-# flux suspend kustomization -n ngsa ngsa # note the namespace `-n ngsa`
-
-# Suspend the git source from updating (should suspend any updates from the git repo)
-# flux suspend source git asb-repo-flux
-```
+## Setup Infrastructure
+
+Infrastructure Setup is separated into multiple steps that must be run sequentially
+
+1. run [`./scripts/clusterCreation/1-CheckPrerequisites.sh`]('../../../scripts/clusterCreation/1-CheckPrerequisites.sh') from the Visual Studio Code, Codespaces session.  
+
+2. run output of first script in a CodeSpaces instance. This will guide you to deploy a new environment. This will only work inside CodeSpaces through local VS Code instance (not through CodeSpaces in browser).
+
+If you would like to restart deployment you can delete current deployment file: `rm .current-deployment`
+
+## Infrastructure Setup During Each Script
+
+### 2-CreateHub.sh
+
+| Deployment File  | Resource Type                            | Name                                   | Resource Group |
+| ---------------- | ---------------------------------------- | -------------------------------------- | -------------- |
+| hub-default.json | Microsoft.OperationalInsights/workspaces | la-hub-${ASB\_HUB\_LOCATION}-${RANDOM} | $ASB\_RG\_HUB  |
+| hub-default.json | Microsoft.Network/networkSecurityGroups  | nsg-${ASB\_HUB\_LOCATION}-bastion      | $ASB\_RG\_HUB  |
+| hub-default.json | Microsoft.Network/virtualNetworks        | vnet-${ASB\_HUB\_LOCATION}-hub         | $ASB\_RG\_HUB  |
+| hub-default.json | Microsoft.Network/publicIpAddresses      | pip-fw-${ASB\_HUB\_LOCATION}-\*        | $ASB\_RG\_HUB  |
+| hub-default.json | Microsoft.Network/firewallPolicies       | fw-policies-base                       | $ASB\_RG\_HUB  |
+| hub-default.json | Microsoft.Network/firewallPolicies       | fw-policies-${ASB\_HUB\_LOCATION}      | $ASB\_RG\_HUB  |
+| hub-default.json | Microsoft.Network/azureFirewalls         | fw-${ASB\_HUB\_LOCATION}               | $ASB\_RG\_HUB  |
+
+### 3-AttachSpokeAndClusterToHub.sh
+
+| Deployment File    | Resource Type                                                                     | Name                                                                                                | Resource Group  |
+| ------------------ | --------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- | --------------- |
+| spoke-default.json | Microsoft.Network/routeTables                                                     | route-to-${ASB\_SPOKE\_LOCATION}-hub-fw                                                             | $ASB\_RG\_SPOKE |
+| spoke-default.json | Microsoft.Network/networkSecurityGroups                                           | nsg-vnet-spoke-BU0001G0001-00-aksilbs                                                               | $ASB\_RG\_SPOKE |
+| spoke-default.json | Microsoft.Network/networkSecurityGroups                                           | nsg-vnet-spoke-BU0001G0001-00-appgw                                                                 | $ASB\_RG\_SPOKE |
+| spoke-default.json | Microsoft.Network/networkSecurityGroups                                           | nsg-vnet-spoke-BU0001G0001-00-nodepools                                                             | $ASB\_RG\_SPOKE |
+| spoke-default.json | Microsoft.Network/virtualNetworks                                                 | vnet-spoke-BU0001G0001-00                                                                           | $ASB\_RG\_SPOKE |
+| spoke-default.json | microsoft.network/virtualnetworks/virtualnetworkpeerings                          | vnet-fw-${ASB\_HUB\_LOCATION}-hub/hub-to-vnet-spoke-BU0001G0001-00                                  | $ASB\_RG\_HUB   |
+| spoke-default.json | Microsoft.Network/publicIpAddresses                                               | pip-${ASB\_DEPLOYMENT\_NAME}-BU0001G0001-00                                                         | $ASB\_RG\_SPOKE |
+| hub-regionA.json   | Microsoft.OperationalInsights/workspaces                                          | la-hub-${ASB\_HUB\_LOCATION}-${RANDOM}                                                              | $ASB\_RG\_HUB   |
+| hub-regionA.json   | Microsoft.Network/networkSecurityGroups                                           | nsg-${ASB\_HUB\_LOCATION}-bastion                                                                   | $ASB\_RG\_HUB   |
+| hub-regionA.json   | Microsoft.Network/virtualNetworks                                                 | vnet-${ASB\_HUB\_LOCATION}-hub                                                                      | $ASB\_RG\_HUB   |
+| hub-regionA.json   | Microsoft.Network/publicIpAddresses                                               | pip-fw-${ASB\_HUB\_LOCATION}-\*                                                                     | $ASB\_RG\_HUB   |
+| hub-regionA.json   | Microsoft.Network/firewallPolicies                                                | fw-policies-base                                                                                    | $ASB\_RG\_HUB   |
+| hub-regionA.json   | Microsoft.Network/firewallPolicies                                                | fw-policies-${ASB\_HUB\_LOCATION}                                                                   | $ASB\_RG\_HUB   |
+| hub-regionA.json   | Microsoft.Network/azureFirewalls                                                  | fw-${ASB\_HUB\_LOCATION}                                                                            | $ASB\_RG\_HUB   |
+| hub-regionA.json   | Microsoft.Network/ipGroups                                                        | ipg-${ASB\_HUB\_LOCATION}-AksNodepools                                                              | $ASB\_RG\_HUB   |
+| cluster-stamp.json | Microsoft.ManagedIdentity/userAssignedIdentities                                  | mi-aks-${RANDOM}-${ASB\_CLUSTER\_LOCATION}-controlplane                                             | $ASB\_RG\_CORE  |
+| cluster-stamp.json | Microsoft.ManagedIdentity/userAssignedIdentities                                  | mi-appgateway-frontend                                                                              | $ASB\_RG\_CORE  |
+| cluster-stamp.json | Microsoft.ManagedIdentity/userAssignedIdentities                                  | podmi-ingress-controller                                                                            | $ASB\_RG\_CORE  |
+| cluster-stamp.json | Microsoft.KeyVault/vaults                                                         | kv-aks-${RANDOM}                                                                                    | $ASB\_RG\_CORE  |
+| cluster-stamp.json | Microsoft.Network/privateEndpoints                                                | nodepools-to-akv                                                                                    | $ASB\_RG\_CORE  |
+| cluster-stamp.json | Microsoft.Network/privateDnsZones                                                 | privatelink.azurecr.io                                                                              | $ASB\_RG\_CORE  |
+| cluster-stamp.json | Microsoft.Network/privateDnsZones                                                 | privatelink.vaultcore.azure.net                                                                     | $ASB\_RG\_CORE  |
+| cluster-stamp.json | Microsoft.Network/privateDnsZones                                                 | ${ASB\_DNS\_ZONE}                                                                                   | $ASB\_RG\_CORE  |
+| cluster-stamp.json | Microsoft.Network/applicationGateways                                             | apw-aks-${RANDOM}-${ASB\_CLUSTER\_LOCATION}                                                         | $ASB\_RG\_CORE  |
+| cluster-stamp.json | Microsoft.Network/virtualNetworks/subnets/Microsoft.Authorization/roleAssignments | vnet-spoke-BU0001G0001-00/snet-clusternodes/${RANDOM}                                               | $ASB\_RG\_SPOKE |
+| cluster-stamp.json | Microsoft.Network/virtualNetworks/subnets/Microsoft.Authorization/roleAssignments | vnet-spoke-BU0001G0001-00/snet-clusteringressservices/${RANDOM}                                     | $ASB\_RG\_SPOKE |
+| cluster-stamp.json | Microsoft.Resources/deployments                                                   | EnsureClusterUserAssignedHasRbacToManageVMSS                                                        | $ASB\_RG\_CORE  |
+| cluster-stamp.json | Microsoft.OperationalInsights/workspaces                                          | la-aks-${RANDOM}                                                                                    | $ASB\_RG\_CORE  |
+| cluster-stamp.json | Microsoft.Insights/scheduledQueryRules                                            | PodFailedScheduledQuery-aks-${RANDOM}-${ASB\_CLUSTER\_LOCATION}                                     | $ASB\_RG\_CORE  |
+| cluster-stamp.json | microsoft.insights/activityLogAlerts                                              | AllAzureAdvisorAlert                                                                                | $ASB\_RG\_CORE  |
+| cluster-stamp.json | Microsoft.OperationsManagement/solutions                                          | ContainerInsights(la-aks-${RANDOM})                                                                 | $ASB\_RG\_CORE  |
+| cluster-stamp.json | Microsoft.OperationsManagement/solutions                                          | KeyVaultAnalytics(la-aks-${RANDOM})                                                                 | $ASB\_RG\_CORE  |
+| cluster-stamp.json | Microsoft.ContainerRegistry/registries                                            | acraks${RANDOM}                                                                                     | $ASB\_RG\_CORE  |
+| cluster-stamp.json | Microsoft.Network/privateEndpoints                                                | nodepools-to-acr                                                                                    | $ASB\_RG\_CORE  |
+| cluster-stamp.json | Microsoft.ContainerService/managedClusters                                        | aks-${RANDOM}-${ASB\_CLUSTER\_LOCATION}                                                             | $ASB\_RG\_CORE  |
+| cluster-stamp.json | Microsoft.Insights/metricAlerts                                                   | Node CPU utilization high for aks-${RANDOM}-${ASB\_CLUSTER\_LOCATION} CI-1                          | $ASB\_RG\_CORE  |
+| cluster-stamp.json | Microsoft.Insights/metricAlerts                                                   | Node working set memory utilization high for aks-${RANDOM}-${ASB\_CLUSTER\_LOCATION} CI-2           | $ASB\_RG\_CORE  |
+| cluster-stamp.json | Microsoft.Insights/metricAlerts                                                   | Nodes in not ready status for aks-${RANDOM}-${ASB\_CLUSTER\_LOCATION} CI-3                          | $ASB\_RG\_CORE  |
+| cluster-stamp.json | Microsoft.Insights/metricAlerts                                                   | Pods in failed state for aks-${RANDOM}-${ASB\_CLUSTER\_LOCATION} CI-4                               | $ASB\_RG\_CORE  |
+| cluster-stamp.json | Microsoft.Insights/metricAlerts                                                   | Disk usage high for aks-${RANDOM}-${ASB\_CLUSTER\_LOCATION} CI-5                                    | $ASB\_RG\_CORE  |
+| cluster-stamp.json | Microsoft.Insights/metricAlerts                                                   | Containers getting OOM killed for aks-${RANDOM}-${ASB\_CLUSTER\_LOCATION} CI-6                      | $ASB\_RG\_CORE  |
+| cluster-stamp.json | Microsoft.Insights/metricAlerts                                                   | Restarting container count for aks-${RANDOM}-${ASB\_CLUSTER\_LOCATION} CI-7                         | $ASB\_RG\_CORE  |
+| cluster-stamp.json | Microsoft.Insights/metricAlerts                                                   | Pods not in ready state for aks-${RANDOM}-${ASB\_CLUSTER\_LOCATION} CI-8                            | $ASB\_RG\_CORE  |
+| cluster-stamp.json | Microsoft.Insights/metricAlerts                                                   | Container CPU usage high for aks-${RANDOM}-${ASB\_CLUSTER\_LOCATION} CI-9                           | $ASB\_RG\_CORE  |
+| cluster-stamp.json | Microsoft.Insights/metricAlerts                                                   | Container working set memory usage high for aks-${RANDOM}-${ASB\_CLUSTER\_LOCATION} CI-10           | $ASB\_RG\_CORE  |
+| cluster-stamp.json | Microsoft.Insights/metricAlerts                                                   | Jobs completed more than 6 hours ago for aks-${RANDOM}-${ASB\_CLUSTER\_LOCATION} CI-11              | $ASB\_RG\_CORE  |
+| cluster-stamp.json | Microsoft.Insights/metricAlerts                                                   | Persistent volume usage high for aks-${RANDOM}-${ASB\_CLUSTER\_LOCATION} CI-18                      | $ASB\_RG\_CORE  |
+| cluster-stamp.json | Microsoft.ManagedIdentity/userAssignedIdentities/providers/roleAssignments        | podmi-ingress-controller                                                                            | $ASB\_RG\_CORE  |
+| cluster-stamp.json | Microsoft.Authorization/policyAssignments                                         | Kubernetes cluster pod security restricted standards for Linux-based workloads                      | $ASB\_RG\_CORE  |
+| cluster-stamp.json | Microsoft.Authorization/policyAssignments                                         | Kubernetes cluster containers should run with a read only root file system                          | $ASB\_RG\_CORE  |
+| cluster-stamp.json | Microsoft.Authorization/policyAssignments                                         | Kubernetes cluster containers CPU and memory resource limits should not exceed the specified limits | $ASB\_RG\_CORE  |
+| cluster-stamp.json | Microsoft.Authorization/policyAssignments                                         | Kubernetes clusters should be accessible only over HTTPS                                            | $ASB\_RG\_CORE  |
+| cluster-stamp.json | Microsoft.Authorization/policyAssignments                                         | Kubernetes clusters should use internal load balancers                                              | $ASB\_RG\_CORE  |
+| cluster-stamp.json | Microsoft.Authorization/policyAssignments                                         | Kubernetes cluster containers should only use allowed images                                        | $ASB\_RG\_CORE  |
 
 ## Deploying NGSA Applications
 
@@ -509,11 +188,11 @@ az keyvault set-policy -n $ASB_KV_NAME --object-id $ASB_NGSA_MI_PRINCIPAL_ID --s
 
 NGSA Application can be deployed into the cluster using two different approaches:
 
-* [Deploy using yaml with FluxCD](./docs/deployNgsaYaml.md)
+- [Deploy using yaml with FluxCD](./docs/deployNgsaYaml.md)
 
-* [Deploy using AutoGitops with FluxCD](https://github.com/bartr/autogitops)
+- [Deploy using AutoGitops with FluxCD](https://github.com/bartr/autogitops)
 
-  * AutoGitOps is reccomended for a full CI/CD integration. For this approach the application repository must be autogitops enabled.
+  - AutoGitOps is reccomended for a full CI/CD integration. For this approach the application repository must be autogitops enabled.
 
 ## Deploying LodeRunner Applications
 
@@ -557,23 +236,15 @@ az keyvault secret set -o table --vault-name $ASB_KV_NAME --name "CosmosLRCollec
 
 LodeRunner Application can be deployed into the cluster using two different approaches:
 
-* [Deploy using yaml with FluxCD](./docs/deployLodeRunnerYaml.md)
+- [Deploy using yaml with FluxCD](./docs/deployLodeRunnerYaml.md)
 
-* [Deploy using AutoGitops with FluxCD](https://github.com/bartr/autogitops)
+- [Deploy using AutoGitops with FluxCD](https://github.com/bartr/autogitops)
 
-  * AutoGitOps is reccomended for a full CI/CD integration. For this approach the application repository must be autogitops enabled.
+  - AutoGitOps is reccomended for a full CI/CD integration. For this approach the application repository must be autogitops enabled.
 
 ## Deploy Fluent Bit
 
 ```bash
-# Import image into ACR
-az acr import --source docker.io/fluent/fluent-bit:1.9.5 -n $ASB_ACR_NAME
-
-# Create namespace
-kubectl create ns fluentbit
-
-# Create secrets to authenticate with log analytics
-kubectl create secret generic fluentbit-secrets --from-literal=WorkspaceId=$(az monitor log-analytics workspace show -g $ASB_RG_CORE -n $ASB_LA_NAME --query customerId -o tsv)   --from-literal=SharedKey=$(az monitor log-analytics workspace get-shared-keys -g $ASB_RG_CORE -n $ASB_LA_NAME --query primarySharedKey -o tsv) -n fluentbit
 
 # Load required yaml
 
