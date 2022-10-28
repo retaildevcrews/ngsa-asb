@@ -47,56 +47,33 @@ Before proceeding, please ensure the PnP material is familiar.  This will help b
 - Please refer to the PnP repo as the `upstream repo`.
 - Please use Codespaces when executing these instructions.  
 
-These instructions are meant for new deployments, and require the use of Codespaces from within Visual Studio Code proper; not a browser-based rendering.
+To continue with this setup, you must execute the scripts using CodeSpaces through a [local VS Code instance](https://docs.github.com/en/codespaces/developing-in-codespaces/using-github-codespaces-in-visual-studio-code). The reason you must use CodeSpaces is because the tooling is already setup to easily run the script and because it depends on DNS secrets being injected by CodeSpaces.
 
-When using browser-based Visual Studio Code sessions the switch for "use device code" is needed.  When using Visual Studio Code proper with a Codespace session the user can authenticate passing in the tenant id, and not using a secondary browser.  This allows for satisfy the group policies that cause issues when using the browser based authentication.
+Running CodeSpaces through a local VS Code instance is required as you can then login to the Azure CLI without using a device code. Logging in with a device code is the only way to login using CodeSpaces through the browser. When logging in with a device code, some commands (i.e. Active Directory calls) required to excute the setup scripts will not work due to conditional access policies.
 
 #### Connecting to the Correct Tenant & Setting the Correct Subscription Context
 
-When authenticating the the Azure portal, either via the [Azure CLI]('https://learn.microsoft.com/en-us/cli/azure/authenticate-azure-cli') or [signing in with](https://learn.microsoft.com/en-us/powershell/azure/authenticate-azureps?view=azps-9.0.1) the Az PowerShell modules it is important to use the correct Tenant Id for the tenant desired as well as it is important to set the correct subscription context.  This ensures that in this "one to many" tenant world the correct tenant is utilized each time.  Examples using both implementations are bellow.
+When authenticating with the Azure portal with the [Azure CLI]('https://learn.microsoft.com/en-us/cli/azure/authenticate-azure-cli') it is important to use the correct Tenant Id for the tenant desired as well as it is important to set the correct subscription context.  This ensures that in this "one to many" tenant world the correct tenant is utilized each time.
 
-##### PowerShell Az Modules
-
-```powershell
-# Connecting to Azure
-Connect-AzAccount -Tenant '{Tenant Id}' --output table
-
-```
-
-Set the subscription passing in either subscription id or name.  
-
-```powershell
-# Install Az Modules
-Install-Module -Name Az --output table
-
-# Set the Azure PowerShell context using piping
-Get-AzSubscription -Subscription '{Subscription Id or Name}' | Set-AzContext -Name 'MyContext'
-
-```
-
-##### Azure ClI
-
-``` bash
-
-# Connecting to Azure
-az login --tenant '{Tenant Id}'
-
-```
+##### Azure ClI Login
 
 ```bash
 
+# Connecting to Azure with specific tenant (e.g. microsoft.onmicrosoft.com)
+az login --tenant '{Tenant Id}'
+
 # change the active subscription using the subscription name
-az account set --subscription "{Subscription Id or Name}" --output table
+az account set --subscription "{Subscription Id or Name}"
 
 ```
 
 ## Setup Infrastructure
 
-Infrastructure Setup is separated into two steps that must be run sequentially
+Infrastructure Setup is separated into multiple steps that must be run sequentially
 
 1. run [`./scripts/clusterCreation/1-CheckPrerequisites.sh`]('../../../scripts/clusterCreation/1-CheckPrerequisites.sh') from the Visual Studio Code, Codespaces session.  
 
-2. run output of first script in a CodeSpaces instance. This will guide you to deploy a new environment. This will only work inside CodeSpaces.
+2. run output of first script in a CodeSpaces instance. This will guide you to deploy a new environment. This will only work inside CodeSpaces through local VS Code instance (not through CodeSpaces in browser).
 
 If you would like to restart deployment you can delete current deployment file: `rm .current-deployment`
 
