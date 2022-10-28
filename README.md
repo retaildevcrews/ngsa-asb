@@ -10,7 +10,7 @@
         - [PowerShell Az Modules](#powershell-az-modules)
         - [Azure ClI](#azure-cli)
   - [Setup Infrastructure](#setup-infrastructure)
-  - [Infrastucture Setup During Each Script](#infrastucture-setup-during-each-script)
+  - [Infrastructure Setup During Each Script](#infrastructure-setup-during-each-script)
     - [2-CreateHub.sh](#2-createhubsh)
     - [3-AttachSpokeAndClusterToHub.sh](#3-attachspokeandclustertohubsh)
   - [Deploying NGSA Applications](#deploying-ngsa-applications)
@@ -42,18 +42,18 @@ NGSA AKS Secure Base line uses the Patterns & Practices (PnP) AKS Secure Baselin
 
 ### Before Beginning
 
-Before proceeding, please make sure the PnP material is familiar.  This will help the person creating the environment understand why specific underlying architectural and design decisions were made.
+Before proceeding, please ensure the PnP material is familiar.  This will help by giving  specific underlying architectural and design decisions knowledge.
 
 * Please refer to the PnP repo as the `upstream repo`.
 * Please use Codespaces when executing these instructions.  
  
-These instructions are meant for new deployments, and require the use of Codespaces from within "thick-client" Visual Studio Code.
+These instructions are meant for new deployments, and require the use of Codespaces from within Visual Studio Code proper; not a browser-based rendering.
 
-Errors will occur if a browser-based instance of Codespaces is used due to group policy that are set.  Though a user can authenticate using "device code" decorations to the authentication this can result in errors if specific group policies are in place.  
+When using browser-based Visual Studio Code sessions the switch for "use device code" is needed.  When using Visual Studio Code proper with a Codespace session the user can authenticate passing in the tenant id, and not using a secondary browser.  This allows for satisfy the group policies that cause issues when using the browser based authentication.
 
 #### Connecting to the Correct Tenant & Setting the Correct Subscription Context
 
-When authenticating the the Azure portal, either via the Azure CLI or the Az PowerShell modules it is important to use the correct Tenant Id for the tenant desired as well as it is important to set the correct subscription context.  This ensures that in this "one to many" tenant world the correct tenant is utilized each time.  Examples using both implementations are bellow.
+When authenticating the the Azure portal, either via the [Azure CLI]('https://learn.microsoft.com/en-us/cli/azure/authenticate-azure-cli') or [signing in with](https://learn.microsoft.com/en-us/powershell/azure/authenticate-azureps?view=azps-9.0.1) the Az PowerShell modules it is important to use the correct Tenant Id for the tenant desired as well as it is important to set the correct subscription context.  This ensures that in this "one to many" tenant world the correct tenant is utilized each time.  Examples using both implementations are bellow.
 
 ##### PowerShell Az Modules
 
@@ -92,15 +92,15 @@ az account set --subscription "{Subscription Id or Name}" --output table
 
 ## Setup Infrastructure
 
-Infrastruture Setup is separated into two steps that must be run sequentially
+Infrastructure Setup is separated into two steps that must be run sequentially
 
-1. run [`./scripts/clusterCreation/1-CheckPrerequisites.sh`]('../../../scripts/clusterCreation/1-CheckPrerequisites.sh') from a local machine. This will fail if run in CodeSpaces. Requires az cli installation.
+1. run [`./scripts/clusterCreation/1-CheckPrerequisites.sh`]('../../../scripts/clusterCreation/1-CheckPrerequisites.sh') from the Visual Studio Code, Codespaces session.  
 
 2. run output of first script in a CodeSpaces instance. This will guide you to deploy a new environment. This will only work inside CodeSpaces.
 
 If you would like to restart deployment you can delete current deployment file: `rm .current-deployment`
 
-## Infrastucture Setup During Each Script
+## Infrastructure Setup During Each Script
 
 ### 2-CreateHub.sh
 
