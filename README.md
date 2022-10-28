@@ -1,6 +1,9 @@
 # NGSA AKS Secure Baseline
 
+## Table of Contents (TOC)
+
 - [NGSA AKS Secure Baseline](#ngsa-aks-secure-baseline)
+  - [Table of Contents (TOC)](#table-of-contents-toc)
   - [Introduction](#introduction)
     - [Before Beginning](#before-beginning)
       - [Connecting to the Correct Tenant & Setting the Correct Subscription Context](#connecting-to-the-correct-tenant--setting-the-correct-subscription-context)
