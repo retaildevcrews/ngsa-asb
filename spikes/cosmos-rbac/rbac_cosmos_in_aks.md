@@ -2,7 +2,7 @@
 
 ## Summary
 
-In this spike, we show how to disable keys and connect to Cosmos DB in our NGSA-ASB AKS clusters using role-based access control (RBAC). This is important because currently Cosmos DB authentication keys are being stored as secrets in the AKS cluster. Implementation requires changes to two repositories:
+In this spike, we show how to disable keys and connect the NGSA app to Cosmos DB in our NGSA-ASB AKS clusters using role-based access control (RBAC). This is important because currently Cosmos DB authentication keys are being stored as secrets in the AKS cluster. Implementation requires changes to two repositories:
 
 - The [NGSA app](https://github.com/retaildevcrews/ngsa-app) code has to be updated so that the ***CosmosClient*** class uses RBAC
 - The [NGSA-ASB](https://github.com/retaildevcrews/ngsa-asb) ***SecretProviderClass*** YAML needs to be updated to remove the variable "CosmosKey" from the SecretsProvider class, since this secret will no longer be stored in the cluster.
@@ -71,7 +71,8 @@ In the file [templates/ngsa/ngsa-pod-identity.yaml](https://github.com/retaildev
 # create the role definition
 az cosmosdb sql role definition create --resource-group ${ASB_COSMOS_RG_NAME} --account-name ${ASB_COSMOS_DB_NAME} --body @definition.json
 
-# create the role assignment assigning read permission over the Cosmos DB account to the managed identity
+# create the role assignment assigning read permission over the Cosmos DB account to the NGSA managed identity
+# NGSA managed identity is already being managed by the AKS cluster
 az cosmosdb sql role assignment create --resource-group ${ASB_COSMOS_RG_NAME} --account-name ${ASB_COSMOS_DB_NAME} --role-definition-name "Read Azure Cosmos DB Metadata" --principal-id ${ASB_NGSA_MI_PRINCIPAL_ID} --scope ${ASB_COSMOS_ID}
 
 # assign read-write permissions over the Cosmos DB account to the managed identity
