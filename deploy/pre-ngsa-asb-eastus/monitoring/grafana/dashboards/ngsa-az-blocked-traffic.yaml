@@ -722,7 +722,7 @@ data:
                   "azureLogAnalytics": {
                     "query": "AzureDiagnostics\r\n| where $__timeFilter(TimeGenerated)\n  and Category == \"ApplicationGatewayFirewallLog\"\r\n  and ResourceProvider == \"MICROSOFT.NETWORK\"\r\n  and action_s == \"Blocked\"\r\n| summarize count() by Resource, hostname_s, requestUri_s, Message\n| project count_, Resource, hostname_s, requestUri_s, Message",
                     "resultFormat": "table",
-                    "workspace": "880c3afb-149f-4529-bc99-274302361cc5"
+                    "workspace": "35e52811-9906-4cb9-9b75-b4f313f22010"
                   },
                   "azureMonitor": {
                     "aggOptions": [],
@@ -807,7 +807,7 @@ data:
                   "azureLogAnalytics": {
                     "query": "AzureDiagnostics\r\n| where $__timeFilter(TimeGenerated)\n  and Category == \"ApplicationGatewayFirewallLog\"\r\n  and ResourceProvider == \"MICROSOFT.NETWORK\"\r\n  and action_s == \"Blocked\"\n| summarize count() by bin_at(TimeGenerated, $__interval, datetime(00:00))\n| order by TimeGenerated asc\r\n",
                     "resultFormat": "time_series",
-                    "workspace": "880c3afb-149f-4529-bc99-274302361cc5"
+                    "workspace": "35e52811-9906-4cb9-9b75-b4f313f22010"
                   },
                   "azureMonitor": {
                     "aggOptions": [],
