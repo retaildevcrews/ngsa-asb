@@ -35,8 +35,8 @@ CosmosClient c = new CosmosClient(cosmosServer, new DefaultAzureCredential(), co
 
 In the file [src/Core/Secrets.cs](https://github.com/retaildevcrews/ngsa-app/blob/main/src/Core/Secrets.cs)
 
-- Remove all references to the `CosmosKey` in the function `GetSecretsFromVolume`
-- Remove any checks for the value of `CosmosKey` in the function `ValidateSecrets`
+- Remove all references to the `CosmosKey` in the function [GetSecretsFromVolume](https://github.com/retaildevcrews/ngsa-app/blob/main/src/Core/Secrets.cs#L25)
+- Remove any checks for the value of `CosmosKey` in the function [ValidateSecrets](https://github.com/retaildevcrews/ngsa-app/blob/main/src/Core/Secrets.cs#L54)
 
 ### NGSA-ASB YAML Updates
 
