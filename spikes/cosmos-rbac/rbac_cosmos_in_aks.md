@@ -21,7 +21,7 @@ In the file [src/DataAccessLayer/dalMain.cs](https://github.com/retaildevcrews/n
 
 - Add `using Azure.Identity;`
 - Remove all `if` statements that check for `CosmosKey`
-- [In this section](https://github.com/retaildevcrews/ngsa-app/blob/main/src/DataAccessLayer/dalMain.cs#L103), replace the reference to CosmosKey with a DefaultAzureCredential instance, by replacing
+- In [this section of dalMain.cs](https://github.com/retaildevcrews/ngsa-app/blob/main/src/DataAccessLayer/dalMain.cs#L103), replace the reference to CosmosKey with a DefaultAzureCredential instance, by replacing
 
 ```bash
 CosmosClient c = new(cosmosServer, cosmosKey, cosmosDetails.CosmosClientOptions);
