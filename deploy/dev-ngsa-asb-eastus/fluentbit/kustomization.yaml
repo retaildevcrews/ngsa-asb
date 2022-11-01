@@ -12,6 +12,11 @@ patches:
       data:
         zone: az-eastus-dev
         region: eastus
+    target:
+      kind: ConfigMap
+      name: fluentbit-log-config
+      namespace: fluentbit
+
   - patch: |
         - op: replace
           path: "/spec/template/spec/containers/0/image"
