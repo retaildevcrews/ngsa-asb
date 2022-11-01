@@ -246,14 +246,14 @@ az network application-gateway http-settings create -g $ASB_RG_CORE --gateway-na
 
 export MAX_RULE_PRIORITY=$(az network application-gateway rule list -g $ASB_RG_CORE --gateway-name $ASB_APP_GW_NAME --query "max([].priority)")
 
-export ABS_HTTPS_REDIRECT_RULE_PRIORITY=$(($MAX_RULE_PRIORITY+1))
+export ABS_HTTPSETTINGS_RULE_PRIORITY=$(($MAX_RULE_PRIORITY+1))
 
 # Verify that the new prority is correct.
-echo $ABS_HTTPS_REDIRECT_RULE_PRIORITY
+echo $ABS_HTTPSETTINGS_RULE_PRIORITY
 
 az network application-gateway rule create -g $ASB_RG_CORE --gateway-name $ASB_APP_GW_NAME \
   -n "$ASB_APP_DNS_NAME-routing-rule" --address-pool $ASB_APP_DNS_FULL_NAME \
-  --http-settings "$ASB_APP_DNS_NAME-httpsettings" --http-listener "listener-$ASB_APP_DNS_NAME" --priority $ABS_HTTPS_REDIRECT_RULE_PRIORITY
+  --http-settings "$ASB_APP_DNS_NAME-httpsettings" --http-listener "listener-$ASB_APP_DNS_NAME" --priority $ABS_HTTPSETTINGS_RULE_PRIORITY 
 
 # set http redirection
 # create listener for HTTP (80), HTTPS redirect config and HTTPS redirect routing rule
