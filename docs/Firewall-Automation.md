@@ -146,19 +146,12 @@ To create the schedules execute the PowerShell script Firewall-Automation-Schedu
     $ASB_FW_Tenant_Id={tenant Id}
     $ASB_FW_Subscription_Name={subscription name}
     $ASB_FW_Subscription_Id={subscription Id}
-    $Automation_Resource_Group='rg-ngsa-asb-firewall-automation-dev'
-    $Firewall_Resource_Group='rg-ngsa-asb-dev-hub'
+    $Base_NSGA_Name='ngsa-asb'
+    $Base_Automation_System_Name='firewall-automation'
     $Location='eastus'
-    $Automation_Account_Name='aa-ngsa-asb-firewall-automation-dev'
     $Sku='Basic'
-    $PowerShell_Runbook_Name='rb-ngsa-asb-firewall-automation-dev'
-    $Vnet_Name='vnet-eastus-hub'
-    $Firewall_Name='fw-eastus'
-    $PIP_Name1='pip-fw-eastus-01'
-    $PIP_Name2='pip-fw-eastus-02'
-    $PIP_Name_Default='pip-fw-eastus-default'
-    $Managed_Identity_Name='mi-ngsa-asb-firewall-automation-dev'
-    $Base_Schedule_Name='as-ngsa-asb-firewall-automation-dev'
+    $RunbookFileName='Firewall-Automation-Runbook.ps1'    
+    $RunbookDescription='This runbook automates the allocation and de-allocation of a firewall for the purposes of scheduling.'
     $Environment='dev'
 
 
@@ -166,18 +159,11 @@ Firewall-Automation-Schedule-Creation.ps1
     -Tenant_Id $ASB_FW_Tenant_Id 
     -Subscription_Name $ASB_FW_Subscription_Name
     -Subscription_Id $ASB_FW_Subscription_Id 
-    -Resource_Group_Name_for_Automation $Automation_Resource_Group -Resource_Group_Name_with_Firewall $Firewall_Resource_Group 
+    -Base_NSGA_Name $Base_NSGA_Name
+    -Base_Automation_System_Name $Base_Automation_System_Name
     -Location $Location
-    -Automation_Account_Name $Automation_Account_Name 
     -Sku $Sku 
-    -PowerShell_Runbook_Name $PowerShell_Runbook_Name 
-    -Vnet_Name $Vnet_Name
-    -Firewall_Name $Firewall_Name
-    -PIP_Name1 $PIP_Name1
-    -PIP_Name2 $PIP_Name2
-    -PIP_Name_Default $PIP_Default
-    -Managed_Identity_Name $Managed_Identity_Name
-    -Base_Schedule_Name $Base_Schedule_Name
+    -RunbookFileName $RunbookFileName 
+    -RunbookDescription $RunbookDescription
     -Environment $Environment
-
 ```
