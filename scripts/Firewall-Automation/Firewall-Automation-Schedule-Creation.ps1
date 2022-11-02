@@ -1,44 +1,13 @@
+$tenantId = Get-Content -Path Env:\ASB_FW_Tenant_Id
+$subscriptionName = Get-Content -Path Env:\ASB_FW_Subscription_Name
+$baseName = Get-Content -Path Env:\ASB_FW_Base_NSGA_Name
+$baseAutomationName = Get-Content -Path Env:\ASB_FW_Base_Automation_System_Name
+$environment = Get-Content -Path Env:\ASB_FW_Environment
+#$runbookFileName = Get-Content -Path Env:\ASB_FW_PowerShell_Runbook_File_Name
+#$sku = Get-Content -Path Env:\ASB_FW_Sku
+$location = Get-Content -Path Env:\ASB_FW_Location
+#$runbookDescription = Get-Content -Path Env:\ASB_FW_PowerShell_Runbook_Description
 
-Param (
-    [Parameter(Mandatory)]
-    [String]$Tenant_Id,
-    [Parameter(Mandatory)]
-    [String]$Subscription_Name,
-    [Parameter(Mandatory)]
-    [String]$Base_NSGA_Name,
-    [Parameter(Mandatory)]
-    [String]$Base_Autmation_System_Name,
-    [Parameter(Mandatory)]
-    [String]$Environment,
-    [Parameter(Mandatory)]
-    [String]$RunbookFileName,
-    [Parameter(Mandatory)]
-    [String]$Sku,
-    [Parameter(Mandatory)]
-    [String]$Location,
-    [Parameter(Mandatory)]
-    [String]$RunbookDescription
-)
-
-$automationResourceGroup = "rg-" + $Base_NSGA_Name + "-" + $Base_Autmation_System_Name + "-" + $Environment
-$firewallResourceGroup = "rg-" + $Base_NSGA_Name + "-" + $Environment + "-hub"
-$alertsResourceGroup = "rg-" + $Base_NSGA_Name + "-" + $Environment
-$automationAccountName = "aa-" + $Base_NSGA_Name + "-" + $Base_Autmation_System_Name + "-" + $Environment
-$runbookName = "rb-" + $Base_NSGA_Name + "-" + $Base_Autmation_System_Name + "-" + $Environment
-$managedIdentityName = "mi-" + $Base_NSGA_Name + "-" + $Base_Autmation_System_Name + "-" + $Environment
-
-$vnetName = "vnet-" + $Location + "-hub"
-
-$firewallName = "fw-" + $Location
-$publicIpName1 = "pip-fw-" + $Location + "-01"
-$publicIpName2 = "pip-fw-" + $Location + "-02"
-$publicIpNameDefault = "pip-fw-" + $Location + "-default"
-$baseScheduleName = "as-" + $Base_NSGA_Name + "-" + $Base_Autmation_System_Name + "-" + $Environment
-
-
-$stop_Time = (Get-Date "21:00:00").AddHours(+4).AddDays(1)
-$start_Time = (Get-Date "06:00:00").AddHours(+4).AddDays(1)
-$end_Time = (Get-Date $start_Time).AddYears(3)
 
 function New-Schedule {
 
@@ -165,8 +134,27 @@ function Import-Modules{
 
   Write-Host "Completed installing & importing Azure Powershell Az Modules for Authentication and Monitor."
 }
+  $automationResourceGroup = "rg-" + $baseName + "-" + $baseAutomationName + "-" + $environment
+  $firewallResourceGroup = "rg-" + $baseName + "-" + $environment + "-hub"
+  $alertsResourceGroup = "rg-" + $baseName + "-" + $environment
+  $automationAccountName = "aa-" + $baseName + "-" + $baseAutomationName + "-" + $environment
+  $runbookName = "rb-" + $baseName + "-" + $baseAutomationName + "-" + $environment
+  $managedIdentityName = "mi-" + $baseName + "-" + $baseAutomationName + "-" + $environment
 
-Authenticate
+  $vnetName = "vnet-" + $location + "-hub"
+
+  $firewallName = "fw-" + $location
+  $publicIpName1 = "pip-fw-" + $location + "-01"
+  $publicIpName2 = "pip-fw-" + $location + "-02"
+  $publicIpNameDefault = "pip-fw-" + $location + "-default"
+  $baseScheduleName = "as-" + $baseName + "-" + $baseAutomationName + "-" + $Environment
+
+
+  $stop_Time = (Get-Date "21:00:00").AddHours(+4).AddDays(1)
+  $start_Time = (Get-Date "06:00:00").AddHours(+4).AddDays(1)
+  $end_Time = (Get-Date $start_Time).AddYears(3)
+
+Authenticate -Subscription_Name $subscriptionName
 
 Import-Modules
 
@@ -176,8 +164,8 @@ $stop_Action_Name = $baseScheduleName + "-stop"
 New-Schedule -Automation_Account_Name $automationAccountName -Resource_Group_Name_for_Automation $automationResourceGroup -schedule_Name $start_Action_Name -start_Time $start_Time -end_Time $end_Time
 New-Schedule -Automation_Account_Name $automationAccountName -Resource_Group_Name_for_Automation $automationResourceGroup -schedule_Name $stop_Action_Name -start_Time $stop_Time -end_Time $stop_Time
 
-Edit-ScheduleAndRunbook -Resource_Group_Name_with_Firewall $firewallResourceGroup -Location $Location -Resource_Group_Name_for_Automation $automationResourceGroup -resource_Group_Name_with_Alerts $alertsResourceGroup -tenant_Id $Tenant_Id -schedule_Name $start_Action_Name -powerShell_Runbook_Name $runbookName -Automation_Account_Name $automationAccountName -subscription_Name $Subscription_Name -vnet_Name $vnetName -firewall_Name $firewallName -pip_Name1 $publicIpName1 -pip_Name2 $publicIpName2 -pip_Name_Default $publicIpNameDefault -managed_Identity_Name $managedIdentityName -action "start"
-Edit-ScheduleAndRunbook -Resource_Group_Name_with_Firewall $firewallResourceGroup -Location $Location -Resource_Group_Name_for_Automation $automationResourceGroup -resource_Group_Name_with_Alerts $alertsResourceGroup -tenant_Id $Tenant_Id -schedule_Name $stop_Action_Name -powerShell_Runbook_Name $runbookName -Automation_Account_Name $automationAccountName -subscription_Name $Subscription_Name -vnet_Name $vnetName -firewall_Name $firewallName -pip_Name1 $publicIpName1 -pip_Name2 $publicIpName2 -pip_Name_Default $publicIpNameDefault -managed_Identity_Name $managedIdentityName -action "stop"
+Edit-ScheduleAndRunbook -Resource_Group_Name_with_Firewall $firewallResourceGroup -Location $location -Resource_Group_Name_for_Automation $automationResourceGroup -resource_Group_Name_with_Alerts $alertsResourceGroup -tenant_Id $tenantId -schedule_Name $start_Action_Name -powerShell_Runbook_Name $runbookName -Automation_Account_Name $automationAccountName -subscription_Name $subscriptionName -vnet_Name $vnetName -firewall_Name $firewallName -pip_Name1 $publicIpName1 -pip_Name2 $publicIpName2 -pip_Name_Default $publicIpNameDefault -managed_Identity_Name $managedIdentityName -action "start"
+Edit-ScheduleAndRunbook -Resource_Group_Name_with_Firewall $firewallResourceGroup -Location $location -Resource_Group_Name_for_Automation $automationResourceGroup -resource_Group_Name_with_Alerts $alertsResourceGroup -tenant_Id $tenantId -schedule_Name $stop_Action_Name -powerShell_Runbook_Name $runbookName -Automation_Account_Name $automationAccountName -subscription_Name $subscriptionName -vnet_Name $vnetName -firewall_Name $firewallName -pip_Name1 $publicIpName1 -pip_Name2 $publicIpName2 -pip_Name_Default $publicIpNameDefault -managed_Identity_Name $managedIdentityName -action "stop"
 
 Publish-AzAutomationRunbook -AutomationAccountName $automationAccountName -Name $runbookName -ResourceGroupName $automationResourceGroup
 

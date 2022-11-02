@@ -1,4 +1,7 @@
 export ASB_FW_Tenant_Id='72f988bf-86f1-41af-91ab-2d7cd011db47' # Tenant Id for the onmicrosoft.com tenant
+export ASB_DEPLOYMENT_NAME='firewall-automation'
+export ASB_SPOKE_LOCATION='westus'
+export ASB_ENV='dev'
 export ASB_FW_Subscription_Name='jofultz-team' # Suscription Id for Jofultz-Team
 export ASB_FW_Base_NSGA_Name='ngsa-asb'
 export ASB_FW_Base_Automation_System_Name='firewall-automation'
@@ -8,16 +11,4 @@ export ASB_FW_Sku='Basic' # Sku for the Automation Account
 export ASB_FW_Location='westus' # Location for resource creation
 export ASB_FW_PowerShell_Runbook_Description='This runbook automates the allocation and de-allocation of a firewall for the purposes of scheduling.' # Description for the runbook.
 
-echo
-echo "-------------------------------------------------------------------"
-echo "         Environment Variables for ASB Firewall Automation         "
-echo "-------------------------------------------------------------------"
-echo
-env | grep ^ASB_FW_ | while read kv; do echo "${kv}"; done
-echo
-echo "-------------------------------------------------------------------"
-echo "         Environment Variables for ASB Firewall Automation         "
-echo "-------------------------------------------------------------------"
-echo
-
-../../saveenv.sh
+./saveenv.sh

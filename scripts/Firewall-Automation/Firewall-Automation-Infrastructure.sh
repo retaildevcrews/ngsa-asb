@@ -1,28 +1,7 @@
 #!/bin/bash
 
-# Retries a command on failure.
-# $1 - the max number of attempts
-# $2... - the command to run
-function retry() {
-    local -r -i max_attempts="$1"; shift
-    local -r cmd="$@"
-    local -i attempt_num=1
-
-    until $cmd
-    do
-        if (( $attempt_num == $max_attempts ))
-        then
-            echo "Attempt $attempt_num failed and there are no more attempts left!"
-            exit;
-        else
-            echo "Attempt $attempt_num failed! Trying again in $attempt_num seconds..."
-            sleep $(( $attempt_num++ ))
-        fi
-    done
-}
-
- function CollectInputParameters(){
-  source ./scripts/automation/firewallAutomationForCostOptimization.variables.sh
+function CollectInputParameters(){
+  source ./scripts/Firewall-Automation/Firewall-Automation-Infrastructure-Variables.sh
 }
 
 function SetSubscription(){
@@ -119,9 +98,7 @@ function CreateAzureAutomationAccount(){
     # parameter position 3 = ASB_FW_Location
     # parameter position 4 = ASB_FW_Sku
 
-  echo
-  echo "Creating Azure Automation Account $1 in Resource Group $2..."
-  
+  echo  
   if [[ $(az automation account list --resource-group "${2}" --query "[?name=='${1}'] | length(@)") > 0 ]]; then
   
       echo "$1 exists, please review, and choose a different name if appropriate."
@@ -133,8 +110,6 @@ function CreateAzureAutomationAccount(){
           
     echo "Completed creating Azure Automation Account $1."
   fi
-
-  echo "Completed creating Azure Automation Account $1 in Resource Group $2."
   echo
 }
 
@@ -143,15 +118,14 @@ function CreateAzureAutomationPowerShellRunbook(){
     # parameter position 1 = rubbook Name
     # parameter position 2 = Automation Resource Group
     # parameter position 3 = Automation Account Name
-    # parameter position 4 = Tenant Id
-    # parameter position 5 = Subscription Id
-    
+    # parameter position 4 = location
+    # parameter position 5 = runbook description
 
       echo "Creating PowerShell Runbook $1 in $2 for $3..."
 
-      pwsh -command "Install-Module -Name Az.Automation; Connect-AzAccount -UseDeviceAuthentication -Tenant $4 -Subscription $5; New-AzAutomationRunbook -Type 'PowerShell' -AutomationAccountName "${3}" -Name "${1}" -ResourceGroupName "${2}";"
-
-      echo "Completed creating PowerShell Runbook $1 in $3 for $4."
+      $(az automation runbook create --automation-account-name "${3}" --resource-group "${2}" --name "${1}" --type "PowerShell" --location "${4}" --description "${5}" --output none)
+      
+      echo "Completed creating PowerShell Runbook $1 in $2 for $3."
   
   echo
 }
@@ -176,23 +150,26 @@ function UpdateAzureAutomationAccountToAllowSystemAssignedIdentity() {
     # parameter position 2 = Automation Resource Group
     # parameter position 3 = Subscription Id
     # parameter position 4 = Tenant Id
-    # parameter position 5 = User=Assigned Managed Identity Name
-    # parameter position 6 = Automation Account Principal Id
-
+    # parameter position 5 = User-Assigned Managed Identity Name
+  
   echo
-  echo "Assigning role Managed Identity Operator to the System Assigned Identity for automation account $1 in resource group $2, within subscription id $3..."
+  echo "Assigning role Managed Identity Operator to the System Assigned Identity for automation account ${1} in resource group ${2}, within subscription id ${3}..."
 
   # a name for our azure ad app
-  appName="${1}-application"
+  local appName="$1-application"
 
   # The name of the app role that the managed identity should be assigned to.
-  appRoleName='Managed Identity Operator' # For example, MyApi.Read.All
+  local appRoleName='Managed Identity Operator' # For example, MyApi.Read.All
 
-  pwsh --command "Connect-AzAccount -UseDeviceAuthentication -Tenant $4 -Subscription $3; Set-AzAutomationAccount -AssignUserIdentity /subscriptions/$3/resourcegroups/$2/providers/Microsoft.ManagedIdentity/userAssignedIdentities/$5 -ResourceGroupName $2 -Name $1 -AssignSystemIdentity;"
+  local automationAccountPrincipalId==$(az automation account show --automation-account-name "${1}" --resource-group "${2}" --query "identity.principalId" -o tsv)
+  
+  echo "Automation Account principal id: $automationAccountPrincipalId"
 
-  $(az role assignment create --assignee "${6}" --role "{$appRoleName}" --scope "/subscriptions/${3}/resourcegroups/${2}/providers/Microsoft.Automation/automationAccounts/${1}" --output none)
-    
-  echo "Completed assigning role Managed Identity Operator to the System Assigned Identity for automation account $1 in resource group $2, within subscription id $3."
+  pwsh --command "Connect-AzAccount -UseDeviceAuthentication -Tenant ${4} -Subscription ${3}; Set-AzAutomationAccount -AssignUserIdentity '/subscriptions/${3}/resourcegroups/${2}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/${5}' -ResourceGroupName ${2} -Name ${1} -AssignSystemIdentity;"
+  # Command not working need to investigate
+  # $(az role assignment create --assignee-object-id "${6}" --assignee-principal-type "ServicePrincipal" --role "$appRoleName" --scope "/subscriptions/$3/resourcegroups/$2/providers/Microsoft.Automation/automationAccounts/$1")
+
+  echo "Completed assigning role Managed Identity Operator to the System Assigned Identity for automation account ${1} in resource group ${2}, within subscription id ${3}."
   echo
 }
 
@@ -279,16 +256,16 @@ function main(){
 
   CreateUserAssignedManagedIdentity $userAssignedManagedIdentityName $automationResourceGroup
 
-  local identityPrincipalId=$(az identity list --resource-group "${automationResourceGroup}" --query "[?name=='${userAssignedManagedIdentityName}'].{name:name,principalId:principalId}|[0].principalId" --output tsv)
+  local identityPrincipalId=$(az identity list --resource-group ${automationResourceGroup} --query "[?name=='${userAssignedManagedIdentityName}'].{name:name,principalId:principalId}|[0].principalId" --output tsv)
 
   CreateAzureAutomationAccount $automationAccountName $automationResourceGroup $ASB_FW_Location $ASB_FW_Sku
 
-  local automationAccountPrincipalId=$(az automation account list --resource-group "${automationResourceGroup}" --query "[?name=='${automationAccountName}'].identity.{principalId:principalId}|[0].principalId" --output tsv)
+  CreateAzureAutomationPowerShellRunbook $runbookName $automationResourceGroup $automationAccountName $location # $ASB_FW_Tenant_Id $subscriptionId
 
-  CreateAzureAutomationPowerShellRunbook $runbookName $automationResourceGroup $automationAccountName $ASB_FW_Tenant_Id $subscriptionId
+  #local automationAccountPrincipalId=$(az automation account list --resource-group ${automationResourceGroup} --query "[?name=='${automationAccountName}'].identity.{principalId:principalId}|[0].principalId" --output tsv)
+  #echo "Automation Account Principal Id: $automationAccountPrincipalId"
 
-  UpdateAzureAutomationAccountToAllowSystemAssignedIdentity $automationAccountName $automationResourceGroup $subscriptionId $ASB_FW_Tenant_Id $userAssignedManagedIdentityName $automationAccountPrincipalId
-
+  UpdateAzureAutomationAccountToAllowSystemAssignedIdentity $automationAccountName $automationResourceGroup $subscriptionId $ASB_FW_Tenant_Id $userAssignedManagedIdentityName
 
   AssignIdentityRole $identityPrincipalId $userAssignedManagedIdentityName $automationResourceGroup $ASB_FW_Subscription_Name "ServicePrincipal" "Monitoring Contributor"
   AssignIdentityRole $identityPrincipalId $userAssignedManagedIdentityName $automationResourceGroup $ASB_FW_Subscription_Name "ServicePrincipal" "Contributor"  
@@ -307,12 +284,12 @@ function main(){
   echo
 }
 
-#  executionStartTime="$(date -u +%s)"
+#$executionStartTime=$(date -u +"%s")
 
 # Call the main controller function to begin the script
 main
 
-# executionEndTime="$(date -u +%s)"
-# elapsedExecutionTime="$(($executionEndTime-$elapsedExecutionTime))"
+#$executionEndTime=$(date -u +"%s")
+#$elapsedExecutionTime=$(( executionEndTime-executionStartTime ))
 
-# eval "echo Elapsed time: $(date -ud "@$elapsedExecutionTime" +'$((%s/3600/24)) days %H hr %M min %S sec')"
+# eval "echo Elapsed time: $(date -ud "$elapsedExecutionTime" +'$((%s/3600/24)) days %H hr %M min %S sec')"
