@@ -6,7 +6,7 @@ metadata:
   labels:
     app.kubernetes.io/name: ngsa-memory
 spec:
-  replicas: 1
+  replicas: 0
   strategy:
     type: RollingUpdate
     rollingUpdate:
