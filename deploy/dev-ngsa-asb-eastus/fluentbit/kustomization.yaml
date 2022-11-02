@@ -3,18 +3,15 @@ kind: Kustomization
 resources:
   - ../../base/apps/fluentbit
 patches:
-  - patch: |
-        - op: replace
-          path: "/data/zone"
-          value: "az-eastus-dev"  
-        - op: replace
-          path: "/data/region"
-          value: "eastus"            
-    target:
+  - patch: |-
+      apiVersion: v1
       kind: ConfigMap
-      name: fluentbit-log-config
-      namespace: fluentbit
-
+      metadata:
+        name: fluentbit-log-config
+        namespace: fluentbit
+      data:
+        zone: az-eastus-dev
+        region: eastus
   - patch: |
         - op: replace
           path: "/spec/template/spec/containers/0/image"
