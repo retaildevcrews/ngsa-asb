@@ -222,6 +222,10 @@ function PublishRunbook(){
   echo
 }
 
+function CreateSchedule(){
+  pwsh --command "./scripts/Firewall-Automation/Firewall-Automation-Schedule-Creation.ps1"
+}
+
 function main(){
   local subscriptionId=$(az account show --query id --output tsv)
   
@@ -232,7 +236,7 @@ function main(){
   local runbookName="rb-${ASB_FW_Base_NSGA_Name}-${ASB_FW_Base_Automation_System_Name}-${ASB_FW_Environment}"
   local runbookDescription="${ASB_FW_PowerShell_Runbook_Description}"
   local runbookFileName="${ASB_FW_PowerShell_Runbook_File_Name}"
-  local runbookFilePath="./scripts/automation/"
+  local runbookFilePath="./scripts/Firewall-Automation/"
   local runbookFilePathAndName=@"${runbookFilePath}${runbookFileName}"
 
   echo
@@ -276,6 +280,8 @@ function main(){
   ImportPowerShellRunbookContent $runbookName $automationResourceGroup $runbookFilePathAndName $automationAccountName
 
   PublishRunbook $runbookName $automationResourceGroup $automationAccountName
+
+  CreateSchedule
 
   echo
   echo "-------------------------------------------------------------------"

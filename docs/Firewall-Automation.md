@@ -8,18 +8,18 @@ Azure Firewall has [costs (Azure Firewall pricing link)](https://azure.microsoft
 
 Before proceeding verify the environment is configured correct to execute the commands necessary below
 
-- Azure CLI 2.0 or greater [Install Azure CLI](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli)
+-   Azure CLI 2.0 or greater [Install Azure CLI](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli)
 
-- Azure CLI Extension for Automation [Install Azure CLI Extensions](https://learn.microsoft.com/en-us/cli/azure/azure-cli-extensions-list)
+-   Azure CLI Extension for Automation [Install Azure CLI Extensions](https://learn.microsoft.com/en-us/cli/azure/azure-cli-extensions-list)
 
-- Azure CLI Extension for Monitor [Install Azure CLI Extensions](https://learn.microsoft.com/en-us/cli/azure/azure-cli-extensions-list)
+-   Azure CLI Extension for Monitor [Install Azure CLI Extensions](https://learn.microsoft.com/en-us/cli/azure/azure-cli-extensions-list)
 
-- _Azure Powershell modules for Linux_ [Install Modules](/allocationAutomationForFirewall.md#Install-Powershell-Modules)
+-   _Azure Powershell modules for Linux_ [Install Modules](/allocationAutomationForFirewall.md#Install-Powershell-Modules)
 
 _The Azure CLI Automation extension is in an experimental stage.  Currently it does not implement all functionality needed.  As a result the the Az Module, specifically for automation, monitoring,  and authentication can be used at the time of writing._
 
-- [_Azure CLI Extension - Automation_](https://github.com/Azure/azure-cli-extensions/tree/main/src/automation)
-- [Azure PowerShell Az Modules](https://learn.microsoft.com/en-us/powershell/azure/install-az-ps?view=azps-9.0.0)
+-   [_Azure CLI Extension - Automation_](https://github.com/Azure/azure-cli-extensions/tree/main/src/automation)
+-   [Azure PowerShell Az Modules](https://learn.microsoft.com/en-us/powershell/azure/install-az-ps?view=azps-9.0.0)
 
 ### Parameters Needed to Proceed
 
@@ -28,36 +28,22 @@ _The Azure CLI Automation extension is in an experimental stage.  Currently it d
 | Parameter Name                        |                                             Example Value                                             | Script Needed For |
 | ------------------------------------- | :---------------------------------------------------------------------------------------------------: | ----------------- |
 | ASB_FW_TenantId                       |                                  00000000-0000-0000-0000-000000000000                                 | bash              |
-| ASB_FW_SubscriptionId                 |                                  00000000-0000-0000-0000-000000000000                                 | bash              |
+| ASB_DEPLOYMENT_NAME                   |                                          firewall-automation                                          | bash              |
+| ASB_ENV                               |                                                  dev                                                  | bash              |
+| ASB_FW_Subscription_Name              |                                              JoFultz-Team                                             | bash              |
+| ASB_FW_Base_NGSA_Name                 |                                                ngsa-asb                                               | bash              |
+| ASB_FW_Base_Automation_System_Name    |                                                  bash                                                 | bash              |
+| ASB_FW_Environment                    |                                                  dev                                                  | bash              |
+| ASB_FW_PowerShell_Runbook_File_Name   |                                    Firewall-Automation-Runbook.ps1                                    | bash              |
+| ASB_FW_Location                       |                                                 westus                                                | bash              |
 | ASB_FW_Sku                            |                                                 Basic                                                 | bash              |
-| ASB_FW_Location                       |                                                 eastus                                                | bash              |
-| ASB_FW_PowerShell_Runbook_File_Name   |                                    Firewall-Automation-Runbook.ps1                                    | PowerShell        |
 | ASB_FW_PowerShell_Runbook_Description | This runbook automates the allocation and de-allocation of a firewall for the purposes of scheduling. | bash              |
 | ASB_FW_Environment                    |                                                  dev                                                  | bash              |
 | firewallName                          |                                              fw-centralus                                             | bash              |
 
 #### Parameters for PowerShell Execution
 
-| Parameter Name                     |             Example Value            | Script Needed For |
-| ---------------------------------- | :----------------------------------: | ----------------- |
-| Tenant_Id                          | 00000000-0000-0000-0000-000000000000 | PowerShell        |
-| Subscription_Name                  |                                      | PowerShell        |
-| Subscription_Id                    | 00000000-0000-0000-0000-000000000000 | PowerShell        |
-| Resource_Group_Name_for_Automation |  rg-ngsa-asb-firewall-automation-dev | PowerShell        |
-| Resource_Group_Name_with_Firewall  |          rg-ngsa-asb-dev-hub         | PowerShell        |
-| Resource_Group_Name_with_Alerts    |            rg-ngsa-asb-dev           | PowerShell        |
-| Location                           |                westus                | PowerShell        |
-| Automation_Account_Name            |  aa-ngsa-asb-firewall-automation-dev | PowerShell        |
-| Sku                                |                 Basic                | PowerShell        |
-| PowerShell_Runbook_Name            |  rb-ngsa-asb=firewall-automation-dev | PowerShell        |
-| Vnet_Name                          |            vnet-eastus-hub           | PowerShell        |
-| Firewall_Name                      |               fw-eastus              | PowerShell        |
-| PIP_Name1                          |           pip-fw-eastus-01           | PowerShell        |
-| PIP_Name2                          |           pip-fw-eastus-02           | PowerShell        |
-| PIP_Name_Default                   |         pip-fw-eastus-default        | PowerShell        |
-| Managed_Identity_Name              |  mi-ngsa-asb-firewall-automation-dev | PowerShell        |
-| Base_Schedule_Name                 |  as-ngsa-asb-firewall-automation-dev | PowerShell        |
-| Environment                        |                  dev                 | PowerShell        |
+The powershell file needed to create the runbook schedules is called from the bash script, and re-uses the environment variables to then generate all parameters needed.  
 
 ### Infrastructure & Assets Creation List
 
@@ -74,9 +60,9 @@ The following infrastructure assets should be established in the subscription wi
 
 ### Resources Created When Complete
 
-1. Azure user-assigned Managed Identity
-2. Azure Automation Account
-3. Azure PowerShell Runbook
+1.  Azure user-assigned Managed Identity
+2.  Azure Automation Account
+3.  Azure PowerShell Runbook
 
     ![List of resources that will be created when complete.](./assets/automation/listOfResourcesInResourceGroup.png)
 
@@ -84,7 +70,7 @@ The following infrastructure assets should be established in the subscription wi
 
 BEFORE continuing please make sure all requirements have been met in the section labeled [prerequisites]("#-prerequisites").
 
-1. [Create Automation Infrastructure (BASH script)]("./scripts/automatoin/Firewall-Automation-Infrastructure.sh")
+1.  [Create Automation Infrastructure (BASH script)]("./scripts/automatoin/Firewall-Automation-Infrastructure.sh")
 
     The [Firewall-Automation-Infrastructure.sh]("./scripts/Firewall-Automation/Firewall-Automation-Infrastructure.sh") script "dot sources" the [Firewall-Automation-Infrastructure-Variables.sh]("./scripts/Firewall-Automation/Firewall-Automation-Infrastructure-Variables.sh").  
 
@@ -137,33 +123,4 @@ Once the variables are adjusted the script must be run from Visual Studio Code (
 
   ./Firewall-Automation-Infrastructure-Variables.sh
 
-```
-
-To create the schedules execute the PowerShell script Firewall-Automation-Schedule-Creation.ps1.  This script must be executed in Codespaces as well, and must have parameters passed to it.  
-
-```PowerShell
-
-    $ASB_FW_Tenant_Id={tenant Id}
-    $ASB_FW_Subscription_Name={subscription name}
-    $ASB_FW_Subscription_Id={subscription Id}
-    $Base_NSGA_Name='ngsa-asb'
-    $Base_Automation_System_Name='firewall-automation'
-    $Location='eastus'
-    $Sku='Basic'
-    $RunbookFileName='Firewall-Automation-Runbook.ps1'    
-    $RunbookDescription='This runbook automates the allocation and de-allocation of a firewall for the purposes of scheduling.'
-    $Environment='dev'
-
-
-Firewall-Automation-Schedule-Creation.ps1 
-    -Tenant_Id $ASB_FW_Tenant_Id 
-    -Subscription_Name $ASB_FW_Subscription_Name
-    -Subscription_Id $ASB_FW_Subscription_Id 
-    -Base_NSGA_Name $Base_NSGA_Name
-    -Base_Automation_System_Name $Base_Automation_System_Name
-    -Location $Location
-    -Sku $Sku 
-    -RunbookFileName $RunbookFileName 
-    -RunbookDescription $RunbookDescription
-    -Environment $Environment
 ```
