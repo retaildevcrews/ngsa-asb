@@ -166,9 +166,7 @@ function UpdateAzureAutomationAccountToAllowSystemAssignedIdentity() {
   echo "Automation Account principal id: $automationAccountPrincipalId"
 
   pwsh --command "Connect-AzAccount -UseDeviceAuthentication -Tenant ${4} -Subscription ${3}; Set-AzAutomationAccount -AssignUserIdentity '/subscriptions/${3}/resourcegroups/${2}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/${5}' -ResourceGroupName ${2} -Name ${1} -AssignSystemIdentity;"
-  # Command not working need to investigate
-  # $(az role assignment create --assignee-object-id "${6}" --assignee-principal-type "ServicePrincipal" --role "$appRoleName" --scope "/subscriptions/$3/resourcegroups/$2/providers/Microsoft.Automation/automationAccounts/$1")
-
+  
   echo "Completed assigning role Managed Identity Operator to the System Assigned Identity for automation account ${1} in resource group ${2}, within subscription id ${3}."
   echo
 }
@@ -290,12 +288,4 @@ function main(){
   echo
 }
 
-#$executionStartTime=$(date -u +"%s")
-
-# Call the main controller function to begin the script
 main
-
-#$executionEndTime=$(date -u +"%s")
-#$elapsedExecutionTime=$(( executionEndTime-executionStartTime ))
-
-# eval "echo Elapsed time: $(date -ud "$elapsedExecutionTime" +'$((%s/3600/24)) days %H hr %M min %S sec')"

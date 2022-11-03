@@ -8,13 +8,13 @@ Azure Firewall has [costs (Azure Firewall pricing link)](https://azure.microsoft
 
 Before proceeding verify the environment is configured correct to execute the commands necessary below
 
--   Azure CLI 2.0 or greater [Install Azure CLI](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli)
+- Azure CLI 2.0 or greater [Install Azure CLI](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli)
 
--   Azure CLI Extension for Automation [Install Azure CLI Extensions](https://learn.microsoft.com/en-us/cli/azure/azure-cli-extensions-list)
+- Azure CLI Extension for Automation [Install Azure CLI Extensions](https://learn.microsoft.com/en-us/cli/azure/azure-cli-extensions-list)
 
--   Azure CLI Extension for Monitor [Install Azure CLI Extensions](https://learn.microsoft.com/en-us/cli/azure/azure-cli-extensions-list)
+- Azure CLI Extension for Monitor [Install Azure CLI Extensions](https://learn.microsoft.com/en-us/cli/azure/azure-cli-extensions-list)
 
--   _Azure Powershell modules for Linux_ [Install Modules](/allocationAutomationForFirewall.md#Install-Powershell-Modules)
+- Azure Powershell modules for Linux_ [Install Modules](/Firewall-Automation.md#Install-Powershell-Modules)
 
 _The Azure CLI Automation extension is in an experimental stage.  Currently it does not implement all functionality needed.  As a result the the Az Module, specifically for automation, monitoring,  and authentication can be used at the time of writing._
 
@@ -55,22 +55,22 @@ The following infrastructure assets should be established in the subscription wi
 |  2. | Automation Account                        |                     [link](https://learn.microsoft.com/en-us/azure/templates/microsoft.automation/automationaccounts?pivots=deployment-language-arm-template)                    | Create an Automation Account that will execute the automation.                                                                                                              |   |
 |  3. | User-Assigned Managed Identity            | [link](https://learn.microsoft.com/en-us/azure/active-directory/managed-identities-azure-resources/how-manage-user-assigned-managed-identities?pivots=identity-mi-methods-azcli) | Create an identity for the Automation Account.                                                                                                                              |   |
 |  4. | Automation Runbook with Powershell        |                                      [link](https://learn.microsoft.com/en-us/azure/automation/automation-runbook-types#powershell-runbooks)                                     | Create a Runbook of type Powershell.                                                                                                                                        |   |
-|  5. | Powershell Content in Runbook             |                               [link](https://learn.microsoft.com/en-us/powershell/module/az.automation/import-azautomationrunbook?view=azps-8.3.0)                               | Upload [pre-defined Powershell content](../automation/FirewallToggle.ps1) into the Runbook body.                                                                            |   |
+|  5. | Powershell Content in Runbook             |                               [link](https://learn.microsoft.com/en-us/powershell/module/az.automation/import-azautomationrunbook?view=azps-8.3.0)                               | Upload [pre-defined Powershell content](../scripts/Firewall-Automation/Firewall-Automation-Runbook.ps1) into the Runbook body.                                                                            |   |
 |  6. | Automation Schedule(s) _using Powershell_ |                               [link](https://learn.microsoft.com/en-us/powershell/module/az.automation/import-azautomationrunbook?view=azps-8.3.0)                               | Create the schedules that will execute the Firewall automation.  These had to be created using Powershell instead of the Azure CLI.  No equivalent behavior has been found. |   |
 
 ### Resources Created When Complete
 
-1.  Azure user-assigned Managed Identity
-2.  Azure Automation Account
-3.  Azure PowerShell Runbook
+1. Azure user-assigned Managed Identity
+2. Azure Automation Account
+3. Azure PowerShell Runbook
 
-    ![List of resources that will be created when complete.](./assets/automation/listOfResourcesInResourceGroup.png)
+    ![List of resources that will be created when complete.](./assets/Firewall-Automation/listOfResourcesInResourceGroup.png)
 
 ## Installation Method - Automated Scripts
 
 BEFORE continuing please make sure all requirements have been met in the section labeled [prerequisites]("#-prerequisites").
 
-1.  [Create Automation Infrastructure (BASH script)]("./scripts/automatoin/Firewall-Automation-Infrastructure.sh")
+1. [Create Automation Infrastructure (BASH script)]("./scripts/Firewall-Automation/Firewall-Automation-Infrastructure.sh")
 
     The [Firewall-Automation-Infrastructure.sh]("./scripts/Firewall-Automation/Firewall-Automation-Infrastructure.sh") script "dot sources" the [Firewall-Automation-Infrastructure-Variables.sh]("./scripts/Firewall-Automation/Firewall-Automation-Infrastructure-Variables.sh").  
 

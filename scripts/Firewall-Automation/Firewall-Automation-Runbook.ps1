@@ -210,11 +210,6 @@ function Enable-Log-Alerts {
     Write-Output "Disabling AzContext Autosave"
     Disable-AzContextAutosave -Scope Process | Out-Null
 
-    # Connect using a Managed Service Identity
-   Write-Output "Using system-assigned managed identity"
-
-    # set and store context
-    Connect-AzAccount -Identity
     $identity = Get-AzUserAssignedIdentity -ResourceGroupName $resource_Group_Name_for_Automation -Name $managed_Identity_Name
     Connect-AzAccount -Identity -AccountId $identity.Id
     $AzureContext = Set-AzContext -SubscriptionName $subscription_Name -Tenant $tenant_Id
@@ -254,3 +249,4 @@ function Enable-Log-Alerts {
 
    Write-Output "Firewall Status Updated"
    return $LASTEXITCODE
+   
