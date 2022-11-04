@@ -291,8 +291,8 @@
                     {
                         "name": "npsystem",
                         "count": 3,
-                        "vmSize": "[variables('vmSize')]",
-                        "osDiskSizeGB": "[variables('osDiskSizeGB')]",
+                        "vmSize": "[parameters('vmSize')]",
+                        "osDiskSizeGB": "[parameters('osDiskSizeGB')]",
                         "osDiskType": "Managed",
                         "osType": "Linux",
                         "minCount": 3,
@@ -306,7 +306,7 @@
                         "orchestratorVersion": "[parameters('kubernetesVersion')]",
                         "enableNodePublicIP": false,
                         "maxPods": 100,
-                        "availabilityZones": "[variables('availabilityZones')]",
+                        "availabilityZones": "[parameters('availabilityZones')]",
                         "upgradeSettings": {
                             "maxSurge": "33%"
                         }
@@ -314,8 +314,8 @@
                     {
                         "name": "npuser01",
                         "count": 2,
-                        "vmSize": "[variables('vmSize')]",
-                        "osDiskSizeGB": "[variables('osDiskSizeGB')]",
+                        "vmSize": "[parameters('vmSize')]",
+                        "osDiskSizeGB": "[parameters('osDiskSizeGB')]",
                         "osDiskType": "Managed",
                         "osType": "Linux",
                         "minCount": 2,
@@ -329,7 +329,7 @@
                         "orchestratorVersion": "[parameters('kubernetesVersion')]",
                         "enableNodePublicIP": false,
                         "maxPods": 100,
-                        "availabilityZones": "[variables('availabilityZones')]",
+                        "availabilityZones": "[parameters('availabilityZones')]",
                         "upgradeSettings": {
                             "maxSurge": "33%"
                         }
