@@ -8,6 +8,7 @@ patches:
         - op: replace
           path: "/spec/servers/0/hosts"
           value:
+            - "ngsa/ngsa-memory-eastus-dev.austinrdc.dev"
             - "ngsa/ngsa-memory-eastus-dev.cse.ms"
             - "ngsa/ngsa-cosmos-eastus-dev.cse.ms"
             - "ngsa/ngsa-java-eastus-dev.cse.ms"
@@ -96,11 +97,23 @@ patches:
       kind: AzureIdentity
       name: istio-ingress-id
       namespace: istio-system
-
+# TODO: Remove the second replace patch for test TLS cert
   - patch: |
         - op: replace
           path: "/spec/parameters/keyvaultName"
-          value: "kv-aks-jxdthrti3j3qu"   
+          value: "kv-aks-jxdthrti3j3qu"
+        - op: replace
+          path: "/spec/parameters/objects"
+          value: |
+              array:
+              - |
+                objectName: test-appgw-ingress-internal-aks-ingress-tls
+                objectAlias: tls.crt
+                objectType: secret
+              - |
+                objectName: test-appgw-ingress-internal-aks-ingress-key
+                objectAlias: tls.key
+                objectType: secret
     target:
       kind: SecretProviderClass
       name: istio-ingress-tls-secret-csi-akv
