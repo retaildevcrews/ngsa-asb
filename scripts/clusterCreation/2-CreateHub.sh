@@ -53,7 +53,7 @@ Enter Deployment Name: " ASB_DEPLOYMENT_NAME
 
 function setDeploymentRegion()
 {
-  azure_locations=( "australiaeast" "centralus" "eastus" "eastus2" "japaneast" "northeurope" "southcentralus" "southeastasia" "uksouth" "westeurope" "westus2" "WestUS3" )
+  azure_locations=( "australiaeast" "centralus" "eastus" "eastus2" "japaneast" "northeurope" "southcentralus" "southeastasia" "uksouth" "westeurope" "westus2" "westus3" "northcentralus" )
   location_selections=( "${azure_locations[@]##*/}" )
 
   # Hub Location Prompt
