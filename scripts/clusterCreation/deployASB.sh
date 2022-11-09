@@ -72,7 +72,7 @@ function setDeploymentRegion()
 
   # We are using 'dns-rg' for triplets
   export ASB_DNS_ZONE_RG=dns-rg
-  export ASB_DNS_ZONE=cse.ms
+  export ASB_DNS_ZONE=austinrdc.dev
 
   # Spoke Location Prompt
   PS3="Select Spoke (Not Cluster) Location: "
@@ -122,7 +122,7 @@ function validateIngressVariables()
 {
   echo "Validating Ingress Variables Set By CodeSpaces..."
 
-  # These env vars are already set in Codespaces enviroment for "cse.ms"
+  # These env vars are already set in Codespaces enviroment for "austinrdc.dev"
   # Check certificates
   if [ -z $APP_GW_CERT_CSMS ]; then >&2 echo "App Gateway cert not set correctly"; exit 1; fi
   if [ -z $INGRESS_CERT_CSMS ]; then >&2 echo "Ingress cert not set correctly"; exit 1; fi
