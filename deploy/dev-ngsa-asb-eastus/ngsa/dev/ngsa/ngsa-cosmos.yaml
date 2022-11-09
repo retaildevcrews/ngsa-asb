@@ -122,7 +122,7 @@ spec:
   gateways:
   - istio-system/istio-gateway
   hosts:
-  - ngsa-cosmos-eastus-dev.cse.ms
+  - ngsa-cosmos-eastus-dev.austinrdc.dev
   http:
   - route:
     - destination:

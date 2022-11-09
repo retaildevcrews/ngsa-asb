@@ -13,7 +13,7 @@ spec:
           - name: GF_SERVER_ROOT_URL
             value: "https://%(domain)s/"
           - name: GF_SERVER_DOMAIN
-            value: "grafana-eastus-dev.cse.ms"
+            value: "grafana-eastus-dev.austinrdc.dev"
           - name: PROMETHEUS_QUERY_URL # For data source
             value: "http://thanos-query.monitoring.svc.cluster.local:10902"
           - name : AZURE_LA_WORKSPACE # For data source
@@ -49,4 +49,4 @@ metadata:
   namespace: monitoring
 spec:
   hosts:
-  - grafana-eastus-dev.cse.ms
+  - grafana-eastus-dev.austinrdc.dev

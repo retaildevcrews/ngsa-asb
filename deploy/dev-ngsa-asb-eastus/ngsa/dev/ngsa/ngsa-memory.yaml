@@ -103,7 +103,6 @@ spec:
   gateways:
   - istio-system/istio-gateway
   hosts:
-  - ngsa-memory-eastus-dev.cse.ms
   - ngsa-memory-eastus-dev.austinrdc.dev
   http:
   - route:
