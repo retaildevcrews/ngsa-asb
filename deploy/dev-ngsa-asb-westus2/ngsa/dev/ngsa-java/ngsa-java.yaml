@@ -109,7 +109,7 @@ spec:
   gateways:
   - istio-system/istio-gateway
   hosts:
-  - ngsa-java-westus2-dev.cse.ms
+  - ngsa-java-westus3-dev.austinrdc.dev
   http:
   - route:
     - destination:

@@ -13,7 +13,7 @@ spec:
           - name: GF_SERVER_ROOT_URL
             value: "https://%(domain)s/"
           - name: GF_SERVER_DOMAIN
-            value: "grafana-westus2-dev.cse.ms"
+            value: "grafana-westus3-dev.austinrdc.dev"
           - name: PROMETHEUS_QUERY_URL # For data source
             value: "http://prometheus-server.monitoring.svc:9090"
           - name : AZURE_LA_WORKSPACE # For data source
@@ -49,4 +49,4 @@ metadata:
   namespace: monitoring
 spec:
   hosts:
-  - grafana-westus2-dev.cse.ms
+  - grafana-westus3-dev.austinrdc.dev
