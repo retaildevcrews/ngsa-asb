@@ -24,4 +24,4 @@ metadata:
   namespace: monitoring
 spec:
   hosts:
-  - thanos-grpc-eastus-dev.cse.ms
+  - thanos-grpc-eastus-dev.austinrdc.dev

@@ -11,9 +11,9 @@ patches:
             - "ngsa/ngsa-memory-eastus-dev.austinrdc.dev"
             - "ngsa/ngsa-cosmos-eastus-dev.austinrdc.dev"
             - "ngsa/ngsa-java-eastus-dev.austinrdc.dev"
-            - "monitoring/grafana-eastus-dev.cse.ms"
-            - "monitoring/thanos-grpc-eastus-dev.cse.ms"
-            - "monitoring/thanos-store-grpc-eastus-dev.cse.ms"
+            - "monitoring/grafana-eastus-dev.austinrdc.dev"
+            - "monitoring/thanos-grpc-eastus-dev.austinrdc.dev"
+            - "monitoring/thanos-store-grpc-eastus-dev.austinrdc.dev"
             - "loderunner/loderunner-eastus-dev.austinrdc.dev"
             - "harbor/harbor-core-eastus-dev.cse.ms"
 
