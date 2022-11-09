@@ -9,9 +9,8 @@ patches:
           path: "/spec/servers/0/hosts"
           value:
             - "ngsa/ngsa-memory-eastus-dev.austinrdc.dev"
-            - "ngsa/ngsa-memory-eastus-dev.cse.ms"
-            - "ngsa/ngsa-cosmos-eastus-dev.cse.ms"
-            - "ngsa/ngsa-java-eastus-dev.cse.ms"
+            - "ngsa/ngsa-cosmos-eastus-dev.austinrdc.dev"
+            - "ngsa/ngsa-java-eastus-dev.austinrdc.dev"
             - "monitoring/grafana-eastus-dev.cse.ms"
             - "monitoring/thanos-grpc-eastus-dev.cse.ms"
             - "monitoring/thanos-store-grpc-eastus-dev.cse.ms"
@@ -97,7 +96,7 @@ patches:
       kind: AzureIdentity
       name: istio-ingress-id
       namespace: istio-system
-# TODO: Remove the second replace patch for test TLS cert
+# TODO: Remove the second replace patch when test TLS cert is removed from keyvault
   - patch: |
         - op: replace
           path: "/spec/parameters/keyvaultName"
