@@ -14,7 +14,7 @@ patches:
             - "monitoring/grafana-eastus-dev.cse.ms"
             - "monitoring/thanos-grpc-eastus-dev.cse.ms"
             - "monitoring/thanos-store-grpc-eastus-dev.cse.ms"
-            - "loderunner/loderunner-eastus-dev.cse.ms"
+            - "loderunner/loderunner-eastus-dev.austinrdc.dev"
             - "harbor/harbor-core-eastus-dev.cse.ms"
 
         - op: add
