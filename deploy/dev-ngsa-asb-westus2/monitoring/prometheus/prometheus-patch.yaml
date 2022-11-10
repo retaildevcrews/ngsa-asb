@@ -11,7 +11,7 @@ spec:
         image: acraksjxdthrti3j3qu.azurecr.io/prom/prometheus:v2.30.0
         env:
           - name: PROM_EXT_LABEL_CLUSTER
-            value: aks-jxdthrti3j3qu-westus2
+            value: aks-jxdthrti3j3qu-westus3
       - name: thanos
         image: acraksjxdthrti3j3qu.azurecr.io/thanos/thanos:v0.23.0
 

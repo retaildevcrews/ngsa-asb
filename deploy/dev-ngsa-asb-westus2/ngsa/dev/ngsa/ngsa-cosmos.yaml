@@ -40,9 +40,9 @@ spec:
           - --prometheus
           - --no-cache
           - --zone
-          - az-westus2-dev
+          - az-westus3-dev
           - --region
-          - westus2
+          - westus3
           ports:
             - name: http
               containerPort: 8080

@@ -1,7 +1,7 @@
 {
-    "zone": "az-westus2-dev",
-    "region": "westus2",
+    "zone": "az-westus3-dev",
+    "region": "westus",
     "mi.name": "wcnp-ngsa-id",
-    "domain" : "cse.ms",
+    "domain" : "austinrdc.dev",
     "environment" : "dev"
 }

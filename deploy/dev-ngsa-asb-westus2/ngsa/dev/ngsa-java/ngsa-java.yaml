@@ -43,9 +43,9 @@ spec:
           - name: PROMETHEUS
             value: "true"
           - name: ZONE
-            value: "az-westus2-dev"
+            value: "az-westus3-dev"
           - name: REGION
-            value: "westus2"
+            value: "westus3"
           ports:
             - name: http
               containerPort: 8080
