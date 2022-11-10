@@ -7,7 +7,7 @@ patches:
       apiVersion: v1
       kind: ConfigMap
       metadata:
-        name: fluentbit
+        name: fluentbit-log-config
         namespace: fluentbit
       data:
         zone: az-centralus-pre
