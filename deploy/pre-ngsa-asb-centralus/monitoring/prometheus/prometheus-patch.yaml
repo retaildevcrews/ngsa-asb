@@ -8,12 +8,12 @@ spec:
     spec:
       containers:
       - name: prometheus
-        image: acraksfykg5bqasutle.azurecr.io/prom/prometheus:v2.30.0
+        image: acraksri3aov7twb4uy.azurecr.io/prom/prometheus:v2.30.0
         env:
           - name: PROM_EXT_LABEL_CLUSTER
-            value: aks-fykg5bqasutle-centralus
+            value: aks-ri3aov7twb4uy-northcentralus
       - name: thanos
-        image: acraksfykg5bqasutle.azurecr.io/thanos/thanos:v0.23.0
+        image: acraksri3aov7twb4uy.azurecr.io/thanos/thanos:v0.23.0
 
 ---
 
@@ -24,4 +24,4 @@ metadata:
   namespace: monitoring
 spec:
   hosts:
-  - thanos-grpc-centralus-pre.cse.ms
+  - thanos-grpc-northcentralus-pre.austinrdc.dev

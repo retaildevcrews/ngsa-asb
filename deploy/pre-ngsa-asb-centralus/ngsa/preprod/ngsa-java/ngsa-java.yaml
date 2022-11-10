@@ -43,9 +43,9 @@ spec:
           - name: PROMETHEUS
             value: "true"
           - name: ZONE
-            value: "az-centralus-pre"
+            value: "az-northcentralus-pre"
           - name: REGION
-            value: "centralus"
+            value: "northcentralus"
           ports:
             - name: http
               containerPort: 8080
@@ -109,7 +109,7 @@ spec:
   gateways:
   - istio-system/istio-gateway
   hosts:
-  - ngsa-java-centralus-pre.cse.ms
+  - ngsa-java-northcentralus-pre.austinrdc.dev
   http:
   - route:
     - destination:

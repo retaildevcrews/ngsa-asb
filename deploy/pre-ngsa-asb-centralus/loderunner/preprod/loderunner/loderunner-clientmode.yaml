@@ -43,9 +43,9 @@ spec:
           - /app/secrets
           - --prometheus
           - --zone
-          - az-centralus-pre
+          - az-northcentralus-pre
           - --region
-          - centralus
+          - northcentralus
           volumeMounts:
             - name: secrets
               mountPath: "/app/secrets"
