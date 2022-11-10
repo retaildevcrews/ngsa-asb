@@ -2,6 +2,6 @@
     "zone": "az-eastus-pre",
     "region": "eastus",
     "mi.name": "wcnp-ngsa-id",
-    "domain" : "cse.ms",
+    "domain" : "austinrdc.dev",
     "environment" : "preprod"
 }
