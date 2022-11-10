@@ -15,7 +15,7 @@ patches:
             - "monitoring/thanos-grpc-eastus-dev.austinrdc.dev"
             - "monitoring/thanos-store-grpc-eastus-dev.austinrdc.dev"
             - "loderunner/loderunner-eastus-dev.austinrdc.dev"
-            - "harbor/harbor-core-eastus-dev.cse.ms"
+            - "harbor/harbor-core-eastus-dev.austinrdc.dev"
 
         - op: add
           path: "/spec/servers/0/tls"
