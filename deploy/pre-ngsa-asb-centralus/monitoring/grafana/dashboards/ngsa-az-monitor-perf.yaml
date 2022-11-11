@@ -1815,8 +1815,8 @@ data:
                   "scopedVars": {
                     "Zone": {
                       "selected": true,
-                      "text": "Central US",
-                      "value": "centralus"
+                      "text": "North Central US",
+                      "value": "northcentralus"
                     }
                   },
                   "seriesOverrides": [],
@@ -1946,8 +1946,8 @@ data:
                   "scopedVars": {
                     "Zone": {
                       "selected": true,
-                      "text": "Central US",
-                      "value": "centralus"
+                      "text": "North Central US",
+                      "value": "northcentralus"
                     }
                   },
                   "seriesOverrides": [],
@@ -2077,8 +2077,8 @@ data:
                   "scopedVars": {
                     "Zone": {
                       "selected": true,
-                      "text": "Central US",
-                      "value": "centralus"
+                      "text": "North Central US",
+                      "value": "northcentralus"
                     }
                   },
                   "seriesOverrides": [],
@@ -3456,8 +3456,8 @@ data:
                   "scopedVars": {
                     "Zone": {
                       "selected": true,
-                      "text": "Central US",
-                      "value": "centralus"
+                      "text": "North Central US",
+                      "value": "northcentralus"
                     }
                   },
                   "seriesOverrides": [],
@@ -3587,8 +3587,8 @@ data:
                   "scopedVars": {
                     "Zone": {
                       "selected": true,
-                      "text": "Central US",
-                      "value": "centralus"
+                      "text": "North Central US",
+                      "value": "northcentralus"
                     }
                   },
                   "seriesOverrides": [],
@@ -3718,8 +3718,8 @@ data:
                   "scopedVars": {
                     "Zone": {
                       "selected": true,
-                      "text": "Central US",
-                      "value": "centralus"
+                      "text": "North Central US",
+                      "value": "northcentralus"
                     }
                   },
                   "seriesOverrides": [],
@@ -4794,8 +4794,8 @@ data:
                   "scopedVars": {
                     "Zone": {
                       "selected": true,
-                      "text": "Central US",
-                      "value": "centralus"
+                      "text": "North Central US",
+                      "value": "northcentralus"
                     }
                   },
                   "targets": [
@@ -4942,8 +4942,8 @@ data:
                   "scopedVars": {
                     "Zone": {
                       "selected": true,
-                      "text": "Central US",
-                      "value": "centralus"
+                      "text": "North Central US",
+                      "value": "northcentralus"
                     }
                   },
                   "targets": [
@@ -5102,8 +5102,8 @@ data:
                   "scopedVars": {
                     "Zone": {
                       "selected": true,
-                      "text": "Central US",
-                      "value": "centralus"
+                      "text": "North Central US",
+                      "value": "northcentralus"
                     }
                   },
                   "targets": [
@@ -5169,7 +5169,7 @@ data:
                   "value": [
                     "eastus",
                     "westus2",
-                    "centralus"
+                    "northcentralus"
                   ]
                 },
                 "error": null,
@@ -5191,11 +5191,11 @@ data:
                   },
                   {
                     "selected": true,
-                    "text": "Central US",
-                    "value": "centralus"
+                    "text": "North Central US",
+                    "value": "northcentralus"
                   }
                 ],
-                "query": "East US: eastus, West US2: westus2, Central US: centralus",
+                "query": "East US: eastus, West US2: westus2, North Central US: northcentralus",
                 "queryValue": "",
                 "skipUrlSync": false,
                 "type": "custom"
