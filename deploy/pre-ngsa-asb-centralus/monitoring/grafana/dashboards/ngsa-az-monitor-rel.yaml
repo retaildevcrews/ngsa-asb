@@ -369,8 +369,8 @@ data:
               "scopedVars": {
                 "Zone": {
                   "selected": true,
-                  "text": "West US2",
-                  "value": "westus2"
+                  "text": "West US3",
+                  "value": "westus3"
                 }
               },
               "targets": [
@@ -458,8 +458,8 @@ data:
               "scopedVars": {
                 "Zone": {
                   "selected": true,
-                  "text": "West US2",
-                  "value": "westus2"
+                  "text": "West US3",
+                  "value": "westus3"
                 }
               },
               "targets": [
@@ -547,8 +547,8 @@ data:
               "scopedVars": {
                 "Zone": {
                   "selected": true,
-                  "text": "West US2",
-                  "value": "westus2"
+                  "text": "West US3",
+                  "value": "westus3"
                 }
               },
               "targets": [
@@ -1594,8 +1594,8 @@ data:
                   "scopedVars": {
                     "Zone": {
                       "selected": true,
-                      "text": "West US2",
-                      "value": "westus2"
+                      "text": "West US3",
+                      "value": "westus3"
                     }
                   },
                   "targets": [
@@ -1691,8 +1691,8 @@ data:
                   "scopedVars": {
                     "Zone": {
                       "selected": true,
-                      "text": "West US2",
-                      "value": "westus2"
+                      "text": "West US3",
+                      "value": "westus3"
                     }
                   },
                   "targets": [
@@ -1788,8 +1788,8 @@ data:
                   "scopedVars": {
                     "Zone": {
                       "selected": true,
-                      "text": "West US2",
-                      "value": "westus2"
+                      "text": "West US3",
+                      "value": "westus3"
                     }
                   },
                   "targets": [
@@ -3241,8 +3241,8 @@ data:
                   "scopedVars": {
                     "Zone": {
                       "selected": true,
-                      "text": "West US2",
-                      "value": "westus2"
+                      "text": "West US3",
+                      "value": "westus3"
                     }
                   },
                   "targets": [
@@ -3333,8 +3333,8 @@ data:
                   "scopedVars": {
                     "Zone": {
                       "selected": true,
-                      "text": "West US2",
-                      "value": "westus2"
+                      "text": "West US3",
+                      "value": "westus3"
                     }
                   },
                   "targets": [
@@ -3425,8 +3425,8 @@ data:
                   "scopedVars": {
                     "Zone": {
                       "selected": true,
-                      "text": "West US2",
-                      "value": "westus2"
+                      "text": "West US3",
+                      "value": "westus3"
                     }
                   },
                   "targets": [
@@ -4242,12 +4242,12 @@ data:
                   "tags": [],
                   "text": [
                     "East US",
-                    "West US2",
+                    "West US3",
                     "Central US"
                   ],
                   "value": [
                     "eastus",
-                    "westus2",
+                    "westus3",
                     "northcentralus"
                   ]
                 },
@@ -4265,8 +4265,8 @@ data:
                   },
                   {
                     "selected": true,
-                    "text": "West US2",
-                    "value": "westus2"
+                    "text": "West US3",
+                    "value": "westus3"
                   },
                   {
                     "selected": true,
@@ -4274,7 +4274,7 @@ data:
                     "value": "northcentralus"
                   }
                 ],
-                "query": "East US: eastus, West US2: westus2, North Central US: northcentralus",
+                "query": "East US: eastus, West US3: westus3, North Central US: northcentralus",
                 "queryValue": "",
                 "skipUrlSync": false,
                 "type": "custom"
