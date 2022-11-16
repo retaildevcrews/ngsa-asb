@@ -106,11 +106,11 @@ patches:
           value: |
               array:
               - |
-                objectName: test-appgw-ingress-internal-aks-ingress-tls
+                objectName: appgw-ingress-internal-aks-ingress-tls
                 objectAlias: tls.crt
                 objectType: secret
               - |
-                objectName: test-appgw-ingress-internal-aks-ingress-key
+                objectName: appgw-ingress-internal-aks-ingress-key
                 objectAlias: tls.key
                 objectType: secret
     target:
