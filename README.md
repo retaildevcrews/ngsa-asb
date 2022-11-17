@@ -7,8 +7,7 @@
   - [Introduction](#introduction)
     - [Before Beginning](#before-beginning)
       - [Connecting to the Correct Tenant & Setting the Correct Subscription Context](#connecting-to-the-correct-tenant--setting-the-correct-subscription-context)
-        - [PowerShell Az Modules](#powershell-az-modules)
-        - [Azure ClI](#azure-cli)
+        - [Azure ClI Login](#azure-cli-login)
   - [Setup Infrastructure](#setup-infrastructure)
   - [Infrastructure Setup During Each Script](#infrastructure-setup-during-each-script)
     - [2-CreateHub.sh](#2-createhubsh)
@@ -16,6 +15,9 @@
   - [Deploying NGSA Applications](#deploying-ngsa-applications)
     - [🛑 Prerequisite - Setup Cosmos DB in secure baseline](#-prerequisite---setup-cosmos-db-in-secure-baseline)
     - [Create managed identity for NGSA app](#create-managed-identity-for-ngsa-app)
+    - [Create managed identity for ngsa-app](#create-managed-identity-for-ngsa-app-1)
+    - [Verify Firewall Assignment](#verify-firewall-assignment)
+    - [Assign User to Cosmos DB](#assign-user-to-cosmos-db)
     - [AAD pod identity setup for ngsa-app](#aad-pod-identity-setup-for-ngsa-app)
   - [Deploying LodeRunner Applications](#deploying-loderunner-applications)
     - [🛑 Prerequisite - Setup Cosmos DB in secure baseline.](#-prerequisite---setup-cosmos-db-in-secure-baseline-1)
@@ -166,6 +168,60 @@ export ASB_NGSA_MI_RESOURCE_ID=$(az identity create -g $ASB_RG_CORE -n $ASB_NGSA
 # save env vars
 ./saveenv.sh -y
 
+```
+
+### Create managed identity for ngsa-app
+
+```bash
+
+export ASB_NGSA_MI_NAME="${ASB_DEPLOYMENT_NAME}-ngsa-id"
+
+export ASB_NGSA_MI_RESOURCE_ID=$(az identity create -g $ASB_RG_CORE -n $ASB_NGSA_MI_NAME --query "id" -o tsv)
+
+# save env vars
+./saveenv.sh -y
+
+```
+
+### Verify Firewall Assignment
+
+Verify that the developer's I.P. address is added to the firewall for the application.  This can be done by visiting the portal navigate to the Cosmos DB account in question, and select the Networking tab.  From the Networking screen for the Cosmos DB account follow the screen to add the I.P. address.  This can be accomplished by selecting the link titled  "+ Add my current IP xxx.xxx.xxx" and follow the prompts to save the I.P. address added.  
+
+Please visit this [link](https://learn.microsoft.com/en-us/azure/cosmos-db/how-to-configure-firewall) for more detailed instructions.  
+
+### Assign User to Cosmos DB
+
+```bash
+  
+  local Assigee_Object_Id = 'Users Object Id'
+
+  az login --tenant 'XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX'
+  az account set --subscription 'XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX'
+
+  # Variables
+  # built in Cosmos DB roles
+  local roles=("00000000-0000-0000-0000-000000000001" "00000000-0000-0000-0000-000000000002") #Array of built in Cosmos roles
+  local principals=("XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX" "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX") # principals that should be assigned. Development user, and the managed identity.
+  local subscriptionId="XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"  #Subscription Id
+  local resourceGroupName="rg-wcnp-dev-cosmos" #Resource Group with Cosmos Db 
+  local accountName="wcnp-dev-cosmos" #Database Account Name
+  local databaseName="ngsa-asb-dev-cosmos" #Database Name
+  local scope="/subscriptions/${subscriptionId}/resourceGroups/${resourceGroupName}/providers/Microsoft.DocumentDB/databaseAccounts/${databaseName}" #scope of assignment
+
+  # Loop and add the out of the box roles to the managed identity scoped to the resource group level
+  for x in "${principals[@]}"
+    do
+
+      for i in "${roles[@]}"
+        do   
+
+          echo az cosmosdb sql role assignment create -g "${resourceGroupName}" --account-name "${accountName}" --role-definition-id "${i}" --principal-id "${x}" --scope "${scope}"
+
+          az cosmosdb sql role assignment create -g "${resourceGroupName}" --account-name "${accountName}" --role-definition-id "${i}" --principal-id "${x}" --scope "${scope}"
+
+          echo role assignment of ${i} complete for ${x}
+      done
+  done
 ```
 
 ### AAD pod identity setup for ngsa-app
