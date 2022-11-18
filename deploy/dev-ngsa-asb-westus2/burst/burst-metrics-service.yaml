@@ -1,10 +1,10 @@
 ##################################################################################################
 # Details service
 ##################################################################################################
-kind: Namespace
-apiVersion: v1
-metadata:
-  name: burstservice
+# kind: Namespace
+# apiVersion: v1
+# metadata:
+#   name: burstservice
 ---
 apiVersion: v1
 kind: Service
