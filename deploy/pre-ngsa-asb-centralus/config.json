@@ -1,7 +1,7 @@
 {
-    "zone": "az-centralus-pre",
-    "region": "centralus",
-    "mi.name": "ngsa-asb-ngsa-id",
-    "domain" : "cse.ms",
+    "zone": "az-northcentralus-pre",
+    "region": "northcentralus",
+    "mi.name": "wcnp-ngsa-id",
+    "domain" : "austinrdc.dev",
     "environment" : "preprod"
 }

@@ -25,9 +25,9 @@ spec:
           - --in-memory
           - --prometheus
           - --zone
-          - az-westus2-pre
+          - az-westus3-pre
           - --region
-          - westus2
+          - westus3
           ports:
             - name: http
               containerPort: 8080
@@ -98,7 +98,7 @@ spec:
   gateways:
   - istio-system/istio-gateway
   hosts:
-  - ngsa-memory-westus2-pre.cse.ms
+  - ngsa-memory-westus3-pre.austinrdc.dev
   http:
   - route:
     - destination:

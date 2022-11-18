@@ -117,7 +117,7 @@ data:
                   "azureLogAnalytics": {
                     "query": "ngsa_CL\r\n| where  k_container_s == \"app\" \r\n   and k_app_s == \"ngsa-cosmos\" \r\n   and LogName_s == \"Ngsa.RequestLog\"\n   and Zone_s has_any ($Zone)\n   and UserAgent_s startswith \"l8r/\"\r\n\r\n| summarize RequestSuccessRate = round(100.0*countif(StatusCode_d < 400)/count(),4)\r\n| project RequestSuccessRate",
                     "resultFormat": "time_series",
-                    "workspace": "b51964b6-4a46-46f2-80b9-01f0649e63f5"
+                    "workspace": "35e52811-9906-4cb9-9b75-b4f313f22010"
                   },
                   "azureMonitor": {
                     "aggOptions": [],
@@ -138,7 +138,7 @@ data:
                   },
                   "queryType": "Azure Log Analytics",
                   "refId": "A",
-                  "subscription": "648dcb5a-de1e-48b2-af6b-fe6ef28d355c"
+                  "subscription": "5dc45b2f-bf13-4281-b763-a53f57290aa3"
                 }
               ],
               "timeFrom": null,
@@ -205,7 +205,7 @@ data:
                   "azureLogAnalytics": {
                     "query": "ngsa_CL\r\n| where  k_container_s == \"app\" \r\n   and k_app_s == \"ngsa-memory\" \r\n   and LogName_s == \"Ngsa.RequestLog\"\n   and Zone_s has_any ($Zone)\n   and UserAgent_s startswith \"l8r/\"\r\n\r\n| summarize RequestSuccessRate = round(100.0*countif(StatusCode_d < 400)/count(),4)\r\n| project RequestSuccessRate",
                     "resultFormat": "time_series",
-                    "workspace": "b51964b6-4a46-46f2-80b9-01f0649e63f5"
+                    "workspace": "35e52811-9906-4cb9-9b75-b4f313f22010"
                   },
                   "azureMonitor": {
                     "aggOptions": [],
@@ -226,7 +226,7 @@ data:
                   },
                   "queryType": "Azure Log Analytics",
                   "refId": "A",
-                  "subscription": "648dcb5a-de1e-48b2-af6b-fe6ef28d355c"
+                  "subscription": "5dc45b2f-bf13-4281-b763-a53f57290aa3"
                 }
               ],
               "timeFrom": null,
@@ -293,7 +293,7 @@ data:
                   "azureLogAnalytics": {
                     "query": "ngsa_CL\r\n| where  k_container_s == \"app\" \r\n   and k_app_s == \"ngsa-java\" \r\n   and LogName_s == \"Ngsa.RequestLog\"\n   and Zone_s has_any ($Zone)\n   and UserAgent_s startswith \"l8r/\"\r\n\r\n| summarize RequestSuccessRate = round(100.0*countif(StatusCode_d < 400)/count(),4)\r\n| project RequestSuccessRate",
                     "resultFormat": "time_series",
-                    "workspace": "b51964b6-4a46-46f2-80b9-01f0649e63f5"
+                    "workspace": "35e52811-9906-4cb9-9b75-b4f313f22010"
                   },
                   "azureMonitor": {
                     "aggOptions": [],
@@ -314,7 +314,7 @@ data:
                   },
                   "queryType": "Azure Log Analytics",
                   "refId": "A",
-                  "subscription": "648dcb5a-de1e-48b2-af6b-fe6ef28d355c"
+                  "subscription": "5dc45b2f-bf13-4281-b763-a53f57290aa3"
                 }
               ],
               "timeFrom": null,
@@ -369,8 +369,8 @@ data:
               "scopedVars": {
                 "Zone": {
                   "selected": true,
-                  "text": "West US2",
-                  "value": "westus2"
+                  "text": "West US3",
+                  "value": "westus3"
                 }
               },
               "targets": [
@@ -383,7 +383,7 @@ data:
                   "azureLogAnalytics": {
                     "query": "ngsa_CL\r\n| where  k_container_s == \"app\" \r\n   and k_app_s == \"ngsa-cosmos\" \r\n   and LogName_s == \"Ngsa.RequestLog\"\n   and Zone_s has_any ($Zone)\n   and UserAgent_s startswith \"l8r/\"\r\n\r\n| summarize RequestSuccessRate = round(100.0*countif(StatusCode_d < 400)/count(),4)\r\n| project RequestSuccessRate",
                     "resultFormat": "time_series",
-                    "workspace": "b51964b6-4a46-46f2-80b9-01f0649e63f5"
+                    "workspace": "35e52811-9906-4cb9-9b75-b4f313f22010"
                   },
                   "azureMonitor": {
                     "aggOptions": [],
@@ -404,7 +404,7 @@ data:
                   },
                   "queryType": "Azure Log Analytics",
                   "refId": "A",
-                  "subscription": "648dcb5a-de1e-48b2-af6b-fe6ef28d355c"
+                  "subscription": "5dc45b2f-bf13-4281-b763-a53f57290aa3"
                 }
               ],
               "timeFrom": null,
@@ -458,8 +458,8 @@ data:
               "scopedVars": {
                 "Zone": {
                   "selected": true,
-                  "text": "West US2",
-                  "value": "westus2"
+                  "text": "West US3",
+                  "value": "westus3"
                 }
               },
               "targets": [
@@ -472,7 +472,7 @@ data:
                   "azureLogAnalytics": {
                     "query": "ngsa_CL\r\n| where  k_container_s == \"app\" \r\n   and k_app_s == \"ngsa-memory\" \r\n   and LogName_s == \"Ngsa.RequestLog\"\n   and Zone_s has_any ($Zone)\n   and UserAgent_s startswith \"l8r/\"\r\n\r\n| summarize RequestSuccessRate = round(100.0*countif(StatusCode_d < 400)/count(),4)\r\n| project RequestSuccessRate",
                     "resultFormat": "time_series",
-                    "workspace": "b51964b6-4a46-46f2-80b9-01f0649e63f5"
+                    "workspace": "35e52811-9906-4cb9-9b75-b4f313f22010"
                   },
                   "azureMonitor": {
                     "aggOptions": [],
@@ -493,7 +493,7 @@ data:
                   },
                   "queryType": "Azure Log Analytics",
                   "refId": "A",
-                  "subscription": "648dcb5a-de1e-48b2-af6b-fe6ef28d355c"
+                  "subscription": "5dc45b2f-bf13-4281-b763-a53f57290aa3"
                 }
               ],
               "timeFrom": null,
@@ -547,8 +547,8 @@ data:
               "scopedVars": {
                 "Zone": {
                   "selected": true,
-                  "text": "West US2",
-                  "value": "westus2"
+                  "text": "West US3",
+                  "value": "westus3"
                 }
               },
               "targets": [
@@ -561,7 +561,7 @@ data:
                   "azureLogAnalytics": {
                     "query": "ngsa_CL\r\n| where  k_container_s == \"app\" \r\n   and k_app_s == \"ngsa-java\" \r\n   and LogName_s == \"Ngsa.RequestLog\"\n   and Zone_s has_any ($Zone)\n   and UserAgent_s startswith \"l8r/\"\r\n\r\n| summarize RequestSuccessRate = round(100.0*countif(StatusCode_d < 400)/count(),4)\r\n| project RequestSuccessRate",
                     "resultFormat": "time_series",
-                    "workspace": "b51964b6-4a46-46f2-80b9-01f0649e63f5"
+                    "workspace": "35e52811-9906-4cb9-9b75-b4f313f22010"
                   },
                   "azureMonitor": {
                     "aggOptions": [],
@@ -582,7 +582,7 @@ data:
                   },
                   "queryType": "Azure Log Analytics",
                   "refId": "A",
-                  "subscription": "648dcb5a-de1e-48b2-af6b-fe6ef28d355c"
+                  "subscription": "5dc45b2f-bf13-4281-b763-a53f57290aa3"
                 }
               ],
               "timeFrom": null,
@@ -637,8 +637,8 @@ data:
               "scopedVars": {
                 "Zone": {
                   "selected": true,
-                  "text": "Central US",
-                  "value": "centralus"
+                  "text": "North Central US",
+                  "value": "northcentralus"
                 }
               },
               "targets": [
@@ -651,7 +651,7 @@ data:
                   "azureLogAnalytics": {
                     "query": "ngsa_CL\r\n| where  k_container_s == \"app\" \r\n   and k_app_s == \"ngsa-cosmos\" \r\n   and LogName_s == \"Ngsa.RequestLog\"\n   and Zone_s has_any ($Zone)\n   and UserAgent_s startswith \"l8r/\"\r\n\r\n| summarize RequestSuccessRate = round(100.0*countif(StatusCode_d < 400)/count(),4)\r\n| project RequestSuccessRate",
                     "resultFormat": "time_series",
-                    "workspace": "b51964b6-4a46-46f2-80b9-01f0649e63f5"
+                    "workspace": "35e52811-9906-4cb9-9b75-b4f313f22010"
                   },
                   "azureMonitor": {
                     "aggOptions": [],
@@ -672,7 +672,7 @@ data:
                   },
                   "queryType": "Azure Log Analytics",
                   "refId": "A",
-                  "subscription": "648dcb5a-de1e-48b2-af6b-fe6ef28d355c"
+                  "subscription": "5dc45b2f-bf13-4281-b763-a53f57290aa3"
                 }
               ],
               "timeFrom": null,
@@ -726,8 +726,8 @@ data:
               "scopedVars": {
                 "Zone": {
                   "selected": true,
-                  "text": "Central US",
-                  "value": "centralus"
+                  "text": "North Central US",
+                  "value": "northcentralus"
                 }
               },
               "targets": [
@@ -740,7 +740,7 @@ data:
                   "azureLogAnalytics": {
                     "query": "ngsa_CL\r\n| where  k_container_s == \"app\" \r\n   and k_app_s == \"ngsa-memory\" \r\n   and LogName_s == \"Ngsa.RequestLog\"\n   and Zone_s has_any ($Zone)\n   and UserAgent_s startswith \"l8r/\"\r\n\r\n| summarize RequestSuccessRate = round(100.0*countif(StatusCode_d < 400)/count(),4)\r\n| project RequestSuccessRate",
                     "resultFormat": "time_series",
-                    "workspace": "b51964b6-4a46-46f2-80b9-01f0649e63f5"
+                    "workspace": "35e52811-9906-4cb9-9b75-b4f313f22010"
                   },
                   "azureMonitor": {
                     "aggOptions": [],
@@ -761,7 +761,7 @@ data:
                   },
                   "queryType": "Azure Log Analytics",
                   "refId": "A",
-                  "subscription": "648dcb5a-de1e-48b2-af6b-fe6ef28d355c"
+                  "subscription": "5dc45b2f-bf13-4281-b763-a53f57290aa3"
                 }
               ],
               "timeFrom": null,
@@ -815,8 +815,8 @@ data:
               "scopedVars": {
                 "Zone": {
                   "selected": true,
-                  "text": "Central US",
-                  "value": "centralus"
+                  "text": "North Central US",
+                  "value": "northcentralus"
                 }
               },
               "targets": [
@@ -829,7 +829,7 @@ data:
                   "azureLogAnalytics": {
                     "query": "ngsa_CL\r\n| where  k_container_s == \"app\" \r\n   and k_app_s == \"ngsa-java\" \r\n   and LogName_s == \"Ngsa.RequestLog\"\n   and Zone_s has_any ($Zone)\n   and UserAgent_s startswith \"l8r/\"\r\n\r\n| summarize RequestSuccessRate = round(100.0*countif(StatusCode_d < 400)/count(),4)\r\n| project RequestSuccessRate",
                     "resultFormat": "time_series",
-                    "workspace": "b51964b6-4a46-46f2-80b9-01f0649e63f5"
+                    "workspace": "35e52811-9906-4cb9-9b75-b4f313f22010"
                   },
                   "azureMonitor": {
                     "aggOptions": [],
@@ -850,7 +850,7 @@ data:
                   },
                   "queryType": "Azure Log Analytics",
                   "refId": "A",
-                  "subscription": "648dcb5a-de1e-48b2-af6b-fe6ef28d355c"
+                  "subscription": "5dc45b2f-bf13-4281-b763-a53f57290aa3"
                 }
               ],
               "timeFrom": null,
@@ -914,7 +914,7 @@ data:
                   "azureLogAnalytics": {
                     "query": "ngsa_CL\r\n| where  $__timeFilter(Date_t)\n   and k_container_s == \"app\"\r\n   and k_app_s == \"ngsa-cosmos\" \r\n\r\n   and LogName_s == \"Ngsa.RequestLog\"\n   and Zone_s has_any ($Zone)\n   and UserAgent_s startswith \"l8r/\"\r\n| summarize RequestSuccessRate = 100.0 * countif(StatusCode_d < 400) / count() by bin_at(Date_t, 2m, datetime(00:00)), Zone_s\r\n| project-rename Date=Date_t\n| order by Date asc",
                     "resultFormat": "time_series",
-                    "workspace": "b51964b6-4a46-46f2-80b9-01f0649e63f5"
+                    "workspace": "35e52811-9906-4cb9-9b75-b4f313f22010"
                   },
                   "azureMonitor": {
                     "aggOptions": [],
@@ -935,7 +935,7 @@ data:
                   },
                   "queryType": "Azure Log Analytics",
                   "refId": "A",
-                  "subscription": "648dcb5a-de1e-48b2-af6b-fe6ef28d355c"
+                  "subscription": "5dc45b2f-bf13-4281-b763-a53f57290aa3"
                 }
               ],
               "thresholds": [],
@@ -1045,7 +1045,7 @@ data:
                   "azureLogAnalytics": {
                     "query": "ngsa_CL\r\n| where  $__timeFilter(Date_t) \n   and k_container_s == \"app\"\r\n   and k_app_s == \"ngsa-memory\" \r\n\r\n   and LogName_s == \"Ngsa.RequestLog\"\n   and Zone_s has_any ($Zone)\n   and UserAgent_s startswith \"l8r/\"\r\n| summarize RequestSuccessRate = 100.0 * countif(StatusCode_d < 400) / count() by bin_at(Date_t, 2m, datetime(00:00)), Zone_s\r\n| project-rename Date=Date_t\n| order by Date asc",
                     "resultFormat": "time_series",
-                    "workspace": "b51964b6-4a46-46f2-80b9-01f0649e63f5"
+                    "workspace": "35e52811-9906-4cb9-9b75-b4f313f22010"
                   },
                   "azureMonitor": {
                     "aggOptions": [],
@@ -1066,7 +1066,7 @@ data:
                   },
                   "queryType": "Azure Log Analytics",
                   "refId": "A",
-                  "subscription": "648dcb5a-de1e-48b2-af6b-fe6ef28d355c"
+                  "subscription": "5dc45b2f-bf13-4281-b763-a53f57290aa3"
                 }
               ],
               "thresholds": [],
@@ -1176,7 +1176,7 @@ data:
                   "azureLogAnalytics": {
                     "query": "ngsa_CL\r\n| where  $__timeFilter(Date_t) \n   and k_container_s == \"app\"\r\n   and k_app_s == \"ngsa-java\" \r\n\r\n   and LogName_s == \"Ngsa.RequestLog\"\n   and Zone_s has_any ($Zone)\n   and UserAgent_s startswith \"l8r/\"\r\n| summarize RequestSuccessRate = 100.0 * countif(StatusCode_d < 400) / count() by bin_at(Date_t, 2m, datetime(00:00)), Zone_s\r\n| project-rename Date=Date_t\n| order by Date asc",
                     "resultFormat": "time_series",
-                    "workspace": "b51964b6-4a46-46f2-80b9-01f0649e63f5"
+                    "workspace": "35e52811-9906-4cb9-9b75-b4f313f22010"
                   },
                   "azureMonitor": {
                     "aggOptions": [],
@@ -1197,7 +1197,7 @@ data:
                   },
                   "queryType": "Azure Log Analytics",
                   "refId": "A",
-                  "subscription": "648dcb5a-de1e-48b2-af6b-fe6ef28d355c"
+                  "subscription": "5dc45b2f-bf13-4281-b763-a53f57290aa3"
                 }
               ],
               "thresholds": [],
@@ -1319,7 +1319,7 @@ data:
                       "azureLogAnalytics": {
                         "query": "ngsa_CL\r\n| where $__timeFilter(Date_t)\n   and k_container_s == \"app\" \r\n   and k_app_s == \"ngsa-cosmos\" \r\n   and LogName_s == \"Ngsa.RequestLog\"\n   and Zone_s has_any ($Zone)\n   and UserAgent_s startswith \"l8r/\"\r\n\r\n| summarize FailedRequestCount=countif(StatusCode_d >= 400)\r\n| project FailedRequestCount",
                         "resultFormat": "time_series",
-                        "workspace": "b51964b6-4a46-46f2-80b9-01f0649e63f5"
+                        "workspace": "35e52811-9906-4cb9-9b75-b4f313f22010"
                       },
                       "azureMonitor": {
                         "aggOptions": [],
@@ -1340,7 +1340,7 @@ data:
                       },
                       "queryType": "Azure Log Analytics",
                       "refId": "A",
-                      "subscription": "648dcb5a-de1e-48b2-af6b-fe6ef28d355c"
+                      "subscription": "5dc45b2f-bf13-4281-b763-a53f57290aa3"
                     }
                   ],
                   "timeFrom": null,
@@ -1415,7 +1415,7 @@ data:
                       "azureLogAnalytics": {
                         "query": "ngsa_CL\r\n| where $__timeFilter(Date_t)\n   and k_container_s == \"app\" \r\n   and k_app_s == \"ngsa-memory\" \r\n   and LogName_s == \"Ngsa.RequestLog\"\n   and Zone_s has_any ($Zone)\n   and UserAgent_s startswith \"l8r/\"\r\n\r\n| summarize FailedRequestCount=countif(StatusCode_d >= 400)\r\n| project FailedRequestCount",
                         "resultFormat": "time_series",
-                        "workspace": "b51964b6-4a46-46f2-80b9-01f0649e63f5"
+                        "workspace": "35e52811-9906-4cb9-9b75-b4f313f22010"
                       },
                       "azureMonitor": {
                         "aggOptions": [],
@@ -1436,7 +1436,7 @@ data:
                       },
                       "queryType": "Azure Log Analytics",
                       "refId": "A",
-                      "subscription": "648dcb5a-de1e-48b2-af6b-fe6ef28d355c"
+                      "subscription": "5dc45b2f-bf13-4281-b763-a53f57290aa3"
                     }
                   ],
                   "timeFrom": null,
@@ -1511,7 +1511,7 @@ data:
                       "azureLogAnalytics": {
                         "query": "ngsa_CL\r\n| where $__timeFilter(Date_t)\n   and k_container_s == \"app\" \r\n   and k_app_s == \"ngsa-java\" \r\n   and LogName_s == \"Ngsa.RequestLog\"\n   and Zone_s has_any ($Zone)\n   and UserAgent_s startswith \"l8r/\"\r\n\r\n| summarize FailedRequestCount=countif(StatusCode_d >= 400)\r\n| project FailedRequestCount",
                         "resultFormat": "time_series",
-                        "workspace": "b51964b6-4a46-46f2-80b9-01f0649e63f5"
+                        "workspace": "35e52811-9906-4cb9-9b75-b4f313f22010"
                       },
                       "azureMonitor": {
                         "aggOptions": [],
@@ -1532,7 +1532,7 @@ data:
                       },
                       "queryType": "Azure Log Analytics",
                       "refId": "A",
-                      "subscription": "648dcb5a-de1e-48b2-af6b-fe6ef28d355c"
+                      "subscription": "5dc45b2f-bf13-4281-b763-a53f57290aa3"
                     }
                   ],
                   "timeFrom": null,
@@ -1594,8 +1594,8 @@ data:
                   "scopedVars": {
                     "Zone": {
                       "selected": true,
-                      "text": "West US2",
-                      "value": "westus2"
+                      "text": "West US3",
+                      "value": "westus3"
                     }
                   },
                   "targets": [
@@ -1608,7 +1608,7 @@ data:
                       "azureLogAnalytics": {
                         "query": "ngsa_CL\r\n| where $__timeFilter(Date_t)\n   and k_container_s == \"app\" \r\n   and k_app_s == \"ngsa-cosmos\" \r\n   and LogName_s == \"Ngsa.RequestLog\"\n   and Zone_s has_any ($Zone)\n   and UserAgent_s startswith \"l8r/\"\r\n\r\n| summarize FailedRequestCount=countif(StatusCode_d >= 400)\r\n| project FailedRequestCount",
                         "resultFormat": "time_series",
-                        "workspace": "b51964b6-4a46-46f2-80b9-01f0649e63f5"
+                        "workspace": "35e52811-9906-4cb9-9b75-b4f313f22010"
                       },
                       "azureMonitor": {
                         "aggOptions": [],
@@ -1629,7 +1629,7 @@ data:
                       },
                       "queryType": "Azure Log Analytics",
                       "refId": "A",
-                      "subscription": "648dcb5a-de1e-48b2-af6b-fe6ef28d355c"
+                      "subscription": "5dc45b2f-bf13-4281-b763-a53f57290aa3"
                     }
                   ],
                   "timeFrom": null,
@@ -1691,8 +1691,8 @@ data:
                   "scopedVars": {
                     "Zone": {
                       "selected": true,
-                      "text": "West US2",
-                      "value": "westus2"
+                      "text": "West US3",
+                      "value": "westus3"
                     }
                   },
                   "targets": [
@@ -1705,7 +1705,7 @@ data:
                       "azureLogAnalytics": {
                         "query": "ngsa_CL\r\n| where $__timeFilter(Date_t)\n   and k_container_s == \"app\" \r\n   and k_app_s == \"ngsa-memory\" \r\n   and LogName_s == \"Ngsa.RequestLog\"\n   and Zone_s has_any ($Zone)\n   and UserAgent_s startswith \"l8r/\"\r\n\r\n| summarize FailedRequestCount=countif(StatusCode_d >= 400)\r\n| project FailedRequestCount",
                         "resultFormat": "time_series",
-                        "workspace": "b51964b6-4a46-46f2-80b9-01f0649e63f5"
+                        "workspace": "35e52811-9906-4cb9-9b75-b4f313f22010"
                       },
                       "azureMonitor": {
                         "aggOptions": [],
@@ -1726,7 +1726,7 @@ data:
                       },
                       "queryType": "Azure Log Analytics",
                       "refId": "A",
-                      "subscription": "648dcb5a-de1e-48b2-af6b-fe6ef28d355c"
+                      "subscription": "5dc45b2f-bf13-4281-b763-a53f57290aa3"
                     }
                   ],
                   "timeFrom": null,
@@ -1788,8 +1788,8 @@ data:
                   "scopedVars": {
                     "Zone": {
                       "selected": true,
-                      "text": "West US2",
-                      "value": "westus2"
+                      "text": "West US3",
+                      "value": "westus3"
                     }
                   },
                   "targets": [
@@ -1802,7 +1802,7 @@ data:
                       "azureLogAnalytics": {
                         "query": "ngsa_CL\r\n| where $__timeFilter(Date_t)\n   and k_container_s == \"app\" \r\n   and k_app_s == \"ngsa-java\" \r\n   and LogName_s == \"Ngsa.RequestLog\"\n   and Zone_s has_any ($Zone)\n   and UserAgent_s startswith \"l8r/\"\r\n\r\n| summarize FailedRequestCount=countif(StatusCode_d >= 400)\r\n| project FailedRequestCount",
                         "resultFormat": "time_series",
-                        "workspace": "b51964b6-4a46-46f2-80b9-01f0649e63f5"
+                        "workspace": "35e52811-9906-4cb9-9b75-b4f313f22010"
                       },
                       "azureMonitor": {
                         "aggOptions": [],
@@ -1823,7 +1823,7 @@ data:
                       },
                       "queryType": "Azure Log Analytics",
                       "refId": "A",
-                      "subscription": "648dcb5a-de1e-48b2-af6b-fe6ef28d355c"
+                      "subscription": "5dc45b2f-bf13-4281-b763-a53f57290aa3"
                     }
                   ],
                   "timeFrom": null,
@@ -1885,8 +1885,8 @@ data:
                   "scopedVars": {
                     "Zone": {
                       "selected": true,
-                      "text": "Central US",
-                      "value": "centralus"
+                      "text": "North Central US",
+                      "value": "northcentralus"
                     }
                   },
                   "targets": [
@@ -1899,7 +1899,7 @@ data:
                       "azureLogAnalytics": {
                         "query": "ngsa_CL\r\n| where $__timeFilter(Date_t)\n   and k_container_s == \"app\" \r\n   and k_app_s == \"ngsa-cosmos\" \r\n   and LogName_s == \"Ngsa.RequestLog\"\n   and Zone_s has_any ($Zone)\n   and UserAgent_s startswith \"l8r/\"\r\n\r\n| summarize FailedRequestCount=countif(StatusCode_d >= 400)\r\n| project FailedRequestCount",
                         "resultFormat": "time_series",
-                        "workspace": "b51964b6-4a46-46f2-80b9-01f0649e63f5"
+                        "workspace": "35e52811-9906-4cb9-9b75-b4f313f22010"
                       },
                       "azureMonitor": {
                         "aggOptions": [],
@@ -1920,7 +1920,7 @@ data:
                       },
                       "queryType": "Azure Log Analytics",
                       "refId": "A",
-                      "subscription": "648dcb5a-de1e-48b2-af6b-fe6ef28d355c"
+                      "subscription": "5dc45b2f-bf13-4281-b763-a53f57290aa3"
                     }
                   ],
                   "timeFrom": null,
@@ -1982,8 +1982,8 @@ data:
                   "scopedVars": {
                     "Zone": {
                       "selected": true,
-                      "text": "Central US",
-                      "value": "centralus"
+                      "text": "North Central US",
+                      "value": "northcentralus"
                     }
                   },
                   "targets": [
@@ -1996,7 +1996,7 @@ data:
                       "azureLogAnalytics": {
                         "query": "ngsa_CL\r\n| where $__timeFilter(Date_t)\n   and k_container_s == \"app\" \r\n   and k_app_s == \"ngsa-memory\" \r\n   and LogName_s == \"Ngsa.RequestLog\"\n   and Zone_s has_any ($Zone)\n   and UserAgent_s startswith \"l8r/\"\r\n\r\n| summarize FailedRequestCount=countif(StatusCode_d >= 400)\r\n| project FailedRequestCount",
                         "resultFormat": "time_series",
-                        "workspace": "b51964b6-4a46-46f2-80b9-01f0649e63f5"
+                        "workspace": "35e52811-9906-4cb9-9b75-b4f313f22010"
                       },
                       "azureMonitor": {
                         "aggOptions": [],
@@ -2017,7 +2017,7 @@ data:
                       },
                       "queryType": "Azure Log Analytics",
                       "refId": "A",
-                      "subscription": "648dcb5a-de1e-48b2-af6b-fe6ef28d355c"
+                      "subscription": "5dc45b2f-bf13-4281-b763-a53f57290aa3"
                     }
                   ],
                   "timeFrom": null,
@@ -2079,8 +2079,8 @@ data:
                   "scopedVars": {
                     "Zone": {
                       "selected": true,
-                      "text": "Central US",
-                      "value": "centralus"
+                      "text": "North Central US",
+                      "value": "northcentralus"
                     }
                   },
                   "targets": [
@@ -2093,7 +2093,7 @@ data:
                       "azureLogAnalytics": {
                         "query": "ngsa_CL\r\n| where $__timeFilter(Date_t)\n   and k_container_s == \"app\" \r\n   and k_app_s == \"ngsa-java\" \r\n   and LogName_s == \"Ngsa.RequestLog\"\n   and Zone_s has_any ($Zone)\n   and UserAgent_s startswith \"l8r/\"\r\n\r\n| summarize FailedRequestCount=countif(StatusCode_d >= 400)\r\n| project FailedRequestCount",
                         "resultFormat": "time_series",
-                        "workspace": "b51964b6-4a46-46f2-80b9-01f0649e63f5"
+                        "workspace": "35e52811-9906-4cb9-9b75-b4f313f22010"
                       },
                       "azureMonitor": {
                         "aggOptions": [],
@@ -2114,7 +2114,7 @@ data:
                       },
                       "queryType": "Azure Log Analytics",
                       "refId": "A",
-                      "subscription": "648dcb5a-de1e-48b2-af6b-fe6ef28d355c"
+                      "subscription": "5dc45b2f-bf13-4281-b763-a53f57290aa3"
                     }
                   ],
                   "timeFrom": null,
@@ -2197,7 +2197,7 @@ data:
                       "azureLogAnalytics": {
                         "query": "let _series_data = materialize(\r\nngsa_CL\r\n| where $__timeFilter(Date_t)\r\n   and  k_container_s == \"app\" \r\n   and k_app_s == \"ngsa-cosmos\"  \r\n\r\n   and LogName_s == \"Ngsa.RequestLog\"\n   and Zone_s has_any ($Zone)\n   and UserAgent_s startswith \"l8r/\"\r\n| summarize FailedRequests=countif(StatusCode_d >= 400) by StatusCode_d , bin(Date_t, 1m), Zone_s );\r\n\r\n\r\n\r\n_series_data \r\n| summarize sum(FailedRequests) by Date_t, Zone_s\n| project-rename FailedRequests=sum_FailedRequests\r\n| order by Date_t asc\n\n\r\n\n",
                         "resultFormat": "time_series",
-                        "workspace": "b51964b6-4a46-46f2-80b9-01f0649e63f5"
+                        "workspace": "35e52811-9906-4cb9-9b75-b4f313f22010"
                       },
                       "azureMonitor": {
                         "aggOptions": [],
@@ -2218,7 +2218,7 @@ data:
                       },
                       "queryType": "Azure Log Analytics",
                       "refId": "A",
-                      "subscription": "648dcb5a-de1e-48b2-af6b-fe6ef28d355c"
+                      "subscription": "5dc45b2f-bf13-4281-b763-a53f57290aa3"
                     }
                   ],
                   "thresholds": [],
@@ -2335,7 +2335,7 @@ data:
                       "azureLogAnalytics": {
                         "query": "let _series_data = materialize(\r\nngsa_CL\r\n| where $__timeFilter(Date_t)\r\n   and  k_container_s == \"app\" \r\n   and k_app_s == \"ngsa-memory\"  \r\n\r\n   and LogName_s == \"Ngsa.RequestLog\"\n   and Zone_s has_any ($Zone)\n   and UserAgent_s startswith \"l8r/\"\r\n| summarize FailedRequests=countif(StatusCode_d >= 400) by StatusCode_d , bin(Date_t, 1m), Zone_s );\r\n\r\n\r\n\r\n_series_data \r\n| summarize sum(FailedRequests) by Date_t, Zone_s\n| project-rename FailedRequests=sum_FailedRequests\r\n| order by Date_t asc\n\n\r\n\n",
                         "resultFormat": "time_series",
-                        "workspace": "b51964b6-4a46-46f2-80b9-01f0649e63f5"
+                        "workspace": "35e52811-9906-4cb9-9b75-b4f313f22010"
                       },
                       "azureMonitor": {
                         "aggOptions": [],
@@ -2356,7 +2356,7 @@ data:
                       },
                       "queryType": "Azure Log Analytics",
                       "refId": "A",
-                      "subscription": "648dcb5a-de1e-48b2-af6b-fe6ef28d355c"
+                      "subscription": "5dc45b2f-bf13-4281-b763-a53f57290aa3"
                     }
                   ],
                   "thresholds": [],
@@ -2473,7 +2473,7 @@ data:
                       "azureLogAnalytics": {
                         "query": "let _series_data = materialize(\r\nngsa_CL\r\n| where $__timeFilter(Date_t)\r\n   and  k_container_s == \"app\" \r\n   and k_app_s == \"ngsa-java\"  \r\n\r\n   and LogName_s == \"Ngsa.RequestLog\"\n   and Zone_s has_any ($Zone)\n   and UserAgent_s startswith \"l8r/\"\r\n| summarize FailedRequests=countif(StatusCode_d >= 400) by StatusCode_d , bin(Date_t, 1m), Zone_s );\r\n\r\n\r\n\r\n_series_data \r\n| summarize sum(FailedRequests) by Date_t, Zone_s\n| project-rename FailedRequests=sum_FailedRequests\r\n| order by Date_t asc\n\n\r\n\n",
                         "resultFormat": "time_series",
-                        "workspace": "b51964b6-4a46-46f2-80b9-01f0649e63f5"
+                        "workspace": "35e52811-9906-4cb9-9b75-b4f313f22010"
                       },
                       "azureMonitor": {
                         "aggOptions": [],
@@ -2494,7 +2494,7 @@ data:
                       },
                       "queryType": "Azure Log Analytics",
                       "refId": "A",
-                      "subscription": "648dcb5a-de1e-48b2-af6b-fe6ef28d355c"
+                      "subscription": "5dc45b2f-bf13-4281-b763-a53f57290aa3"
                     }
                   ],
                   "thresholds": [],
@@ -2649,7 +2649,7 @@ data:
                       "azureLogAnalytics": {
                         "query": "ngsa_CL\r\n| where $__timeFilter(Date_t) \n    and k_container_s == \"app\" \r\n   and k_app_s == \"ngsa-cosmos\" \r\n   and LogName_s == \"Ngsa.RequestLog\"\r\n\r\n   and StatusCode_d >= 400\n   and Zone_s has_any ($Zone)\n   and UserAgent_s startswith \"l8r/\"\r\n| summarize count() by tostring(toint(StatusCode_d)), Path_s, Zone_s\r\n| project-rename StatusCode=StatusCode_d,RequestCount=count_,Path=Path_s, Zone=Zone_s\n\n\r\n\n",
                         "resultFormat": "time_series",
-                        "workspace": "b51964b6-4a46-46f2-80b9-01f0649e63f5"
+                        "workspace": "35e52811-9906-4cb9-9b75-b4f313f22010"
                       },
                       "azureMonitor": {
                         "aggOptions": [],
@@ -2670,7 +2670,7 @@ data:
                       },
                       "queryType": "Azure Log Analytics",
                       "refId": "A",
-                      "subscription": "648dcb5a-de1e-48b2-af6b-fe6ef28d355c"
+                      "subscription": "5dc45b2f-bf13-4281-b763-a53f57290aa3"
                     }
                   ],
                   "timeFrom": null,
@@ -2774,7 +2774,7 @@ data:
                       "azureLogAnalytics": {
                         "query": "ngsa_CL\r\n| where $__timeFilter(Date_t) \n    and k_container_s == \"app\" \r\n   and k_app_s == \"ngsa-memory\" \r\n   and LogName_s == \"Ngsa.RequestLog\"\r\n\r\n   and StatusCode_d >= 400\n   and Zone_s has_any ($Zone)  \n   and UserAgent_s startswith \"l8r/\"\r\n| summarize count() by tostring(toint(StatusCode_d)), Path_s, Zone_s\r\n| project-rename StatusCode=StatusCode_d,RequestCount=count_,Path=Path_s, Zone=Zone_s",
                         "resultFormat": "time_series",
-                        "workspace": "b51964b6-4a46-46f2-80b9-01f0649e63f5"
+                        "workspace": "35e52811-9906-4cb9-9b75-b4f313f22010"
                       },
                       "azureMonitor": {
                         "aggOptions": [],
@@ -2795,7 +2795,7 @@ data:
                       },
                       "queryType": "Azure Log Analytics",
                       "refId": "A",
-                      "subscription": "648dcb5a-de1e-48b2-af6b-fe6ef28d355c"
+                      "subscription": "5dc45b2f-bf13-4281-b763-a53f57290aa3"
                     }
                   ],
                   "timeFrom": null,
@@ -2875,7 +2875,7 @@ data:
                       "azureLogAnalytics": {
                         "query": "ngsa_CL\r\n| where $__timeFilter(Date_t) \n    and k_container_s == \"app\" \r\n   and k_app_s == \"ngsa-java\" \r\n   and LogName_s == \"Ngsa.RequestLog\"\r\n\r\n   and StatusCode_d >= 400\n   and Zone_s has_any ($Zone)  \n   and UserAgent_s startswith \"l8r/\"\r\n| summarize count() by tostring(toint(StatusCode_d)), Path_s, Zone_s\r\n| project-rename StatusCode=StatusCode_d,RequestCount=count_,Path=Path_s, Zone=Zone_s",
                         "resultFormat": "time_series",
-                        "workspace": "b51964b6-4a46-46f2-80b9-01f0649e63f5"
+                        "workspace": "35e52811-9906-4cb9-9b75-b4f313f22010"
                       },
                       "azureMonitor": {
                         "aggOptions": [],
@@ -2896,7 +2896,7 @@ data:
                       },
                       "queryType": "Azure Log Analytics",
                       "refId": "A",
-                      "subscription": "648dcb5a-de1e-48b2-af6b-fe6ef28d355c"
+                      "subscription": "5dc45b2f-bf13-4281-b763-a53f57290aa3"
                     }
                   ],
                   "timeFrom": null,
@@ -2981,7 +2981,7 @@ data:
                       "azureLogAnalytics": {
                         "query": "ngsa_CL\r\n| where $__timeFilter(Date_t)\n  and k_container_s == \"app\" \r\n   and k_app_s == \"ngsa-cosmos\" \r\n   and LogName_s == \"Ngsa.RequestLog\"\n   and UserAgent_s startswith \"l8r/\"\n   and Zone_s has_any ($Zone)\r\n\r\n| summarize count() by bin(Date_t,1m)\r\n| summarize round(avg(count_),0)\r\n| project AvgRequests=avg_count_",
                         "resultFormat": "time_series",
-                        "workspace": "b51964b6-4a46-46f2-80b9-01f0649e63f5"
+                        "workspace": "35e52811-9906-4cb9-9b75-b4f313f22010"
                       },
                       "azureMonitor": {
                         "aggOptions": [],
@@ -3002,7 +3002,7 @@ data:
                       },
                       "queryType": "Azure Log Analytics",
                       "refId": "A",
-                      "subscription": "648dcb5a-de1e-48b2-af6b-fe6ef28d355c"
+                      "subscription": "5dc45b2f-bf13-4281-b763-a53f57290aa3"
                     }
                   ],
                   "timeFrom": null,
@@ -3072,7 +3072,7 @@ data:
                       "azureLogAnalytics": {
                         "query": "ngsa_CL\r\n| where $__timeFilter(Date_t)\n  and k_container_s == \"app\" \r\n   and k_app_s == \"ngsa-memory\" \r\n   and LogName_s == \"Ngsa.RequestLog\"\n   and Zone_s has_any ($Zone)\n   and UserAgent_s startswith \"l8r/\"\r\n\r\n| summarize count() by bin(Date_t,1m)\r\n| summarize round(avg(count_),0)\r\n| project AvgRequests=avg_count_",
                         "resultFormat": "time_series",
-                        "workspace": "b51964b6-4a46-46f2-80b9-01f0649e63f5"
+                        "workspace": "35e52811-9906-4cb9-9b75-b4f313f22010"
                       },
                       "azureMonitor": {
                         "aggOptions": [],
@@ -3093,7 +3093,7 @@ data:
                       },
                       "queryType": "Azure Log Analytics",
                       "refId": "A",
-                      "subscription": "648dcb5a-de1e-48b2-af6b-fe6ef28d355c"
+                      "subscription": "5dc45b2f-bf13-4281-b763-a53f57290aa3"
                     }
                   ],
                   "timeFrom": null,
@@ -3163,7 +3163,7 @@ data:
                       "azureLogAnalytics": {
                         "query": "ngsa_CL\r\n| where $__timeFilter(Date_t)\n  and k_container_s == \"app\" \r\n   and k_app_s == \"ngsa-java\" \r\n   and LogName_s == \"Ngsa.RequestLog\"\n   and Zone_s has_any ($Zone)\n   and UserAgent_s startswith \"l8r/\"\r\n\r\n| summarize count() by bin(Date_t,1m)\r\n| summarize round(avg(count_),0)\r\n| project AvgRequests=avg_count_",
                         "resultFormat": "time_series",
-                        "workspace": "b51964b6-4a46-46f2-80b9-01f0649e63f5"
+                        "workspace": "35e52811-9906-4cb9-9b75-b4f313f22010"
                       },
                       "azureMonitor": {
                         "aggOptions": [],
@@ -3184,7 +3184,7 @@ data:
                       },
                       "queryType": "Azure Log Analytics",
                       "refId": "A",
-                      "subscription": "648dcb5a-de1e-48b2-af6b-fe6ef28d355c"
+                      "subscription": "5dc45b2f-bf13-4281-b763-a53f57290aa3"
                     }
                   ],
                   "timeFrom": null,
@@ -3241,8 +3241,8 @@ data:
                   "scopedVars": {
                     "Zone": {
                       "selected": true,
-                      "text": "West US2",
-                      "value": "westus2"
+                      "text": "West US3",
+                      "value": "westus3"
                     }
                   },
                   "targets": [
@@ -3255,7 +3255,7 @@ data:
                       "azureLogAnalytics": {
                         "query": "ngsa_CL\r\n| where $__timeFilter(Date_t)\n  and k_container_s == \"app\" \r\n   and k_app_s == \"ngsa-cosmos\" \r\n   and LogName_s == \"Ngsa.RequestLog\"\n   and UserAgent_s startswith \"l8r/\"\n   and Zone_s has_any ($Zone)\r\n\r\n| summarize count() by bin(Date_t,1m)\r\n| summarize round(avg(count_),0)\r\n| project AvgRequests=avg_count_",
                         "resultFormat": "time_series",
-                        "workspace": "b51964b6-4a46-46f2-80b9-01f0649e63f5"
+                        "workspace": "35e52811-9906-4cb9-9b75-b4f313f22010"
                       },
                       "azureMonitor": {
                         "aggOptions": [],
@@ -3276,7 +3276,7 @@ data:
                       },
                       "queryType": "Azure Log Analytics",
                       "refId": "A",
-                      "subscription": "648dcb5a-de1e-48b2-af6b-fe6ef28d355c"
+                      "subscription": "5dc45b2f-bf13-4281-b763-a53f57290aa3"
                     }
                   ],
                   "timeFrom": null,
@@ -3333,8 +3333,8 @@ data:
                   "scopedVars": {
                     "Zone": {
                       "selected": true,
-                      "text": "West US2",
-                      "value": "westus2"
+                      "text": "West US3",
+                      "value": "westus3"
                     }
                   },
                   "targets": [
@@ -3347,7 +3347,7 @@ data:
                       "azureLogAnalytics": {
                         "query": "ngsa_CL\r\n| where $__timeFilter(Date_t)\n  and k_container_s == \"app\" \r\n   and k_app_s == \"ngsa-memory\" \r\n   and LogName_s == \"Ngsa.RequestLog\"\n   and Zone_s has_any ($Zone)\n   and UserAgent_s startswith \"l8r/\"\r\n\r\n| summarize count() by bin(Date_t,1m)\r\n| summarize round(avg(count_),0)\r\n| project AvgRequests=avg_count_",
                         "resultFormat": "time_series",
-                        "workspace": "b51964b6-4a46-46f2-80b9-01f0649e63f5"
+                        "workspace": "35e52811-9906-4cb9-9b75-b4f313f22010"
                       },
                       "azureMonitor": {
                         "aggOptions": [],
@@ -3368,7 +3368,7 @@ data:
                       },
                       "queryType": "Azure Log Analytics",
                       "refId": "A",
-                      "subscription": "648dcb5a-de1e-48b2-af6b-fe6ef28d355c"
+                      "subscription": "5dc45b2f-bf13-4281-b763-a53f57290aa3"
                     }
                   ],
                   "timeFrom": null,
@@ -3425,8 +3425,8 @@ data:
                   "scopedVars": {
                     "Zone": {
                       "selected": true,
-                      "text": "West US2",
-                      "value": "westus2"
+                      "text": "West US3",
+                      "value": "westus3"
                     }
                   },
                   "targets": [
@@ -3439,7 +3439,7 @@ data:
                       "azureLogAnalytics": {
                         "query": "ngsa_CL\r\n| where $__timeFilter(Date_t)\n  and k_container_s == \"app\" \r\n   and k_app_s == \"ngsa-java\" \r\n   and LogName_s == \"Ngsa.RequestLog\"\n   and Zone_s has_any ($Zone)\n   and UserAgent_s startswith \"l8r/\"\r\n\r\n| summarize count() by bin(Date_t,1m)\r\n| summarize round(avg(count_),0)\r\n| project AvgRequests=avg_count_",
                         "resultFormat": "time_series",
-                        "workspace": "b51964b6-4a46-46f2-80b9-01f0649e63f5"
+                        "workspace": "35e52811-9906-4cb9-9b75-b4f313f22010"
                       },
                       "azureMonitor": {
                         "aggOptions": [],
@@ -3460,7 +3460,7 @@ data:
                       },
                       "queryType": "Azure Log Analytics",
                       "refId": "A",
-                      "subscription": "648dcb5a-de1e-48b2-af6b-fe6ef28d355c"
+                      "subscription": "5dc45b2f-bf13-4281-b763-a53f57290aa3"
                     }
                   ],
                   "timeFrom": null,
@@ -3517,8 +3517,8 @@ data:
                   "scopedVars": {
                     "Zone": {
                       "selected": true,
-                      "text": "Central US",
-                      "value": "centralus"
+                      "text": "North Central US",
+                      "value": "northcentralus"
                     }
                   },
                   "targets": [
@@ -3531,7 +3531,7 @@ data:
                       "azureLogAnalytics": {
                         "query": "ngsa_CL\r\n| where $__timeFilter(Date_t)\n  and k_container_s == \"app\" \r\n   and k_app_s == \"ngsa-cosmos\" \r\n   and LogName_s == \"Ngsa.RequestLog\"\n   and UserAgent_s startswith \"l8r/\"\n   and Zone_s has_any ($Zone)\r\n\r\n| summarize count() by bin(Date_t,1m)\r\n| summarize round(avg(count_),0)\r\n| project AvgRequests=avg_count_",
                         "resultFormat": "time_series",
-                        "workspace": "b51964b6-4a46-46f2-80b9-01f0649e63f5"
+                        "workspace": "35e52811-9906-4cb9-9b75-b4f313f22010"
                       },
                       "azureMonitor": {
                         "aggOptions": [],
@@ -3552,7 +3552,7 @@ data:
                       },
                       "queryType": "Azure Log Analytics",
                       "refId": "A",
-                      "subscription": "648dcb5a-de1e-48b2-af6b-fe6ef28d355c"
+                      "subscription": "5dc45b2f-bf13-4281-b763-a53f57290aa3"
                     }
                   ],
                   "timeFrom": null,
@@ -3609,8 +3609,8 @@ data:
                   "scopedVars": {
                     "Zone": {
                       "selected": true,
-                      "text": "Central US",
-                      "value": "centralus"
+                      "text": "North Central US",
+                      "value": "northcentralus"
                     }
                   },
                   "targets": [
@@ -3623,7 +3623,7 @@ data:
                       "azureLogAnalytics": {
                         "query": "ngsa_CL\r\n| where $__timeFilter(Date_t)\n  and k_container_s == \"app\" \r\n   and k_app_s == \"ngsa-memory\" \r\n   and LogName_s == \"Ngsa.RequestLog\"\n   and Zone_s has_any ($Zone)\n   and UserAgent_s startswith \"l8r/\"\r\n\r\n| summarize count() by bin(Date_t,1m)\r\n| summarize round(avg(count_),0)\r\n| project AvgRequests=avg_count_",
                         "resultFormat": "time_series",
-                        "workspace": "b51964b6-4a46-46f2-80b9-01f0649e63f5"
+                        "workspace": "35e52811-9906-4cb9-9b75-b4f313f22010"
                       },
                       "azureMonitor": {
                         "aggOptions": [],
@@ -3644,7 +3644,7 @@ data:
                       },
                       "queryType": "Azure Log Analytics",
                       "refId": "A",
-                      "subscription": "648dcb5a-de1e-48b2-af6b-fe6ef28d355c"
+                      "subscription": "5dc45b2f-bf13-4281-b763-a53f57290aa3"
                     }
                   ],
                   "timeFrom": null,
@@ -3701,8 +3701,8 @@ data:
                   "scopedVars": {
                     "Zone": {
                       "selected": true,
-                      "text": "Central US",
-                      "value": "centralus"
+                      "text": "North Central US",
+                      "value": "northcentralus"
                     }
                   },
                   "targets": [
@@ -3715,7 +3715,7 @@ data:
                       "azureLogAnalytics": {
                         "query": "ngsa_CL\r\n| where $__timeFilter(Date_t)\n  and k_container_s == \"app\" \r\n   and k_app_s == \"ngsa-java\" \r\n   and LogName_s == \"Ngsa.RequestLog\"\n   and Zone_s has_any ($Zone)\n   and UserAgent_s startswith \"l8r/\"\r\n\r\n| summarize count() by bin(Date_t,1m)\r\n| summarize round(avg(count_),0)\r\n| project AvgRequests=avg_count_",
                         "resultFormat": "time_series",
-                        "workspace": "b51964b6-4a46-46f2-80b9-01f0649e63f5"
+                        "workspace": "35e52811-9906-4cb9-9b75-b4f313f22010"
                       },
                       "azureMonitor": {
                         "aggOptions": [],
@@ -3736,7 +3736,7 @@ data:
                       },
                       "queryType": "Azure Log Analytics",
                       "refId": "A",
-                      "subscription": "648dcb5a-de1e-48b2-af6b-fe6ef28d355c"
+                      "subscription": "5dc45b2f-bf13-4281-b763-a53f57290aa3"
                     }
                   ],
                   "timeFrom": null,
@@ -3817,7 +3817,7 @@ data:
                       "azureLogAnalytics": {
                         "query": "ngsa_CL\r\n| where $__timeFilter(Date_t)\n   and k_container_s == \"app\"\r\n   and k_app_s == \"ngsa-cosmos\"\n   and LogName_s == \"Ngsa.RequestLog\"\n   and Zone_s has_any ($Zone)\n   and UserAgent_s startswith \"l8r/\"\r\n| summarize count() by bin_at(Date_t, 1m, datetime(00:00)), Zone_s\r\n| project-rename Date=Date_t,ServerRequests=count_\r\n| order by Date asc",
                         "resultFormat": "time_series",
-                        "workspace": "b51964b6-4a46-46f2-80b9-01f0649e63f5"
+                        "workspace": "35e52811-9906-4cb9-9b75-b4f313f22010"
                       },
                       "azureMonitor": {
                         "aggOptions": [],
@@ -3838,7 +3838,7 @@ data:
                       },
                       "queryType": "Azure Log Analytics",
                       "refId": "A",
-                      "subscription": "648dcb5a-de1e-48b2-af6b-fe6ef28d355c"
+                      "subscription": "5dc45b2f-bf13-4281-b763-a53f57290aa3"
                     }
                   ],
                   "thresholds": [],
@@ -3940,7 +3940,7 @@ data:
                       "azureLogAnalytics": {
                         "query": "ngsa_CL\r\n| where  $__timeFilter(Date_t)\n   and  k_container_s == \"app\"\r\n   and k_app_s == \"ngsa-memory\" \r\n\r\n   and LogName_s == \"Ngsa.RequestLog\"\n   and Zone_s has_any ($Zone)  \n   and UserAgent_s startswith \"l8r/\"\r\n| summarize count() by bin_at(Date_t, 1m, datetime(00:00)), Zone_s\r\n| project-rename Date=Date_t, ServerRequests=count_\r\n| order by Date asc",
                         "resultFormat": "time_series",
-                        "workspace": "b51964b6-4a46-46f2-80b9-01f0649e63f5"
+                        "workspace": "35e52811-9906-4cb9-9b75-b4f313f22010"
                       },
                       "azureMonitor": {
                         "aggOptions": [],
@@ -3961,7 +3961,7 @@ data:
                       },
                       "queryType": "Azure Log Analytics",
                       "refId": "A",
-                      "subscription": "648dcb5a-de1e-48b2-af6b-fe6ef28d355c"
+                      "subscription": "5dc45b2f-bf13-4281-b763-a53f57290aa3"
                     }
                   ],
                   "thresholds": [],
@@ -4063,7 +4063,7 @@ data:
                       "azureLogAnalytics": {
                         "query": "ngsa_CL\r\n| where  $__timeFilter(Date_t)\n   and  k_container_s == \"app\"\r\n   and k_app_s == \"ngsa-java\" \r\n\r\n   and LogName_s == \"Ngsa.RequestLog\"\n   and Zone_s has_any ($Zone)  \n   and UserAgent_s startswith \"l8r/\"\r\n| summarize count() by bin_at(Date_t, 1m, datetime(00:00)), Zone_s\r\n| project-rename Date=Date_t, ServerRequests=count_\r\n| order by Date asc",
                         "resultFormat": "time_series",
-                        "workspace": "b51964b6-4a46-46f2-80b9-01f0649e63f5"
+                        "workspace": "35e52811-9906-4cb9-9b75-b4f313f22010"
                       },
                       "azureMonitor": {
                         "aggOptions": [],
@@ -4084,7 +4084,7 @@ data:
                       },
                       "queryType": "Azure Log Analytics",
                       "refId": "A",
-                      "subscription": "648dcb5a-de1e-48b2-af6b-fe6ef28d355c"
+                      "subscription": "5dc45b2f-bf13-4281-b763-a53f57290aa3"
                     }
                   ],
                   "thresholds": [],
@@ -4195,7 +4195,7 @@ data:
                       "azureLogAnalytics": {
                         "query": "loderunner_CL\r\n| where $__timeFilter(Date_t) and StatusCode_d >= 400 and (k_app_s == \"loderunner\" or k_app_s == \"loderunner-clientmode\") and Zone_s has_any ($Zone)\r\n| extend AppType = case(Server_s contains 'ngsa-memory', \"ngsa-memory\", \r\n                      Server_s contains 'ngsa-cosmos', \"ngsa-cosmos\", \r\n                      Server_s contains 'ngsa-java', \"ngsa-java\", \r\n                       \"unknown!\")\r\n| summarize countif(StatusCode_d >= 400) by AppType, Zone_s, StatusCode_d\r\n| project-rename FailureCount=countif_, Zone=Zone_s, StatusCode=StatusCode_d\r\n| order by AppType, Zone, StatusCode",
                         "resultFormat": "time_series",
-                        "workspace": "b51964b6-4a46-46f2-80b9-01f0649e63f5"
+                        "workspace": "35e52811-9906-4cb9-9b75-b4f313f22010"
                       },
                       "azureMonitor": {
                         "aggOptions": [],
@@ -4216,7 +4216,7 @@ data:
                       },
                       "queryType": "Azure Log Analytics",
                       "refId": "A",
-                      "subscription": "648dcb5a-de1e-48b2-af6b-fe6ef28d355c"
+                      "subscription": "5dc45b2f-bf13-4281-b763-a53f57290aa3"
                     }
                   ],
                   "timeFrom": null,
@@ -4242,13 +4242,13 @@ data:
                   "tags": [],
                   "text": [
                     "East US",
-                    "West US2",
+                    "West US3",
                     "Central US"
                   ],
                   "value": [
                     "eastus",
-                    "westus2",
-                    "centralus"
+                    "westus3",
+                    "northcentralus"
                   ]
                 },
                 "error": null,
@@ -4265,16 +4265,16 @@ data:
                   },
                   {
                     "selected": true,
-                    "text": "West US2",
-                    "value": "westus2"
+                    "text": "West US3",
+                    "value": "westus3"
                   },
                   {
                     "selected": true,
-                    "text": "Central US",
-                    "value": "centralus"
+                    "text": "North Central US",
+                    "value": "northcentralus"
                   }
                 ],
-                "query": "East US: eastus, West US2: westus2, Central US: centralus",
+                "query": "East US: eastus, West US3: westus3, North Central US: northcentralus",
                 "queryValue": "",
                 "skipUrlSync": false,
                 "type": "custom"

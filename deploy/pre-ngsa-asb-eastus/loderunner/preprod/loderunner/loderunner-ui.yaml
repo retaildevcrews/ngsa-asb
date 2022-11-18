@@ -27,8 +27,8 @@ spec:
     metadata:
       labels:
         app: loderunner-ui
-        deploy: 22-11-08-14-47-48
-        version: beta-2211-08-14
+        deploy: 22-11-10-06-04-38
+        version: beta-2211-10-06
     spec:
       containers:
         - name: app
@@ -47,7 +47,7 @@ spec:
               cpu: "50m"
           env:
           - name: "LRAPI_DNS"
-            value: "https://loderunner-eastus-pre.cse.ms/api"
+            value: "https://loderunner-eastus-pre.austinrdc.dev/api"
           readinessProbe:
             initialDelaySeconds: 5
             httpGet:
@@ -94,7 +94,7 @@ spec:
   gateways:
   - istio-system/istio-gateway
   hosts:
-  - loderunner-eastus-pre.cse.ms
+  - loderunner-eastus-pre.austinrdc.dev
   http:
   - match:
     - uri:
