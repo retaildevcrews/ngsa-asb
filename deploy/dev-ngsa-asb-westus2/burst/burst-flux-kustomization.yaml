@@ -10,7 +10,7 @@ spec:
     namespace: istio-system
   interval: 1m0s # detect drift and undo kubectl edits every minute
   prune: true # remove stale resources from cluster
-  targetNamespace: burstservice # overwrite the ns for resources in path
+  # targetNamespace: burstservice # overwrite the ns for resources in path
   path: ./deploy/dev-ngsa-asb-westus2/burst
   sourceRef:
     kind: GitRepository
