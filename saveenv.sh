@@ -9,8 +9,10 @@ then
 else
   if [ -z "$ASB_SPOKE_LOCATION" ]
   then
+    # only hub variables exist
     export ENV_FILE_NAME="${ASB_DEPLOYMENT_NAME}-${ASB_ENV}.env"
   else
+    # hub and spoke variables
     export ENV_FILE_NAME="${ASB_DEPLOYMENT_NAME}-${ASB_ENV}-${ASB_SPOKE_LOCATION}.env"
   fi
 
