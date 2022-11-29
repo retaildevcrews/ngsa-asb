@@ -1,16 +1,16 @@
 param (
     [Parameter(Mandatory)]
-    [String]$resource_Group_Name_with_Firewall="rg-ngsa-asb-dev-hub",
+    [String]$resource_Group_Name_with_Firewall="PLACE_HOLDER",
     [Parameter(Mandatory)]
-    [String]$resource_Group_Name_with_Alerts="rg-ngsa-asb-dev",
+    [String]$resource_Group_Name_with_Alerts="PLACE_HOLDER",
     [Parameter(Mandatory)]
-    [String]$resource_Group_Name_for_Automation="rg-asb-firewall-automation-dev",
+    [String]$resource_Group_Name_for_Automation="PLACE_HOLDER",
     [Parameter(Mandatory)]
-    [String]$automation_Account_Name="aa-asb-firewall-automation-dev",
+    [String]$automation_Account_Name="PLACE_HOLDER",
     [Parameter(Mandatory)]
-    [String]$tenant_Id="72f988bf-86f1-41af-91ab-2d7cd011db47",
+    [String]$tenant_Id="PLACE_HOLDER",
     [Parameter(Mandatory)]
-    [String]$subscription_Name="jofultz-wcnp",
+    [String]$subscription_Name="PLACE_HOLDER",
     [Parameter(Mandatory)]
     [String]$vnet_Name="vnet-eastus-hub",
     [Parameter(Mandatory)]
@@ -22,11 +22,11 @@ param (
     [Parameter(Mandatory)]
     [String]$pip_Name_Default="pip-fw-eastus-default",
     [Parameter(Mandatory)]
-    [String]$managed_Identity_Name="mi-asb-firewall-automation-dev",
+    [String]$managed_Identity_Name="PLACE_HOLDER",
     [Parameter(Mandatory)]
     [String]$action="start",
     [Parameter(Mandatory)]
-    [String]$environment="dev",
+    [String]$environment="PLACE_HOLDER",
     [Parameter(Mandatory)]
     [String]$location="eastus"
 )

@@ -161,7 +161,7 @@ function UpdateAzureAutomationAccountToAllowSystemAssignedIdentity() {
   # The name of the app role that the managed identity should be assigned to.
   local appRoleName='Managed Identity Operator' # For example, MyApi.Read.All
 
-  local automationAccountPrincipalId==$(az automation account show --automation-account-name "${1}" --resource-group "${2}" --query "identity.principalId" -o tsv)
+  local automationAccountPrincipalId=$(az automation account show --automation-account-name "${1}" --resource-group "${2}" --query "identity.principalId" -o tsv)
   
   echo "Automation Account principal id: $automationAccountPrincipalId"
 

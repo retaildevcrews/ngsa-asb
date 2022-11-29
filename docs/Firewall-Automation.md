@@ -68,11 +68,11 @@ The following infrastructure assets should be established in the subscription wi
 
 ## Installation Method - Automated Scripts
 
-BEFORE continuing please make sure all requirements have been met in the section labeled [prerequisites]("#-prerequisites").
+BEFORE continuing please make sure all requirements have been met in the section labeled [prerequisites](#prerequisites).
 
-1. [Create Automation Infrastructure (BASH script)]("./scripts/Firewall-Automation/Firewall-Automation-Infrastructure.sh")
+1. [Create Automation Infrastructure (BASH script)](../scripts/Firewall-Automation/Firewall-Automation-Infrastructure.sh)
 
-    The [Firewall-Automation-Infrastructure.sh]("./scripts/Firewall-Automation/Firewall-Automation-Infrastructure.sh") script "dot sources" the [Firewall-Automation-Infrastructure-Variables.sh]("./scripts/Firewall-Automation/Firewall-Automation-Infrastructure-Variables.sh").  
+    The [Firewall-Automation-Infrastructure.sh](../scripts/Firewall-Automation/Firewall-Automation-Infrastructure.sh) script "dot sources" the [Firewall-Automation-Infrastructure-Variables.sh](../scripts/Firewall-Automation/Firewall-Automation-Infrastructure-Variables.sh).  
 
 _This file must to be adjusted for the specifics of the execution._
 
@@ -98,9 +98,9 @@ Below will detail what is being executed within the script files for further und
 
 #### Adjust Variables
 
-The file [Firewall-Automation-Infrastructure-Variables.sh]("./scripts/Firewall-Automation/Firewall-Automation-Infrastructure-Variables.sh") must be adjusted to include relevant values.
+The file [Firewall-Automation-Infrastructure-Variables.sh](../scripts/Firewall-Automation/Firewall-Automation-Infrastructure-Variables.sh) must be adjusted to include relevant values.
 
-_Potentially sensitive values such as subscription Id have been omitted from the documentation_
+Note: _Potentially sensitive values such as subscription Id have been omitted from the documentation_
 
 ```bash
 ASB_FW_Tenant_Id=''
@@ -120,7 +120,7 @@ ASB_FW_PowerShell_Runbook_Description='This runbook automates the allocation and
 Once the variables are adjusted the script must be run from Visual Studio Code (thick client) using Codespaces.  the script does not require input parameters because they are provided in the variable file mentioned above.
 
 ```bash
-
-  ./Firewall-Automation-Infrastructure-Variables.sh
+  # run this command from the top-level directory of this repository
+  ./scripts/Firewall-Automation/Firewall-Automation-Infrastructure.sh
 
 ```
