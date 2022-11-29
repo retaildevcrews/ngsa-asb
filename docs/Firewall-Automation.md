@@ -6,20 +6,25 @@ Azure Firewall has [costs (Azure Firewall pricing link)](https://azure.microsoft
 
 ### Prerequisites
 
-Before proceeding verify the environment is configured correct to execute the commands necessary below
+Before proceeding, verify that the correct version of Azure CLI and required extensions have been installed:
 
-- Azure CLI 2.0 or greater [Install Azure CLI](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli)
+- Azure CLI 2.0 or greater
+  - Run the command `az version`
+  - If the correct version is not installed, install Azure CLI from [here](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli)
 
-- Azure CLI Extension for Automation [Install Azure CLI Extensions](https://learn.microsoft.com/en-us/cli/azure/azure-cli-extensions-list)
+- Azure CLI Extension for Automation
+  - Run the command `az extension show --name automation -o table`
+  - If the Azure CLI extension for automation is not installed, install it from [here](https://github.com/Azure/azure-cli-extensions/tree/main/src/automation#how-to-use).
 
-- Azure CLI Extension for Monitor [Install Azure CLI Extensions](https://learn.microsoft.com/en-us/cli/azure/azure-cli-extensions-list)
+- Azure CLI Extension for Monitor
+  - Run the command `az extension show --name monitor-control-service -o table`
+  - If the Azure CLI extension for monitor-control-service is not installed, install it from [here](https://github.com/Azure/azure-cli-extensions/tree/main/src/monitor-control-service#how-to-use)
 
-- Azure Powershell modules for Linux_ [Install Modules](/Firewall-Automation.md#Install-Powershell-Modules)
+- Azure Powershell modules
+  - Open up a PowerShell Terminal
+  - [Install Azure PowerShell Modules](https://learn.microsoft.com/en-us/powershell/azure/install-az-ps?view=latest#installation) from the prompt using the command `Install-Module -Name Az -Scope CurrentUser -Repository PSGallery -Force`
 
 _The Azure CLI Automation extension is in an experimental stage.  Currently it does not implement all functionality needed.  As a result the the Az Module, specifically for automation, monitoring,  and authentication can be used at the time of writing._
-
--   [_Azure CLI Extension - Automation_](https://github.com/Azure/azure-cli-extensions/tree/main/src/automation)
--   [Azure PowerShell Az Modules](https://learn.microsoft.com/en-us/powershell/azure/install-az-ps?view=azps-9.0.0)
 
 ### Parameters Needed to Proceed
 
