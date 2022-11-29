@@ -75,18 +75,13 @@ The following infrastructure assets should be established in the subscription wi
 
 BEFORE continuing please make sure all requirements have been met in the section labeled [prerequisites](#prerequisites).
 
-1. [Create Automation Infrastructure (BASH script)](../scripts/Firewall-Automation/Firewall-Automation-Infrastructure.sh)
+### Adjust Environment Variable Values
 
-    The [Firewall-Automation-Infrastructure.sh](../scripts/Firewall-Automation/Firewall-Automation-Infrastructure.sh) script "dot sources" the [Firewall-Automation-Infrastructure-Variables.sh](../scripts/Firewall-Automation/Firewall-Automation-Infrastructure-Variables.sh).  
+The file [Firewall-Automation-Infrastructure-Variables.sh](../scripts/Firewall-Automation/Firewall-Automation-Infrastructure-Variables.sh) must be updated to include relevant values for all of the required environment variables. It will be run by the script [Firewall-Automation-Infrastructure.sh](../scripts/Firewall-Automation/Firewall-Automation-Infrastructure.sh) as part of the automated setup.
 
-_This file must to be adjusted for the specifics of the execution._
-
-### BASH Variables
-
-The BASH variables are exported into environment variables.  
+Note: _Potentially sensitive values such as subscription Id have been omitted from the documentation_
 
 ```bash
-# Tenant Id for the onmicrosoft.com tenant
 export ASB_FW_Tenant_Id=''
 export ASB_FW_Subscription_Name=''
 export ASB_FW_Base_NSGA_Name='ngsa-asb'
@@ -99,33 +94,10 @@ export ASB_FW_PowerShell_Runbook_Description='This runbook allocates and de-allo
 
 ```
 
-Below will detail what is being executed within the script files for further understanding.  This section is informational only.
+### Execute Script
 
-#### Adjust Variables
-
-The file [Firewall-Automation-Infrastructure-Variables.sh](../scripts/Firewall-Automation/Firewall-Automation-Infrastructure-Variables.sh) must be adjusted to include relevant values.
-
-Note: _Potentially sensitive values such as subscription Id have been omitted from the documentation_
+Once the variables are updated, the setup script must be run from Visual Studio Code (thick client) using Codespaces. The script does not require input parameters because the required parameters are stored as environment variables when it runs the variable script. Run this command from the top-level directory of this repository.
 
 ```bash
-ASB_FW_Tenant_Id=''
-ASB_FW_Subscription_Name=''
-ASB_FW_Base_NSGA_Name='ngsa-asb'
-ASB_FW_Base_Automation_System_Name='firewall-automation'
-ASB_FW_Environment='dev'
-ASB_FW_PowerShell_Runbook_File_Name='Firewall-Automation-Runbook.ps1'
-ASB_FW_Sku='Basic'
-ASB_FW_Location='westus'
-ASB_FW_PowerShell_Runbook_Description='This runbook automates the allocation and de-allocation of a firewall for the purposes of scheduling.'
-
-```
-
-#### Executing Script
-
-Once the variables are adjusted the script must be run from Visual Studio Code (thick client) using Codespaces.  the script does not require input parameters because they are provided in the variable file mentioned above.
-
-```bash
-  # run this command from the top-level directory of this repository
   ./scripts/Firewall-Automation/Firewall-Automation-Infrastructure.sh
-
 ```
