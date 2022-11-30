@@ -131,13 +131,13 @@ function Authenticate {
 function Import-Modules {
   Write-Host "Installing & Importing Azure Powershell Az Module for Automation."
 
-  Install-Module -Name Az.Automation -Force | out-null
-  Import-Module -Name Az.Automation -Force | out-null
+  # Install-Module -Name Az.Automation -Force | out-null
+  # Import-Module -Name Az.Automation -Force | out-null
 
   Write-Host "Installing & Importing Azure Powershell Az Module for Monitor."
 
-  Install-Module -Name Az.Monitor -Force | out-null
-  Import-Module -Name Az.Monitor -Force | out-null
+  # Install-Module -Name Az.Monitor -Force | out-null
+  # Import-Module -Name Az.Monitor -Force | out-null
 
   Write-Host "Completed installing & importing Azure Powershell Az Modules for Authentication and Monitor."
 }
