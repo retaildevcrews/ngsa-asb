@@ -10,16 +10,11 @@ Before proceeding verify the environment is configured correct to execute the co
 
 - Azure CLI 2.0 or greater [Install Azure CLI](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli)
 
-- Azure CLI Extension for Automation [Install Azure CLI Extensions](https://learn.microsoft.com/en-us/cli/azure/azure-cli-extensions-list)
+- Azure CLI Extension for Automation [Install Azure CLI Extensions](https://github.com/Azure/azure-cli-extensions/tree/main/src/automation)
 
-- Azure CLI Extension for Monitor [Install Azure CLI Extensions](https://learn.microsoft.com/en-us/cli/azure/azure-cli-extensions-list)
+- Azure Powershell modules [Install Modules](https://learn.microsoft.com/en-us/powershell/azure/install-az-ps?view=azps-9.0.0)
 
-- Azure Powershell modules for Linux_ [Install Modules](/Firewall-Automation.md#Install-Powershell-Modules)
-
-_The Azure CLI Automation extension is in an experimental stage.  Currently it does not implement all functionality needed.  As a result the the Az Module, specifically for automation, monitoring,  and authentication can be used at the time of writing._
-
--   [_Azure CLI Extension - Automation_](https://github.com/Azure/azure-cli-extensions/tree/main/src/automation)
--   [Azure PowerShell Az Modules](https://learn.microsoft.com/en-us/powershell/azure/install-az-ps?view=azps-9.0.0)
+_The Azure CLI Automation extension is in an experimental stage.  Currently it does not implement all functionality needed.  As a result the the Az Module, specifically for automation, and authentication can be used at the time of writing._
 
 ### Parameters Needed to Proceed
 
