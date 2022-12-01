@@ -193,14 +193,12 @@ Please visit this [link](https://learn.microsoft.com/en-us/azure/cosmos-db/how-t
 
 ```bash
   
-  local Assigee_Object_Id = 'Users Object Id'
-
   az login --tenant 'XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX'
   az account set --subscription 'XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX'
 
   # Variables
   # built in Cosmos DB roles
-  local roles=("00000000-0000-0000-0000-000000000001" "00000000-0000-0000-0000-000000000002") #Array of built in Cosmos roles
+  local roles=("00000000-0000-0000-0000-000000000002") #Array of built in Cosmos roles
   local principals=("XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX" "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX") # principals that should be assigned. Development user, and the managed identity.
   local subscriptionId="XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"  #Subscription Id
   local resourceGroupName="rg-wcnp-dev-cosmos" #Resource Group with Cosmos Db 
