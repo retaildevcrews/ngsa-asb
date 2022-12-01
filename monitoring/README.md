@@ -141,9 +141,25 @@ cat templates/monitoring/thanos/thanos-compactor.yaml | envsubst > $ASB_GIT_PATH
 
 ### Prepare Grafana deployment for Azure Active Directory (AAD)
 
-Deploy Grafana that uses AAD as the authentication mechanism.
+Deploy Grafana that uses AAD as the authentication mechanism. These variables are required in next section.
 
-First, follow the steps detailed in the [Grafana documentation](https://grafana.com/docs/grafana/latest/auth/azuread/#create-the-azure-ad-application) to create the AAD Service Principal. Use the `ASB_DOMAIN` value as the `grafana domain` for the redirect URLs. Note the `TENANT_ID`, `CLIENT_ID` and `CLIENT_SECRET` values as you'll be needing these for the deployment template.
+```bash
+
+export ASB_GRAFANA_MI_NAME=ngsa-grafana
+
+# Create App Registration and ServicePrincipal with same name
+CLIENT_SECRET=$(az ad sp create-for-rbac --name $ASB_GRAFANA_MI_NAME --output tsv --query password)
+
+CLIENT_ID=$(az ad app list --show-mine --query "[?displayName=='$ASB_GRAFANA_MI_NAME'].appId" -o tsv)
+
+TENANT_ID=$(az ad sp list --show-mine --query "[?displayName=='$ASB_GRAFANA_MI_NAME'].appOwnerOrganizationId" -o tsv)
+
+# App roles modified from https://grafana.com/docs/grafana/latest/auth/azuread/#create-the-azure-ad-application
+az ad app update --id $CLIENT_ID --app-roles @grafana-app-roles.json
+
+```
+
+Use the `ASB_DOMAIN` value as the `grafana domain` for the redirect URLs
 
 **Note**: The `CLIENT_SECRET` will be mounted from Key Vault and into the Grafana pod using Pod Identity. Rather than creating a whole new Managed Identity, Grafana makes use of NGSA's managed identity to grab the secret from Key Vault. Ensure that you have it setup by following the [Cosmos pod identity setup guide](../docs/cosmos.md#aad-pod-identity-setup-for-app).
 
@@ -166,12 +182,7 @@ You'll need to run a few more steps to completely setup the AAD Service Principa
 az keyvault set-policy --secret-permissions set --object-id $(az ad signed-in-user show --query id -o tsv) -n $ASB_KV_NAME -g $ASB_RG_CORE
 
 # Set grafana AAD client secrets
-az keyvault secret set -o table --vault-name $ASB_KV_NAME --name "grafana-aad-client-secret" --value [insert CLIENT_SECRET]
-
-# set grafana AAD ids
-export ASB_GRAFANA_SP_CLIENT_ID=[insert CLIENT_ID]
-export ASB_GRAFANA_SP_TENANT_ID=[insert TENANT_ID]
-export ASB_GRAFANA_MI_NAME=grafana-id
+az keyvault secret set -o table --vault-name $ASB_KV_NAME --name "grafana-aad-client-secret" --value "$CLIENT_SECRET"
 
 # create grafana-config config-map file
 cat templates/monitoring/grafana/01-grafana-config.yaml | envsubst  > $ASB_GIT_PATH/monitoring/grafana/01-grafana-config.yaml
