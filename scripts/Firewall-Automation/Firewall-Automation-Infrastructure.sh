@@ -223,7 +223,7 @@ function PublishRunbook(){
 
 function CreateSchedule(){
   # use pwsh for PowerShell version 7.x and above
-  powershell -Command "./scripts/Firewall-Automation/Firewall-Automation-Schedule-Creation.ps1"
+  powershell -Command "Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass; ./scripts/Firewall-Automation/Firewall-Automation-Schedule-Creation.ps1"
 }
 
 function main(){
