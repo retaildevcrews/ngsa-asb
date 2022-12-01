@@ -283,6 +283,8 @@ function main(){
 
   CreateSchedule
 
+  PublishRunbook $runbookName $automationResourceGroup $automationAccountName
+
   echo
   echo "-------------------------------------------------------------------"
   echo "  Completed Azure Automation Infrastructure creation.              "
