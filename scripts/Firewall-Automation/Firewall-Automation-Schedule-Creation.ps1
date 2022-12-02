@@ -1,4 +1,4 @@
-foreach ($line in (Get-Content -Path './firewall-automation-dev-westus.env')) {
+foreach ($line in (Get-Content -Path './firewall-automation-dev-eastus.env')) {
   if ($line.Contains('export ')) {
     $line = $line -replace 'export ', ''
     $line = $line.Replace("'", "")
