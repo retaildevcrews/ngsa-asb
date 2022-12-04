@@ -20,8 +20,8 @@ spec:
       labels:
         aadpodidbinding: ngsa-asb-ngsa-id
         app: ngsa-java
-        deploy: 22-11-28-23-56-07
-        version: beta-2211-28-23
+        deploy: 22-12-04-06-07-10
+        version: beta-2212-04-06
     spec:
       automountServiceAccountToken: false
       securityContext:
