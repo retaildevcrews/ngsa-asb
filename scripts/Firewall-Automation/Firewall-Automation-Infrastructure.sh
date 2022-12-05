@@ -167,9 +167,12 @@ function UpdateAzureAutomationAccountToAllowSystemAssignedIdentity() {
 
   # use pwsh for PowerShell version 7.x and above
   powershell -Command "Connect-AzAccount -Tenant ${4} -Subscription ${3}; Set-AzAutomationAccount -AssignUserIdentity '/subscriptions/${3}/resourcegroups/${2}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/${5}' -ResourceGroupName ${2} -Name ${1} -AssignSystemIdentity;"
-  
+
+  # Create the role assignment for Automation Account giving 'Managed Identity Operator' permission over 'rg-[deploymentName]-firewall-automation-dev' resource group
+  az role assignment create --role $appRoleName --assignee $automationAccountPrincipalId --scope "/subscriptions/${3}/resourceGroups/${2}"
+
   echo "Completed assigning role Managed Identity Operator to the System Assigned Identity for automation account ${1} in resource group ${2}, within subscription id ${3}."
-  echo
+
 }
 
 function AssignIdentityRole(){
