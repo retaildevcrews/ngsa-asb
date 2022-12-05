@@ -148,25 +148,31 @@ Deploy Grafana that uses AAD as the authentication mechanism. These variables ar
 export ASB_GRAFANA_MI_NAME=ngsa-grafana
 
 # Create App Registration and ServicePrincipal with same name
-CLIENT_SECRET=$(az ad sp create-for-rbac --name $ASB_GRAFANA_MI_NAME --output tsv --query password)
+az ad sp create-for-rbac --name $ASB_GRAFANA_MI_NAME --years 2
 
 CLIENT_ID=$(az ad app list --show-mine --query "[?displayName=='$ASB_GRAFANA_MI_NAME'].appId" -o tsv)
 
 TENANT_ID=$(az ad sp list --show-mine --query "[?displayName=='$ASB_GRAFANA_MI_NAME'].appOwnerOrganizationId" -o tsv)
 
+# Remove rbac key as not needed and only number of secrets limited to a Service Principal is two
+RBAC_ID=$(az ad app credential list --id $CLIENT_ID --query "[?displayName=='rbac'].keyId" -o tsv)
+az ad app credential delete --id $CLIENT_ID --key-id $RBAC_ID
+
 # App roles modified from https://grafana.com/docs/grafana/latest/auth/azuread/#create-the-azure-ad-application
 az ad app update --id $CLIENT_ID --app-roles @grafana-app-roles.json
 
+# Create Grafana OAuth Secret
+CLIENT_SECRET=$(az ad app credential reset --append --id $CLIENT_ID --display-name "Grafana OAuth" --years 2 -o tsv --query password)
+
 ```
-
-Use the `ASB_DOMAIN` value as the `grafana domain` for the redirect URLs
-
-**Note**: The `CLIENT_SECRET` will be mounted from Key Vault and into the Grafana pod using Pod Identity. Rather than creating a whole new Managed Identity, Grafana makes use of NGSA's managed identity to grab the secret from Key Vault. Ensure that you have it setup by following the [Cosmos pod identity setup guide](../docs/cosmos.md#aad-pod-identity-setup-for-app).
 
 You'll need to run a few more steps to completely setup the AAD Service Principal.
 
 1. Navigate to the Service Principal you created in AAD -> Enterprise Applications. Search for your application and click on it.
-2. If you haven't added the users already, go ahead and add them in the "Users and groups" menu from the sidebar.
+2. Click on "Users and groups" > "+ Add user/group"
+2.1. For "Users and Groups" select "ADC-ADM"
+2.2. For "role" select "Grafana Org Admin"
+2.3. Click "Assign". NOTE: assignment does not cascade to nested groups
 3. Go to "Properties", select "Yes" for the "Assignment required?" option and save. This ensures users only assigned to the Service Principal can access Grafana.
 
 ### Setup Grafana deployment templates
