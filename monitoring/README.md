@@ -176,9 +176,9 @@ You'll need to run a few more steps to completely setup the AAD Service Principa
 
 1. Navigate to the Service Principal you created in AAD -> Enterprise Applications. Search for your application and click on it.
 2. Click on "Users and groups" > "+ Add user/group"
-2.1. For "Users and Groups" select "ADC-ADM"
-2.2. For "role" select "Grafana Org Admin"
-2.3. Click "Assign". NOTE: assignment does not cascade to nested groups
+   - For "Users and Groups" select "ADC-ADM"
+   - For "role" select "Grafana Org Admin"
+   - Click "Assign". NOTE: assignment does not cascade to nested groups
 3. Go to "Properties", select "Yes" for the "Assignment required?" option and save. This ensures users only assigned to the Service Principal can access Grafana.
 
 ### Setup Grafana deployment templates
