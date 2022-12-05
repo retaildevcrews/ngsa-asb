@@ -164,6 +164,12 @@ az ad app update --id $CLIENT_ID --app-roles @grafana-app-roles.json
 # Create Grafana OAuth Secret
 CLIENT_SECRET=$(az ad app credential reset --append --id $CLIENT_ID --display-name "Grafana OAuth" --years 2 -o tsv --query password)
 
+# Enable Grafana users to login using created App Registration. Needs to be repeated for each created grafana instance.
+export ASB_APP_NAME=grafana
+export ASB_APP_DNS_NAME=${ASB_APP_NAME}-${ASB_SPOKE_LOCATION}-${ASB_ENV}
+export ASB_APP_DNS_FULL_NAME=${ASB_APP_DNS_NAME}.${ASB_DNS_ZONE}
+az ad app update --id $CLIENT_ID  --web-redirect-uris "https://ASB_APP_DNS_FULL_NAME/ https://ASB_APP_DNS_FULL_NAME/login/azuread"
+
 ```
 
 You'll need to run a few more steps to completely setup the AAD Service Principal.
