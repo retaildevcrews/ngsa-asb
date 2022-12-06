@@ -269,17 +269,11 @@ function main(){
 
   CreateAzureAutomationPowerShellRunbook $runbookName $automationResourceGroup $automationAccountName $location # $ASB_FW_Tenant_Id $subscriptionId
 
-  #local automationAccountPrincipalId=$(az automation account list --resource-group ${automationResourceGroup} --query "[?name=='${automationAccountName}'].identity.{principalId:principalId}|[0].principalId" --output tsv)
-  #echo "Automation Account Principal Id: $automationAccountPrincipalId"
-
   UpdateAzureAutomationAccountToAllowSystemAssignedIdentity $automationAccountName $automationResourceGroup $subscriptionId $ASB_FW_Tenant_Id $userAssignedManagedIdentityName
 
   AssignIdentityRole $identityPrincipalId $userAssignedManagedIdentityName $automationResourceGroup $ASB_FW_Subscription_Name "ServicePrincipal" "Monitoring Contributor"
   AssignIdentityRole $identityPrincipalId $userAssignedManagedIdentityName $automationResourceGroup $ASB_FW_Subscription_Name "ServicePrincipal" "Contributor"  
  
-  # Set the subscription to the one specified in the parameters
-  #SetSubscription $ASB_FW_Subscription_Name $ASB_FW_Tenant_Id
-
   ImportPowerShellRunbookContent $runbookName $automationResourceGroup $runbookFilePathAndName $automationAccountName
 
   PublishRunbook $runbookName $automationResourceGroup $automationAccountName

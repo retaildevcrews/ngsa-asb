@@ -191,9 +191,6 @@ New-Schedule -automation_Account_Name $automationAccountName -resource_Group_Nam
 Edit-ScheduleAndRunbook -resource_Group_Name_with_Firewall $firewallResourceGroup -Location $location -resource_Group_Name_for_Automation $automationResourceGroup -resource_Group_Name_with_Alerts $alertsResourceGroup -tenant_Id $tenantId -schedule_Name $start_Action_Name -powerShell_Runbook_Name $runbookName -automation_Account_Name $automationAccountName -subscription_Name $subscriptionName -vnet_Name $vnetName -firewall_Name $firewallName -pip_Name1 $publicIpName1 -pip_Name2 $publicIpName2 -pip_Name_Default $publicIpNameDefault -managed_Identity_Name $managedIdentityName -action "start"
 Edit-ScheduleAndRunbook -resource_Group_Name_with_Firewall $firewallResourceGroup -Location $location -resource_Group_Name_for_Automation $automationResourceGroup -resource_Group_Name_with_Alerts $alertsResourceGroup -tenant_Id $tenantId -schedule_Name $stop_Action_Name -powerShell_Runbook_Name $runbookName -automation_Account_Name $automationAccountName -subscription_Name $subscriptionName -vnet_Name $vnetName -firewall_Name $firewallName -pip_Name1 $publicIpName1 -pip_Name2 $publicIpName2 -pip_Name_Default $publicIpNameDefault -managed_Identity_Name $managedIdentityName -action "stop"
 
-# At this time the runbook was already published but since we edit the runbook we are going to publish again after CreateSchedule ps1 is excecuted
-# Publish-AzAutomationRunbook -AutomationAccountName $automationAccountName -Name $runbookName -ResourceGroupName $automationResourceGroup
-
 # Disable the schedule after creation
 Set-AzAutomationSchedule -AutomationAccountName $automationAccountName -Name $start_Action_Name -IsEnabled $false -ResourceGroupName $automationResourceGroup
 Set-AzAutomationSchedule -AutomationAccountName $automationAccountName -Name $stop_Action_Name  -IsEnabled $false -ResourceGroupName $automationResourceGroup
