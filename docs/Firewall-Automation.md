@@ -6,11 +6,49 @@ Azure Firewall has [costs (Azure Firewall pricing link)](https://azure.microsoft
 
 Prevent accidental commits with `git update-index --assume-unchanged scripts/Firewall-Automation/Firewall-Automation-Infrastructure-Variables.sh`
 
-# TODO: Add instructions about how to create SP and do role assigments to it at the subscription azure roles
+## Login to Azure
 
-## -Automation Contributor
+```bash
+az login 
 
-## -Managed Identity Operator
+###  show your Azure accounts
+az account list -o table
+
+###  select the Azure subscription if necessary
+az account set -s {subscription name or Id}
+```
+
+The execution of the script requires a ServicePrincipal to be created as part of the provisioning process:
+
+ServicePrincipal | Purpose | Graph Permissions |
+-----------------|---------|-------------------|
+ e.g:  firewall-automation-sp-\<env> | Application Identity |
+
+## Service Principal Permissions
+
+Role assignment scoped to the subcription neeeds to be created and assigned to the service principal **firewall-automation-sp-\<env>**.
+
+This service principal requires role assignments listed in the table below to enable Powershell Connect and Automation commands to work.
+
+| Role | Type | Scope |
+| --- | --- | --- |
+| Automation Contributor  | App | Subscription |
+| Managed Identity Operator  | App | Subscription |
+
+## The following command will create Service Principal and do the role assignments
+
+```Code
+
+local automationClientSecret=$(az ad sp create-for-rbac -n http://firewall-automation-sp-<env> --query password -o tsv)
+
+local automationClientId=$(az ad sp show --id http://firewall-automation-sp-<env> --query appId -o tsv)
+
+az role assignment create --role "'Managed Identity Operator'" --assignee $automationClientId --scope "/subscriptions/<subscription_Id>"
+az role assignment create --role "Automation Contributor'" --assignee $automationClientId --scope "/subscriptions/<subscription_Id>"
+
+```
+
+# TODO add instruction to add this automationClientSecret and  automationClientId to Firewall-Automation-Infrastructure-Variables.sh file 
 
 ### Prerequisites
 
