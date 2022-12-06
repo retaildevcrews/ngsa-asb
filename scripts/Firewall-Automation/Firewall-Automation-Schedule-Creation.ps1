@@ -14,7 +14,11 @@ $baseAutomationName = $env:ASB_FW_Base_Automation_System_Name
 $environment = $env:ASB_FW_Environment
 $location = $env:ASB_FW_Location
 
-Write-Output((Get-ChildItem env:*).GetEnumerator() | Sort-Object Name | Out-String)
+$spclientid = $env:ASB_SP_CONNECT_AZ_CLIENTID
+$spsecret = $env:ASB_SP_CONNECT_AZ_SECRET
+
+# NOTE : do not want to write since this will output secret 
+# Write-Output((Get-ChildItem env:*).GetEnumerator() | Sort-Object Name | Out-String)
 
 function New-Schedule {
 
@@ -124,7 +128,20 @@ function Edit-ScheduleAndRunbook {
 }
 
 function Authenticate {  
-  Connect-AzAccount -UseDeviceAuth  
+  #Connect-AzAccount -UseDeviceAuth 
+  
+  $password=ConvertTo-SecureString $spsecret -AsPlainText -Force
+
+  $Credential=New-Object -TypeName System.Management.Automation.PSCredential ($spclientid, $password)
+  
+  try{
+    Connect-AzAccount -ServicePrincipal -Tenant $tenantId -Subscription $subscriptionName -Credential $Credential
+    Write-Host "Successfully connected to Azure account."
+  }
+  catch{
+    Write-Host "Unexpected error occurred when trying to connect to Azure account."
+  }
+
   Set-AzContext -Subscription $subscriptionName
 }
 
