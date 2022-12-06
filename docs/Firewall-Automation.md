@@ -4,6 +4,14 @@ Azure Firewall has [costs (Azure Firewall pricing link)](https://azure.microsoft
 
 ## Before Beginning
 
+Prevent accidental commits with `git update-index --assume-unchanged scripts/Firewall-Automation/Firewall-Automation-Infrastructure-Variables.sh`
+
+# TODO: Add instructions about how to create SP and do role assigments to it at the subscription azure roles
+
+## -Automation Contributor
+
+## -Managed Identity Operator
+
 ### Prerequisites
 
 Before proceeding, verify that the correct version of Azure CLI and required extensions have been installed:

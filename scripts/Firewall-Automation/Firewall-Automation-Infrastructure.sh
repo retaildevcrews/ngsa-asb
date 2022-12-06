@@ -161,20 +161,16 @@ function UpdateAzureAutomationAccountToAllowSystemAssignedIdentity() {
   # The name of the app role that the managed identity should be assigned to.
   local appRoleName='Managed Identity Operator' # For example, MyApi.Read.All
 
-  # local automationAccountPrincipalId=$(az automation account show --automation-account-name "${1}" --resource-group "${2}" --query "identity.principalId" -o tsv)
-  
-  # echo "Automation Account principal id: $automationAccountPrincipalId"
-
-  # use pwsh for PowerShell version 7.x and above
-  # powershell -Command "Connect-AzAccount -Tenant ${4} -Subscription ${3}; Set-AzAutomationAccount -AssignUserIdentity '/subscriptions/${3}/resourcegroups/${2}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/${5}' -ResourceGroupName ${2} -Name ${1} -AssignSystemIdentity;"
-  
-  # for testing only 
-  # pwsh --command "./scripts/Firewall-Automation/Firewall-Automation-SetSystemAssignedIdentity.ps1 5dc45b2f-bf13-4281-b763-a53f57290aa3 rg-gortega-test mi-gortega-test aa-gortega-test"
-
+  # Do assign ManagedIdentity to Automation Account
   pwsh --command "./scripts/Firewall-Automation/Firewall-Automation-SetSystemAssignedIdentity.ps1 ${3} ${2} ${5} ${1}"
+
+  # Get ManagedIdentity Id from automation account, this requires to perform the assign ManagedIdentity to Automation Account step first. 
+  local automationAccountPrincipalId=$(az automation account show --automation-account-name "${1}" --resource-group "${2}" --query "identity.principalId" -o tsv)
   
+  echo "Automation Account principal id: $automationAccountPrincipalId"
+
   # Create the role assignment for Automation Account giving 'Managed Identity Operator' permission over 'rg-[deploymentName]-firewall-automation-dev' resource group
-  az role assignment create --role $appRoleName --assignee $automationAccountPrincipalId --scope "/subscriptions/${3}/resourceGroups/${2}"
+  az role assignment create --role "$appRoleName" --assignee $automationAccountPrincipalId --scope "/subscriptions/${3}/resourceGroups/${2}"
 
   echo "Completed assigning role Managed Identity Operator to the System Assigned Identity for automation account ${1} in resource group ${2}, within subscription id ${3}."
 
@@ -230,8 +226,7 @@ function PublishRunbook(){
 }
 
 function CreateSchedule(){
-  # use pwsh for PowerShell version 7.x and above
-  pwsh --command "Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass; ./scripts/Firewall-Automation/Firewall-Automation-Schedule-Creation.ps1"
+  pwsh --command "./scripts/Firewall-Automation/Firewall-Automation-Schedule-Creation.ps1"
 }
 
 function main(){
@@ -290,8 +285,6 @@ function main(){
   PublishRunbook $runbookName $automationResourceGroup $automationAccountName
 
   CreateSchedule
-
-  PublishRunbook $runbookName $automationResourceGroup $automationAccountName
 
   echo
   echo "-------------------------------------------------------------------"
