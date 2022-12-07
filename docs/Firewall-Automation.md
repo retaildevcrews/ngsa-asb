@@ -1,10 +1,10 @@
 # Web Application Firewall (WAF) Allocation/De-Allocation Automation
 
-Azure Firewall has [costs (Azure Firewall pricing link)](https://azure.microsoft.com/en-gb/pricing/details/azure-firewall/#pricing) associated with it which can be optimized by allocating and de-allocating the firewall when appropriate.  Below describes the mechanism to implement an Azure Automation Runbook that will allocate and de-allocate the firewall on a schedule as well as enable and disable the alerts associated with this activity to minimize nonessential systems communications.
+Azure Firewall has [costs (Azure Firewall pricing link)](https://azure.microsoft.com/en-gb/pricing/details/azure-firewall/#pricing) associated with it which can be optimized by allocating and de-allocating the firewall when appropriate.  The instructions below describe how to implement an Azure Automation Runbook that will automate firewall allocation and de-allocation on a schedule, and enable and disable associated alerts to minimize nonessential systems communications.
 
 ## Before Beginning
 
-🛑 IMPORTANT: Prevent accidental `Sensitive Data` commits for the variables file with `git update-index --assume-unchanged scripts/Firewall-Automation/Firewall-Automation-Infrastructure-Variables.sh`
+🛑 IMPORTANT: Prevent accidental `Sensitive Data` commits for the variables file by running the command `git update-index --assume-unchanged scripts/Firewall-Automation/Firewall-Automation-Infrastructure-Variables.sh`
 
 ## Login to Azure
 
@@ -18,42 +18,9 @@ az account list -o table
 az account set -s {subscription name or Id}
 ```
 
-The execution of the script requires a ServicePrincipal to be created as part of the provisioning process:
+## Prerequisites
 
-ServicePrincipal | Purpose | Graph Permissions |
------------------|---------|-------------------|
- e.g:  firewall-automation-sp-\<env> | Application Identity |
-
-## Service Principal Permissions
-
-Role assignment scoped to the subcription neeeds to be created and assigned to the service principal **firewall-automation-sp-\<env>**.
-
-This service principal requires role assignments listed in the table below to enable Powershell Connect and Automation commands to work.
-
-| Role | Type | Scope |
-| --- | --- | --- |
-| Automation Contributor  | App | Subscription |
-| Managed Identity Operator  | App | Subscription |
-
-## Create Service Principal and to do the role assignments
-
-```bash
-
-# Replace the correct SP name 
-local automationClientSecret=$(az ad sp create-for-rbac -n http://firewall-automation-sp-<env> --query password -o tsv)
-
-# Replace the correct SP name 
-local automationClientId=$(az ad sp show --id http://firewall-automation-sp-<env> --query appId -o tsv)
-
-# Replace the correct SubscriptionId
-az role assignment create --role "'Managed Identity Operator'" --assignee $automationClientId --scope "/subscriptions/<subscription_Id>"
-
-# Replace the correct SubscriptionId
-az role assignment create --role "Automation Contributor'" --assignee $automationClientId --scope "/subscriptions/<subscription_Id>"
-
-```
-
-### Prerequisites
+### PowerShell, Azure CLI and Azure CLI Extensions
 
 Before proceeding, verify that the correct version of Azure CLI and required extensions have been installed:
 
@@ -73,11 +40,48 @@ Before proceeding, verify that the correct version of Azure CLI and required ext
   - Open up a PowerShell Terminal
   - [Install Azure PowerShell Modules](https://learn.microsoft.com/en-us/powershell/azure/install-az-ps?view=latest#installation) from the prompt using the command `Install-Module -Name Az -Scope CurrentUser -Repository PSGallery -Force`
 
-_The Azure CLI Automation extension is in an experimental stage.  Currently it does not implement all functionality needed.  As a result the the Az Module, specifically for automation, monitoring,  and authentication can be used at the time of writing._
+Note: *The Azure CLI Automation extension is in an experimental stage.  Currently it does not implement all functionality needed.  As a result the the Az Module, specifically for automation, monitoring, and authentication can be used at the time of writing.*
 
-### Parameters Needed to Proceed
+### Service Principal and Role Assignments
 
-#### Parameters for Bash Execution
+The execution of the automation infrastructure setup script **Firewall-Automation-Infrastructure.sh** requires a Service Principal to be created as part of the provisioning process:
+
+Service Principal | Purpose | Graph Permissions |
+-----------------|---------|-------------------|
+ e.g:  firewall-automation-sp-\<env> | Application Identity |
+
+#### Required Role Assignments
+
+Role assignments scoped to the subscription need to be created and assigned to the service principal **firewall-automation-sp-\<env>**. The service principal requires role assignments with the roles listed in the table below to enable Powershell Connect and Automation commands to work.
+
+| Role | Type | Scope |
+| --- | --- | --- |
+| Automation Contributor  | App | Subscription |
+| Managed Identity Operator  | App | Subscription |
+
+#### Create Service Principal and Role Assignments
+
+Run the commands below to create the service principal and the required role assignments
+
+```bash
+
+# Replace the correct SP name 
+local automationClientSecret=$(az ad sp create-for-rbac -n http://firewall-automation-sp-<env> --query password -o tsv)
+
+# Replace the correct SP name 
+local automationClientId=$(az ad sp show --id http://firewall-automation-sp-<env> --query appId -o tsv)
+
+# Replace the correct SubscriptionId
+az role assignment create --role "'Managed Identity Operator'" --assignee $automationClientId --scope "/subscriptions/<subscription_Id>"
+
+# Replace the correct SubscriptionId
+az role assignment create --role "Automation Contributor'" --assignee $automationClientId --scope "/subscriptions/<subscription_Id>"
+
+```
+
+## Parameters Needed to Proceed
+
+### Parameters for Bash Execution
 
 | Parameter Name                        |                                             Example Value                                             | Script Needed For |
 | ------------------------------------- | :---------------------------------------------------------------------------------------------------: | ----------------- |
@@ -95,11 +99,11 @@ _The Azure CLI Automation extension is in an experimental stage.  Currently it d
 | ASB_FW_Environment                    |                                                  dev                                                  | bash              |
 | firewallName                          |                                              fw-centralus                                             | bash              |
 
-#### Parameters for PowerShell Execution
+### Parameters for PowerShell Execution
 
-The powershell file needed to create the runbook schedules is called from the bash script, and re-uses the environment variables to then generate all parameters needed.  
+The PowerShell file needed to create the runbook schedules is called from the bash script, and re-uses the environment variables to then generate all parameters needed.  
 
-### Infrastructure & Assets Creation List
+## Infrastructure & Assets Creation List
 
 The following infrastructure assets should be established in the subscription with the Azure Firewall(s) to be managed once all aspects of this document are fulfilled.  Though six (6) items are listed, technically one (1) item is an import of content to the body of the Azure Automation Runbook so this item will not show up in the portal without deeper investigation.  
 
@@ -112,27 +116,25 @@ The following infrastructure assets should be established in the subscription wi
 |  5. | Powershell Content in Runbook             |                               [link](https://learn.microsoft.com/en-us/powershell/module/az.automation/import-azautomationrunbook?view=azps-8.3.0)                               | Upload [pre-defined Powershell content](../scripts/Firewall-Automation/Firewall-Automation-Runbook.ps1) into the Runbook body.                                                                            |   |
 |  6. | Automation Schedule(s) _using Powershell_ |                               [link](https://learn.microsoft.com/en-us/powershell/module/az.automation/import-azautomationrunbook?view=azps-8.3.0)                               | Create the schedules that will execute the Firewall automation.  These had to be created using Powershell instead of the Azure CLI.  No equivalent behavior has been found. |   |
 
-### Resources Created When Complete
+## Resources Created When Complete
 
-1. Azure user-assigned Managed Identity
+1. Azure User-Assigned Managed Identity
 2. Azure Automation Account
 3. Azure PowerShell Runbook
 
     ![List of resources that will be created when complete.](./assets/Firewall-Automation/listOfResourcesInResourceGroup.png)
 
-## Installation Method - Automated Scripts
+## Runbook and Schedule Creation using Automated Scripts
 
-BEFORE continuing please make sure all requirements have been met in the section labeled [prerequisites](#prerequisites).
+The steps to set up the runbook and schedule are listed in this section. BEFORE continuing please make sure all requirements have been met in the section labeled [prerequisites](#prerequisites).
 
-### Adjust Environment Variable Values
+### Update Environment Variable Values
 
 The file [Firewall-Automation-Infrastructure-Variables.sh](../scripts/Firewall-Automation/Firewall-Automation-Infrastructure-Variables.sh) must be updated to include relevant values for all of the required environment variables. It will be run by the script [Firewall-Automation-Infrastructure.sh](../scripts/Firewall-Automation/Firewall-Automation-Infrastructure.sh) as part of the automated setup.
 
-Note: _Potentially sensitive values such as subscription Id have been omitted from the documentation_
+Note: *Potentially sensitive values such as subscription name have been omitted from the sample below. When updating the values in the script Firewall-Automation-Infrastructure-Variables.sh, Service Principal client Id and Secret should be copied from local variables set up earlier in the section [Create Service Principal and Role Assignments](#create-service-principal-and-role-assignments)*
 
-## TODO: Do we need to add special instructions to add automationClientSecret and  automationClientId to Firewall-Automation-Infrastructure-Variables.sh file ???
-
-## TODO: Need to create the triage item to try to automate the SP creation and inject those values into the variables file 
+#### TODO: Need to create the triage item to try to automate the SP creation and inject those values into the variables file
 
 ```bash
 export ASB_FW_Tenant_Id=''
@@ -144,8 +146,8 @@ export ASB_FW_PowerShell_Runbook_File_Name='Firewall-Automation-Runbook.ps1'
 export ASB_FW_Sku='Basic'
 export ASB_FW_Location='westus'
 export ASB_FW_PowerShell_Runbook_Description='This runbook allocates and de-allocates specific firewalls.  It also enables and disables specific metric and log alerts associated with such activities.'
-export ASB_SP_CONNECT_AZ_CLIENTID='' # Value from local variable @automationClientId from Section "Create Service Principal"
-export ASB_SP_CONNECT_AZ_SECRET='' # Value from local variable @automationClientSecret from Section "Create Service Principal"
+export ASB_SP_CONNECT_AZ_CLIENTID='' # Value from local variable @automationClientId from Section "Create Service Principal and Role Assignments"
+export ASB_SP_CONNECT_AZ_SECRET='' # Value from local variable @automationClientSecret from Section "Create Service Principal and Role Assignments"
 ```
 
 ### Execute Script
