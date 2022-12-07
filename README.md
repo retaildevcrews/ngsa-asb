@@ -14,7 +14,7 @@
     - [3-AttachSpokeAndClusterToHub.sh](#3-attachspokeandclustertohubsh)
   - [Deploying NGSA Applications](#deploying-ngsa-applications)
     - [🛑 Prerequisite - Setup Cosmos DB in secure baseline](#-prerequisite---setup-cosmos-db-in-secure-baseline)
-    - [Export managed identity for ngsa-app](#export-managed-identity-for-ngsa-app)
+    - [Create managed identity for ngsa-app](#create-managed-identity-for-ngsa-app)
     - [Assign read-write permissions over the Cosmos DB account to the managed identity](#assign-read-write-permissions-over-the-cosmos-db-account-to-the-managed-identity)
     - [AAD pod identity setup for ngsa-app](#aad-pod-identity-setup-for-ngsa-app)
   - [Deploying LodeRunner Applications](#deploying-loderunner-applications)
@@ -154,7 +154,7 @@ If you would like to restart deployment you can delete current deployment file: 
 
 ### 🛑 Prerequisite - [Setup Cosmos DB in secure baseline](./docs/cosmos.md)
 
-### Export managed identity for ngsa-app
+### Create managed identity for ngsa-app
 
 ```bash
 
