@@ -6,7 +6,7 @@
   - [Table of Contents (TOC)](#table-of-contents-toc)
   - [Introduction](#introduction)
     - [Before Beginning](#before-beginning)
-      - [Connecting to the Correct Tenant & Setting the Correct Subscription Context](#connecting-to-the-correct-tenant--setting-the-correct-subscription-context)
+      - [Connecting to the Correct Tenant \& Setting the Correct Subscription Context](#connecting-to-the-correct-tenant--setting-the-correct-subscription-context)
         - [Azure ClI Login](#azure-cli-login)
   - [Setup Infrastructure](#setup-infrastructure)
   - [Infrastructure Setup During Each Script](#infrastructure-setup-during-each-script)
@@ -14,10 +14,8 @@
     - [3-AttachSpokeAndClusterToHub.sh](#3-attachspokeandclustertohubsh)
   - [Deploying NGSA Applications](#deploying-ngsa-applications)
     - [🛑 Prerequisite - Setup Cosmos DB in secure baseline](#-prerequisite---setup-cosmos-db-in-secure-baseline)
-    - [Create managed identity for NGSA app](#create-managed-identity-for-ngsa-app)
-    - [Create managed identity for ngsa-app](#create-managed-identity-for-ngsa-app-1)
-    - [Verify Firewall Assignment](#verify-firewall-assignment)
-    - [Assign User to Cosmos DB](#assign-user-to-cosmos-db)
+    - [Export managed identity for ngsa-app](#export-managed-identity-for-ngsa-app)
+    - [Assign read-write permissions over the Cosmos DB account to the managed identity](#assign-read-write-permissions-over-the-cosmos-db-account-to-the-managed-identity)
     - [AAD pod identity setup for ngsa-app](#aad-pod-identity-setup-for-ngsa-app)
   - [Deploying LodeRunner Applications](#deploying-loderunner-applications)
     - [🛑 Prerequisite - Setup Cosmos DB in secure baseline.](#-prerequisite---setup-cosmos-db-in-secure-baseline-1)
@@ -77,9 +75,7 @@ Infrastructure Setup is separated into multiple steps that must be run sequentia
 
 2. run output of first script in a CodeSpaces instance. This will guide you to deploy a new environment. This will only work inside CodeSpaces through local VS Code instance (not through CodeSpaces in browser).
 
-If you would like to restart hub deployment you can delete current deployment file: `rm .current-deployment`
-
-If you would like to restart or create a new spoke deployment you can execute: `echo ${ASB_DEPLOYMENT_NAME}-${ASB_ENV}.env > .current-deployment`
+If you would like to restart deployment you can delete current deployment file: `rm .current-deployment`
 
 ## Infrastructure Setup During Each Script
 
@@ -158,21 +154,7 @@ If you would like to restart or create a new spoke deployment you can execute: `
 
 ### 🛑 Prerequisite - [Setup Cosmos DB in secure baseline](./docs/cosmos.md)
 
-### Create managed identity for NGSA app
-
-```bash
-
-# Create managed identity for ngsa-app
-export ASB_NGSA_MI_NAME="${ASB_DEPLOYMENT_NAME}-ngsa-id"
-
-export ASB_NGSA_MI_RESOURCE_ID=$(az identity create -g $ASB_RG_CORE -n $ASB_NGSA_MI_NAME --query "id" -o tsv)
-
-# save env vars
-./saveenv.sh -y
-
-```
-
-### Create managed identity for ngsa-app
+### Export managed identity for ngsa-app
 
 ```bash
 
@@ -185,43 +167,14 @@ export ASB_NGSA_MI_RESOURCE_ID=$(az identity create -g $ASB_RG_CORE -n $ASB_NGSA
 
 ```
 
-### Verify Firewall Assignment
+### Assign read-write permissions over the Cosmos DB account to the managed identity
 
-Verify that the developer's I.P. address is added to the firewall for the application.  This can be done by visiting the portal navigate to the Cosmos DB account in question, and select the Networking tab.  From the Networking screen for the Cosmos DB account follow the screen to add the I.P. address.  This can be accomplished by selecting the link titled  "+ Add my current IP xxx.xxx.xxx" and follow the prompts to save the I.P. address added.  
+Assigning read-write permissions over the Cosmos DB account for the managed identity.  
 
-Please visit this [link](https://learn.microsoft.com/en-us/azure/cosmos-db/how-to-configure-firewall) for more detailed instructions.  
+```azure-cli
 
-### Assign User to Cosmos DB
+  az cosmosdb sql role assignment create --resource-group ${ASB_COSMOS_RG_NAME} --account-name ${ASB_COSMOS_DB_NAME} --role-definition-id 00000000-0000-0000-0000-000000000002 --principal-id ${ASB_NGSA_MI_PRINCIPAL_ID} --scope ${ASB_COSMOS_ID}
 
-```bash
-  
-  az login --tenant 'XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX'
-  az account set --subscription 'XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX'
-
-  # Variables
-  # built in Cosmos DB roles
-  local roles=("00000000-0000-0000-0000-000000000002") #Array of built in Cosmos roles
-  local principals=("XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX" "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX") # principals that should be assigned. Development user, and the managed identity.
-  local subscriptionId="XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"  #Subscription Id
-  local resourceGroupName="rg-wcnp-dev-cosmos" #Resource Group with Cosmos Db 
-  local accountName="wcnp-dev-cosmos" #Database Account Name
-  local databaseName="ngsa-asb-dev-cosmos" #Database Name
-  local scope="/subscriptions/${subscriptionId}/resourceGroups/${resourceGroupName}/providers/Microsoft.DocumentDB/databaseAccounts/${databaseName}" #scope of assignment
-
-  # Loop and add the out of the box roles to the managed identity scoped to the resource group level
-  for x in "${principals[@]}"
-    do
-
-      for i in "${roles[@]}"
-        do   
-
-          echo az cosmosdb sql role assignment create -g "${resourceGroupName}" --account-name "${accountName}" --role-definition-id "${i}" --principal-id "${x}" --scope "${scope}"
-
-          az cosmosdb sql role assignment create -g "${resourceGroupName}" --account-name "${accountName}" --role-definition-id "${i}" --principal-id "${x}" --scope "${scope}"
-
-          echo role assignment of ${i} complete for ${x}
-      done
-  done
 ```
 
 ### AAD pod identity setup for ngsa-app
