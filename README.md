@@ -77,7 +77,9 @@ Infrastructure Setup is separated into multiple steps that must be run sequentia
 
 2. run output of first script in a CodeSpaces instance. This will guide you to deploy a new environment. This will only work inside CodeSpaces through local VS Code instance (not through CodeSpaces in browser).
 
-If you would like to restart deployment you can delete current deployment file: `rm .current-deployment`
+If you would like to restart hub deployment you can delete current deployment file: `rm .current-deployment`
+
+If you would like to restart or create a new spoke deployment you can execute: `echo ${ASB_DEPLOYMENT_NAME}-${ASB_ENV}.env > .current-deployment`
 
 ## Infrastructure Setup During Each Script
 
