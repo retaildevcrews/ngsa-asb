@@ -4,7 +4,7 @@ Azure Firewall has [costs (Azure Firewall pricing link)](https://azure.microsoft
 
 ## Before Beginning
 
-Prevent accidental commits with `git update-index --assume-unchanged scripts/Firewall-Automation/Firewall-Automation-Infrastructure-Variables.sh`
+🛑 IMPORTANT: Prevent accidental `Sensitive Data` commits for the variables file with `git update-index --assume-unchanged scripts/Firewall-Automation/Firewall-Automation-Infrastructure-Variables.sh`
 
 ## Login to Azure
 
@@ -35,20 +35,23 @@ This service principal requires role assignments listed in the table below to en
 | Automation Contributor  | App | Subscription |
 | Managed Identity Operator  | App | Subscription |
 
-## The following command will create Service Principal and do the role assignments
+## Create Service Principal and to do the role assignments
 
-```Code
+```bash
 
+# Replace the correct SP name 
 local automationClientSecret=$(az ad sp create-for-rbac -n http://firewall-automation-sp-<env> --query password -o tsv)
 
+# Replace the correct SP name 
 local automationClientId=$(az ad sp show --id http://firewall-automation-sp-<env> --query appId -o tsv)
 
+# Replace the correct SubscriptionId
 az role assignment create --role "'Managed Identity Operator'" --assignee $automationClientId --scope "/subscriptions/<subscription_Id>"
+
+# Replace the correct SubscriptionId
 az role assignment create --role "Automation Contributor'" --assignee $automationClientId --scope "/subscriptions/<subscription_Id>"
 
 ```
-
-# TODO add instruction to add this automationClientSecret and  automationClientId to Firewall-Automation-Infrastructure-Variables.sh file 
 
 ### Prerequisites
 
@@ -127,6 +130,10 @@ The file [Firewall-Automation-Infrastructure-Variables.sh](../scripts/Firewall-A
 
 Note: _Potentially sensitive values such as subscription Id have been omitted from the documentation_
 
+## TODO: Do we need to add special instructions to add automationClientSecret and  automationClientId to Firewall-Automation-Infrastructure-Variables.sh file ???
+
+## TODO: Need to create the triage item to try to automate the SP creation and inject those values into the variables file 
+
 ```bash
 export ASB_FW_Tenant_Id=''
 export ASB_FW_Subscription_Name=''
@@ -137,7 +144,8 @@ export ASB_FW_PowerShell_Runbook_File_Name='Firewall-Automation-Runbook.ps1'
 export ASB_FW_Sku='Basic'
 export ASB_FW_Location='westus'
 export ASB_FW_PowerShell_Runbook_Description='This runbook allocates and de-allocates specific firewalls.  It also enables and disables specific metric and log alerts associated with such activities.'
-
+export ASB_SP_CONNECT_AZ_CLIENTID='' # Value from local variable @automationClientId from Section "Create Service Principal"
+export ASB_SP_CONNECT_AZ_SECRET='' # Value from local variable @automationClientSecret from Section "Create Service Principal"
 ```
 
 ### Execute Script
