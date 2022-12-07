@@ -33,10 +33,10 @@ spec:
             - --query.partial-response
           resources:
             requests:
-              cpu: '100m'
+              cpu: '50m'
               memory: '64Mi'
             limits:
-              cpu: '250m'
+              cpu: '200m'
               memory: '256Mi'
           livenessProbe:
               httpGet:
