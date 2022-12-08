@@ -42,7 +42,7 @@ catch{
 }
 
   
-# NOTE: this command requies that SP must be a member of the followinf Subscription azure roles
+# NOTE: this command requires that SP must be a member of the following Subscription azure roles
 # -Automation Contributor
 # -Managed Identity Operator
   
