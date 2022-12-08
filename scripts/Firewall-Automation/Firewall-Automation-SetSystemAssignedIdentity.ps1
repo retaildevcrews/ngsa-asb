@@ -25,9 +25,6 @@ $subscriptionName = $env:ASB_FW_Subscription_Name
 $spclientid = $env:ASB_SP_CONNECT_AZ_CLIENTID
 $spsecret = $env:ASB_SP_CONNECT_AZ_SECRET
 
-# NOTE : do not want to write since this will output secret 
-# Write-Output((Get-ChildItem env:*).GetEnumerator() | Sort-Object Name | Out-String)
- 
 
 $password=ConvertTo-SecureString $spsecret -AsPlainText -Force
 
