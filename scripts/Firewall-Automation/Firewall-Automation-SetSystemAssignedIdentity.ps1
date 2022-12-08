@@ -10,7 +10,7 @@ param (
     [String]$automation_account_Name="PLACE_HOLDER"
 )
 
-foreach ($line in (Get-Content -Path './firewall-automation-dev-eastus.env')) {
+foreach ($line in (Get-Content -Path './scripts/Firewall-Automation/Firewall-Automation-Infrastructure-Variables.env')) {
     if ($line.Contains('export ')) {
       $line = $line -replace 'export ', ''
       $line = $line.Replace("'", "")

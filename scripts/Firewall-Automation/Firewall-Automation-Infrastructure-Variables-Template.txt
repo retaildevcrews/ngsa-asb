@@ -1,4 +1,3 @@
-#!/bin/bash
 
 export ASB_FW_Tenant_Id='<<TENANTID>>' 
 export ASB_FW_Subscription_Name='<<SUBSCRIPTION-NAME>>' 
@@ -11,4 +10,3 @@ export ASB_FW_Location='<<FW_LOCATION>>'
 export ASB_FW_PowerShell_Runbook_Description='This runbook automates the allocation and de-allocation of a firewall for the purposes of scheduling.'
 export ASB_SP_CONNECT_AZ_CLIENTID='<<SP-CLIENT>>' 
 export ASB_SP_CONNECT_AZ_SECRET='<<SP-SECRET>>' 
-./saveenv.sh

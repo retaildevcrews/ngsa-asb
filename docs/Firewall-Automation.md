@@ -58,7 +58,7 @@ cat scripts/Firewall-Automation/Firewall-Automation-Infrastructure-Variables-Tem
 |  sed "s|<<FW_DEPLOYMENT_NAME>>|$deploymentName|" \
 |  sed "s|<<FW_ENV>>|$enviroment|" \
 |  sed "s|<<FW_LOCATION>>|$location|" \
-> scripts/Firewall-Automation/Firewall-Automation-Infrastructure-Variables.sh
+> scripts/Firewall-Automation/Firewall-Automation-Infrastructure-Variables.env
 
 ```
 
@@ -98,9 +98,9 @@ local automationClientSecret=$(az ad sp create-for-rbac -n $servicePrincipalName
 local automationClientId=$(az ad sp list --all --filter "displayname eq '${servicePrincipalName}'" --query "[].appId" -o tsv)
 
 # Update Firewall-Automation-Infrastructure-Variables.sh  with values from local variables set above.
-cat scripts/Firewall-Automation/Firewall-Automation-Infrastructure-Variables.sh \
+cat scripts/Firewall-Automation/Firewall-Automation-Infrastructure-Variables.env \
 |  sed "s|<<SP-SECRET>>|$automationClientSecret|"  \
-|  sed "s|<<SP-CLIENT>>|$automationClientId|" > scripts/Firewall-Automation/Firewall-Automation-Infrastructure-Variables.sh
+|  sed "s|<<SP-CLIENT>>|$automationClientId|" > scripts/Firewall-Automation/Firewall-Automation-Infrastructure-Variables.env
 
 # Create Managed Identity Operator role assignment 
 az role assignment create --role "Managed Identity Operator" --assignee $automationClientId --scope "/subscriptions/${subscriptionId}"
