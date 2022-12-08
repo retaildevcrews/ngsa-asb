@@ -12,6 +12,7 @@ param (
 
 foreach ($line in (Get-Content -Path './scripts/Firewall-Automation/Firewall-Automation-Infrastructure-Variables.env')) {
     if ($line.Contains('export ')) {
+      $line = $line.Trim()
       $line = $line -replace 'export ', ''
       $line = $line.Replace("'", "")
       $lineItems = $line -split '='
