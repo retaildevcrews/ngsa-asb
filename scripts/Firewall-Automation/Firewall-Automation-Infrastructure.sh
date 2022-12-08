@@ -153,11 +153,8 @@ function UpdateAzureAutomationAccountToAllowSystemAssignedIdentity() {
     # parameter position 5 = User-Assigned Managed Identity Name
   
   echo
-  # echo "Assigning role Managed Identity Operator to the System Assigned Identity for automation account ${1} in resource group ${2}, within subscription id ${3}..."
+  
   echo "Assigning ManagedIdentity as UserIdentity  for automation account ${1} in resource group ${2}, within subscription id ${3}..."
-
-  # a name for our azure ad app
-  # local appName="$1-application"
 
   # Do assign ManagedIdentity to Automation Account
   pwsh --command "./scripts/Firewall-Automation/Firewall-Automation-SetSystemAssignedIdentity.ps1 ${3} ${2} ${5} ${1}"
