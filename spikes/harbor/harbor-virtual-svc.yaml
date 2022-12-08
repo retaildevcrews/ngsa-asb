@@ -7,7 +7,7 @@ spec:
   gateways:
   - istio-system/istio-gateway
   hosts:
-  - harbor-core-eastus-dev.cse.ms
+  - harbor-core-eastus-dev.austinrdc.dev
   http:
   - name: "core"
     match:
