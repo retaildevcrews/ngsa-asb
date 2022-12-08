@@ -36,11 +36,11 @@ Before proceeding, verify that the correct version of Azure CLI and required ext
   - Open up a PowerShell Terminal
   - [Install Azure PowerShell Modules](https://learn.microsoft.com/en-us/powershell/azure/install-az-ps?view=latest#installation) from the prompt using the command `Install-Module -Name Az -Scope CurrentUser -Repository PSGallery -Force`
 
-Note: *The Azure CLI Automation extension is in an experimental stage.  Currently it does not implement all functionality needed.  As a result the the Az Module, specifically for automation, monitoring, and authentication can be used at the time of writing.*
+Note: *The Azure CLI Automation extension is in an experimental stage.  Currently it does not implement all functionality needed.  As a result the Az Module, specifically for automation, monitoring, and authentication can be used at the time of writing.*
 
 ### Update Environment Variable Values
 
-The file [Firewall-Automation-Infrastructure-Variables.sh](../scripts/Firewall-Automation/Firewall-Automation-Infrastructure-Variables.sh) must be created from the template to include relevant values for all of the required environment variables. It will be run by the script [Firewall-Automation-Infrastructure.sh](../scripts/Firewall-Automation/Firewall-Automation-Infrastructure.sh) as part of the automated setup. The file `Firewall-Automation-Infrastructure-Variables.sh` will be ignored by git.
+The file Firewall-Automation-Infrastructure-Variables.env must be created from the template to include relevant values for all of the required environment variables. It will be used by the script [Firewall-Automation-Infrastructure.sh](../scripts/Firewall-Automation/Firewall-Automation-Infrastructure.sh) as part of the automated setup. The file `Firewall-Automation-Infrastructure-Variables.env` will be ignored by git.
 
 ```bash
 
