@@ -18,9 +18,6 @@ $location = $env:ASB_FW_Location
 $spclientid = $env:ASB_SP_CONNECT_AZ_CLIENTID
 $spsecret = $env:ASB_SP_CONNECT_AZ_SECRET
 
-# NOTE : do not want to write since this will output secret 
-# Write-Output((Get-ChildItem env:*).GetEnumerator() | Sort-Object Name | Out-String)
-
 function New-Schedule {
 
   param (
@@ -146,19 +143,6 @@ function Authenticate {
   Set-AzContext -Subscription $subscriptionName
 }
 
-function Import-Modules {
-  Write-Host "Installing & Importing Azure Powershell Az Module for Automation."
-
-  # Install-Module -Name Az.Automation -Force | out-null
-  # Import-Module -Name Az.Automation -Force | out-null
-
-  Write-Host "Installing & Importing Azure Powershell Az Module for Monitor."
-
-  # Install-Module -Name Az.Monitor -Force | out-null
-  # Import-Module -Name Az.Monitor -Force | out-null
-
-  Write-Host "Completed installing & importing Azure Powershell Az Modules for Authentication and Monitor."
-}
 $automationResourceGroup = "rg-" + $baseName + "-" + $baseAutomationName + "-" + $environment
 $firewallResourceGroup = "rg-" + $baseName + "-" + $environment + "-hub"
 $alertsResourceGroup = "rg-" + $baseName + "-" + $environment
@@ -180,8 +164,6 @@ $start_Time = (Get-Date "06:00:00").AddHours(+4).AddDays(1)
 $end_Time = (Get-Date $start_Time).AddYears(3)
 
 Authenticate -Subscription_Name $subscriptionName
-
-Import-Modules
 
 $start_Action_Name = $baseScheduleName + "-start"
 $stop_Action_Name = $baseScheduleName + "-stop"
