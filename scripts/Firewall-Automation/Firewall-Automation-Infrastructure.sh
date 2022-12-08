@@ -153,16 +153,26 @@ function UpdateAzureAutomationAccountToAllowSystemAssignedIdentity() {
     # parameter position 5 = User-Assigned Managed Identity Name
   
   echo
-  echo "Assigning role Managed Identity Operator to the System Assigned Identity for automation account ${1} in resource group ${2}, within subscription id ${3}..."
+  # echo "Assigning role Managed Identity Operator to the System Assigned Identity for automation account ${1} in resource group ${2}, within subscription id ${3}..."
+  echo "Assigning ManagedIdentity as UserIdentity  for automation account ${1} in resource group ${2}, within subscription id ${3}..."
 
   # a name for our azure ad app
-  local appName="$1-application"
-
-  # The name of the app role that the managed identity should be assigned to.
-  local appRoleName='Managed Identity Operator' # For example, MyApi.Read.All
+  # local appName="$1-application"
 
   # Do assign ManagedIdentity to Automation Account
   pwsh --command "./scripts/Firewall-Automation/Firewall-Automation-SetSystemAssignedIdentity.ps1 ${3} ${2} ${5} ${1}"
+
+}
+
+
+function RoleAssignment() {
+  # Arguments: 
+    # parameter position 1 = Automation Account Name
+    # parameter position 2 = Automation Resource Group
+    # parameter position 3 = Subscription Id
+  
+  echo
+  echo "Assigning role Managed Identity Operator to the System Assigned Identity for automation account ${1} in resource group ${2}, within subscription id ${3}..."
 
   # Get ManagedIdentity Id from automation account, this requires to perform the assign ManagedIdentity to Automation Account step first. 
   local automationAccountPrincipalId=$(az automation account show --automation-account-name "${1}" --resource-group "${2}" --query "identity.principalId" -o tsv)
@@ -170,11 +180,12 @@ function UpdateAzureAutomationAccountToAllowSystemAssignedIdentity() {
   echo "Automation Account principal id: $automationAccountPrincipalId"
 
   # Create the role assignment for Automation Account giving 'Managed Identity Operator' permission over 'rg-[deploymentName]-firewall-automation-dev' resource group
-  az role assignment create --role "$appRoleName" --assignee $automationAccountPrincipalId --scope "/subscriptions/${3}/resourceGroups/${2}"
+  az role assignment create --role "Managed Identity Operator" --assignee $automationAccountPrincipalId --scope "/subscriptions/${3}/resourceGroups/${2}"
 
   echo "Completed assigning role Managed Identity Operator to the System Assigned Identity for automation account ${1} in resource group ${2}, within subscription id ${3}."
 
 }
+
 
 function AssignIdentityRole(){
   # Arguments: 
@@ -279,6 +290,8 @@ function main(){
   PublishRunbook $runbookName $automationResourceGroup $automationAccountName
 
   CreateSchedule
+
+  RoleAssignment $automationAccountName $automationResourceGroup $subscriptionId
 
   echo
   echo "-------------------------------------------------------------------"
