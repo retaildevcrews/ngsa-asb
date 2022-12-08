@@ -1,7 +1,7 @@
 #!/bin/bash
 
 function CollectInputParameters(){
-  source ./scripts/Firewall-Automation/Firewall-Automation-Infrastructure-Variables.sh
+  source ./scripts/Firewall-Automation/Firewall-Automation-Infrastructure-Variables.env
 }
 
 function SetSubscription(){
