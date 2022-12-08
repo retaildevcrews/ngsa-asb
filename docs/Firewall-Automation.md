@@ -172,10 +172,10 @@ Once the variables are updated, the setup script must be run from Visual Studio 
 ```bash
 
 # Replace the correct SubscriptionId
-az role assignment delete --assignee $automationClientId --role "'Managed Identity Operator'" --scope "/subscriptions/${subscriptionId}"
+az role assignment delete --assignee $automationClientId --role "Managed Identity Operator" --scope "/subscriptions/${subscriptionId}"
 
 # Replace the correct SubscriptionId
-az role assignment delete --assignee $automationClientId --role "Automation Contributor'" --scope "/subscriptions/${subscriptionId}"
+az role assignment delete --assignee $automationClientId --role "Automation Contributor" --scope "/subscriptions/${subscriptionId}"
 
 # Replace the correct SP name and get Service Principal Id 
 local servicePrincipalId=$(az ad sp list --all --filter "displayname eq '${servicePrincipalName}'" --query "[].id" -o tsv)
