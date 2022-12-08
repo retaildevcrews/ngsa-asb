@@ -234,9 +234,9 @@ function main(){
   
   CollectInputParameters
 
-  local automationResourceGroup="rg-${ASB_FW_Base_NSGA_Name}-${ASB_FW_Base_Automation_System_Name}-${ASB_FW_Environment}"
+  local automationResourceGroup="rg-${ASB_FW_Deployment_Name}-${ASB_FW_Base_Automation_System_Name}-${ASB_FW_Environment}"
 
-  local runbookName="rb-${ASB_FW_Base_NSGA_Name}-${ASB_FW_Base_Automation_System_Name}-${ASB_FW_Environment}"
+  local runbookName="rb-${ASB_FW_Deployment_Name}-${ASB_FW_Base_Automation_System_Name}-${ASB_FW_Environment}"
   local runbookDescription="${ASB_FW_PowerShell_Runbook_Description}"
   local runbookFileName="${ASB_FW_PowerShell_Runbook_File_Name}"
   local runbookFilePath="./scripts/Firewall-Automation/"
@@ -257,9 +257,9 @@ function main(){
 
   CreateResourceGroup $automationResourceGroup $ASB_FW_Location
 
-  local automationAccountName="aa-${ASB_FW_Base_NSGA_Name}-${ASB_FW_Base_Automation_System_Name}-${ASB_FW_Environment}"
+  local automationAccountName="aa-${ASB_FW_Deployment_Name}-${ASB_FW_Base_Automation_System_Name}-${ASB_FW_Environment}"
   
-  local userAssignedManagedIdentityName="mi-${ASB_FW_Base_NSGA_Name}-${ASB_FW_Base_Automation_System_Name}-${ASB_FW_Environment}"
+  local userAssignedManagedIdentityName="mi-${ASB_FW_Deployment_Name}-${ASB_FW_Base_Automation_System_Name}-${ASB_FW_Environment}"
 
   CreateUserAssignedManagedIdentity $userAssignedManagedIdentityName $automationResourceGroup
 

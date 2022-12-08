@@ -9,7 +9,7 @@ foreach ($line in (Get-Content -Path './firewall-automation-dev-eastus.env')) {
 
 $tenantId = $env:ASB_FW_Tenant_Id
 $subscriptionName = $env:ASB_FW_Subscription_Name
-$baseName = $env:ASB_FW_Base_NSGA_Name
+$baseName = $env:ASB_FW_Deployment_Name
 $baseAutomationName = $env:ASB_FW_Base_Automation_System_Name
 $environment = $env:ASB_FW_Environment
 $location = $env:ASB_FW_Location

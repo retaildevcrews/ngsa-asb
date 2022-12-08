@@ -2,10 +2,6 @@
 
 Azure Firewall has [costs (Azure Firewall pricing link)](https://azure.microsoft.com/en-gb/pricing/details/azure-firewall/#pricing) associated with it which can be optimized by allocating and de-allocating the firewall when appropriate.  The instructions below describe how to implement an Azure Automation Runbook that will automate firewall allocation and de-allocation on a schedule, and enable and disable associated alerts to minimize nonessential systems communications.
 
-## Before Beginning
-
-🛑 IMPORTANT: Prevent accidental `Sensitive Data` commits for the variables file by running the command `git update-index --assume-unchanged scripts/Firewall-Automation/Firewall-Automation-Infrastructure-Variables.sh`
-
 ## Login to Azure
 
 ```bash
@@ -42,6 +38,30 @@ Before proceeding, verify that the correct version of Azure CLI and required ext
 
 Note: *The Azure CLI Automation extension is in an experimental stage.  Currently it does not implement all functionality needed.  As a result the the Az Module, specifically for automation, monitoring, and authentication can be used at the time of writing.*
 
+### Update Environment Variable Values
+
+The file [Firewall-Automation-Infrastructure-Variables.sh](../scripts/Firewall-Automation/Firewall-Automation-Infrastructure-Variables.sh) must be created from the template to include relevant values for all of the required environment variables. It will be run by the script [Firewall-Automation-Infrastructure.sh](../scripts/Firewall-Automation/Firewall-Automation-Infrastructure.sh) as part of the automated setup. The file `Firewall-Automation-Infrastructure-Variables.sh` will be ignored by git.
+
+```bash
+
+# Set input variable values.
+local tenantId=$(az account show -o tsv --query tenantId)
+local subscriptionName=$(az account show -o tsv --query name)
+local deploymentName='' #e.g wcnptest
+local enviroment='' #e.g dev or preprod
+local location='' #e.g eastus
+
+# Create Firewall-Automation-Infrastructure-Variables.sh from template with values from  local variables set above.
+cat scripts/Firewall-Automation/Firewall-Automation-Infrastructure-Variables-Template.txt \
+|  sed "s|<<TENANTID>>|$tenantId|"  \
+|  sed "s|<<SUBSCRIPTION-NAME>>|$subscriptionName|" \
+|  sed "s|<<FW_DEPLOYMENT_NAME>>|$deploymentName|" \
+|  sed "s|<<FW_ENV>>|$enviroment|" \
+|  sed "s|<<FW_LOCATION>>|$location|" \
+> scripts/Firewall-Automation/Firewall-Automation-Infrastructure-Variables.sh
+
+```
+
 ### Service Principal and Role Assignments
 
 The execution of the automation infrastructure setup script **Firewall-Automation-Infrastructure.sh** requires a Service Principal to be created as part of the provisioning process:
@@ -65,17 +85,28 @@ Run the commands below to create the service principal and the required role ass
 
 ```bash
 
-# Replace the correct SP name 
-local automationClientSecret=$(az ad sp create-for-rbac -n http://firewall-automation-sp-<env> --query password -o tsv)
+# Replace the correct SP name e.g 'firewall-automation-sp'
+local servicePrincipalName=''
 
-# Replace the correct SP name 
-local automationClientId=$(az ad sp show --id http://firewall-automation-sp-<env> --query appId -o tsv)
+# Get the current Susbcription Id 
+local subscriptionId=$(az account show -o tsv --query id)
 
-# Replace the correct SubscriptionId
-az role assignment create --role "'Managed Identity Operator'" --assignee $automationClientId --scope "/subscriptions/<subscription_Id>"
+# Create SP and get secret 
+local automationClientSecret=$(az ad sp create-for-rbac -n $servicePrincipalName --query password -o tsv)
 
-# Replace the correct SubscriptionId
-az role assignment create --role "Automation Contributor'" --assignee $automationClientId --scope "/subscriptions/<subscription_Id>"
+# Get Service principal ClientId 
+local automationClientId=$(az ad sp list --all --filter "displayname eq '${servicePrincipalName}'" --query "[].appId" -o tsv)
+
+# Update Firewall-Automation-Infrastructure-Variables.sh  with values from local variables set above.
+cat scripts/Firewall-Automation/Firewall-Automation-Infrastructure-Variables.sh \
+|  sed "s|<<SP-SECRET>>|$automationClientSecret|"  \
+|  sed "s|<<SP-CLIENT>>|$automationClientId|" > scripts/Firewall-Automation/Firewall-Automation-Infrastructure-Variables.sh
+
+# Create Managed Identity Operator role assignment 
+az role assignment create --role "Managed Identity Operator" --assignee $automationClientId --scope "/subscriptions/${subscriptionId}"
+
+# Create Automation Contributor role assignment 
+az role assignment create --role "Automation Contributor" --assignee $automationClientId --scope "/subscriptions/${subscriptionId}"
 
 ```
 
@@ -128,32 +159,28 @@ The following infrastructure assets should be established in the subscription wi
 
 The steps to set up the runbook and schedule are listed in this section. BEFORE continuing please make sure all requirements have been met in the section labeled [prerequisites](#prerequisites).
 
-### Update Environment Variable Values
-
-The file [Firewall-Automation-Infrastructure-Variables.sh](../scripts/Firewall-Automation/Firewall-Automation-Infrastructure-Variables.sh) must be updated to include relevant values for all of the required environment variables. It will be run by the script [Firewall-Automation-Infrastructure.sh](../scripts/Firewall-Automation/Firewall-Automation-Infrastructure.sh) as part of the automated setup.
-
-Note: *Potentially sensitive values such as subscription name have been omitted from the sample below. When updating the values in the script Firewall-Automation-Infrastructure-Variables.sh, Service Principal client Id and Secret should be copied from local variables set up earlier in the section [Create Service Principal and Role Assignments](#create-service-principal-and-role-assignments)*
-
-#### TODO: Need to create the triage item to try to automate the SP creation and inject those values into the variables file
-
-```bash
-export ASB_FW_Tenant_Id=''
-export ASB_FW_Subscription_Name=''
-export ASB_FW_Base_NSGA_Name='ngsa-asb'
-export ASB_FW_Base_Automation_System_Name='firewall-automation'
-export ASB_FW_Environment='dev'
-export ASB_FW_PowerShell_Runbook_File_Name='Firewall-Automation-Runbook.ps1'
-export ASB_FW_Sku='Basic'
-export ASB_FW_Location='westus'
-export ASB_FW_PowerShell_Runbook_Description='This runbook allocates and de-allocates specific firewalls.  It also enables and disables specific metric and log alerts associated with such activities.'
-export ASB_SP_CONNECT_AZ_CLIENTID='' # Value from local variable @automationClientId from Section "Create Service Principal and Role Assignments"
-export ASB_SP_CONNECT_AZ_SECRET='' # Value from local variable @automationClientSecret from Section "Create Service Principal and Role Assignments"
-```
-
 ### Execute Script
 
 Once the variables are updated, the setup script must be run from Visual Studio Code (thick client) using Codespaces. The script does not require input parameters because the required parameters are stored as environment variables when it runs the variable script. Run this command from the top-level directory of this repository.
 
 ```bash
   ./scripts/Firewall-Automation/Firewall-Automation-Infrastructure.sh
+```
+
+## Delete Service Principal and Role Assignments
+
+```bash
+
+# Replace the correct SubscriptionId
+az role assignment delete --assignee $automationClientId --role "'Managed Identity Operator'" --scope "/subscriptions/${subscriptionId}"
+
+# Replace the correct SubscriptionId
+az role assignment delete --assignee $automationClientId --role "Automation Contributor'" --scope "/subscriptions/${subscriptionId}"
+
+# Replace the correct SP name and get Service Principal Id 
+local servicePrincipalId=$(az ad sp list --all --filter "displayname eq '${servicePrincipalName}'" --query "[].id" -o tsv)
+
+# Delete SP
+az ad sp delete --id $servicePrincipalId
+
 ```
