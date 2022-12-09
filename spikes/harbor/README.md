@@ -20,8 +20,33 @@
     * If using a health probe, use `/api/v2.0/health` Harbor endpoint
   * Listeners (http and https)
   * Rules (http and https)
-* [Optional] Add an exception for the harbor-host in the WAF policy (e.g. for
+* Add an exception to allow image push traffic (otherwise app gateway blocks some API calls) in the WAF policy (e.g. for
   Eastus-dev you'll add it in `rg-wcnp-dev/wcnp-waf-policy-eastus`)
+
+  ```bash
+  # Change these variables as needed
+  ASB_WAF_POLICY_RULE_AAD=harborImgPushRule
+  ASB_WAF_POLICY_NAME=wcnp-waf-policy-eastus
+  ASB_RG_CORE=rg-wcnp-dev
+  ASB_WAF_POLICY_RULE_PRIORITY_AAD=12
+
+  # Create a Match type rule
+  az network application-gateway waf-policy custom-rule create \
+    -n $ASB_WAF_POLICY_RULE_AAD --policy-name $ASB_WAF_POLICY_NAME -g $ASB_RG_CORE \
+    --action Allow --priority $ASB_WAF_POLICY_RULE_PRIORITY_AAD --rule-type MatchRule
+
+  # Add Hostname condition to the rule
+  az network application-gateway waf-policy custom-rule match-condition add \
+    -n $ASB_WAF_POLICY_RULE_AAD --policy-name $ASB_WAF_POLICY_NAME -g $ASB_RG_CORE \
+    --match-variables RequestHeaders.Host --operator Regex --values "^harbor-core.*.austinrdc.dev$" \
+    --transforms RemoveNulls Lowercase
+
+  # Now add second URI condition to the rule
+  az network application-gateway waf-policy custom-rule match-condition add \
+    -n $ASB_WAF_POLICY_RULE_AAD --policy-name $ASB_WAF_POLICY_NAME -g $ASB_RG_CORE \
+    --match-variables RequestUri --operator BeginsWith --values "/v2/" \
+    --transforms UrlDecode Lowercase
+  ```
 
 At this point Harbor should be ready to deploy.
 Now we need to make sure our cluster can pull the Harbor container images.
