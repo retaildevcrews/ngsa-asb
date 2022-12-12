@@ -45,20 +45,14 @@ The file Firewall-Automation-Infrastructure-Variables.env must be created from t
 ```bash
 
 # Set input variable values.
-local tenantId=$(az account show -o tsv --query tenantId)
-local subscriptionName=$(az account show -o tsv --query name)
-local deploymentName='' #e.g wcnptest
-local enviroment='' #e.g dev or preprod
-local location='' #e.g eastus
+export tenantId=$(az account show -o tsv --query tenantId)
+export subscriptionName=$(az account show -o tsv --query name)
+export deploymentName='' #e.g wcnptest
+export enviroment='' #e.g dev or preprod
+export location='' #e.g eastus
 
-# Create Firewall-Automation-Infrastructure-Variables.sh from template with values from  local variables set above.
-cat scripts/Firewall-Automation/Firewall-Automation-Infrastructure-Variables-Template.txt \
-|  sed "s|<<TENANTID>>|$tenantId|"  \
-|  sed "s|<<SUBSCRIPTION-NAME>>|$subscriptionName|" \
-|  sed "s|<<FW_DEPLOYMENT_NAME>>|$deploymentName|" \
-|  sed "s|<<FW_ENV>>|$enviroment|" \
-|  sed "s|<<FW_LOCATION>>|$location|" \
-> scripts/Firewall-Automation/Firewall-Automation-Infrastructure-Variables.env
+# Create Firewall-Automation-Infrastructure-Variables.sh from template with values from local variables set above.
+cat scripts/Firewall-Automation/Firewall-Automation-Infrastructure-Variables-Template.txt | envsubst > scripts/Firewall-Automation/Firewall-Automation-Infrastructure-Variables.env
 
 ```
 
@@ -168,6 +162,8 @@ Once the variables are updated, the setup script must be run from Visual Studio 
 ```
 
 ## Delete Service Principal and Role Assignments
+
+After have completed the setup proccess if no longer needed, then it is recommended to delete the Service Principal.
 
 ```bash
 
