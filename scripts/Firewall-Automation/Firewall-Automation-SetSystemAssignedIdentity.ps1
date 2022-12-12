@@ -1,13 +1,17 @@
 param (
 
     [Parameter(Mandatory)]
-    [String]$susbcription_Id="PLACE_HOLDER",
+    [String]$susbcription_Id,
     [Parameter(Mandatory)]
-    [String]$resourcegroup_Name="PLACE_HOLDER",
+    [String]$resourcegroup_Name,
     [Parameter(Mandatory)]
-    [String]$managed_identity_Name="PLACE_HOLDER",
+    [String]$managed_identity_Name,
     [Parameter(Mandatory)]
-    [String]$automation_account_Name="PLACE_HOLDER"
+    [String]$automation_account_Name,
+    [Parameter(Mandatory)]
+    [String]$spclientid,
+    [Parameter(Mandatory)]
+    [String]$spsecret
 )
 
 foreach ($line in (Get-Content -Path './scripts/Firewall-Automation/Firewall-Automation-Infrastructure-Variables.env')) {
@@ -22,8 +26,6 @@ foreach ($line in (Get-Content -Path './scripts/Firewall-Automation/Firewall-Aut
   
 $tenantId = $env:ASB_FW_Tenant_Id
 $subscriptionName = $env:ASB_FW_Subscription_Name
-$spclientid = $env:ASB_SP_CONNECT_AZ_CLIENTID
-$spsecret = $env:ASB_SP_CONNECT_AZ_SECRET
 
 
 $password=ConvertTo-SecureString $spsecret -AsPlainText -Force

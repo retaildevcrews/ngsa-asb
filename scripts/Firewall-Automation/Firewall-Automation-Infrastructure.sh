@@ -151,13 +151,15 @@ function UpdateAzureAutomationAccountToAllowSystemAssignedIdentity() {
     # parameter position 3 = Subscription Id
     # parameter position 4 = Tenant Id
     # parameter position 5 = User-Assigned Managed Identity Name
+    # parameter position 6 = AutomationClientId
+    # parameter position 7 = AutomationClientSecret
   
   echo
   
   echo "Assigning ManagedIdentity as UserIdentity  for automation account ${1} in resource group ${2}, within subscription id ${3}..."
 
   # Do assign ManagedIdentity to Automation Account
-  pwsh --command "./scripts/Firewall-Automation/Firewall-Automation-SetSystemAssignedIdentity.ps1 ${3} ${2} ${5} ${1}"
+  pwsh --command "./scripts/Firewall-Automation/Firewall-Automation-SetSystemAssignedIdentity.ps1 ${3} ${2} ${5} ${1} $automationClientId $automationClientSecret"
 
 }
 
@@ -234,7 +236,11 @@ function PublishRunbook(){
 }
 
 function CreateSchedule(){
-  pwsh --command "./scripts/Firewall-Automation/Firewall-Automation-Schedule-Creation.ps1"
+  # Arguments: 
+    # parameter position 1 = AutomationClientId
+    # parameter position 2 = AutomationClientSecret
+
+  pwsh --command "./scripts/Firewall-Automation/Firewall-Automation-Schedule-Creation.ps1 ${1} ${2}"
 }
 
 function main(){
@@ -277,7 +283,12 @@ function main(){
 
   CreateAzureAutomationPowerShellRunbook $runbookName $automationResourceGroup $automationAccountName $location # $ASB_FW_Tenant_Id $subscriptionId
 
-  UpdateAzureAutomationAccountToAllowSystemAssignedIdentity $automationAccountName $automationResourceGroup $subscriptionId $ASB_FW_Tenant_Id $userAssignedManagedIdentityName
+  # Read secrets from key vault
+  local automationClientId=$(az keyvault secret show --subscription $ASB_FW_Subscription_Name --vault-name $ASB_KV_Name -n AutomationClientId --query value -o tsv)
+  local automationClientSecret=$(az keyvault secret show --subscription $ASB_FW_Subscription_Name --vault-name $ASB_KV_Name -n AutomationClientSecret --query value -o tsv)
+
+
+  UpdateAzureAutomationAccountToAllowSystemAssignedIdentity $automationAccountName $automationResourceGroup $subscriptionId $ASB_FW_Tenant_Id $userAssignedManagedIdentityName $automationClientId $automationClientSecret
 
   AssignIdentityRole $identityPrincipalId $userAssignedManagedIdentityName $automationResourceGroup $ASB_FW_Subscription_Name "ServicePrincipal" "Monitoring Contributor"
   AssignIdentityRole $identityPrincipalId $userAssignedManagedIdentityName $automationResourceGroup $ASB_FW_Subscription_Name "ServicePrincipal" "Contributor"  
@@ -286,7 +297,7 @@ function main(){
 
   PublishRunbook $runbookName $automationResourceGroup $automationAccountName
 
-  CreateSchedule
+  CreateSchedule $automationClientId $automationClientSecret
 
   RoleAssignment $automationAccountName $automationResourceGroup $subscriptionId
 

@@ -1,3 +1,10 @@
+param (
+    [Parameter(Mandatory)]
+    [String]$spclientid,
+    [Parameter(Mandatory)]
+    [String]$spsecret
+)
+
 foreach ($line in (Get-Content -Path './scripts/Firewall-Automation/Firewall-Automation-Infrastructure-Variables.env')) {
   if ($line.Contains('export ')) {
     $line = $line.Trim()
@@ -15,8 +22,6 @@ $baseAutomationName = $env:ASB_FW_Base_Automation_System_Name
 $environment = $env:ASB_FW_Environment
 $location = $env:ASB_FW_Location
 
-$spclientid = $env:ASB_SP_CONNECT_AZ_CLIENTID
-$spsecret = $env:ASB_SP_CONNECT_AZ_SECRET
 
 function New-Schedule {
 
@@ -126,7 +131,6 @@ function Edit-ScheduleAndRunbook {
 }
 
 function Authenticate {  
-  #Connect-AzAccount -UseDeviceAuth 
   
   $password=ConvertTo-SecureString $spsecret -AsPlainText -Force
 

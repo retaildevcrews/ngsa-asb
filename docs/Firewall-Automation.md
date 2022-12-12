@@ -50,6 +50,8 @@ export subscriptionName=$(az account show -o tsv --query name)
 export deploymentName='' #e.g wcnptest
 export enviroment='' #e.g dev or preprod
 export location='' #e.g eastus
+export keyVaultName=''#e.g kv-aks-abcdefg
+export keyVaultRGName=''#key vault resource group name
 
 # Create Firewall-Automation-Infrastructure-Variables.sh from template with values from local variables set above.
 cat scripts/Firewall-Automation/Firewall-Automation-Infrastructure-Variables-Template.txt | envsubst > scripts/Firewall-Automation/Firewall-Automation-Infrastructure-Variables.env
@@ -73,7 +75,7 @@ Role assignments scoped to the subscription need to be created and assigned to t
 | Automation Contributor  | App | Subscription |
 | Managed Identity Operator  | App | Subscription |
 
-#### Create Service Principal and Role Assignments
+#### Create Service Principal and Role Assignments and store Secrets in Key Vault
 
 Run the commands below to create the service principal and the required role assignments
 
@@ -91,16 +93,23 @@ local automationClientSecret=$(az ad sp create-for-rbac -n $servicePrincipalName
 # Get Service principal ClientId 
 local automationClientId=$(az ad sp list --all --filter "displayname eq '${servicePrincipalName}'" --query "[].appId" -o tsv)
 
-# Update Firewall-Automation-Infrastructure-Variables.sh  with values from local variables set above.
-cat scripts/Firewall-Automation/Firewall-Automation-Infrastructure-Variables.env \
-|  sed "s|<<SP-SECRET>>|$automationClientSecret|"  \
-|  sed "s|<<SP-CLIENT>>|$automationClientId|" > scripts/Firewall-Automation/Firewall-Automation-Infrastructure-Variables.env
-
 # Create Managed Identity Operator role assignment 
 az role assignment create --role "Managed Identity Operator" --assignee $automationClientId --scope "/subscriptions/${subscriptionId}"
 
 # Create Automation Contributor role assignment 
 az role assignment create --role "Automation Contributor" --assignee $automationClientId --scope "/subscriptions/${subscriptionId}"
+
+# Add Automation Client secrets to key vault
+
+# give logged in user access to key vault
+az keyvault set-policy --secret-permissions set --object-id $(az ad signed-in-user show --query id -o tsv) -n $ASB_KV_Name -g $ASB_KV_ResourceGroupName
+
+# set app secrets
+az keyvault secret set -o table --vault-name $ASB_KV_Name --name "AutomationClientSecret" --value $automationClientSecret
+az keyvault secret set -o table --vault-name $ASB_KV_Name --name "AutomationClientId" --value $automationClientId
+
+# remove logged in user's access to key vault
+az keyvault delete-policy --object-id $(az ad signed-in-user show --query id -o tsv) -n $ASB_KV_Name -g $ASB_KV_ResourceGroupName
 
 ```
 
@@ -161,7 +170,7 @@ Once the variables are updated, the setup script must be run from Visual Studio 
   ./scripts/Firewall-Automation/Firewall-Automation-Infrastructure.sh
 ```
 
-## Delete Service Principal and Role Assignments
+## Delete Service Principal, Role Assignments and Secrets from Key Vault
 
 After have completed the setup proccess if no longer needed, then it is recommended to delete the Service Principal.
 
@@ -184,5 +193,15 @@ local appRegistrationlId=$(az ad app list --all --filter "displayname eq '${serv
 
 # Delete AppRegistration
 az ad app delete --id $appRegistrationlId
+
+# Give logged in user access to key vault
+az keyvault set-policy --secret-permissions delete --object-id $(az ad signed-in-user show --query id -o tsv) -n $ASB_KV_Name -g $ASB_KV_ResourceGroupName
+
+# Delete Automation service principal secrets
+az keyvault secret delete --name "AutomationClientSecret" --vault-name $ASB_KV_Name
+az keyvault secret delete --name "AutomationClientId" --vault-name $ASB_KV_Name
+
+# Remove logged in user's access to key vault
+az keyvault delete-policy --object-id $(az ad signed-in-user show --query id -o tsv) -n $ASB_KV_Name -g $ASB_KV_ResourceGroupName
 
 ```
