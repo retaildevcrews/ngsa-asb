@@ -48,7 +48,12 @@
     --transforms UrlDecode Lowercase
   ```
 
-At this point Harbor should be ready to deploy.
+* Also, to pull from Harbor from inside our AKS cluster, Harbor url needs to be added to `rg-wcnp-dev` group Policy
+  * Azure Portal -> `rg-wcnp-dev` --> Policies --> Click on "Kubernetes cluster containers should only use allowed images" policy
+  * Then Edit Assignment --> Parameters
+  * Now under "Allowed registry or registries regex" textbox, append `|harbor-core-eastus-dev.austinrdc.dev.+$` at the end and save
+
+At this point Harbor should be ready to deploy and used for push and pull.
 Now we need to make sure our cluster can pull the Harbor container images.
 We will push Harbor images into our cluster's private ACR repo
   (e.g. `rg-wcnp-dev/acraksjxdthrti3j3qu`).
