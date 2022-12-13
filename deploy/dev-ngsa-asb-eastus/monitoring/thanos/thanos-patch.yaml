@@ -40,7 +40,7 @@ spec:
             - --query.replica-label=prometheus_replica
             - --store=thanos-grpc-eastus-dev.austinrdc.dev:443
             - --store=thanos-store-grpc-eastus-dev.austinrdc.dev:443
-            - --store=thanos-grpc-westus2-dev.austinrdc.dev:443
+            - --store=thanos-grpc-westus3-dev.austinrdc.dev:443
             - --grpc-client-tls-secure
             - --grpc-address=0.0.0.0:10901
             - --http-address=0.0.0.0:10902
