@@ -24,7 +24,7 @@ echo $ASB_DEPLOYMENT_NAME
 az deployment group create \
   -n spoke-$ASB_ORG_APP_ID_NAME \
   -g $ASB_RG_SPOKE \
-  -f networking/spoke-default.json \
+  -f networking/spoke-default.bicep \
   -p deploymentName=${ASB_DEPLOYMENT_NAME} \
      hubLocation=${ASB_HUB_LOCATION} \
      hubVnetResourceId=${ASB_HUB_VNET_ID} \
@@ -114,7 +114,7 @@ az network private-dns link vnet create -n "to_vnet-spoke-$ASB_ORG_APP_ID_NAME-0
 
 # Create AKS
 az deployment group create -g $ASB_RG_CORE \
-  -f cluster/cluster-stamp-additional.json \
+  -f cluster/cluster-stamp-additional.bicep \
   -n cluster-${ASB_DEPLOYMENT_NAME}-$ASB_CLUSTER_LOCATION \
   -p location=${ASB_CLUSTER_LOCATION} \
      hubLocation=${ASB_HUB_LOCATION} \

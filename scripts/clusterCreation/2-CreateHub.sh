@@ -173,7 +173,7 @@ function deployDefaultHub()
   # Create hub network
   az deployment group create \
     -g $ASB_RG_HUB \
-    -f networking/hub-default.json \
+    -f networking/hub-default.bicep \
     -p location=${ASB_HUB_LOCATION} \
     -c --query name
 

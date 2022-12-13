@@ -12,7 +12,7 @@ Follow ASB Setup Until [Resource Group Creation](/README.md#set-aks-environment-
 # Create hub network
 az deployment group create \
   -g $ASB_RG_HUB \
-  -f networking/hub-default.json \
+  -f networking/hub-default.bicep \
   -p location=${ASB_HUB_LOCATION} \
   -c --query name
 
@@ -25,7 +25,7 @@ export ASB_SPOKE_IP_PREFIX="10.240"
 az deployment group create \
   -n spoke-$ASB_ORG_APP_ID_NAME \
   -g $ASB_RG_SPOKE \
-  -f networking/spoke-default.json \
+  -f networking/spoke-default.bicep \
   -p deploymentName=${ASB_DEPLOYMENT_NAME} \
      hubLocation=${ASB_HUB_LOCATION} \
      hubVnetResourceId=${ASB_HUB_VNET_ID} \
@@ -40,7 +40,7 @@ export ASB_NODEPOOLS_SUBNET_ID=$(az deployment group show -g $ASB_RG_SPOKE -n sp
 # Create Region A hub network
 az deployment group create \
   -g $ASB_RG_HUB \
-  -f spikes/cilium/hub-regionA.json \
+  -f spikes/cilium/hub-regionA.bicep \
   -p location=${ASB_HUB_LOCATION} nodepoolSubnetResourceIds="['${ASB_NODEPOOLS_SUBNET_ID}']" \
   -c --query name
 
@@ -71,7 +71,7 @@ az extension add --name aks-preview
 
 # Create AKS
 az deployment group create -g $ASB_RG_CORE \
-  -f spikes/cilium/cluster-stamp.json \
+  -f spikes/cilium/cluster-stamp.bicep \
   -n cluster-${ASB_DEPLOYMENT_NAME}-${ASB_CLUSTER_LOCATION} \
   -p appGatewayListenerCertificate=${APP_GW_CERT_CSMS} \
      asbDomainSuffix=${ASB_DOMAIN_SUFFIX} \
