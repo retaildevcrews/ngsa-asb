@@ -48,13 +48,16 @@ The file Firewall-Automation-Infrastructure-Variables.env must be created from t
 export tenantId=$(az account show -o tsv --query tenantId)
 export subscriptionName=$(az account show -o tsv --query name)
 export deploymentName='' #e.g wcnptest
-export enviroment='' #e.g dev or preprod
+export environment='' #e.g dev or preprod
 export location='' #e.g eastus
 export keyVaultName=''#e.g kv-aks-abcdefg
 export keyVaultRGName=''#key vault resource group name
 
 # Create Firewall-Automation-Infrastructure-Variables.sh from template with values from local variables set above.
 cat scripts/Firewall-Automation/Firewall-Automation-Infrastructure-Variables-Template.txt | envsubst > scripts/Firewall-Automation/Firewall-Automation-Infrastructure-Variables.env
+
+# Set environment variables 
+source scripts/Firewall-Automation/Firewall-Automation-Infrastructure-Variables.env
 
 ```
 
@@ -148,7 +151,7 @@ The following infrastructure assets should be established in the subscription wi
 |  3. | User-Assigned Managed Identity            | [link](https://learn.microsoft.com/en-us/azure/active-directory/managed-identities-azure-resources/how-manage-user-assigned-managed-identities?pivots=identity-mi-methods-azcli) | Create an identity for the Automation Account.                                                                                                                              |
 |  4. | Automation Runbook with Powershell        |                                      [link](https://learn.microsoft.com/en-us/azure/automation/automation-runbook-types#powershell-runbooks)                                     | Create a Runbook of type Powershell.                                                                                                                                        |
 |  5. | Powershell Content in Runbook             |                               [link](https://learn.microsoft.com/en-us/powershell/module/az.automation/import-azautomationrunbook?view=azps-8.3.0)                               | Upload [pre-defined Powershell content](../scripts/Firewall-Automation/Firewall-Automation-Runbook.ps1) into the Runbook body.                                                                            |
-|  6. | Automation Schedule(s) _using Powershell_ |                               [link](https://learn.microsoft.com/en-us/powershell/module/az.automation/import-azautomationrunbook?view=azps-8.3.0)                               | Create the schedules that will execute the Firewall automation.  These had to be created using Powershell instead of the Azure CLI.  No equivalent behavior has been found. |
+|  6. | Automation Schedule(s) *using Powershell* |                               [link](https://learn.microsoft.com/en-us/powershell/module/az.automation/import-azautomationrunbook?view=azps-8.3.0)                               | Create the schedules that will execute the Firewall automation.  These had to be created using Powershell instead of the Azure CLI.  No equivalent behavior has been found. |
 
 ## Resources Created When Complete
 
@@ -167,6 +170,9 @@ The steps to set up the runbook and schedule are listed in this section. BEFORE 
 Once the variables are updated, the setup script must be run from Visual Studio Code (thick client) using Codespaces. The script does not require input parameters because the required parameters are stored as environment variables when it runs the variable script. Run this command from the top-level directory of this repository.
 
 ```bash
+# give logged in user access to key vault
+az keyvault set-policy --secret-permissions get --object-id $(az ad signed-in-user show --query id -o tsv) -n $ASB_KV_Name -g $ASB_KV_ResourceGroupName
+
   ./scripts/Firewall-Automation/Firewall-Automation-Infrastructure.sh
 ```
 
