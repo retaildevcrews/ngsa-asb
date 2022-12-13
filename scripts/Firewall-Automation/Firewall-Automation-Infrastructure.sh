@@ -1,7 +1,7 @@
 #!/bin/bash
 
 function CollectInputParameters(){
-  source ./scripts/Firewall-Automation/Firewall-Automation-Infrastructure-Variables.sh
+  source ./scripts/Firewall-Automation/Firewall-Automation-Infrastructure-Variables.env
 }
 
 function SetSubscription(){
@@ -151,25 +151,40 @@ function UpdateAzureAutomationAccountToAllowSystemAssignedIdentity() {
     # parameter position 3 = Subscription Id
     # parameter position 4 = Tenant Id
     # parameter position 5 = User-Assigned Managed Identity Name
+    # parameter position 6 = AutomationClientId
+    # parameter position 7 = AutomationClientSecret
+  
+  echo
+  
+  echo "Assigning ManagedIdentity as UserIdentity  for automation account ${1} in resource group ${2}, within subscription id ${3}..."
+
+  # Do assign ManagedIdentity to Automation Account
+  pwsh --command "./scripts/Firewall-Automation/Firewall-Automation-SetSystemAssignedIdentity.ps1 ${3} ${2} ${5} ${1} $automationClientId $automationClientSecret"
+
+}
+
+
+function RoleAssignment() {
+  # Arguments: 
+    # parameter position 1 = Automation Account Name
+    # parameter position 2 = Automation Resource Group
+    # parameter position 3 = Subscription Id
   
   echo
   echo "Assigning role Managed Identity Operator to the System Assigned Identity for automation account ${1} in resource group ${2}, within subscription id ${3}..."
 
-  # a name for our azure ad app
-  local appName="$1-application"
-
-  # The name of the app role that the managed identity should be assigned to.
-  local appRoleName='Managed Identity Operator' # For example, MyApi.Read.All
-
-  local automationAccountPrincipalId==$(az automation account show --automation-account-name "${1}" --resource-group "${2}" --query "identity.principalId" -o tsv)
+  # Get ManagedIdentity Id from automation account, this requires to perform the assign ManagedIdentity to Automation Account step first. 
+  local automationAccountPrincipalId=$(az automation account show --automation-account-name "${1}" --resource-group "${2}" --query "identity.principalId" -o tsv)
   
   echo "Automation Account principal id: $automationAccountPrincipalId"
 
-  pwsh --command "Connect-AzAccount -UseDeviceAuthentication -Tenant ${4} -Subscription ${3}; Set-AzAutomationAccount -AssignUserIdentity '/subscriptions/${3}/resourcegroups/${2}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/${5}' -ResourceGroupName ${2} -Name ${1} -AssignSystemIdentity;"
-  
+  # Create the role assignment for Automation Account giving 'Managed Identity Operator' permission over 'rg-[deploymentName]-firewall-automation-dev' resource group
+  az role assignment create --role "Managed Identity Operator" --assignee $automationAccountPrincipalId --scope "/subscriptions/${3}/resourceGroups/${2}"
+
   echo "Completed assigning role Managed Identity Operator to the System Assigned Identity for automation account ${1} in resource group ${2}, within subscription id ${3}."
-  echo
+
 }
+
 
 function AssignIdentityRole(){
   # Arguments: 
@@ -221,17 +236,31 @@ function PublishRunbook(){
 }
 
 function CreateSchedule(){
-  pwsh --command "./scripts/Firewall-Automation/Firewall-Automation-Schedule-Creation.ps1"
+  # Arguments: 
+    # parameter position 1 = AutomationClientId
+    # parameter position 2 = AutomationClientSecret
+
+  pwsh --command "./scripts/Firewall-Automation/Firewall-Automation-Schedule-Creation.ps1 ${1} ${2}"
+}
+
+function GrantSignedInUserAccessToKeyVault(){
+  # give logged in user access to key vault
+  az keyvault set-policy --secret-permissions get --object-id $(az ad signed-in-user show --query id -o tsv) -n $ASB_KV_Name -g $ASB_KV_ResourceGroupName -o tsv
+}
+
+function RemoveSignedInUserAccessToKeyVault(){
+  # Remove logged in user's access to key vault
+  az keyvault delete-policy --object-id $(az ad signed-in-user show --query id -o tsv) -n $ASB_KV_Name -g $ASB_KV_ResourceGroupName -o tsv
 }
 
 function main(){
   local subscriptionId=$(az account show --query id --output tsv)
   
   CollectInputParameters
+  
+  local automationResourceGroup="rg-${ASB_FW_Deployment_Name}-${ASB_FW_Base_Automation_System_Name}-${ASB_FW_Environment}"
 
-  local automationResourceGroup="rg-${ASB_FW_Base_NSGA_Name}-${ASB_FW_Base_Automation_System_Name}-${ASB_FW_Environment}"
-
-  local runbookName="rb-${ASB_FW_Base_NSGA_Name}-${ASB_FW_Base_Automation_System_Name}-${ASB_FW_Environment}"
+  local runbookName="rb-${ASB_FW_Deployment_Name}-${ASB_FW_Base_Automation_System_Name}-${ASB_FW_Environment}"
   local runbookDescription="${ASB_FW_PowerShell_Runbook_Description}"
   local runbookFileName="${ASB_FW_PowerShell_Runbook_File_Name}"
   local runbookFilePath="./scripts/Firewall-Automation/"
@@ -252,9 +281,9 @@ function main(){
 
   CreateResourceGroup $automationResourceGroup $ASB_FW_Location
 
-  local automationAccountName="aa-${ASB_FW_Base_NSGA_Name}-${ASB_FW_Base_Automation_System_Name}-${ASB_FW_Environment}"
+  local automationAccountName="aa-${ASB_FW_Deployment_Name}-${ASB_FW_Base_Automation_System_Name}-${ASB_FW_Environment}"
   
-  local userAssignedManagedIdentityName="mi-${ASB_FW_Base_NSGA_Name}-${ASB_FW_Base_Automation_System_Name}-${ASB_FW_Environment}"
+  local userAssignedManagedIdentityName="mi-${ASB_FW_Deployment_Name}-${ASB_FW_Base_Automation_System_Name}-${ASB_FW_Environment}"
 
   CreateUserAssignedManagedIdentity $userAssignedManagedIdentityName $automationResourceGroup
 
@@ -264,23 +293,30 @@ function main(){
 
   CreateAzureAutomationPowerShellRunbook $runbookName $automationResourceGroup $automationAccountName $location # $ASB_FW_Tenant_Id $subscriptionId
 
-  #local automationAccountPrincipalId=$(az automation account list --resource-group ${automationResourceGroup} --query "[?name=='${automationAccountName}'].identity.{principalId:principalId}|[0].principalId" --output tsv)
-  #echo "Automation Account Principal Id: $automationAccountPrincipalId"
+  # Grant SignedInUser Access to KeyVault 
+  GrantSignedInUserAccessToKeyVault
 
-  UpdateAzureAutomationAccountToAllowSystemAssignedIdentity $automationAccountName $automationResourceGroup $subscriptionId $ASB_FW_Tenant_Id $userAssignedManagedIdentityName
+  # Read secrets from key vault
+  local automationClientId=$(az keyvault secret show --subscription $ASB_FW_Subscription_Name --vault-name $ASB_KV_Name -n AutomationClientId --query value -o tsv)
+  local automationClientSecret=$(az keyvault secret show --subscription $ASB_FW_Subscription_Name --vault-name $ASB_KV_Name -n AutomationClientSecret --query value -o tsv)
+
+  # Remove SignedInUser Access to KeyVault 
+  RemoveSignedInUserAccessToKeyVault
+
+  UpdateAzureAutomationAccountToAllowSystemAssignedIdentity $automationAccountName $automationResourceGroup $subscriptionId $ASB_FW_Tenant_Id $userAssignedManagedIdentityName $automationClientId $automationClientSecret
 
   AssignIdentityRole $identityPrincipalId $userAssignedManagedIdentityName $automationResourceGroup $ASB_FW_Subscription_Name "ServicePrincipal" "Monitoring Contributor"
   AssignIdentityRole $identityPrincipalId $userAssignedManagedIdentityName $automationResourceGroup $ASB_FW_Subscription_Name "ServicePrincipal" "Contributor"  
  
-  # Set the subscription to the one specified in the parameters
-  #SetSubscription $ASB_FW_Subscription_Name $ASB_FW_Tenant_Id
-
   ImportPowerShellRunbookContent $runbookName $automationResourceGroup $runbookFilePathAndName $automationAccountName
 
   PublishRunbook $runbookName $automationResourceGroup $automationAccountName
 
-  CreateSchedule
+  CreateSchedule $automationClientId $automationClientSecret
 
+  RoleAssignment $automationAccountName $automationResourceGroup $subscriptionId
+
+  
   echo
   echo "-------------------------------------------------------------------"
   echo "  Completed Azure Automation Infrastructure creation.              "
