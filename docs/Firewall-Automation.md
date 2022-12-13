@@ -46,7 +46,7 @@ The file Firewall-Automation-Infrastructure-Variables.env must be created from t
 
 # Set input variable values.
 export tenantId=$(az account show -o tsv --query tenantId)
-export subscriptionName=$(az account show -o tsv --query name)
+export subscriptionName=$(az account show -o tsv --query id)
 export deploymentName='' #e.g wcnptest
 export environment='' #e.g dev or preprod
 export location='' #e.g eastus
@@ -123,8 +123,6 @@ az keyvault delete-policy --object-id $(az ad signed-in-user show --query id -o 
 | Parameter Name                        |                                             Example Value                                             | Script Needed For |
 | ------------------------------------- | :---------------------------------------------------------------------------------------------------: | ----------------- |
 | ASB_FW_TenantId                       |                                  00000000-0000-0000-0000-000000000000                                 | bash              |
-| ASB_DEPLOYMENT_NAME                   |                                          firewall-automation                                          | bash              |
-| ASB_ENV                               |                                                  dev                                                  | bash              |
 | ASB_FW_Subscription_Name              |                                              JoFultz-Team                                             | bash              |
 | ASB_FW_Base_NGSA_Name                 |                                                ngsa-asb                                               | bash              |
 | ASB_FW_Base_Automation_System_Name    |                                                  bash                                                 | bash              |
