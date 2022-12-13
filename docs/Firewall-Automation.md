@@ -169,6 +169,8 @@ The steps to set up the runbook and schedule are listed in this section. BEFORE 
 
 Once the variables are updated, the setup script must be run from Visual Studio Code (thick client) using Codespaces. The script does not require input parameters because the required parameters are stored as environment variables when it runs the variable script. Run this command from the top-level directory of this repository.
 
+Please note that short after have started the script, it will open up a browser tab to login.
+
 ```bash
   ./scripts/Firewall-Automation/Firewall-Automation-Infrastructure.sh
 ```
