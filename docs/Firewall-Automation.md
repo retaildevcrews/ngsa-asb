@@ -63,7 +63,7 @@ source scripts/Firewall-Automation/Firewall-Automation-Infrastructure-Variables.
 
 ### Service Principal and Role Assignments
 
-The execution of the automation infrastructure setup script **Firewall-Automation-Infrastructure.sh** requires a Service Principal to be created as part of the provisioning process:
+The execution of the automation infrastructure setup script **Firewall-Automation-Infrastructure.sh** requires a Service Principal to be created as part of the provisioning process. The Service Principal is only needed for setup, and it is not utilized to execute the RunBook automation.
 
 Service Principal | Purpose |
 -----------------|---------|
@@ -170,9 +170,6 @@ The steps to set up the runbook and schedule are listed in this section. BEFORE 
 Once the variables are updated, the setup script must be run from Visual Studio Code (thick client) using Codespaces. The script does not require input parameters because the required parameters are stored as environment variables when it runs the variable script. Run this command from the top-level directory of this repository.
 
 ```bash
-# give logged in user access to key vault
-az keyvault set-policy --secret-permissions get --object-id $(az ad signed-in-user show --query id -o tsv) -n $ASB_KV_Name -g $ASB_KV_ResourceGroupName
-
   ./scripts/Firewall-Automation/Firewall-Automation-Infrastructure.sh
 ```
 

@@ -243,11 +243,21 @@ function CreateSchedule(){
   pwsh --command "./scripts/Firewall-Automation/Firewall-Automation-Schedule-Creation.ps1 ${1} ${2}"
 }
 
+function GrantSignedInUserAccessToKeyVault(){
+  # give logged in user access to key vault
+  az keyvault set-policy --secret-permissions get --object-id $(az ad signed-in-user show --query id -o tsv) -n $ASB_KV_Name -g $ASB_KV_ResourceGroupName -o tsv
+}
+
+function RemoveSignedInUserAccessToKeyVault(){
+  # Remove logged in user's access to key vault
+  az keyvault delete-policy --object-id $(az ad signed-in-user show --query id -o tsv) -n $ASB_KV_Name -g $ASB_KV_ResourceGroupName -o tsv
+}
+
 function main(){
   local subscriptionId=$(az account show --query id --output tsv)
   
   CollectInputParameters
-
+  
   local automationResourceGroup="rg-${ASB_FW_Deployment_Name}-${ASB_FW_Base_Automation_System_Name}-${ASB_FW_Environment}"
 
   local runbookName="rb-${ASB_FW_Deployment_Name}-${ASB_FW_Base_Automation_System_Name}-${ASB_FW_Environment}"
@@ -283,10 +293,15 @@ function main(){
 
   CreateAzureAutomationPowerShellRunbook $runbookName $automationResourceGroup $automationAccountName $location # $ASB_FW_Tenant_Id $subscriptionId
 
+  # Grant SignedInUser Access to KeyVault 
+  GrantSignedInUserAccessToKeyVault
+
   # Read secrets from key vault
   local automationClientId=$(az keyvault secret show --subscription $ASB_FW_Subscription_Name --vault-name $ASB_KV_Name -n AutomationClientId --query value -o tsv)
   local automationClientSecret=$(az keyvault secret show --subscription $ASB_FW_Subscription_Name --vault-name $ASB_KV_Name -n AutomationClientSecret --query value -o tsv)
 
+  # Remove SignedInUser Access to KeyVault 
+  RemoveSignedInUserAccessToKeyVault
 
   UpdateAzureAutomationAccountToAllowSystemAssignedIdentity $automationAccountName $automationResourceGroup $subscriptionId $ASB_FW_Tenant_Id $userAssignedManagedIdentityName $automationClientId $automationClientSecret
 
@@ -301,6 +316,7 @@ function main(){
 
   RoleAssignment $automationAccountName $automationResourceGroup $subscriptionId
 
+  
   echo
   echo "-------------------------------------------------------------------"
   echo "  Completed Azure Automation Infrastructure creation.              "
