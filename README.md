@@ -6,16 +6,16 @@
   - [Table of Contents (TOC)](#table-of-contents-toc)
   - [Introduction](#introduction)
     - [Before Beginning](#before-beginning)
-      - [Connecting to the Correct Tenant & Setting the Correct Subscription Context](#connecting-to-the-correct-tenant--setting-the-correct-subscription-context)
-        - [PowerShell Az Modules](#powershell-az-modules)
-        - [Azure ClI](#azure-cli)
+      - [Connecting to the Correct Tenant \& Setting the Correct Subscription Context](#connecting-to-the-correct-tenant--setting-the-correct-subscription-context)
+        - [Azure ClI Login](#azure-cli-login)
   - [Setup Infrastructure](#setup-infrastructure)
   - [Infrastructure Setup During Each Script](#infrastructure-setup-during-each-script)
     - [2-CreateHub.sh](#2-createhubsh)
     - [3-AttachSpokeAndClusterToHub.sh](#3-attachspokeandclustertohubsh)
   - [Deploying NGSA Applications](#deploying-ngsa-applications)
     - [🛑 Prerequisite - Setup Cosmos DB in secure baseline](#-prerequisite---setup-cosmos-db-in-secure-baseline)
-    - [Create managed identity for NGSA app](#create-managed-identity-for-ngsa-app)
+    - [Create managed identity for ngsa-app](#create-managed-identity-for-ngsa-app)
+    - [Assign read-write permissions over the Cosmos DB account to the managed identity](#assign-read-write-permissions-over-the-cosmos-db-account-to-the-managed-identity)
     - [AAD pod identity setup for ngsa-app](#aad-pod-identity-setup-for-ngsa-app)
   - [Deploying LodeRunner Applications](#deploying-loderunner-applications)
     - [🛑 Prerequisite - Setup Cosmos DB in secure baseline.](#-prerequisite---setup-cosmos-db-in-secure-baseline-1)
@@ -75,7 +75,9 @@ Infrastructure Setup is separated into multiple steps that must be run sequentia
 
 2. run output of first script in a CodeSpaces instance. This will guide you to deploy a new environment. This will only work inside CodeSpaces through local VS Code instance (not through CodeSpaces in browser).
 
-If you would like to restart deployment you can delete current deployment file: `rm .current-deployment`
+If you would like to restart hub deployment you can delete current deployment file: `rm .current-deployment`
+
+If you would like to restart or create a new spoke deployment you can execute: `echo ${ASB_DEPLOYMENT_NAME}-${ASB_ENV}.env > .current-deployment`
 
 ## Infrastructure Setup During Each Script
 
@@ -154,17 +156,26 @@ If you would like to restart deployment you can delete current deployment file: 
 
 ### 🛑 Prerequisite - [Setup Cosmos DB in secure baseline](./docs/cosmos.md)
 
-### Create managed identity for NGSA app
+### Create managed identity for ngsa-app
 
 ```bash
 
-# Create managed identity for ngsa-app
 export ASB_NGSA_MI_NAME="${ASB_DEPLOYMENT_NAME}-ngsa-id"
 
 export ASB_NGSA_MI_RESOURCE_ID=$(az identity create -g $ASB_RG_CORE -n $ASB_NGSA_MI_NAME --query "id" -o tsv)
 
 # save env vars
 ./saveenv.sh -y
+
+```
+
+### Assign read-write permissions over the Cosmos DB account to the managed identity
+
+Assigning read-write permissions over the Cosmos DB account for the managed identity.  
+
+```azure-cli
+
+  az cosmosdb sql role assignment create --resource-group ${ASB_COSMOS_RG_NAME} --account-name ${ASB_COSMOS_DB_NAME} --role-definition-id 00000000-0000-0000-0000-000000000002 --principal-id ${ASB_NGSA_MI_PRINCIPAL_ID} --scope ${ASB_COSMOS_ID}
 
 ```
 

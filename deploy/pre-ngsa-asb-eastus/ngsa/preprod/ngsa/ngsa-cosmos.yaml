@@ -19,8 +19,8 @@ spec:
       labels:
         aadpodidbinding: ngsa-asb-ngsa-id
         app: ngsa-cosmos
-        deploy: 22-11-06-06-04-15
-        version: beta-2211-06-06
+        deploy: 22-12-13-17-38-33
+        version: beta-2212-13-17
     spec:
       containers:
         - name: app
@@ -33,6 +33,8 @@ spec:
           - az-eastus-pre
           - --region
           - eastus
+          - --cosmos-auth-type
+          - ManagedIdentity
           ports:
             - name: http
               containerPort: 8080

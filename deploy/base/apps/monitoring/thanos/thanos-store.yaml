@@ -41,11 +41,11 @@ spec:
               containerPort: 10900
           resources:
             requests:
-              cpu: '500m'
-              memory: '512Mi'
+              cpu: '100m'
+              memory: '192Mi'
             limits:
-              cpu: '1000m'
-              memory: '1024Mi'
+              cpu: '400m'
+              memory: '768Mi'
           livenessProbe:
               httpGet:
                 port: 10902
