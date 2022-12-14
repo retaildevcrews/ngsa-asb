@@ -3517,7 +3517,7 @@ data:
                   "scopedVars": {
                     "Zone": {
                       "selected": true,
-                      "text": "Central US",
+                      "text": "North Central US",
                       "value": "northcentralus"
                     }
                   },
