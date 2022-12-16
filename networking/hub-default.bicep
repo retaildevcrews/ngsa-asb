@@ -239,8 +239,6 @@ resource bastionNetworkNsg 'Microsoft.Network/networkSecurityGroups@2020-05-01' 
   }
 }
 
-// 2017-05-01-preview
-
 resource bastionNetworkNsgName_Microsoft_Insights_default 'Microsoft.Insights/diagnosticSettings@2017-05-01-preview' = {
   name: 'default'
   properties: {
