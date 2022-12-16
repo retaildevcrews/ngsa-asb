@@ -1,3 +1,7 @@
+targetScope = 'resourceGroup'
+
+/*** PARAMETERS ***/
+
 @description('Deployment name used in naming')
 @minLength(3)
 @maxLength(8)
@@ -60,20 +64,10 @@ param hubLocation string
 @maxLength(7)
 param spokeIpPrefix string
 
-var orgAppId_var = orgAppId
-var clusterVNetName = 'vnet-spoke-${orgAppId_var}-00'
-var routeTableName = 'route-to-${spokeLocation}-hub-fw'
-var hubRgName = split(hubVnetResourceId, '/')[4]
-var hubNetworkName = split(hubVnetResourceId, '/')[8]
-var hubFwResourceId = resourceId(hubRgName, 'Microsoft.Network/azureFirewalls', 'fw-${hubLocation}')
-var hubLaWorkspaceName = 'la-hub-${hubLocation}-${uniqueString(hubVnetResourceId)}'
-var hubLaWorkspaceResourceId = resourceId(hubRgName, 'Microsoft.OperationalInsights/workspaces', hubLaWorkspaceName)
-var toHubPeeringName = 'spoke-to-${hubNetworkName}'
-var primaryClusterPipName = 'pip-${deploymentName}-${orgAppId_var}-00'
-var spokeIpPrefix_var = spokeIpPrefix
+/*** RESOURCES ***/
 
 resource routeTable 'Microsoft.Network/routeTables@2020-05-01' = {
-  name: routeTableName
+  name: 'route-to-${spokeLocation}-hub-fw'
   location: spokeLocation
   properties: {
     routes: [
@@ -82,7 +76,7 @@ resource routeTable 'Microsoft.Network/routeTables@2020-05-01' = {
         properties: {
           nextHopType: 'VirtualAppliance'
           addressPrefix: '0.0.0.0/0'
-          nextHopIpAddress: reference(hubFwResourceId, '2020-05-01').ipConfigurations[0].properties.privateIpAddress
+          nextHopIpAddress: reference(resourceId(split(hubVnetResourceId, '/')[4], 'Microsoft.Network/azureFirewalls', 'fw-${hubLocation}'), '2020-05-01').ipConfigurations[0].properties.privateIpAddress
         }
       }
     ]
@@ -90,17 +84,17 @@ resource routeTable 'Microsoft.Network/routeTables@2020-05-01' = {
 }
 
 resource nsg_clusterVNetName_nodepools 'Microsoft.Network/networkSecurityGroups@2020-05-01' = {
-  name: 'nsg-${clusterVNetName}-nodepools'
+  name: 'nsg-vnet-spoke-${orgAppId}-00-nodepools'
   location: spokeLocation
   properties: {
     securityRules: []
   }
 }
 
-resource nsg_clusterVNetName_nodepools_Microsoft_Insights_toHub 'Microsoft.Network/networkSecurityGroups/providers/diagnosticSettings@2017-05-01-preview' = {
-  name: 'nsg-${clusterVNetName}-nodepools/Microsoft.Insights/toHub'
+resource nsg_clusterVNetName_nodepools_Microsoft_Insights_toHub 'Microsoft.Insights/diagnosticSettings@2017-05-01-preview' = {
+  name: 'toHub'
   properties: {
-    workspaceId: hubLaWorkspaceResourceId
+    workspaceId: resourceId(split(hubVnetResourceId, '/')[4], 'Microsoft.OperationalInsights/workspaces', 'la-hub-${hubLocation}-${uniqueString(hubVnetResourceId)}')
     logs: [
       {
         category: 'NetworkSecurityGroupEvent'
@@ -112,23 +106,21 @@ resource nsg_clusterVNetName_nodepools_Microsoft_Insights_toHub 'Microsoft.Netwo
       }
     ]
   }
-  dependsOn: [
-    nsg_clusterVNetName_nodepools
-  ]
+  scope: nsg_clusterVNetName_nodepools
 }
 
 resource nsg_clusterVNetName_aksilbs 'Microsoft.Network/networkSecurityGroups@2020-05-01' = {
-  name: 'nsg-${clusterVNetName}-aksilbs'
+  name: 'nsg-vnet-spoke-${orgAppId}-00-aksilbs'
   location: spokeLocation
   properties: {
     securityRules: []
   }
 }
 
-resource nsg_clusterVNetName_aksilbs_Microsoft_Insights_toHub 'Microsoft.Network/networkSecurityGroups/providers/diagnosticSettings@2017-05-01-preview' = {
-  name: 'nsg-${clusterVNetName}-aksilbs/Microsoft.Insights/toHub'
+resource nsg_clusterVNetName_aksilbs_Microsoft_Insights_toHub 'Microsoft.Insights/diagnosticSettings@2017-05-01-preview' = {
+  name: 'toHub'
   properties: {
-    workspaceId: hubLaWorkspaceResourceId
+    workspaceId: resourceId(split(hubVnetResourceId, '/')[4], 'Microsoft.OperationalInsights/workspaces', 'la-hub-${hubLocation}-${uniqueString(hubVnetResourceId)}')
     logs: [
       {
         category: 'NetworkSecurityGroupEvent'
@@ -140,13 +132,11 @@ resource nsg_clusterVNetName_aksilbs_Microsoft_Insights_toHub 'Microsoft.Network
       }
     ]
   }
-  dependsOn: [
-    nsg_clusterVNetName_aksilbs
-  ]
+  scope: nsg_clusterVNetName_aksilbs
 }
 
 resource nsg_clusterVNetName_appgw 'Microsoft.Network/networkSecurityGroups@2020-05-01' = {
-  name: 'nsg-${clusterVNetName}-appgw'
+  name: 'nsg-vnet-spoke-${orgAppId}-00-appgw'
   location: spokeLocation
   properties: {
     securityRules: [
@@ -236,10 +226,10 @@ resource nsg_clusterVNetName_appgw 'Microsoft.Network/networkSecurityGroups@2020
   }
 }
 
-resource nsg_clusterVNetName_appgw_Microsoft_Insights_toHub 'Microsoft.Network/networkSecurityGroups/providers/diagnosticSettings@2017-05-01-preview' = {
-  name: 'nsg-${clusterVNetName}-appgw/Microsoft.Insights/toHub'
+resource nsg_clusterVNetName_appgw_Microsoft_Insights_toHub 'Microsoft.Insights/diagnosticSettings@2017-05-01-preview' = {
+  name: 'toHub'
   properties: {
-    workspaceId: hubLaWorkspaceResourceId
+    workspaceId: resourceId(split(hubVnetResourceId, '/')[4], 'Microsoft.OperationalInsights/workspaces', 'la-hub-${hubLocation}-${uniqueString(hubVnetResourceId)}')
     logs: [
       {
         category: 'NetworkSecurityGroupEvent'
@@ -251,25 +241,23 @@ resource nsg_clusterVNetName_appgw_Microsoft_Insights_toHub 'Microsoft.Network/n
       }
     ]
   }
-  dependsOn: [
-    nsg_clusterVNetName_appgw
-  ]
+  scope: nsg_clusterVNetName_appgw
 }
 
 resource clusterVNet 'Microsoft.Network/virtualNetworks@2020-05-01' = {
-  name: clusterVNetName
+  name: 'vnet-spoke-${orgAppId}-00'
   location: spokeLocation
   properties: {
     addressSpace: {
       addressPrefixes: [
-        '${spokeIpPrefix_var}.0.0/16'
+        '${spokeIpPrefix}.0.0/16'
       ]
     }
     subnets: [
       {
         name: 'snet-clusternodes'
         properties: {
-          addressPrefix: '${spokeIpPrefix_var}.0.0/22'
+          addressPrefix: '${spokeIpPrefix}.0.0/22'
           routeTable: {
             id: routeTable.id
           }
@@ -283,7 +271,7 @@ resource clusterVNet 'Microsoft.Network/virtualNetworks@2020-05-01' = {
       {
         name: 'snet-clusteringressservices'
         properties: {
-          addressPrefix: '${spokeIpPrefix_var}.4.0/28'
+          addressPrefix: '${spokeIpPrefix}.4.0/28'
           routeTable: {
             id: routeTable.id
           }
@@ -297,7 +285,7 @@ resource clusterVNet 'Microsoft.Network/virtualNetworks@2020-05-01' = {
       {
         name: 'snet-applicationgateway'
         properties: {
-          addressPrefix: '${spokeIpPrefix_var}.4.16/28'
+          addressPrefix: '${spokeIpPrefix}.4.16/28'
           networkSecurityGroup: {
             id: nsg_clusterVNetName_appgw.id
           }
@@ -311,7 +299,7 @@ resource clusterVNet 'Microsoft.Network/virtualNetworks@2020-05-01' = {
 
 resource clusterVNetName_toHubPeering 'Microsoft.Network/virtualNetworks/virtualNetworkPeerings@2020-05-01' = {
   parent: clusterVNet
-  name: '${toHubPeeringName}'
+  name: 'spoke-to-${split(hubVnetResourceId, '/')[8]}'
   properties: {
     remoteVirtualNetwork: {
       id: hubVnetResourceId
@@ -323,10 +311,10 @@ resource clusterVNetName_toHubPeering 'Microsoft.Network/virtualNetworks/virtual
   }
 }
 
-resource clusterVNetName_Microsoft_Insights_toHub 'Microsoft.Network/virtualNetworks/providers/diagnosticSettings@2017-05-01-preview' = {
-  name: '${clusterVNetName}/Microsoft.Insights/toHub'
+resource clusterVNetName_Microsoft_Insights_toHub 'Microsoft.Insights/diagnosticSettings@2017-05-01-preview' = {
+  name: 'toHub'
   properties: {
-    workspaceId: hubLaWorkspaceResourceId
+    workspaceId: resourceId(split(hubVnetResourceId, '/')[4], 'Microsoft.OperationalInsights/workspaces', 'la-hub-${hubLocation}-${uniqueString(hubVnetResourceId)}')
     metrics: [
       {
         category: 'AllMetrics'
@@ -334,18 +322,16 @@ resource clusterVNetName_Microsoft_Insights_toHub 'Microsoft.Network/virtualNetw
       }
     ]
   }
-  dependsOn: [
-    clusterVNet
-  ]
+  scope: clusterVNet
 }
 
 module CreateHubTo_clusterVNetName_Peer './nested_CreateHubTo_clusterVNetName_Peer.bicep' = {
-  name: 'CreateHubTo${clusterVNetName}Peer'
-  scope: resourceGroup(hubRgName)
+  name: 'CreateHubTovnet-spoke-${orgAppId}-00Peer'
+  scope: resourceGroup(split(hubVnetResourceId, '/')[4])
   params: {
     resourceId_Microsoft_Network_virtualNetworks_variables_clusterVNetName: clusterVNet.id
-    variables_hubNetworkName: hubNetworkName
-    variables_clusterVNetName: clusterVNetName
+    variables_hubNetworkName: split(hubVnetResourceId, '/')[8]
+    variables_clusterVNetName: 'vnet-spoke-${orgAppId}-00'
   }
   dependsOn: [
     clusterVNetName_toHubPeering
@@ -353,7 +339,7 @@ module CreateHubTo_clusterVNetName_Peer './nested_CreateHubTo_clusterVNetName_Pe
 }
 
 resource primaryClusterPip 'Microsoft.Network/publicIpAddresses@2020-05-01' = {
-  name: primaryClusterPipName
+  name: 'pip-${deploymentName}-${orgAppId}-00'
   location: spokeLocation
   sku: {
     name: 'Standard'
@@ -367,6 +353,6 @@ resource primaryClusterPip 'Microsoft.Network/publicIpAddresses@2020-05-01' = {
 
 output clusterVnetResourceId string = clusterVNet.id
 output nodepoolSubnetResourceIds array = [
-  resourceId('Microsoft.Network/virtualNetworks/subnets', clusterVNetName, 'snet-clusternodes')
+  resourceId('Microsoft.Network/virtualNetworks/subnets', 'vnet-spoke-${orgAppId}-00', 'snet-clusternodes')
 ]
 output appGwPublicIpAddress string = primaryClusterPip.properties.ipAddress
