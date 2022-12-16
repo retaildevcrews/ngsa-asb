@@ -1,3 +1,7 @@
+targetScope = 'resourceGroup'
+
+/*** PARAMETERS ***/
+
 @description('The hub\'s regional affinity. All resources tied to this hub will also be homed in this region.  The network team maintains this approved regional list which is a subset of zones with Availability Zone support.')
 @allowed([
   'australiaeast'
@@ -45,21 +49,18 @@ param azureBastionSubnetAddressSpace string = '10.200.0.96/27'
 @maxLength(18)
 param azureCommonServicesSubnetAddressSpace string = '10.200.0.128/28'
 
-var baseFwPipName = 'pip-fw-${location}'
-var hubFwPipNames_var = [
-  '${baseFwPipName}-default'
-  '${baseFwPipName}-01'
-  '${baseFwPipName}-02'
+var hubFwPipNames = [
+  'pip-fw-${location}-default'
+  'pip-fw-${location}-01'
+  'pip-fw-${location}-02'
 ]
-var hubFwName = 'fw-${location}'
-var fwPoliciesBaseName = 'fw-policies-base'
-var fwPoliciesName = 'fw-policies-${location}'
-var hubVNetName = 'vnet-${location}-hub'
-var bastionNetworkNsgName = 'nsg-${location}-bastion'
-var hubLaName = 'la-hub-${location}-${uniqueString(hubVnet.id)}'
 
+/*** RESOURCES ***/
+
+// This Log Analytics workspace stores logs from the regional hub network, its spokes, and bastion.
+// Log analytics is a regional resource, as such there will be one workspace per hub (region)
 resource hubLa 'Microsoft.OperationalInsights/workspaces@2020-08-01' = {
-  name: hubLaName
+  name: 'la-hub-${location}-${uniqueString(hubVnet.id)}'
   location: location
   properties: {
     sku: {
@@ -72,7 +73,7 @@ resource hubLa 'Microsoft.OperationalInsights/workspaces@2020-08-01' = {
 }
 
 resource bastionNetworkNsg 'Microsoft.Network/networkSecurityGroups@2020-05-01' = {
-  name: bastionNetworkNsgName
+  name: 'nsg-${location}-bastion'
   location: location
   properties: {
     securityRules: [
@@ -238,8 +239,10 @@ resource bastionNetworkNsg 'Microsoft.Network/networkSecurityGroups@2020-05-01' 
   }
 }
 
-resource bastionNetworkNsgName_Microsoft_Insights_default 'Microsoft.Network/networkSecurityGroups/providers/diagnosticSettings@2017-05-01-preview' = {
-  name: '${bastionNetworkNsgName}/Microsoft.Insights/default'
+// 2017-05-01-preview
+
+resource bastionNetworkNsgName_Microsoft_Insights_default 'Microsoft.Insights/diagnosticSettings@2017-05-01-preview' = {
+  name: 'default'
   properties: {
     workspaceId: hubLa.id
     logs: [
@@ -253,14 +256,11 @@ resource bastionNetworkNsgName_Microsoft_Insights_default 'Microsoft.Network/net
       }
     ]
   }
-  dependsOn: [
-
-    bastionNetworkNsg
-  ]
+  scope: bastionNetworkNsg
 }
 
 resource hubVnet 'Microsoft.Network/virtualNetworks@2020-05-01' = {
-  name: hubVNetName
+  name: 'vnet-${location}-hub'
   location: location
   properties: {
     addressSpace: {
@@ -301,8 +301,8 @@ resource hubVnet 'Microsoft.Network/virtualNetworks@2020-05-01' = {
   }
 }
 
-resource hubVnetName_Microsoft_Insights_default 'Microsoft.Network/virtualNetworks/providers/diagnosticSettings@2017-05-01-preview' = {
-  name: '${hubVNetName}/Microsoft.Insights/default'
+resource hubVnetName_Microsoft_Insights_default 'Microsoft.Insights/diagnosticSettings@2017-05-01-preview' = {
+  name: 'default'
   properties: {
     workspaceId: hubLa.id
     metrics: [
@@ -312,13 +312,10 @@ resource hubVnetName_Microsoft_Insights_default 'Microsoft.Network/virtualNetwor
       }
     ]
   }
-  dependsOn: [
-
-    hubVnet
-  ]
+  scope: hubVnet
 }
 
-resource hubFwPipNames 'Microsoft.Network/publicIpAddresses@2020-05-01' = [for item in hubFwPipNames_var: {
+resource hubFwPips 'Microsoft.Network/publicIpAddresses@2020-05-01' = [for item in hubFwPipNames: {
   name: item
   location: location
   sku: {
@@ -332,7 +329,7 @@ resource hubFwPipNames 'Microsoft.Network/publicIpAddresses@2020-05-01' = [for i
 }]
 
 resource fwPoliciesBase 'Microsoft.Network/firewallPolicies@2020-11-01' = {
-  name: fwPoliciesBaseName
+  name: 'fw-policies-base'
   location: location
   properties: {
     sku: {
@@ -352,7 +349,6 @@ resource fwPoliciesBase 'Microsoft.Network/firewallPolicies@2020-11-01' = {
 resource fwPoliciesBaseName_DefaultNetworkRuleCollectionGroup 'Microsoft.Network/firewallPolicies/ruleCollectionGroups@2020-11-01' = {
   parent: fwPoliciesBase
   name: 'DefaultNetworkRuleCollectionGroup'
-  location: location
   properties: {
     priority: 200
     ruleCollections: [
@@ -390,7 +386,7 @@ resource fwPoliciesBaseName_DefaultNetworkRuleCollectionGroup 'Microsoft.Network
 }
 
 resource fwPolicies 'Microsoft.Network/firewallPolicies@2020-11-01' = {
-  name: fwPoliciesName
+  name: 'fw-policies-${location}'
   location: location
   properties: {
     basePolicy: {
@@ -417,7 +413,6 @@ resource fwPolicies 'Microsoft.Network/firewallPolicies@2020-11-01' = {
 resource fwPoliciesName_DefaultDnatRuleCollectionGroup 'Microsoft.Network/firewallPolicies/ruleCollectionGroups@2020-11-01' = {
   parent: fwPolicies
   name: 'DefaultDnatRuleCollectionGroup'
-  location: location
   properties: {
     priority: 100
     ruleCollections: []
@@ -427,7 +422,6 @@ resource fwPoliciesName_DefaultDnatRuleCollectionGroup 'Microsoft.Network/firewa
 resource fwPoliciesName_DefaultApplicationRuleCollectionGroup 'Microsoft.Network/firewallPolicies/ruleCollectionGroups@2020-11-01' = {
   parent: fwPolicies
   name: 'DefaultApplicationRuleCollectionGroup'
-  location: location
   properties: {
     priority: 300
     ruleCollections: []
@@ -441,7 +435,6 @@ resource fwPoliciesName_DefaultApplicationRuleCollectionGroup 'Microsoft.Network
 resource fwPoliciesName_DefaultNetworkRuleCollectionGroup 'Microsoft.Network/firewallPolicies/ruleCollectionGroups@2020-11-01' = {
   parent: fwPolicies
   name: 'DefaultNetworkRuleCollectionGroup'
-  location: location
   properties: {
     priority: 200
     ruleCollections: []
@@ -453,7 +446,7 @@ resource fwPoliciesName_DefaultNetworkRuleCollectionGroup 'Microsoft.Network/fir
 }
 
 resource hubFw 'Microsoft.Network/azureFirewalls@2020-11-01' = {
-  name: hubFwName
+  name: 'fw-${location}'
   location: location
   zones: [
     '1'
@@ -470,29 +463,29 @@ resource hubFw 'Microsoft.Network/azureFirewalls@2020-11-01' = {
     threatIntelMode: 'Deny'
     ipConfigurations: [
       {
-        name: hubFwPipNames_var[0]
+        name: hubFwPipNames[0]
         properties: {
           subnet: {
-            id: resourceId('Microsoft.Network/virtualNetworks/subnets', hubVNetName, 'AzureFirewallSubnet')
+            id: resourceId('Microsoft.Network/virtualNetworks/subnets', 'vnet-${location}-hub', 'AzureFirewallSubnet')
           }
           publicIPAddress: {
-            id: resourceId('Microsoft.Network/publicIpAddresses', hubFwPipNames_var[0])
-          }
-        }
-      }
-      {
-        name: hubFwPipNames_var[1]
-        properties: {
-          publicIPAddress: {
-            id: resourceId('Microsoft.Network/publicIpAddresses', hubFwPipNames_var[1])
+            id: resourceId('Microsoft.Network/publicIpAddresses', hubFwPipNames[0])
           }
         }
       }
       {
-        name: hubFwPipNames_var[2]
+        name: hubFwPipNames[1]
         properties: {
           publicIPAddress: {
-            id: resourceId('Microsoft.Network/publicIpAddresses', hubFwPipNames_var[2])
+            id: resourceId('Microsoft.Network/publicIpAddresses', hubFwPipNames[1])
+          }
+        }
+      }
+      {
+        name: hubFwPipNames[2]
+        properties: {
+          publicIPAddress: {
+            id: resourceId('Microsoft.Network/publicIpAddresses', hubFwPipNames[2])
           }
         }
       }
@@ -505,14 +498,14 @@ resource hubFw 'Microsoft.Network/azureFirewalls@2020-11-01' = {
     }
   }
   dependsOn: [
-    hubFwPipNames
+    hubFwPips
     hubVnet
     fwPoliciesName_DefaultNetworkRuleCollectionGroup
   ]
 }
 
-resource hubFwName_Microsoft_Insights_default 'Microsoft.Network/azureFirewalls/providers/diagnosticSettings@2017-05-01-preview' = {
-  name: '${hubFwName}/Microsoft.Insights/default'
+resource hubFwName_Microsoft_Insights_default 'Microsoft.Insights/diagnosticSettings@2017-05-01-preview' = {
+  name: 'default'
   properties: {
     workspaceId: hubLa.id
     logs: [
@@ -536,10 +529,7 @@ resource hubFwName_Microsoft_Insights_default 'Microsoft.Network/azureFirewalls/
       }
     ]
   }
-  dependsOn: [
-
-    hubFw
-  ]
+  scope: hubFw
 }
 
 output hubVnetId string = hubVnet.id
