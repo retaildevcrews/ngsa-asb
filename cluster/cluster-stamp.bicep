@@ -1,3 +1,7 @@
+targetScope = 'resourceGroup'
+
+/*** PARAMETERS ***/
+
 @description('Deployment name used in naming')
 @minLength(3)
 @maxLength(8)
@@ -108,6 +112,9 @@ param location string
   'japaneast'
   'southeastasia'
 ])
+
+/*** VARIABLES ***/
+
 param geoRedundancyLocation string
 param kubernetesVersion string = '1.20.9'
 
@@ -122,7 +129,7 @@ var nodeResourceGroupName = 'rg-${nodepoolsRGName}-nodepools-${location}'
 var baseName = 'aks-${subRgUniqueString}'
 var clusterName = '${baseName}-${location}'
 var laNewWorkspaceName = 'la-${baseName}'
-var logAnalyticsWorkspaceName = ((empty(laWorkspaceName) && empty(laResourceGroup)) ? laNewWorkspaceName : ((!(empty(laWorkspaceName) || empty(laResourceGroup))) ? laWorkspaceName : null))
+var logAnalyticsWorkspaceName = ((empty(laWorkspaceName) && empty(laResourceGroup)) ? laNewWorkspaceName : laWorkspaceName)
 var isNewLogAnalytics = (logAnalyticsWorkspaceName == laNewWorkspaceName)
 var logAnalyticsResourceGroup = (isNewLogAnalytics ? resourceGroup().name : laResourceGroup)
 var containerInsightsSolutionName = 'ContainerInsights(${logAnalyticsWorkspaceName})'
@@ -134,7 +141,6 @@ var vnetIngressServicesSubnetResourceId = '${targetVnetResourceId}/subnets/snet-
 var vnetHubCommonServicesSubnetResourceId = '${hubVnetResourceId}/subnets/CommonServicesSubnet'
 var HubvnetName = split(hubVnetResourceId, '/')[8]
 var agwName = 'apw-${clusterName}'
-var apwResourceId = agw.id
 var acrPrivateDnsZonesName = 'privatelink.azurecr.io'
 var akvPrivateDnsZonesName = 'privatelink.vaultcore.azure.net'
 var clusterControlPlaneIdentityName = 'mi-${clusterName}-controlplane'
@@ -543,7 +549,7 @@ resource agw 'Microsoft.Network/applicationGateways@2020-05-01' = {
           pickHostNameFromBackendAddress: true
           requestTimeout: 20
           probe: {
-            id: '${agw.id}/probes/probe-ngsa-memory-${asbDnsName}'
+            id: resourceId('Microsoft.Network/applicationGateways/probes', agwName, 'probe-${asbDnsName}')
           }
         }
       }
@@ -553,14 +559,14 @@ resource agw 'Microsoft.Network/applicationGateways@2020-05-01' = {
         name: 'listener-ngsa-memory-${asbDnsName}'
         properties: {
           frontendIPConfiguration: {
-            id: '${apwResourceId}/frontendIPConfigurations/apw-frontend-ip-configuration'
+            id: resourceId('Microsoft.Network/applicationGateways/frontendIPConfigurations', agwName, 'apw-frontend-ip-configuration')
           }
           frontendPort: {
-            id: '${apwResourceId}/frontendPorts/apw-frontend-ports'
+            id: resourceId('Microsoft.Network/applicationGateways/frontendPorts', agwName, 'port-443')
           }
           protocol: 'Https'
           sslCertificate: {
-            id: '${apwResourceId}/sslCertificates/${agwName}-ssl-certificate'
+            id: resourceId('Microsoft.Network/applicationGateways/sslCertificates', agwName, '${agwName}-ssl-certificate')
           }
           hostName: 'ngsa-memory-${asbDomainSuffix}'
           hostNames: []
@@ -571,10 +577,10 @@ resource agw 'Microsoft.Network/applicationGateways@2020-05-01' = {
         name: 'http-listener-ngsa-memory-${asbDnsName}'
         properties: {
           frontendIPConfiguration: {
-            id: '${apwResourceId}/frontendIPConfigurations/apw-frontend-ip-configuration'
+            id: resourceId('Microsoft.Network/applicationGateways/frontendIPConfigurations', agwName, 'apw-frontend-ip-configuration')
           }
           frontendPort: {
-            id: '${apwResourceId}/frontendPorts/apw-frontend-ports-http'
+            id: resourceId('Microsoft.Network/applicationGateways/frontendPorts', agwName, 'port-80')
           }
           protocol: 'Http'
           hostName: 'ngsa-memory-${asbDomainSuffix}'
@@ -588,7 +594,7 @@ resource agw 'Microsoft.Network/applicationGateways@2020-05-01' = {
         properties: {
           redirectType: 'Permanent'
           targetListener: {
-            id: '${apwResourceId}/httpListeners/listener-ngsa-memory-${asbDnsName}'
+            id: resourceId('Microsoft.Network/applicationGateways/httpListeners', agwName,'listener-ngsa-memory-${asbDnsName}')
           }
           includePath: 'true'
           includeQueryString: 'true'
@@ -601,13 +607,13 @@ resource agw 'Microsoft.Network/applicationGateways@2020-05-01' = {
         properties: {
           ruleType: 'Basic'
           httpListener: {
-            id: '${apwResourceId}/httpListeners/listener-ngsa-memory-${asbDnsName}'
+            id: resourceId('Microsoft.Network/applicationGateways/frontendIPConfigurations', agwName,'listener-ngsa-memory-${asbDnsName}')
           }
           backendAddressPool: {
-            id: '${apwResourceId}/backendAddressPools/ngsa-memory-${asbDomainSuffix}'
+            id: resourceId('Microsoft.Network/applicationGateways/backendAddressPools', agwName,'ngsa-memory-${asbDomainSuffix}')
           }
           backendHttpSettings: {
-            id: '${apwResourceId}/backendHttpSettingsCollection/ngsa-memory-${asbDnsName}-httpsettings'
+            id: resourceId('Microsoft.Network/applicationGateways/backendHttpSettingsCollection', agwName,'ngsa-memory-${asbDnsName}-httpsettings')
           }
         }
       }
@@ -616,10 +622,10 @@ resource agw 'Microsoft.Network/applicationGateways@2020-05-01' = {
         properties: {
           ruleType: 'Basic'
           httpListener: {
-            id: '${apwResourceId}/httpListeners/http-listener-ngsa-memory-${asbDnsName}'
+            id: resourceId('Microsoft.Network/applicationGateways/httpListeners', agwName,'http-listener-ngsa-memory-${asbDnsName}')
           }
           redirectConfiguration: {
-            id: '${apwResourceId}/redirectConfigurations/https-redirect-config-ngsa-memory-${asbDnsName}'
+            id: resourceId('Microsoft.Network/applicationGateways/redirectConfigurations', agwName,'https-redirect-config-ngsa-memory-${asbDnsName}')
           }
         }
       }
@@ -627,8 +633,8 @@ resource agw 'Microsoft.Network/applicationGateways@2020-05-01' = {
   }
 }
 
-resource agwName_Microsoft_Insights_default 'Microsoft.Network/applicationGateways/providers/diagnosticSettings@2017-05-01-preview' = {
-  name: '${agwName}//Microsoft.Insights/default'
+resource agwName_Microsoft_Insights_default 'Microsoft.Insights/diagnosticSettings@2017-05-01-preview' = {
+  name: 'default'
   properties: {
     workspaceId: resourceId(logAnalyticsResourceGroup, 'Microsoft.OperationalInsights/workspaces', logAnalyticsWorkspaceName)
     logs: [
@@ -662,6 +668,7 @@ module EnsureClusterIdentityHasRbacToSelfManagedResources './nested_EnsureCluste
     variables_clusterControlPlaneIdentityName: clusterControlPlaneIdentityName
     variables_vnetName: vnetName
     variables_vnetIngressServicesSubnetResourceId: vnetIngressServicesSubnetResourceId
+    location: location
   }
 }
 
@@ -1088,8 +1095,7 @@ resource cluster 'Microsoft.ContainerService/managedClusters@2021-02-01' = {
   }
   dependsOn: [
     containerInsightsSolution
-    resourceId(vNetResourceGroup, 'Microsoft.Resources/deployments', 'EnsureClusterIdentityHasRbacToSelfManagedResources')
-
+    EnsureClusterIdentityHasRbacToSelfManagedResources
     policyAssignmentNameAKSLinuxRestrictive
     policyAssignmentNameEnforceHttpsIngress
     policyAssignmentNameEnforceImageSource
