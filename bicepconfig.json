@@ -69,9 +69,6 @@
         "simplify-interpolation": {
           "level": "warning"
         },
-        "use-protectedsettings-for-commandtoexecute-secrets": {
-          "level": "warning"
-        },
         "use-recent-api-versions": {
           "level": "off"
         },
