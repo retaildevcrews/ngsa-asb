@@ -1,9 +1,13 @@
+targetScope = 'resourceGroup'
+
+/*** PARAMETERS ***/
+
 param resourceId_Microsoft_ManagedIdentity_userAssignedIdentities_variables_clusterControlPlaneIdentityName object
-param variables_vnetNodePoolSubnetResourceId ? /* TODO: fill in correct type */
-param variables_networkContributorRole ? /* TODO: fill in correct type */
-param variables_clusterControlPlaneIdentityName ? /* TODO: fill in correct type */
-param variables_vnetName ? /* TODO: fill in correct type */
-param variables_vnetIngressServicesSubnetResourceId ? /* TODO: fill in correct type */
+param variables_vnetNodePoolSubnetResourceId string
+param variables_networkContributorRole string
+param variables_clusterControlPlaneIdentityName string
+param variables_vnetName string
+param variables_vnetIngressServicesSubnetResourceId string
 
 @description('AKS Service, Node Pool, and supporting services (KeyVault, App Gateway, etc) region. This needs to be the same region as the vnet provided in these parameters.')
 @allowed([
@@ -27,8 +31,26 @@ param variables_vnetIngressServicesSubnetResourceId ? /* TODO: fill in correct t
 ])
 param location string
 
+/*** EXISTING HUB RESOURCES ***/
+
+resource targetVirtualNetwork 'Microsoft.Network/virtualNetworks@2021-05-01' existing = {
+  name: variables_vnetName
+}
+
+resource snetClusterNodes 'Microsoft.Network/virtualNetworks/subnets@2021-05-01' existing = {
+  parent: targetVirtualNetwork
+  name: 'snet-clusternodes'
+}
+
+resource snetClusterIngress 'Microsoft.Network/virtualNetworks/subnets@2021-05-01' existing = {
+  parent: targetVirtualNetwork
+  name: 'snet-clusteringressservices'
+}
+
+/*** RESOURCES ***/
+
 resource variables_vnetNodePoolSubnetResourceId_variables_networkContributorRole_variables_clusterControlPlaneIdentityName_location 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
-  scope: 'Microsoft.Network/virtualNetworks/${variables_vnetName}/subnets/snet-clusternodes'
+  scope: snetClusterNodes
   name: guid(variables_vnetNodePoolSubnetResourceId, variables_networkContributorRole, variables_clusterControlPlaneIdentityName, location)
   properties: {
     roleDefinitionId: variables_networkContributorRole
@@ -39,7 +61,7 @@ resource variables_vnetNodePoolSubnetResourceId_variables_networkContributorRole
 }
 
 resource variables_vnetIngressServicesSubnetResourceId_variables_networkContributorRole_variables_clusterControlPlaneIdentityName_location 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
-  scope: 'Microsoft.Network/virtualNetworks/${variables_vnetName}/subnets/snet-clusteringressservices'
+  scope: snetClusterIngress
   name: guid(variables_vnetIngressServicesSubnetResourceId, variables_networkContributorRole, variables_clusterControlPlaneIdentityName, location)
   properties: {
     roleDefinitionId: variables_networkContributorRole
