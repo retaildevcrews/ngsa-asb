@@ -162,7 +162,10 @@ az ad app credential delete --id $CLIENT_ID --key-id $RBAC_ID
 az ad app update --id $CLIENT_ID --app-roles @grafana-app-roles.json
 
 # Create Grafana OAuth Secret
-CLIENT_SECRET=$(az ad app credential reset --append --id $CLIENT_ID --display-name "Grafana OAuth" --years 2 -o tsv --query password)
+GRAFANA_OAUTH_CLIENT_SECRET=$(az ad app credential reset --append --id $CLIENT_ID --display-name "Grafana OAuth" --years 2 -o tsv --query password)
+
+# Create Az Monitor Secret
+AZ_MONITOR_CLIENT_SECRET=$(az ad app credential reset --append --id $CLIENT_ID --display-name "AZ Monitor" --years 2 -o tsv --query password)
 
 # Enable Grafana users to login using created App Registration. Needs to be repeated for each created grafana instance.
 export ASB_APP_NAME=grafana
@@ -194,9 +197,9 @@ You'll need to run a few more steps to completely setup the AAD Service Principa
 az keyvault set-policy --secret-permissions set --object-id $(az ad signed-in-user show --query id -o tsv) -n $ASB_KV_NAME -g $ASB_RG_CORE
 
 # Set grafana AAD client secrets
-az keyvault secret set -o table --vault-name $ASB_KV_NAME --name "grafana-aad-client-secret" --value [insert CLIENT_SECRET]
+az keyvault secret set -o table --vault-name $ASB_KV_NAME --name "grafana-aad-client-secret" --value $GRAFANA_OAUTH_CLIENT_SECRET
 
-az keyvault secret set -o table --vault-name $ASB_KV_NAME --name "grafana-azure-monitor-client-secret" --value [insert CLIENT_SECRET]
+az keyvault secret set -o table --vault-name $ASB_KV_NAME --name "grafana-azure-monitor-client-secret" --value $AZ_MONITOR_CLIENT_SECRET
 
 # set grafana AAD ids
 export ASB_GRAFANA_SP_CLIENT_ID=[insert CLIENT_ID]
