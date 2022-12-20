@@ -2,7 +2,7 @@
 apiVersion: aadpodidentity.k8s.io/v1
 kind: AzureIdentity
 metadata:
-  name: ngsa-asb-loderunner-id
+  name: wcnp-loderunner-id
   namespace: loderunner
 spec:
   type: 0
@@ -14,11 +14,11 @@ spec:
 apiVersion: aadpodidentity.k8s.io/v1
 kind: AzureIdentityBinding
 metadata:
-  name: ngsa-asb-loderunner-id-binding
+  name: wcnp-loderunner-id-binding
   namespace: loderunner
 spec:
-  azureIdentity: ngsa-asb-loderunner-id
-  selector: ngsa-asb-loderunner-id
+  azureIdentity: wcnp-loderunner-id
+  selector: wcnp-loderunner-id
 
 ---
 
@@ -52,7 +52,7 @@ spec:
       key: key
   parameters:
     usePodIdentity: "true"
-    keyvaultName: "kv-aks-ri3aov7twb4uy"
+    keyvaultName: "kv-aks-fykg5bqasutle"
     objects: |
       array:
         - |
