@@ -202,8 +202,8 @@ az keyvault secret set -o table --vault-name $ASB_KV_NAME --name "grafana-aad-cl
 az keyvault secret set -o table --vault-name $ASB_KV_NAME --name "grafana-azure-monitor-client-secret" --value $AZ_MONITOR_CLIENT_SECRET
 
 # set grafana AAD ids
-export ASB_GRAFANA_SP_CLIENT_ID=[insert CLIENT_ID]
-export ASB_GRAFANA_SP_TENANT_ID=[insert TENANT_ID]
+export ASB_GRAFANA_SP_CLIENT_ID=$CLIENT_ID
+export ASB_GRAFANA_SP_TENANT_ID=$TENANT_ID
 export ASB_GRAFANA_MI_NAME=grafana-id
 
 # create grafana-config config-map file
