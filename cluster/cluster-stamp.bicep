@@ -113,53 +113,113 @@ param location string
   'southeastasia'
 ])
 
-/*** VARIABLES ***/
-
 param geoRedundancyLocation string
 param kubernetesVersion string = '1.20.9'
 
-var networkContributorRole = '${subscription().id}/providers/Microsoft.Authorization/roleDefinitions/4d97b98b-1d4f-4787-a291-c67834d212e7'
-var monitoringMetricsPublisherRole = '${subscription().id}/providers/Microsoft.Authorization/roleDefinitions/3913510d-42f4-4e42-8a64-420c390055eb'
-var acrPullRole = '${subscription().id}/providers/Microsoft.Authorization/roleDefinitions/7f951dda-4ed3-4680-a7ca-43fe172d538d'
-var managedIdentityOperatorRole = '${subscription().id}/providers/Microsoft.Authorization/roleDefinitions/f1a07417-d97a-45cb-824c-7a7467783830'
-var virtualMachineContributorRole = '${subscription().id}/providers/Microsoft.Authorization/roleDefinitions/9980e02c-c2be-4d73-94e8-173b1dc7cf3c'
-var readerRole = '${subscription().id}/providers/Microsoft.Authorization/roleDefinitions/acdd72a7-3385-48ef-bd42-f606fba81ae7'
-var subRgUniqueString = uniqueString('aks', subscription().subscriptionId, resourceGroup().id)
-var nodeResourceGroupName = 'rg-${nodepoolsRGName}-nodepools-${location}'
-var baseName = 'aks-${subRgUniqueString}'
-var clusterName = '${baseName}-${location}'
-var laNewWorkspaceName = 'la-${baseName}'
+/*** VARIABLES ***/
+
+var clusterName = '${'aks-${uniqueString('aks', subscription().subscriptionId, resourceGroup().id)}'}-${location}'
+var laNewWorkspaceName = 'la-${'aks-${uniqueString('aks', subscription().subscriptionId, resourceGroup().id)}'}'
 var logAnalyticsWorkspaceName = ((empty(laWorkspaceName) && empty(laResourceGroup)) ? laNewWorkspaceName : laWorkspaceName)
 var isNewLogAnalytics = (logAnalyticsWorkspaceName == laNewWorkspaceName)
 var logAnalyticsResourceGroup = (isNewLogAnalytics ? resourceGroup().name : laResourceGroup)
-var containerInsightsSolutionName = 'ContainerInsights(${logAnalyticsWorkspaceName})'
-var defaultAcrName = 'acraks${subRgUniqueString}'
-var vNetResourceGroup = split(targetVnetResourceId, '/')[4]
-var vnetName = split(targetVnetResourceId, '/')[8]
-var vnetNodePoolSubnetResourceId = '${targetVnetResourceId}/subnets/snet-clusternodes'
-var vnetIngressServicesSubnetResourceId = '${targetVnetResourceId}/subnets/snet-cluster-ingressservices'
-var vnetHubCommonServicesSubnetResourceId = '${hubVnetResourceId}/subnets/CommonServicesSubnet'
-var HubvnetName = split(hubVnetResourceId, '/')[8]
-var agwName = 'apw-${clusterName}'
-var acrPrivateDnsZonesName = 'privatelink.azurecr.io'
-var akvPrivateDnsZonesName = 'privatelink.vaultcore.azure.net'
-var clusterControlPlaneIdentityName = 'mi-${clusterName}-controlplane'
-var keyVaultName = 'kv-${baseName}'
-var policyResourceIdAKSLinuxRestrictive = '/providers/Microsoft.Authorization/policySetDefinitions/42b8ef37-b724-4e24-bbc8-7a7708edfe00'
-var policyResourceIdEnforceHttpsIngress = '/providers/Microsoft.Authorization/policyDefinitions/1a5b4dca-0b6f-4cf5-907c-56316bc1bf3d'
-var policyResourceIdEnforceInternalLoadBalancers = '/providers/Microsoft.Authorization/policyDefinitions/3fc4dc25-5baf-40d8-9b05-7fe74c1bc64e'
-var policyResourceIdRoRootFilesystem = '/providers/Microsoft.Authorization/policyDefinitions/df49d893-a74c-421d-bc95-c663042e5b80'
-var policyResourceIdEnforceResourceLimits = '/providers/Microsoft.Authorization/policyDefinitions/e345eecc-fa47-480f-9e88-67dcc122b164'
-var policyResourceIdEnforceImageSource = '/providers/Microsoft.Authorization/policyDefinitions/febd0533-8e55-448f-b837-bd0e06f16469'
-var policyAssignmentNameAKSLinuxRestrictive_var = guid(policyResourceIdAKSLinuxRestrictive, resourceGroup().name, clusterName)
-var policyAssignmentNameEnforceHttpsIngress_var = guid(policyResourceIdEnforceHttpsIngress, resourceGroup().name, clusterName)
-var policyAssignmentNameEnforceInternalLoadBalancers_var = guid(policyResourceIdEnforceInternalLoadBalancers, resourceGroup().name, clusterName)
-var policyAssignmentNameRoRootFilesystem_var = guid(policyResourceIdRoRootFilesystem, resourceGroup().name, clusterName)
-var policyAssignmentNameEnforceResourceLimits_var = guid(policyResourceIdEnforceResourceLimits, resourceGroup().name, clusterName)
-var policyAssignmentNameEnforceImageSource_var = guid(policyResourceIdEnforceImageSource, resourceGroup().name, clusterName)
+var defaultAcrName = 'acraks${uniqueString('aks', subscription().subscriptionId, resourceGroup().id)}'
+var keyVaultName = 'kv-${'aks-${uniqueString('aks', subscription().subscriptionId, resourceGroup().id)}'}'
+
+
+/*** EXISTING TENANT RESOURCES ***/
+
+// Built-in 'Kubernetes cluster pod security restricted standards for Linux-based workloads' Azure Policy for Kubernetes initiative definition
+var policyResourceIdAKSLinuxRestrictive = tenantResourceId('Microsoft.Authorization/policySetDefinitions', '42b8ef37-b724-4e24-bbc8-7a7708edfe00')
+
+// Built-in 'Kubernetes clusters should be accessible only over HTTPS' Azure Policy for Kubernetes policy definition
+var policyResourceIdEnforceHttpsIngress = tenantResourceId('Microsoft.Authorization/policyDefinitions', '1a5b4dca-0b6f-4cf5-907c-56316bc1bf3d')
+
+// Built-in 'Kubernetes clusters should use internal load balancers' Azure Policy for Kubernetes policy definition
+var policyResourceIdEnforceInternalLoadBalancers = tenantResourceId('Microsoft.Authorization/policyDefinitions', '3fc4dc25-5baf-40d8-9b05-7fe74c1bc64e')
+
+// Built-in 'Kubernetes cluster containers should run with a read only root file system' Azure Policy for Kubernetes policy definition
+var policyResourceIdRoRootFilesystem = tenantResourceId('Microsoft.Authorization/policyDefinitions', 'df49d893-a74c-421d-bc95-c663042e5b80')
+
+// Built-in 'AKS container CPU and memory resource limits should not exceed the specified limits' Azure Policy for Kubernetes policy definition
+var policyResourceIdEnforceResourceLimits = tenantResourceId('Microsoft.Authorization/policyDefinitions', 'e345eecc-fa47-480f-9e88-67dcc122b164')
+
+// Built-in 'AKS containers should only use allowed images' Azure Policy for Kubernetes policy definition
+var policyResourceIdEnforceImageSource = tenantResourceId('Microsoft.Authorization/policyDefinitions', 'febd0533-8e55-448f-b837-bd0e06f16469')
+
+/*** EXISTING SUBSCRIPTION RESOURCES ***/
+
+// Built-in Azure RBAC role that is applied to a cluster to grant its monitoring agent's identity with publishing metrics and push alerts permissions.
+resource monitoringMetricsPublisherRole 'Microsoft.Authorization/roleDefinitions@2018-01-01-preview' existing = {
+  name: '3913510d-42f4-4e42-8a64-420c390055eb'
+  scope: subscription()
+}
+
+// Built-in Azure RBAC role: Read and Assign User Assigned Identity
+resource managedIdentityOperatorRole 'Microsoft.Authorization/roleDefinitions@2018-01-01-preview' existing = {
+  name: 'f1a07417-d97a-45cb-824c-7a7467783830'
+  scope: subscription()
+}
+
+// Built-in Azure RBAC role: Subscription Reader
+resource readerRole 'Microsoft.Authorization/roleDefinitions@2018-01-01-preview' existing = {
+  name: 'acdd72a7-3385-48ef-bd42-f606fba81ae7'
+  scope: subscription()
+}
+
+// Built-in Azure RBAC role: Network Contributor Role
+resource networkContributorRole 'Microsoft.Authorization/roleDefinitions@2018-01-01-preview' existing = {
+  name: '4d97b98b-1d4f-4787-a291-c67834d212e7'
+  scope: subscription()
+}
+
+// Built-in Azure RBAC role: Network Contributor Role
+resource virtualMachineContributorRole 'Microsoft.Authorization/roleDefinitions@2018-01-01-preview' existing = {
+  name: '9980e02c-c2be-4d73-94e8-173b1dc7cf3c'
+  scope: subscription()
+}
+
+// Built-in Azure RBAC role that can be applied to an Azure Container Registry to grant the authority pull container images. Granted to the AKS cluster's kubelet identity.
+resource acrPullRole 'Microsoft.Authorization/roleDefinitions@2018-01-01-preview' existing = {
+  name: '7f951dda-4ed3-4680-a7ca-43fe172d538d'
+  scope: subscription()
+}
+
+/*** EXISTING SPOKE RESOURCES ***/
+
+// Spoke resource group
+resource targetResourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' existing = {
+  scope: subscription()
+  name: '${split(targetVnetResourceId,'/')[4]}'
+}
+
+// Spoke virtual network
+resource targetVirtualNetwork 'Microsoft.Network/virtualNetworks@2022-05-01' existing = {
+  scope: targetResourceGroup
+  name: '${last(split(targetVnetResourceId,'/'))}'
+
+  // Spoke virutual network's subnet for the cluster nodes
+  resource snetClusterNodes 'subnets' existing = {
+    name: 'snet-clusternodes'
+  }
+
+  // Spoke virutual network's subnet for all private endpoints
+  resource snetPrivatelinkendpoints 'subnets' existing = {
+    name: 'snet-privatelinkendpoints'
+  }
+
+  // Spoke virutual network's subnet for application gateway
+  resource snetApplicationGateway 'subnets' existing = {
+    name: 'snet-applicationgateway'
+  }
+
+  // 
+}
+
+/*** RESOURCES ***/
 
 resource clusterControlPlaneIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2018-11-30' = {
-  name: clusterControlPlaneIdentityName
+  name: 'mi-${clusterName}-controlplane'
   location: location
 }
 
@@ -228,7 +288,6 @@ resource keyVaultName_sslcert 'Microsoft.KeyVault/vaults/secrets@2019-09-01' = {
   name: 'sslcert'
   properties: {
     value: appGatewayListenerCertificate
-    recoveryLevel: 'Purgeable'
   }
 }
 
@@ -237,7 +296,6 @@ resource keyVaultName_appgw_ingress_internal_aks_ingress_tls 'Microsoft.KeyVault
   name: 'appgw-ingress-internal-aks-ingress-tls'
   properties: {
     value: aksIngressControllerCertificate
-    recoveryLevel: 'Purgeable'
   }
 }
 
@@ -246,12 +304,11 @@ resource keyVaultName_appgw_ingress_internal_aks_ingress_key 'Microsoft.KeyVault
   name: 'appgw-ingress-internal-aks-ingress-key'
   properties: {
     value: aksIngressControllerKey
-    recoveryLevel: 'Purgeable'
   }
 }
 
-resource keyVaultName_Microsoft_Insights_default 'Microsoft.KeyVault/vaults/providers/diagnosticSettings@2017-05-01-preview' = {
-  name: '${keyVaultName}/Microsoft.Insights/default'
+resource keyVaultName_Microsoft_Insights_default 'Microsoft.Insights/diagnosticSettings@2017-05-01-preview' = {
+  name: 'default'
   properties: {
     workspaceId: resourceId(logAnalyticsResourceGroup, 'Microsoft.OperationalInsights/workspaces', logAnalyticsWorkspaceName)
     logs: [
@@ -267,16 +324,16 @@ resource keyVaultName_Microsoft_Insights_default 'Microsoft.KeyVault/vaults/prov
       }
     ]
   }
+  scope: keyVault
   dependsOn: [
-    keyVault
     laNewWorkspace
   ]
 }
 
-resource keyVaultName_Microsoft_Authorization_id_readerRole 'Microsoft.KeyVault/vaults/providers/roleAssignments@2018-09-01-preview' = {
-  name: '${keyVaultName}/Microsoft.Authorization/${guid(concat(resourceGroup().id), readerRole)}'
+resource keyVaultName_Microsoft_Authorization_id_readerRole 'Microsoft.Authorization/roleAssignments@2018-09-01-preview' = {
+  name: guid(concat(resourceGroup().id), readerRole.id)
   properties: {
-    roleDefinitionId: readerRole
+    roleDefinitionId: readerRole.id
     principalId: podmi_ingress_controller.properties.principalId
     principalType: 'ServicePrincipal'
   }
@@ -291,7 +348,7 @@ resource nodepools_to_akv 'Microsoft.Network/privateEndpoints@2020-05-01' = {
   location: location
   properties: {
     subnet: {
-      id: vnetHubCommonServicesSubnetResourceId
+      id: '${hubVnetResourceId}/subnets/CommonServicesSubnet' // TODO
     }
     privateLinkServiceConnections: [
       {
@@ -310,7 +367,6 @@ resource nodepools_to_akv 'Microsoft.Network/privateEndpoints@2020-05-01' = {
 resource nodepools_to_akv_default 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2020-05-01' = {
   parent: nodepools_to_akv
   name: 'default'
-  location: location
   properties: {
     privateDnsZoneConfigs: [
       {
@@ -324,7 +380,7 @@ resource nodepools_to_akv_default 'Microsoft.Network/privateEndpoints/privateDns
 }
 
 resource acrPrivateDnsZones 'Microsoft.Network/privateDnsZones@2020-06-01' = {
-  name: acrPrivateDnsZonesName
+  name: 'privatelink.azurecr.io'
   location: 'global'
   properties: {
   }
@@ -332,7 +388,7 @@ resource acrPrivateDnsZones 'Microsoft.Network/privateDnsZones@2020-06-01' = {
 
 resource acrPrivateDnsZonesName_to_Hubvnet 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2020-06-01' = {
   parent: acrPrivateDnsZones
-  name: 'to_${HubvnetName}'
+  name: 'to_${split(hubVnetResourceId, '/')[8]}'
   location: 'global'
   properties: {
     virtualNetwork: {
@@ -344,7 +400,7 @@ resource acrPrivateDnsZonesName_to_Hubvnet 'Microsoft.Network/privateDnsZones/vi
 
 resource acrPrivateDnsZonesName_to_vnet 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2020-06-01' = {
   parent: acrPrivateDnsZones
-  name: 'to_${vnetName}'
+  name: 'to_${split(targetVnetResourceId, '/')[8]}'
   location: 'global'
   properties: {
     virtualNetwork: {
@@ -355,7 +411,7 @@ resource acrPrivateDnsZonesName_to_vnet 'Microsoft.Network/privateDnsZones/virtu
 }
 
 resource akvPrivateDnsZones 'Microsoft.Network/privateDnsZones@2018-09-01' = {
-  name: akvPrivateDnsZonesName
+  name: 'privatelink.vaultcore.azure.net'
   location: 'global'
   properties: {
   }
@@ -363,7 +419,7 @@ resource akvPrivateDnsZones 'Microsoft.Network/privateDnsZones@2018-09-01' = {
 
 resource akvPrivateDnsZonesName_to_Hubvnet 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2020-06-01' = {
   parent: akvPrivateDnsZones
-  name: 'to_${HubvnetName}'
+  name: 'to_${split(hubVnetResourceId, '/')[8]}'
   location: 'global'
   properties: {
     virtualNetwork: {
@@ -375,7 +431,7 @@ resource akvPrivateDnsZonesName_to_Hubvnet 'Microsoft.Network/privateDnsZones/vi
 
 resource akvPrivateDnsZonesName_to_vnet 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2020-06-01' = {
   parent: akvPrivateDnsZones
-  name: 'to_${vnetName}'
+  name: 'to_${split(targetVnetResourceId, '/')[8]}'
   location: 'global'
   properties: {
     virtualNetwork: {
@@ -407,7 +463,7 @@ resource asbDnsZone_ngsa_memory_asbDns 'Microsoft.Network/privateDnsZones/A@2018
 
 resource asbDnsZone_to_vnet 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2020-06-01' = {
   parent: asbDnsZone_resource
-  name: 'to_${vnetName}'
+  name: 'to_${split(targetVnetResourceId, '/')[8]}'
   location: 'global'
   properties: {
     virtualNetwork: {
@@ -419,7 +475,7 @@ resource asbDnsZone_to_vnet 'Microsoft.Network/privateDnsZones/virtualNetworkLin
 
 resource asbDnsZone_to_Hubvnet 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2020-06-01' = {
   parent: asbDnsZone_resource
-  name: 'to_${HubvnetName}'
+  name: 'to_${split(hubVnetResourceId, '/')[8]}'
   location: 'global'
   properties: {
     virtualNetwork: {
@@ -430,7 +486,7 @@ resource asbDnsZone_to_Hubvnet 'Microsoft.Network/privateDnsZones/virtualNetwork
 }
 
 resource agw 'Microsoft.Network/applicationGateways@2020-05-01' = {
-  name: agwName
+  name: 'apw-${clusterName}'
   location: location
   identity: {
     type: 'UserAssigned'
@@ -462,7 +518,7 @@ resource agw 'Microsoft.Network/applicationGateways@2020-05-01' = {
         name: 'apw-ip-configuration'
         properties: {
           subnet: {
-            id: '${targetVnetResourceId}/subnets/snet-applicationgateway'
+            id: targetVirtualNetwork::snetApplicationGateway.id
           }
         }
       }
@@ -472,7 +528,7 @@ resource agw 'Microsoft.Network/applicationGateways@2020-05-01' = {
         name: 'apw-frontend-ip-configuration'
         properties: {
           publicIPAddress: {
-            id: resourceId(subscription().subscriptionId, vNetResourceGroup, 'Microsoft.Network/publicIpAddresses', 'pip-${deploymentName}-${orgAppId}-00')
+            id: resourceId(subscription().subscriptionId, split(targetVnetResourceId, '/')[4], 'Microsoft.Network/publicIpAddresses', 'pip-${deploymentName}-${orgAppId}-00')
           }
         }
       }
@@ -505,7 +561,7 @@ resource agw 'Microsoft.Network/applicationGateways@2020-05-01' = {
     enableHttp2: false
     sslCertificates: [
       {
-        name: '${agwName}-ssl-certificate'
+        name: 'apw-${clusterName}-ssl-certificate'
         properties: {
           keyVaultSecretId: '${keyVault.properties.vaultUri}secrets/sslcert'
         }
@@ -549,7 +605,7 @@ resource agw 'Microsoft.Network/applicationGateways@2020-05-01' = {
           pickHostNameFromBackendAddress: true
           requestTimeout: 20
           probe: {
-            id: resourceId('Microsoft.Network/applicationGateways/probes', agwName, 'probe-${asbDnsName}')
+            id: resourceId('Microsoft.Network/applicationGateways/probes', 'apw-${clusterName}', 'probe-${asbDnsName}')
           }
         }
       }
@@ -559,14 +615,14 @@ resource agw 'Microsoft.Network/applicationGateways@2020-05-01' = {
         name: 'listener-ngsa-memory-${asbDnsName}'
         properties: {
           frontendIPConfiguration: {
-            id: resourceId('Microsoft.Network/applicationGateways/frontendIPConfigurations', agwName, 'apw-frontend-ip-configuration')
+            id: resourceId('Microsoft.Network/applicationGateways/frontendIPConfigurations', 'apw-${clusterName}', 'apw-frontend-ip-configuration')
           }
           frontendPort: {
-            id: resourceId('Microsoft.Network/applicationGateways/frontendPorts', agwName, 'port-443')
+            id: resourceId('Microsoft.Network/applicationGateways/frontendPorts', 'apw-${clusterName}', 'port-443')
           }
           protocol: 'Https'
           sslCertificate: {
-            id: resourceId('Microsoft.Network/applicationGateways/sslCertificates', agwName, '${agwName}-ssl-certificate')
+            id: resourceId('Microsoft.Network/applicationGateways/sslCertificates', 'apw-${clusterName}', 'apw-${clusterName}-ssl-certificate')
           }
           hostName: 'ngsa-memory-${asbDomainSuffix}'
           hostNames: []
@@ -577,10 +633,10 @@ resource agw 'Microsoft.Network/applicationGateways@2020-05-01' = {
         name: 'http-listener-ngsa-memory-${asbDnsName}'
         properties: {
           frontendIPConfiguration: {
-            id: resourceId('Microsoft.Network/applicationGateways/frontendIPConfigurations', agwName, 'apw-frontend-ip-configuration')
+            id: resourceId('Microsoft.Network/applicationGateways/frontendIPConfigurations', 'apw-${clusterName}', 'apw-frontend-ip-configuration')
           }
           frontendPort: {
-            id: resourceId('Microsoft.Network/applicationGateways/frontendPorts', agwName, 'port-80')
+            id: resourceId('Microsoft.Network/applicationGateways/frontendPorts', 'apw-${clusterName}', 'port-80')
           }
           protocol: 'Http'
           hostName: 'ngsa-memory-${asbDomainSuffix}'
@@ -594,10 +650,10 @@ resource agw 'Microsoft.Network/applicationGateways@2020-05-01' = {
         properties: {
           redirectType: 'Permanent'
           targetListener: {
-            id: resourceId('Microsoft.Network/applicationGateways/httpListeners', agwName,'listener-ngsa-memory-${asbDnsName}')
+            id: resourceId('Microsoft.Network/applicationGateways/httpListeners', 'apw-${clusterName}','listener-ngsa-memory-${asbDnsName}')
           }
-          includePath: 'true'
-          includeQueryString: 'true'
+          includePath: true
+          includeQueryString: true
         }
       }
     ]
@@ -607,13 +663,13 @@ resource agw 'Microsoft.Network/applicationGateways@2020-05-01' = {
         properties: {
           ruleType: 'Basic'
           httpListener: {
-            id: resourceId('Microsoft.Network/applicationGateways/frontendIPConfigurations', agwName,'listener-ngsa-memory-${asbDnsName}')
+            id: resourceId('Microsoft.Network/applicationGateways/frontendIPConfigurations', 'apw-${clusterName}','listener-ngsa-memory-${asbDnsName}')
           }
           backendAddressPool: {
-            id: resourceId('Microsoft.Network/applicationGateways/backendAddressPools', agwName,'ngsa-memory-${asbDomainSuffix}')
+            id: resourceId('Microsoft.Network/applicationGateways/backendAddressPools', 'apw-${clusterName}','ngsa-memory-${asbDomainSuffix}')
           }
           backendHttpSettings: {
-            id: resourceId('Microsoft.Network/applicationGateways/backendHttpSettingsCollection', agwName,'ngsa-memory-${asbDnsName}-httpsettings')
+            id: resourceId('Microsoft.Network/applicationGateways/backendHttpSettingsCollection', 'apw-${clusterName}','ngsa-memory-${asbDnsName}-httpsettings')
           }
         }
       }
@@ -622,10 +678,10 @@ resource agw 'Microsoft.Network/applicationGateways@2020-05-01' = {
         properties: {
           ruleType: 'Basic'
           httpListener: {
-            id: resourceId('Microsoft.Network/applicationGateways/httpListeners', agwName,'http-listener-ngsa-memory-${asbDnsName}')
+            id: resourceId('Microsoft.Network/applicationGateways/httpListeners', 'apw-${clusterName}','http-listener-ngsa-memory-${asbDnsName}')
           }
           redirectConfiguration: {
-            id: resourceId('Microsoft.Network/applicationGateways/redirectConfigurations', agwName,'https-redirect-config-ngsa-memory-${asbDnsName}')
+            id: resourceId('Microsoft.Network/applicationGateways/redirectConfigurations', 'apw-${clusterName}','https-redirect-config-ngsa-memory-${asbDnsName}')
           }
         }
       }
@@ -660,24 +716,24 @@ resource agwName_Microsoft_Insights_default 'Microsoft.Insights/diagnosticSettin
 
 module EnsureClusterIdentityHasRbacToSelfManagedResources './nested_EnsureClusterIdentityHasRbacToSelfManagedResources.bicep' = {
   name: 'EnsureClusterIdentityHasRbacToSelfManagedResources'
-  scope: resourceGroup(vNetResourceGroup)
+  scope: resourceGroup(split(targetVnetResourceId, '/')[4])
   params: {
     resourceId_Microsoft_ManagedIdentity_userAssignedIdentities_variables_clusterControlPlaneIdentityName: clusterControlPlaneIdentity.properties
-    variables_vnetNodePoolSubnetResourceId: vnetNodePoolSubnetResourceId
-    variables_networkContributorRole: networkContributorRole
-    variables_clusterControlPlaneIdentityName: clusterControlPlaneIdentityName
-    variables_vnetName: vnetName
-    variables_vnetIngressServicesSubnetResourceId: vnetIngressServicesSubnetResourceId
+    variables_vnetNodePoolSubnetResourceId: '${targetVnetResourceId}/subnets/snet-clusternodes' // TODO
+    variables_networkContributorRole: networkContributorRole.id
+    variables_clusterControlPlaneIdentityName: 'mi-${clusterName}-controlplane'
+    variables_vnetName: split(targetVnetResourceId, '/')[8]
+    variables_vnetIngressServicesSubnetResourceId: '${targetVnetResourceId}/subnets/snet-cluster-ingressservices' // TODO
     location: location
   }
 }
 
 module EnsureClusterUserAssignedHasRbacToManageVMSS './nested_EnsureClusterUserAssignedHasRbacToManageVMSS.bicep' = {
   name: 'EnsureClusterUserAssignedHasRbacToManageVMSS'
-  scope: resourceGroup(nodeResourceGroupName)
+  scope: resourceGroup('rg-${nodepoolsRGName}-nodepools-${location}')
   params: {
     resourceId_Microsoft_ContainerService_managedClusters_variables_clusterName: reference(cluster.id, '2020-03-01')
-    variables_virtualMachineContributorRole: virtualMachineContributorRole
+    variables_virtualMachineContributorRole: virtualMachineContributorRole.id
     location: location
   }
 }
@@ -697,7 +753,6 @@ resource laNewWorkspaceName_AllPrometheus 'Microsoft.OperationalInsights/workspa
   parent: laNewWorkspace
   name: 'AllPrometheus'
   properties: {
-    eTag: '*'
     category: 'Prometheus'
     displayName: 'All collected Prometheus information'
     query: 'InsightsMetrics | where Namespace == "prometheus"'
@@ -709,7 +764,6 @@ resource laNewWorkspaceName_ForbiddenReponsesOnIngress 'Microsoft.OperationalIns
   parent: laNewWorkspace
   name: 'ForbiddenReponsesOnIngress'
   properties: {
-    eTag: '*'
     category: 'Prometheus'
     displayName: 'Increase number of forbidden response on the Ingress Controller'
     query: 'let value = toscalar(InsightsMetrics | where Namespace == "prometheus" and Name == "traefik_entrypoint_requests_total" | where parse_json(Tags).code == 403 | summarize Value = avg(Val) by bin(TimeGenerated, 5m) | summarize min = min(Value)); InsightsMetrics | where Namespace == "prometheus" and Name == "traefik_entrypoint_requests_total" | where parse_json(Tags).code == 403 | summarize AggregatedValue = avg(Val)-value by bin(TimeGenerated, 5m) | order by TimeGenerated | render barchart'
@@ -721,7 +775,6 @@ resource laNewWorkspaceName_NodeRebootRequested 'Microsoft.OperationalInsights/w
   parent: laNewWorkspace
   name: 'NodeRebootRequested'
   properties: {
-    eTag: '*'
     category: 'Prometheus'
     displayName: 'Nodes reboot required by kured'
     query: 'InsightsMetrics | where Namespace == "prometheus" and Name == "kured_reboot_required" | where Val > 0'
@@ -746,7 +799,7 @@ resource PodFailedScheduledQuery_cluster 'Microsoft.Insights/scheduledQueryRules
     }
     action: {
       'odata.type': 'Microsoft.WindowsAzure.Management.Monitoring.Alerts.Models.Microsoft.AppInsights.Nexus.DataContracts.Resources.ScheduledQueryRules.AlertingAction'
-      severity: 3
+      severity: '3'
       trigger: {
         thresholdOperator: 'GreaterThan'
         threshold: 3
@@ -792,13 +845,13 @@ resource AllAzureAdvisorAlert 'microsoft.insights/activityLogAlerts@2017-04-01' 
 }
 
 resource containerInsightsSolution 'Microsoft.OperationsManagement/solutions@2015-11-01-preview' = if (isNewLogAnalytics) {
-  name: containerInsightsSolutionName
+  name: 'ContainerInsights(${logAnalyticsWorkspaceName})'
   location: location
   properties: {
     workspaceResourceId: resourceId(logAnalyticsResourceGroup, 'Microsoft.OperationalInsights/workspaces', logAnalyticsWorkspaceName)
   }
   plan: {
-    name: containerInsightsSolutionName
+    name: 'ContainerInsights(${logAnalyticsWorkspaceName})'
     product: 'OMSGallery/ContainerInsights'
     promotionCode: ''
     publisher: 'Microsoft'
@@ -861,10 +914,10 @@ resource defaultAcr 'Microsoft.ContainerRegistry/registries@2020-11-01-preview' 
   }
 }
 
-resource defaultAcrName_Microsoft_Authorization_Microsoft_ContainerService_managedClusters_clusterName_acrPullRole 'Microsoft.ContainerRegistry/registries/providers/roleAssignments@2020-04-01-preview' = {
-  name: '${defaultAcrName}/Microsoft.Authorization/${guid(cluster.id, acrPullRole)}'
+resource defaultAcrName_Microsoft_Authorization_Microsoft_ContainerService_managedClusters_clusterName_acrPullRole 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
+  name: guid(cluster.id, acrPullRole.id)
   properties: {
-    roleDefinitionId: acrPullRole
+    roleDefinitionId: acrPullRole.id
     principalId: reference(cluster.id, '2020-12-01').identityProfile.kubeletidentity.objectId
     principalType: 'ServicePrincipal'
   }
@@ -876,14 +929,14 @@ resource defaultAcrName_Microsoft_Authorization_Microsoft_ContainerService_manag
 
 resource defaultAcrName_geoRedundancyLocation 'Microsoft.ContainerRegistry/registries/replications@2019-05-01' = {
   parent: defaultAcr
-  name: '${geoRedundancyLocation}'
+  name: geoRedundancyLocation
   location: geoRedundancyLocation
   properties: {
   }
 }
 
-resource defaultAcrName_Microsoft_Insights_default 'Microsoft.ContainerRegistry/registries/providers/diagnosticSettings@2017-05-01-preview' = {
-  name: '${defaultAcrName}/Microsoft.Insights/default'
+resource defaultAcrName_Microsoft_Insights_default 'Microsoft.Insights/diagnosticSettings@2017-05-01-preview' = {
+  name: 'default'
   properties: {
     workspaceId: resourceId(logAnalyticsResourceGroup, 'Microsoft.OperationalInsights/workspaces', logAnalyticsWorkspaceName)
     metrics: [
@@ -904,8 +957,8 @@ resource defaultAcrName_Microsoft_Insights_default 'Microsoft.ContainerRegistry/
       }
     ]
   }
+  scope: defaultAcr
   dependsOn: [
-    defaultAcr
     laNewWorkspace
   ]
 }
@@ -915,7 +968,7 @@ resource nodepools_to_acr 'Microsoft.Network/privateEndpoints@2020-05-01' = {
   location: location
   properties: {
     subnet: {
-      id: vnetHubCommonServicesSubnetResourceId
+      id: targetVirtualNetwork::snetPrivatelinkendpoints.id
     }
     privateLinkServiceConnections: [
       {
@@ -937,7 +990,6 @@ resource nodepools_to_acr 'Microsoft.Network/privateEndpoints@2020-05-01' = {
 resource nodepools_to_acr_default 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2020-05-01' = {
   parent: nodepools_to_acr
   name: 'default'
-  location: location
   properties: {
     privateDnsZoneConfigs: [
       {
@@ -966,7 +1018,7 @@ resource cluster 'Microsoft.ContainerService/managedClusters@2021-02-01' = {
         osType: 'Linux'
         minCount: 3
         maxCount: 4
-        vnetSubnetID: vnetNodePoolSubnetResourceId
+        vnetSubnetID: targetVirtualNetwork::snetClusterNodes.id
         enableAutoScaling: true
         type: 'VirtualMachineScaleSets'
         mode: 'System'
@@ -993,7 +1045,7 @@ resource cluster 'Microsoft.ContainerService/managedClusters@2021-02-01' = {
         osType: 'Linux'
         minCount: 2
         maxCount: 5
-        vnetSubnetID: vnetNodePoolSubnetResourceId
+        vnetSubnetID: targetVirtualNetwork::snetClusterNodes.id
         enableAutoScaling: true
         type: 'VirtualMachineScaleSets'
         mode: 'User'
@@ -1035,10 +1087,9 @@ resource cluster 'Microsoft.ContainerService/managedClusters@2021-02-01' = {
         }
       }
     }
-    nodeResourceGroup: nodeResourceGroupName
+    nodeResourceGroup: 'rg-${nodepoolsRGName}-nodepools-${location}'
     enableRBAC: true
     enablePodSecurityPolicy: false
-    maxAgentPools: 2
     networkProfile: {
       networkPlugin: 'azure'
       networkPolicy: 'azure'
@@ -1105,17 +1156,17 @@ resource cluster 'Microsoft.ContainerService/managedClusters@2021-02-01' = {
   ]
 }
 
-resource clusterName_Microsoft_Authorization_Microsoft_ContainerService_managedClusters_clusterName_omsagent_monitoringMetricsPublisherRole 'Microsoft.ContainerService/managedClusters/providers/roleAssignments@2020-04-01-preview' = {
-  name: '${clusterName}/Microsoft.Authorization/${guid(cluster.id, 'omsagent', monitoringMetricsPublisherRole)}'
+resource clusterName_Microsoft_Authorization_Microsoft_ContainerService_managedClusters_clusterName_omsagent_monitoringMetricsPublisherRole 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
+  name: guid(cluster.id, 'omsagent', monitoringMetricsPublisherRole.id)
   properties: {
-    roleDefinitionId: monitoringMetricsPublisherRole
+    roleDefinitionId: monitoringMetricsPublisherRole.id
     principalId: reference(cluster.id, '2020-12-01').addonProfiles.omsagent.identity.objectId
     principalType: 'ServicePrincipal'
   }
 }
 
-resource clusterName_Microsoft_Insights_default 'Microsoft.ContainerService/managedClusters/providers/diagnosticSettings@2017-05-01-preview' = {
-  name: '${clusterName}/Microsoft.Insights/default'
+resource clusterName_Microsoft_Insights_default 'Microsoft.Insights/diagnosticSettings@2017-05-01-preview' = {
+  name: 'default'
   properties: {
     workspaceId: resourceId(logAnalyticsResourceGroup, 'Microsoft.OperationalInsights/workspaces', logAnalyticsWorkspaceName)
     logs: [
@@ -1137,8 +1188,8 @@ resource clusterName_Microsoft_Insights_default 'Microsoft.ContainerService/mana
       }
     ]
   }
+  scope: cluster
   dependsOn: [
-    cluster
     laNewWorkspace
   ]
 }
@@ -1165,7 +1216,7 @@ resource Node_CPU_utilization_high_for_clusterName_CI_1 'Microsoft.Insights/metr
           metricNamespace: 'Insights.Container/nodes'
           name: 'Metric1'
           operator: 'GreaterThan'
-          threshold: '80'
+          threshold: 80
           timeAggregation: 'Average'
           skipMetricValidation: true
         }
@@ -1210,7 +1261,7 @@ resource Node_working_set_memory_utilization_high_for_clusterName_CI_2 'Microsof
           metricNamespace: 'Insights.Container/nodes'
           name: 'Metric1'
           operator: 'GreaterThan'
-          threshold: '80'
+          threshold: 80
           timeAggregation: 'Average'
           skipMetricValidation: true
         }
@@ -1262,7 +1313,7 @@ resource Jobs_completed_more_than_6_hours_ago_for_clusterName_CI_11 'Microsoft.I
           metricNamespace: 'Insights.Container/pods'
           name: 'Metric1'
           operator: 'GreaterThan'
-          threshold: '0'
+          threshold: 0
           timeAggregation: 'Average'
           skipMetricValidation: true
         }
@@ -1314,7 +1365,7 @@ resource Container_CPU_usage_high_for_clusterName_CI_9 'Microsoft.Insights/metri
           metricNamespace: 'Insights.Container/containers'
           name: 'Metric1'
           operator: 'GreaterThan'
-          threshold: '90'
+          threshold: 90
           timeAggregation: 'Average'
           skipMetricValidation: true
         }
@@ -1366,7 +1417,7 @@ resource Container_working_set_memory_usage_high_for_clusterName_CI_10 'Microsof
           metricNamespace: 'Insights.Container/containers'
           name: 'Metric1'
           operator: 'GreaterThan'
-          threshold: '90'
+          threshold: 90
           timeAggregation: 'Average'
           skipMetricValidation: true
         }
@@ -1411,7 +1462,7 @@ resource Pods_in_failed_state_for_clusterName_CI_4 'Microsoft.Insights/metricAle
           metricNamespace: 'Insights.Container/pods'
           name: 'Metric1'
           operator: 'GreaterThan'
-          threshold: '0'
+          threshold: 0
           timeAggregation: 'Average'
           skipMetricValidation: true
         }
@@ -1463,7 +1514,7 @@ resource Disk_usage_high_for_clusterName_CI_5 'Microsoft.Insights/metricAlerts@2
           metricNamespace: 'Insights.Container/nodes'
           name: 'Metric1'
           operator: 'GreaterThan'
-          threshold: '80'
+          threshold: 80
           timeAggregation: 'Average'
           skipMetricValidation: true
         }
@@ -1508,7 +1559,7 @@ resource Nodes_in_not_ready_status_for_clusterName_CI_3 'Microsoft.Insights/metr
           metricNamespace: 'Insights.Container/nodes'
           name: 'Metric1'
           operator: 'GreaterThan'
-          threshold: '0'
+          threshold: 0
           timeAggregation: 'Average'
           skipMetricValidation: true
         }
@@ -1560,7 +1611,7 @@ resource Containers_getting_OOM_killed_for_clusterName_CI_6 'Microsoft.Insights/
           metricNamespace: 'Insights.Container/pods'
           name: 'Metric1'
           operator: 'GreaterThan'
-          threshold: '0'
+          threshold: 0
           timeAggregation: 'Average'
           skipMetricValidation: true
         }
@@ -1612,7 +1663,7 @@ resource Persistent_volume_usage_high_for_clusterName_CI_18 'Microsoft.Insights/
           metricNamespace: 'Insights.Container/persistentvolumes'
           name: 'Metric1'
           operator: 'GreaterThan'
-          threshold: '80'
+          threshold: 80
           timeAggregation: 'Average'
           skipMetricValidation: true
         }
@@ -1664,7 +1715,7 @@ resource Pods_not_in_ready_state_for_clusterName_CI_8 'Microsoft.Insights/metric
           metricNamespace: 'Insights.Container/pods'
           name: 'Metric1'
           operator: 'LessThan'
-          threshold: '80'
+          threshold: 80
           timeAggregation: 'Average'
           skipMetricValidation: true
         }
@@ -1716,7 +1767,7 @@ resource Restarting_container_count_for_clusterName_CI_7 'Microsoft.Insights/met
           metricNamespace: 'Insights.Container/pods'
           name: 'Metric1'
           operator: 'GreaterThan'
-          threshold: '0'
+          threshold: 0
           timeAggregation: 'Average'
           skipMetricValidation: true
         }
@@ -1739,17 +1790,17 @@ resource Restarting_container_count_for_clusterName_CI_7 'Microsoft.Insights/met
   ]
 }
 
-resource podmi_ingress_controller_Microsoft_Authorization_id_managedIdentityOperatorRole_cluster 'Microsoft.ManagedIdentity/userAssignedIdentities/providers/roleAssignments@2018-09-01-preview' = {
-  name: 'podmi-ingress-controller/Microsoft.Authorization/${guid(concat(resourceGroup().id), managedIdentityOperatorRole, clusterName)}'
+resource podmi_ingress_controller_Microsoft_Authorization_id_managedIdentityOperatorRole_cluster 'Microsoft.Authorization/roleAssignments@2018-09-01-preview' = {
+  name: guid(concat(resourceGroup().id), managedIdentityOperatorRole.id, clusterName)
   properties: {
-    roleDefinitionId: managedIdentityOperatorRole
+    roleDefinitionId: managedIdentityOperatorRole.id
     principalId: reference(cluster.id, '2020-11-01').identityProfile.kubeletidentity.objectId
     principalType: 'ServicePrincipal'
   }
 }
 
 resource policyAssignmentNameAKSLinuxRestrictive 'Microsoft.Authorization/policyAssignments@2020-03-01' = {
-  name: policyAssignmentNameAKSLinuxRestrictive_var
+  name: guid(policyResourceIdAKSLinuxRestrictive, resourceGroup().name, clusterName)
   properties: {
     displayName: concat(reference(policyResourceIdAKSLinuxRestrictive, '2020-09-01').displayName)
     scope: subscriptionResourceId('Microsoft.Resources/resourceGroups', resourceGroup().name)
@@ -1774,7 +1825,7 @@ resource policyAssignmentNameAKSLinuxRestrictive 'Microsoft.Authorization/policy
 }
 
 resource policyAssignmentNameEnforceHttpsIngress 'Microsoft.Authorization/policyAssignments@2020-03-01' = {
-  name: policyAssignmentNameEnforceHttpsIngress_var
+  name: guid(policyResourceIdEnforceHttpsIngress, resourceGroup().name, clusterName)
   properties: {
     displayName: concat(reference(policyResourceIdEnforceHttpsIngress, '2020-09-01').displayName)
     scope: subscriptionResourceId('Microsoft.Resources/resourceGroups', resourceGroup().name)
@@ -1791,7 +1842,7 @@ resource policyAssignmentNameEnforceHttpsIngress 'Microsoft.Authorization/policy
 }
 
 resource policyAssignmentNameEnforceInternalLoadBalancers 'Microsoft.Authorization/policyAssignments@2020-03-01' = {
-  name: policyAssignmentNameEnforceInternalLoadBalancers_var
+  name: guid(policyResourceIdEnforceInternalLoadBalancers, resourceGroup().name, clusterName)
   properties: {
     displayName: concat(reference(policyResourceIdEnforceInternalLoadBalancers, '2020-09-01').displayName)
     scope: subscriptionResourceId('Microsoft.Resources/resourceGroups', resourceGroup().name)
@@ -1808,7 +1859,7 @@ resource policyAssignmentNameEnforceInternalLoadBalancers 'Microsoft.Authorizati
 }
 
 resource policyAssignmentNameRoRootFilesystem 'Microsoft.Authorization/policyAssignments@2020-03-01' = {
-  name: policyAssignmentNameRoRootFilesystem_var
+  name: guid(policyResourceIdRoRootFilesystem, resourceGroup().name, clusterName)
   properties: {
     displayName: concat(reference(policyResourceIdRoRootFilesystem, '2020-09-01').displayName)
     scope: subscriptionResourceId('Microsoft.Resources/resourceGroups', resourceGroup().name)
@@ -1829,7 +1880,7 @@ resource policyAssignmentNameRoRootFilesystem 'Microsoft.Authorization/policyAss
 }
 
 resource policyAssignmentNameEnforceResourceLimits 'Microsoft.Authorization/policyAssignments@2020-03-01' = {
-  name: policyAssignmentNameEnforceResourceLimits_var
+  name: guid(policyResourceIdEnforceResourceLimits, resourceGroup().name, clusterName)
   properties: {
     displayName: concat(reference(policyResourceIdEnforceResourceLimits, '2020-09-01').displayName)
     scope: subscriptionResourceId('Microsoft.Resources/resourceGroups', resourceGroup().name)
@@ -1860,7 +1911,7 @@ resource policyAssignmentNameEnforceResourceLimits 'Microsoft.Authorization/poli
 }
 
 resource policyAssignmentNameEnforceImageSource 'Microsoft.Authorization/policyAssignments@2020-03-01' = {
-  name: policyAssignmentNameEnforceImageSource_var
+  name: guid(policyResourceIdEnforceImageSource, resourceGroup().name, clusterName)
   properties: {
     displayName: concat(reference(policyResourceIdEnforceImageSource, '2020-09-01').displayName)
     scope: subscriptionResourceId('Microsoft.Resources/resourceGroups', resourceGroup().name)
@@ -1886,10 +1937,10 @@ resource policyAssignmentNameEnforceImageSource 'Microsoft.Authorization/policyA
 }
 
 output aksClusterName string = clusterName
-output agwName string = agwName
+output agwName string = 'apw-${clusterName}'
 output aksIngressControllerPodManagedIdentityResourceId string = podmi_ingress_controller.id
 output aksIngressControllerPodManagedIdentityClientId string = reference(podmi_ingress_controller.id, '2018-11-30').clientId
 output keyVaultName string = keyVaultName
 output logAnalyticsName string = logAnalyticsWorkspaceName
 output containerRegistryName string = defaultAcrName
-output vnetNodePoolSubnetResourceId string = vnetNodePoolSubnetResourceId
+output vnetNodePoolSubnetResourceId string = '${targetVnetResourceId}/subnets/snet-clusternodes'
