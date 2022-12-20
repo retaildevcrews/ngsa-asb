@@ -47,7 +47,7 @@ spec:
               cpu: "50m"
           env:
           - name: "LRAPI_DNS"
-            value: "https://loderunner-westus2-pre.cse.ms/api"
+            value: "https://loderunner-westus3-pre.austinrdc.dev/api"
           readinessProbe:
             initialDelaySeconds: 5
             httpGet:
@@ -94,7 +94,7 @@ spec:
   gateways:
   - istio-system/istio-gateway
   hosts:
-  - loderunner-westus2-pre.cse.ms
+  - loderunner-westus3-pre.austinrdc.dev
   http:
   - match:
     - uri:

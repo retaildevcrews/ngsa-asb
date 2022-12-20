@@ -30,9 +30,9 @@ spec:
           - --prometheus
           - --no-cache
           - --zone
-          - az-westus2-pre
+          - az-westus3-pre
           - --region
-          - westus2
+          - westus3
           - --cosmos-auth-type
           - ManagedIdentity
           ports:
@@ -114,7 +114,7 @@ spec:
   gateways:
   - istio-system/istio-gateway
   hosts:
-  - ngsa-cosmos-westus2-pre.cse.ms
+  - ngsa-cosmos-westus3-pre.austinrdc.dev
   http:
   - route:
     - destination:

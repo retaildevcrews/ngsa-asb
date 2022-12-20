@@ -25,9 +25,9 @@ spec:
           - --in-memory
           - --prometheus
           - --zone
-          - az-centralus-pre
+          - az-northcentralus-pre
           - --region
-          - centralus
+          - northcentralus
           ports:
             - name: http
               containerPort: 8080
@@ -98,7 +98,7 @@ spec:
   gateways:
   - istio-system/istio-gateway
   hosts:
-  - ngsa-memory-centralus-pre.cse.ms
+  - ngsa-memory-northcentralus-pre.austinrdc.dev
   http:
   - route:
     - destination:

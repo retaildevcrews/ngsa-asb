@@ -112,6 +112,17 @@ az network private-dns link vnet create -n "to_vnet-spoke-$ASB_ORG_APP_ID_NAME-0
 
 # This section takes 15-20 minutes
 
+# To find a list of VM sizes available in your Azure subscription:
+# 1. Navigate to the following location in Azure:
+#    Create a Resource > Marketplace > Create Kubernetes Cluster
+# 2. Specify your Subscription and Region
+# 3. Click "Change size" in the Node Size setting
+
+# Set VM attributes
+export ASB_VM_SIZE=standard_d4plds_v5 # e.g: westus2: standard_d4plds_v5, centralus: standard_d4plds_v5
+export ASB_OS_DISK_SIZE_GB=150 # e.g: westus2: 150, centralus: 150
+export ASB_AVAILABILITY_ZONES=["\"1\"","\"2\"","\"3\""] # e.g: westus2: ["\"1\"","\"2\"","\"3\""], centralus: ["\"1\"","\"3\""]
+
 # Create AKS
 az deployment group create -g $ASB_RG_CORE \
   -f cluster/cluster-stamp-additional.json \
@@ -129,6 +140,9 @@ az deployment group create -g $ASB_RG_CORE \
      nodepoolsRGName=${ASB_RG_NAME} \
      orgAppId=${ASB_ORG_APP_ID_NAME} \
      targetVnetResourceId=${ASB_SPOKE_VNET_ID} \
+     vmSize=${ASB_VM_SIZE} \
+     osDiskSizeGB=${ASB_OS_DISK_SIZE_GB} \
+     availabilityZones=${ASB_AVAILABILITY_ZONES} \
   -c --query name
 
 # Grant PullFromACR permission

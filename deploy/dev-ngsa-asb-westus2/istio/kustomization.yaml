@@ -8,12 +8,12 @@ patches:
         - op: replace
           path: "/spec/servers/0/hosts"
           value:
-            - "ngsa/ngsa-memory-westus2-dev.cse.ms"
-            - "ngsa/ngsa-cosmos-westus2-dev.cse.ms"
-            - "ngsa/ngsa-java-westus2-dev.cse.ms"
-            - "monitoring/grafana-westus2-dev.cse.ms"
-            - "monitoring/thanos-grpc-westus2-dev.cse.ms"
-            - "loderunner/loderunner-westus2-dev.cse.ms"
+            - "ngsa/ngsa-memory-westus3-dev.austinrdc.dev"
+            - "ngsa/ngsa-cosmos-westus3-dev.austinrdc.dev"
+            - "ngsa/ngsa-java-westus3-dev.austinrdc.dev"
+            - "monitoring/grafana-westus3-dev.austinrdc.dev"
+            - "monitoring/thanos-grpc-westus3-dev.austinrdc.dev"
+            - "loderunner/loderunner-westus3-dev.austinrdc.dev"
 
         - op: add
           path: "/spec/servers/0/tls"
@@ -86,11 +86,11 @@ patches:
   - patch: |
         - op: replace
           path: "/spec/resourceID"
-          value: "/subscriptions/648dcb5a-de1e-48b2-af6b-fe6ef28d355c/resourceGroups/rg-ngsa-asb-dev/providers/Microsoft.ManagedIdentity/userAssignedIdentities/podmi-ingress-controller"
+          value: "/subscriptions/5dc45b2f-bf13-4281-b763-a53f57290aa3/resourceGroups/rg-wcnp-dev/providers/Microsoft.ManagedIdentity/userAssignedIdentities/podmi-ingress-controller"
 
         - op: replace
           path: "/spec/clientID"
-          value: "c4d9277f-d849-4c44-a6f1-6ebb2153944a"
+          value: "51f32449-99df-4b9b-a8b7-0e347ab19f37"
     target:
       kind: AzureIdentity
       name: istio-ingress-id
@@ -99,7 +99,7 @@ patches:
   - patch: |
         - op: replace
           path: "/spec/parameters/keyvaultName"
-          value: "kv-aks-3i2qzkkxofr7c"
+          value: "kv-aks-jxdthrti3j3qu"   
     target:
       kind: SecretProviderClass
       name: istio-ingress-tls-secret-csi-akv

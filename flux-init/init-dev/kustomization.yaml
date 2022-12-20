@@ -6,7 +6,7 @@ patches:
   - patch: |
       - op: replace
         path: "/spec/template/spec/containers/0/image"
-        value: "acraks3i2qzkkxofr7c.azurecr.io/fluxcd/helm-controller:v0.22.2"
+        value: "acraksjxdthrti3j3qu.azurecr.io/fluxcd/helm-controller:v0.22.2"        
     target:
       kind: Deployment
       name: helm-controller
@@ -14,7 +14,7 @@ patches:
   - patch: |
       - op: replace
         path: "/spec/template/spec/containers/0/image"
-        value: "acraks3i2qzkkxofr7c.azurecr.io/fluxcd/kustomize-controller:v0.27.0"
+        value: "acraksjxdthrti3j3qu.azurecr.io/fluxcd/kustomize-controller:v0.27.0"        
     target:
       kind: Deployment
       name: kustomize-controller
@@ -22,7 +22,7 @@ patches:
   - patch: |
       - op: replace
         path: "/spec/template/spec/containers/0/image"
-        value: "acraks3i2qzkkxofr7c.azurecr.io/fluxcd/notification-controller:v0.25.1"
+        value: "acraksjxdthrti3j3qu.azurecr.io/fluxcd/notification-controller:v0.25.1"        
     target:
       kind: Deployment
       name: notification-controller
@@ -30,7 +30,7 @@ patches:
   - patch: |
       - op: replace
         path: "/spec/template/spec/containers/0/image"
-        value: "acraks3i2qzkkxofr7c.azurecr.io/fluxcd/source-controller:v0.26.1"
+        value: "acraksjxdthrti3j3qu.azurecr.io/fluxcd/source-controller:v0.26.1"        
     target:
       kind: Deployment
       name: source-controller
@@ -45,3 +45,4 @@ patches:
       kind: Kustomization
       name: flux-system
       namespace: flux-system
+

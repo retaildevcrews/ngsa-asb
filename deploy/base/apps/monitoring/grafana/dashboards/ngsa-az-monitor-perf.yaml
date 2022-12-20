@@ -110,7 +110,7 @@ data:
                     "timeGrain": "auto"
                   },
                   "azureLogAnalytics": {
-                    "query": "AzureDiagnostics\n| where ResourceProvider==\"MICROSOFT.DOCUMENTDB\" and Category == \"DataPlaneRequests\" and Resource == \"NGSA-ASB-DEV-COSMOS\"\n| where databaseName_s == \"imdb\"\n| where statusCode_s == 429\n| count",
+                    "query": "AzureDiagnostics\n| where ResourceProvider==\"MICROSOFT.DOCUMENTDB\" and Category == \"DataPlaneRequests\" and Resource == \"WCNP-DEV-COSMOS\"\n| where databaseName_s == \"imdb\"\n| where statusCode_s == 429\n| count",
                     "resultFormat": "time_series",
                     "workspace": "$laResourceId"
                   },
@@ -240,8 +240,8 @@ data:
                     "metricDefinition": "Microsoft.DocumentDB/databaseAccounts",
                     "metricName": "TotalRequests",
                     "metricNamespace": "microsoft.documentdb/databaseaccounts",
-                    "resourceGroup": "rg-ngsa-asb-dev-cosmos",
-                    "resourceName": "ngsa-asb-dev-cosmos",
+                    "resourceGroup": "rg-wcnp-dev-cosmos",
+                    "resourceName": "wcnp-dev-cosmos",
                     "timeGrain": "auto",
                     "timeGrains": [
                       {
@@ -350,8 +350,8 @@ data:
                     "metricDefinition": "Microsoft.DocumentDB/databaseAccounts",
                     "metricName": "TotalRequestUnits",
                     "metricNamespace": "microsoft.documentdb/databaseaccounts",
-                    "resourceGroup": "rg-ngsa-asb-dev-cosmos",
-                    "resourceName": "ngsa-asb-dev-cosmos",
+                    "resourceGroup": "rg-wcnp-dev-cosmos",
+                    "resourceName": "wcnp-dev-cosmos",
                     "timeGrain": "auto",
                     "timeGrains": [
                       {
@@ -482,7 +482,7 @@ data:
                     "timeGrain": "auto"
                   },
                   "azureLogAnalytics": {
-                    "query": "AzureMetrics \n| where MetricName == \"ProvisionedThroughput\" and Resource == \"NGSA-ASB-DEV-COSMOS\"\n| summarize max(Count) ",
+                    "query": "AzureMetrics \n| where MetricName == \"ProvisionedThroughput\" and Resource == \"WCNP-DEV-COSMOS\"\n| summarize max(Count) ",
                     "resultFormat": "time_series",
                     "workspace": "$laResourceId"
                   },
@@ -2619,11 +2619,11 @@ data:
                   "selected": true,
                   "text": [
                     "East US",
-                    "West US2"
+                    "West US3"
                   ],
                   "value": [
                     "eastus",
-                    "westus2"
+                    "westus3"
                   ]
                 },
                 "hide": 0,
@@ -2638,11 +2638,11 @@ data:
                   },
                   {
                     "selected": true,
-                    "text": "West US2",
-                    "value": "westus2"
+                    "text": "West US3",
+                    "value": "westus3"
                   }
                 ],
-                "query": "East US: eastus, West US2: westus2",
+                "query": "East US: eastus, West US3: westus3",
                 "queryValue": "",
                 "skipUrlSync": false,
                 "type": "custom"
@@ -2650,8 +2650,8 @@ data:
               {
                 "current": {
                   "selected": false,
-                  "text": "/subscriptions/648dcb5a-de1e-48b2-af6b-fe6ef28d355c/resourceGroups/rg-ngsa-asb-dev/providers/Microsoft.OperationalInsights/workspaces/la-aks-3i2qzkkxofr7c",
-                  "value": "/subscriptions/648dcb5a-de1e-48b2-af6b-fe6ef28d355c/resourceGroups/rg-ngsa-asb-dev/providers/Microsoft.OperationalInsights/workspaces/la-aks-3i2qzkkxofr7c"
+                  "text": "/subscriptions/5dc45b2f-bf13-4281-b763-a53f57290aa3/resourceGroups/rg-wcnp-dev/providers/Microsoft.OperationalInsights/workspaces/la-aks-jxdthrti3j3qu",
+                  "value": "/subscriptions/5dc45b2f-bf13-4281-b763-a53f57290aa3/resourceGroups/rg-wcnp-dev/providers/Microsoft.OperationalInsights/workspaces/la-aks-jxdthrti3j3qu"
                 },
                 "hide": 2,
                 "includeAll": false,
@@ -2660,11 +2660,11 @@ data:
                 "options": [
                   {
                     "selected": true,
-                    "text": "/subscriptions/648dcb5a-de1e-48b2-af6b-fe6ef28d355c/resourceGroups/rg-ngsa-asb-dev/providers/Microsoft.OperationalInsights/workspaces/la-aks-3i2qzkkxofr7c",
-                    "value": "/subscriptions/648dcb5a-de1e-48b2-af6b-fe6ef28d355c/resourceGroups/rg-ngsa-asb-dev/providers/Microsoft.OperationalInsights/workspaces/la-aks-3i2qzkkxofr7c"
+                    "text": "/subscriptions/5dc45b2f-bf13-4281-b763-a53f57290aa3/resourceGroups/rg-wcnp-dev/providers/Microsoft.OperationalInsights/workspaces/la-aks-jxdthrti3j3qu",
+                    "value": "/subscriptions/5dc45b2f-bf13-4281-b763-a53f57290aa3/resourceGroups/rg-wcnp-dev/providers/Microsoft.OperationalInsights/workspaces/la-aks-jxdthrti3j3qu"
                   }
                 ],
-                "query": "/subscriptions/648dcb5a-de1e-48b2-af6b-fe6ef28d355c/resourceGroups/rg-ngsa-asb-dev/providers/Microsoft.OperationalInsights/workspaces/la-aks-3i2qzkkxofr7c",
+                "query": "/subscriptions/5dc45b2f-bf13-4281-b763-a53f57290aa3/resourceGroups/rg-wcnp-dev/providers/Microsoft.OperationalInsights/workspaces/la-aks-jxdthrti3j3qu",
                 "queryValue": "",
                 "skipUrlSync": false,
                 "type": "custom"

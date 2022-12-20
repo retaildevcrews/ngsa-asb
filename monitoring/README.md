@@ -51,7 +51,7 @@ az storage account create \
 az storage container create \
   --name metrics \
   --account-name $ASB_THANOS_STORAGE_ACCOUNT_NAME \
-  --account-key "$(az storage account keys list -g $ASB_RG_CORE -n $ASB_THANOS_STORAGE_ACCOUNT_NAME --query [0].value -o tsv)"
+  --account-key "$(az storage account keys list -g $ASB_RG_CORE -n $ASB_THANOS_STORAGE_ACCOUNT_NAME --query "[0].value" -o tsv)"
 
 # Save environment variables
 ./saveenv.sh
@@ -65,7 +65,7 @@ The Thanos configuration has a secret for accessing the storage account. This wi
 ```bash
 
 # Generate secret config from template and save to keyvault
-THANOS_KV_SET_COMMAND='AZURE_STORAGE_ACCOUNT_KEY=$(az storage account keys list -g $ASB_RG_CORE -n $ASB_THANOS_STORAGE_ACCOUNT_NAME --query [0].value -o tsv) envsubst < monitoring/template/thanos-storage-config.yaml.tmpl'
+THANOS_KV_SET_COMMAND='AZURE_STORAGE_ACCOUNT_KEY=$(az storage account keys list -g $ASB_RG_CORE -n $ASB_THANOS_STORAGE_ACCOUNT_NAME --query "[0].value" -o tsv) envsubst < monitoring/template/thanos-storage-config.yaml.tmpl'
 az keyvault secret set --name "thanos-storage-config" --vault-name $ASB_KV_NAME --value "$(eval $THANOS_KV_SET_COMMAND)"
 
 ```
@@ -162,7 +162,10 @@ az ad app credential delete --id $CLIENT_ID --key-id $RBAC_ID
 az ad app update --id $CLIENT_ID --app-roles @grafana-app-roles.json
 
 # Create Grafana OAuth Secret
-CLIENT_SECRET=$(az ad app credential reset --append --id $CLIENT_ID --display-name "Grafana OAuth" --years 2 -o tsv --query password)
+GRAFANA_OAUTH_CLIENT_SECRET=$(az ad app credential reset --append --id $CLIENT_ID --display-name "Grafana OAuth" --years 2 -o tsv --query password)
+
+# Create Az Monitor Secret
+AZ_MONITOR_CLIENT_SECRET=$(az ad app credential reset --append --id $CLIENT_ID --display-name "AZ Monitor" --years 2 -o tsv --query password)
 
 # Enable Grafana users to login using created App Registration. Needs to be repeated for each created grafana instance.
 export ASB_APP_NAME=grafana
@@ -194,7 +197,14 @@ You'll need to run a few more steps to completely setup the AAD Service Principa
 az keyvault set-policy --secret-permissions set --object-id $(az ad signed-in-user show --query id -o tsv) -n $ASB_KV_NAME -g $ASB_RG_CORE
 
 # Set grafana AAD client secrets
-az keyvault secret set -o table --vault-name $ASB_KV_NAME --name "grafana-aad-client-secret" --value "$CLIENT_SECRET"
+az keyvault secret set -o table --vault-name $ASB_KV_NAME --name "grafana-aad-client-secret" --value $GRAFANA_OAUTH_CLIENT_SECRET
+
+az keyvault secret set -o table --vault-name $ASB_KV_NAME --name "grafana-azure-monitor-client-secret" --value $AZ_MONITOR_CLIENT_SECRET
+
+# set grafana AAD ids
+export ASB_GRAFANA_SP_CLIENT_ID=$CLIENT_ID
+export ASB_GRAFANA_SP_TENANT_ID=$TENANT_ID
+export ASB_GRAFANA_MI_NAME=grafana-id
 
 # create grafana-config config-map file
 cat templates/monitoring/grafana/01-grafana-config.yaml | envsubst  > $ASB_GIT_PATH/monitoring/grafana/01-grafana-config.yaml
@@ -265,9 +275,16 @@ az network application-gateway http-settings create -g $ASB_RG_CORE --gateway-na
   -n "$ASB_APP_DNS_NAME-httpsettings" --port 443 --protocol Https --cookie-based-affinity Disabled --connection-draining-timeout 0 \
   --timeout 20 --host-name-from-backend-pool true --enable-probe --probe "probe-$ASB_APP_DNS_NAME"
 
+export MAX_RULE_PRIORITY=$(az network application-gateway rule list -g $ASB_RG_CORE --gateway-name $ASB_APP_GW_NAME --query "max([].priority)")
+
+export ABS_HTTPSETTINGS_RULE_PRIORITY=$(($MAX_RULE_PRIORITY+1))
+
+# Verify that the new prority is correct.
+echo $ABS_HTTPSETTINGS_RULE_PRIORITY
+
 az network application-gateway rule create -g $ASB_RG_CORE --gateway-name $ASB_APP_GW_NAME \
   -n "$ASB_APP_DNS_NAME-routing-rule" --address-pool $ASB_APP_DNS_FULL_NAME \
-  --http-settings "$ASB_APP_DNS_NAME-httpsettings" --http-listener "listener-$ASB_APP_DNS_NAME"
+  --http-settings "$ASB_APP_DNS_NAME-httpsettings" --http-listener "listener-$ASB_APP_DNS_NAME" --priority $ABS_HTTPSETTINGS_RULE_PRIORITY 
 
 # set http redirection
 # create listener for HTTP (80), HTTPS redirect config and HTTPS redirect routing rule
@@ -278,9 +295,16 @@ az network application-gateway redirect-config create -g $ASB_RG_CORE --gateway-
   -n "https-redirect-config-$ASB_APP_DNS_NAME" -t "Permanent" --include-path true \
   --include-query-string true --target-listener "listener-$ASB_APP_DNS_NAME"
 
+export MAX_RULE_PRIORITY=$(az network application-gateway rule list -g $ASB_RG_CORE --gateway-name $ASB_APP_GW_NAME --query "max([].priority)")
+
+export ABS_HTTPS_REDIRECT_RULE_PRIORITY=$(($MAX_RULE_PRIORITY+1))
+
+# Verify that the new prority is correct.
+echo $ABS_HTTPS_REDIRECT_RULE_PRIORITY
+
 az network application-gateway rule create -g $ASB_RG_CORE --gateway-name $ASB_APP_GW_NAME \
   -n "https-redirect-$ASB_APP_DNS_NAME-routing-rule" --http-listener "http-listener-$ASB_APP_DNS_NAME" \
-  --redirect-config "https-redirect-config-$ASB_APP_DNS_NAME"
+  --redirect-config "https-redirect-config-$ASB_APP_DNS_NAME" --priority $ABS_HTTPS_REDIRECT_RULE_PRIORITY
 
 ```
 
