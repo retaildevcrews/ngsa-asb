@@ -112,8 +112,8 @@ param location string
   'japaneast'
   'southeastasia'
 ])
-
 param geoRedundancyLocation string
+
 param kubernetesVersion string = '1.20.9'
 
 /*** VARIABLES ***/
@@ -720,8 +720,8 @@ resource agwName_Microsoft_Insights_default 'Microsoft.Insights/diagnosticSettin
       }
     ]
   }
+  scope: agw
   dependsOn: [
-    agw
     laNewWorkspace
   ]
 }
