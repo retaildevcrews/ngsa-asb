@@ -185,6 +185,25 @@ resource acrPullRole 'Microsoft.Authorization/roleDefinitions@2018-01-01-preview
   scope: subscription()
 }
 
+/*** EXISTING HUB RESOURCES ***/
+
+// Spoke resource group
+resource hubResourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' existing = {
+  scope: subscription()
+  name: '${split(hubVnetResourceId,'/')[4]}'
+}
+
+// Spoke virtual network
+resource hubVirtualNetwork 'Microsoft.Network/virtualNetworks@2022-05-01' existing = {
+  scope: hubResourceGroup
+  name: '${last(split(hubVnetResourceId,'/'))}'
+
+  // Spoke virutual network's subnet for the cluster nodes
+  resource commonServicesSubnet 'subnets' existing = {
+    name: 'CommonServicesSubnet'
+  }
+}
+
 /*** EXISTING SPOKE RESOURCES ***/
 
 // Spoke resource group
@@ -203,17 +222,10 @@ resource targetVirtualNetwork 'Microsoft.Network/virtualNetworks@2022-05-01' exi
     name: 'snet-clusternodes'
   }
 
-  // Spoke virutual network's subnet for all private endpoints
-  resource snetPrivatelinkendpoints 'subnets' existing = {
-    name: 'snet-privatelinkendpoints'
-  }
-
   // Spoke virutual network's subnet for application gateway
   resource snetApplicationGateway 'subnets' existing = {
     name: 'snet-applicationgateway'
   }
-
-  // 
 }
 
 /*** RESOURCES ***/
@@ -339,7 +351,6 @@ resource keyVaultName_Microsoft_Authorization_id_readerRole 'Microsoft.Authoriza
   }
   dependsOn: [
     keyVault
-
   ]
 }
 
@@ -348,21 +359,22 @@ resource nodepools_to_akv 'Microsoft.Network/privateEndpoints@2020-05-01' = {
   location: location
   properties: {
     subnet: {
-      id: '${hubVnetResourceId}/subnets/CommonServicesSubnet' // TODO
+      id: hubVirtualNetwork::commonServicesSubnet.id
     }
     privateLinkServiceConnections: [
-      {
-        name: 'nodepools'
-        properties: {
-          privateLinkServiceId: keyVault.id
-          groupIds: [
-            'vault'
-          ]
-        }
+    {
+      name: 'nodepools'
+      properties: {
+        privateLinkServiceId: keyVault.id
+        groupIds: [
+          'vault'
+        ]
       }
-    ]
+    }
+  ]
   }
 }
+
 
 resource nodepools_to_akv_default 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2020-05-01' = {
   parent: nodepools_to_akv
@@ -968,7 +980,7 @@ resource nodepools_to_acr 'Microsoft.Network/privateEndpoints@2020-05-01' = {
   location: location
   properties: {
     subnet: {
-      id: targetVirtualNetwork::snetPrivatelinkendpoints.id
+      id: hubVirtualNetwork::commonServicesSubnet.id
     }
     privateLinkServiceConnections: [
       {
