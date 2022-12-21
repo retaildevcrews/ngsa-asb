@@ -40,7 +40,7 @@ export ASB_NODEPOOLS_SUBNET_ID=$(az deployment group show -g $ASB_RG_SPOKE -n sp
 # Create Region A hub network
 az deployment group create \
   -g $ASB_RG_HUB \
-  -f spikes/cilium/hub-regionA.bicep \
+  -f spikes/cilium/hub-regionA.json \
   -p location=${ASB_HUB_LOCATION} nodepoolSubnetResourceIds="['${ASB_NODEPOOLS_SUBNET_ID}']" \
   -c --query name
 
@@ -71,7 +71,7 @@ az extension add --name aks-preview
 
 # Create AKS
 az deployment group create -g $ASB_RG_CORE \
-  -f spikes/cilium/cluster-stamp.bicep \
+  -f spikes/cilium/cluster-stamp.json \
   -n cluster-${ASB_DEPLOYMENT_NAME}-${ASB_CLUSTER_LOCATION} \
   -p appGatewayListenerCertificate=${APP_GW_CERT_CSMS} \
      asbDomainSuffix=${ASB_DOMAIN_SUFFIX} \
