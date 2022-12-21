@@ -64,6 +64,10 @@ param hubLocation string
 @maxLength(7)
 param spokeIpPrefix string
 
+/*** VARIABLES ***/
+
+var hubLaWorkspaceId=resourceId(split(hubVnetResourceId, '/')[4], 'Microsoft.OperationalInsights/workspaces', 'la-hub-${hubLocation}-${uniqueString(hubVnetResourceId)}')
+
 /*** RESOURCES ***/
 
 resource routeTable 'Microsoft.Network/routeTables@2020-05-01' = {
@@ -94,7 +98,7 @@ resource nsg_clusterVNetName_nodepools 'Microsoft.Network/networkSecurityGroups@
 resource nsg_clusterVNetName_nodepools_Microsoft_Insights_toHub 'Microsoft.Insights/diagnosticSettings@2017-05-01-preview' = {
   name: 'toHub'
   properties: {
-    workspaceId: resourceId(split(hubVnetResourceId, '/')[4], 'Microsoft.OperationalInsights/workspaces', 'la-hub-${hubLocation}-${uniqueString(hubVnetResourceId)}')
+    workspaceId: hubLaWorkspaceId
     logs: [
       {
         category: 'NetworkSecurityGroupEvent'
@@ -120,7 +124,7 @@ resource nsg_clusterVNetName_aksilbs 'Microsoft.Network/networkSecurityGroups@20
 resource nsg_clusterVNetName_aksilbs_Microsoft_Insights_toHub 'Microsoft.Insights/diagnosticSettings@2017-05-01-preview' = {
   name: 'toHub'
   properties: {
-    workspaceId: resourceId(split(hubVnetResourceId, '/')[4], 'Microsoft.OperationalInsights/workspaces', 'la-hub-${hubLocation}-${uniqueString(hubVnetResourceId)}')
+    workspaceId: hubLaWorkspaceId
     logs: [
       {
         category: 'NetworkSecurityGroupEvent'
@@ -229,7 +233,7 @@ resource nsg_clusterVNetName_appgw 'Microsoft.Network/networkSecurityGroups@2020
 resource nsg_clusterVNetName_appgw_Microsoft_Insights_toHub 'Microsoft.Insights/diagnosticSettings@2017-05-01-preview' = {
   name: 'toHub'
   properties: {
-    workspaceId: resourceId(split(hubVnetResourceId, '/')[4], 'Microsoft.OperationalInsights/workspaces', 'la-hub-${hubLocation}-${uniqueString(hubVnetResourceId)}')
+    workspaceId: hubLaWorkspaceId
     logs: [
       {
         category: 'NetworkSecurityGroupEvent'
