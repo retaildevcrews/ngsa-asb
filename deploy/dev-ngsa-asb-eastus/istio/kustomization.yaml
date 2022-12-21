@@ -8,14 +8,14 @@ patches:
         - op: replace
           path: "/spec/servers/0/hosts"
           value:
-            - "ngsa/ngsa-memory-eastus-dev.cse.ms"
-            - "ngsa/ngsa-cosmos-eastus-dev.cse.ms"
-            - "ngsa/ngsa-java-eastus-dev.cse.ms"
-            - "monitoring/grafana-eastus-dev.cse.ms"
-            - "monitoring/thanos-grpc-eastus-dev.cse.ms"
-            - "monitoring/thanos-store-grpc-eastus-dev.cse.ms"
-            - "loderunner/loderunner-eastus-dev.cse.ms"
-            - "harbor/harbor-core-eastus-dev.cse.ms"
+            - "ngsa/ngsa-memory-eastus-dev.austinrdc.dev"
+            - "ngsa/ngsa-cosmos-eastus-dev.austinrdc.dev"
+            - "ngsa/ngsa-java-eastus-dev.austinrdc.dev"
+            - "monitoring/grafana-eastus-dev.austinrdc.dev"
+            - "monitoring/thanos-grpc-eastus-dev.austinrdc.dev"
+            - "monitoring/thanos-store-grpc-eastus-dev.austinrdc.dev"
+            - "loderunner/loderunner-eastus-dev.austinrdc.dev"
+            - "harbor/harbor-core-eastus-dev.austinrdc.dev"
 
         - op: add
           path: "/spec/servers/0/tls"
@@ -87,20 +87,32 @@ patches:
   - patch: |
         - op: replace
           path: "/spec/resourceID"
-          value: "/subscriptions/648dcb5a-de1e-48b2-af6b-fe6ef28d355c/resourceGroups/rg-ngsa-asb-dev/providers/Microsoft.ManagedIdentity/userAssignedIdentities/podmi-ingress-controller"
+          value: "/subscriptions/5dc45b2f-bf13-4281-b763-a53f57290aa3/resourceGroups/rg-wcnp-dev/providers/Microsoft.ManagedIdentity/userAssignedIdentities/podmi-ingress-controller"
 
         - op: replace
           path: "/spec/clientID"
-          value: "c4d9277f-d849-4c44-a6f1-6ebb2153944a"
+          value: "51f32449-99df-4b9b-a8b7-0e347ab19f37"
     target:
       kind: AzureIdentity
       name: istio-ingress-id
       namespace: istio-system
-
+# TODO: Remove the second replace patch when test TLS cert is removed from keyvault
   - patch: |
         - op: replace
           path: "/spec/parameters/keyvaultName"
-          value: "kv-aks-3i2qzkkxofr7c"
+          value: "kv-aks-jxdthrti3j3qu"
+        - op: replace
+          path: "/spec/parameters/objects"
+          value: |
+              array:
+              - |
+                objectName: appgw-ingress-internal-aks-ingress-tls
+                objectAlias: tls.crt
+                objectType: secret
+              - |
+                objectName: appgw-ingress-internal-aks-ingress-key
+                objectAlias: tls.key
+                objectType: secret
     target:
       kind: SecretProviderClass
       name: istio-ingress-tls-secret-csi-akv

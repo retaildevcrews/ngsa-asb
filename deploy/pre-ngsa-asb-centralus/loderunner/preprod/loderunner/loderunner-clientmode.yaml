@@ -17,9 +17,9 @@ spec:
     metadata:
       labels:
         app: loderunner-clientmode
-        aadpodidbinding: ngsa-asb-loderunner-id
-        deploy: 22-12-13-17-12-09
-        version: beta-2212-13-17
+        aadpodidbinding: wcnp-loderunner-id
+        deploy: 22-12-21-06-03-50
+        version: beta-2212-21-06
     spec:
       containers:
         - name: app
@@ -43,9 +43,9 @@ spec:
           - /app/secrets
           - --prometheus
           - --zone
-          - az-centralus-pre
+          - az-northcentralus-pre
           - --region
-          - centralus
+          - northcentralus
           volumeMounts:
             - name: secrets
               mountPath: "/app/secrets"

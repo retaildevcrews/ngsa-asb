@@ -15,7 +15,7 @@ patches:
   - patch: |
         - op: replace
           path: "/spec/template/spec/containers/0/image"
-          value: "acraksfykg5bqasutle.azurecr.io/fluent/fluent-bit:1.9.5"        
+          value: "acraksri3aov7twb4uy.azurecr.io/fluent/fluent-bit:1.9.5"        
     target:
       kind: DaemonSet
       name: fluentbit

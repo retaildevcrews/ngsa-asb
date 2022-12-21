@@ -3,4 +3,5 @@ kind: Kustomization
 resources:
   - 01-namespace.yaml
   - 02-istio-operator.yaml
+  - 03-istio-crd-gateway.yaml
   - istio-flux-kustomization.yaml  

@@ -32,6 +32,15 @@ param targetVnetResourceId string
 @description('Azure AD Group in the identified tenant that will be granted the highly privileged cluster-admin role.')
 param clusterAdminAadGroupObjectId string
 
+@description('Kubernetes cluster VM size name')
+param vmSize string
+
+@description('Kubernetes cluster temp storage (GiB)')
+param osDiskSizeGB int
+
+@description('Kubernetes cluster availability zones')
+param availabilityZones array
+
 @description('Your AKS control plane Cluster API authentication tenant')
 param k8sControlPlaneAuthorizationTenantId string
 
@@ -223,8 +232,8 @@ resource cluster 'Microsoft.ContainerService/managedClusters@2021-02-01' = {
       {
         name: 'npsystem'
         count: 3
-        vmSize: 'Standard_A4_v2'
-        osDiskSizeGB: 80
+        vmSize: vmSize
+        osDiskSizeGB: osDiskSizeGB
         osDiskType: 'Managed'
         osType: 'Linux'
         minCount: 3
@@ -238,11 +247,7 @@ resource cluster 'Microsoft.ContainerService/managedClusters@2021-02-01' = {
         orchestratorVersion: kubernetesVersion
         enableNodePublicIP: false
         maxPods: 100
-        availabilityZones: [
-          '1'
-          '2'
-          '3'
-        ]
+        availabilityZones: availabilityZones
         upgradeSettings: {
           maxSurge: '33%'
         }
@@ -250,8 +255,8 @@ resource cluster 'Microsoft.ContainerService/managedClusters@2021-02-01' = {
       {
         name: 'npuser01'
         count: 2
-        vmSize: 'Standard_A4_v2'
-        osDiskSizeGB: 120
+        vmSize: vmSize
+        osDiskSizeGB: osDiskSizeGB
         osDiskType: 'Managed'
         osType: 'Linux'
         minCount: 2
@@ -265,11 +270,7 @@ resource cluster 'Microsoft.ContainerService/managedClusters@2021-02-01' = {
         orchestratorVersion: kubernetesVersion
         enableNodePublicIP: false
         maxPods: 100
-        availabilityZones: [
-          '1'
-          '2'
-          '3'
-        ]
+        availabilityZones: availabilityZones
         upgradeSettings: {
           maxSurge: '33%'
         }

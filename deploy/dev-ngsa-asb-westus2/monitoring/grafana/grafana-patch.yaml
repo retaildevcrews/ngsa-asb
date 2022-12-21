@@ -8,16 +8,16 @@ spec:
     spec:
       containers:
         - name: grafana
-          image: acraks3i2qzkkxofr7c.azurecr.io/grafana/grafana:8.5.5
+          image: acraksjxdthrti3j3qu.azurecr.io/grafana/grafana:8.5.5
           env:
           - name: GF_SERVER_ROOT_URL
             value: "https://%(domain)s/"
           - name: GF_SERVER_DOMAIN
-            value: "grafana-westus2-dev.cse.ms"
+            value: "grafana-westus3-dev.austinrdc.dev"
           - name: PROMETHEUS_QUERY_URL # For data source
             value: "http://prometheus-server.monitoring.svc:9090"
           - name : AZURE_LA_WORKSPACE # For data source
-            value: "128a9fb0-cbb6-4730-8a8b-1c540b62315c"
+            value: "369b22b4-74d1-4d51-aa0d-5aff2e25fed8"
           - name: GF_AUTH_AZUREAD_CLIENT_SECRET
             valueFrom:
               secretKeyRef:
@@ -49,4 +49,4 @@ metadata:
   namespace: monitoring
 spec:
   hosts:
-  - grafana-westus2-dev.cse.ms
+  - grafana-westus3-dev.austinrdc.dev

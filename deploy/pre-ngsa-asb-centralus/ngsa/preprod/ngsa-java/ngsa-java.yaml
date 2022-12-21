@@ -20,8 +20,8 @@ spec:
       labels:
         aadpodidbinding: ngsa-asb-ngsa-id
         app: ngsa-java
-        deploy: 22-12-13-17-40-33
-        version: beta-2212-13-17
+        deploy: 22-12-18-06-08-29
+        version: beta-2212-18-06
     spec:
       automountServiceAccountToken: false
       securityContext:
@@ -43,9 +43,9 @@ spec:
           - name: PROMETHEUS
             value: "true"
           - name: ZONE
-            value: "az-centralus-pre"
+            value: "az-northcentralus-pre"
           - name: REGION
-            value: "centralus"
+            value: "northcentralus"
           ports:
             - name: http
               containerPort: 8080
@@ -109,7 +109,7 @@ spec:
   gateways:
   - istio-system/istio-gateway
   hosts:
-  - ngsa-java-centralus-pre.cse.ms
+  - ngsa-java-northcentralus-pre.austinrdc.dev
   http:
   - route:
     - destination:

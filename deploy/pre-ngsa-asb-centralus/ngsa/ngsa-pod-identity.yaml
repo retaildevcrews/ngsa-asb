@@ -5,8 +5,8 @@ metadata:
   namespace: ngsa
 spec:
   type: 0
-  resourceID: /subscriptions/648dcb5a-de1e-48b2-af6b-fe6ef28d355c/resourcegroups/rg-ngsa-asb-pre/providers/Microsoft.ManagedIdentity/userAssignedIdentities/ngsa-asb-ngsa-id
-  clientID: 2653c2c9-37cc-4a9b-8867-63194d263bf9
+  resourceID: /subscriptions/5dc45b2f-bf13-4281-b763-a53f57290aa3/resourcegroups/rg-wcnp-pre/providers/Microsoft.ManagedIdentity/userAssignedIdentities/wcnp-ngsa-id
+  clientID: b650f77f-0242-48be-92ce-8d5504eb1af3
 
 ---
 
@@ -30,7 +30,7 @@ spec:
   provider: azure
   parameters:
     usePodIdentity: "true"
-    keyvaultName: "kv-aks-fykg5bqasutle"
+    keyvaultName: "kv-aks-ri3aov7twb4uy"
     objects: |
       array:
         - |
@@ -45,4 +45,4 @@ spec:
         - |
           objectName: CosmosUrl
           objectType: secret
-    tenantId: "72f988bf-86f1-41af-91ab-2d7cd011db47"
+    tenantId: "16b3c013-d300-468d-ac64-7eda0820b6d3"

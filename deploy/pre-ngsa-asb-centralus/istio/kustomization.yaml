@@ -8,12 +8,12 @@ patches:
         - op: replace
           path: "/spec/servers/0/hosts"
           value:
-          - "ngsa/ngsa-memory-centralus-pre.cse.ms"
-          - "ngsa/ngsa-cosmos-centralus-pre.cse.ms"
-          - "ngsa/ngsa-java-centralus-pre.cse.ms"
-          - "monitoring/grafana-centralus-pre.cse.ms"
-          - "monitoring/thanos-grpc-centralus-pre.cse.ms"
-          - "loderunner/loderunner-centralus-pre.cse.ms"
+          - "ngsa/ngsa-memory-northcentralus-pre.austinrdc.dev"
+          - "ngsa/ngsa-cosmos-northcentralus-pre.austinrdc.dev"
+          - "ngsa/ngsa-java-northcentralus-pre.austinrdc.dev"
+          - "monitoring/grafana-northcentralus-pre.austinrdc.dev"
+          - "monitoring/thanos-grpc-northcentralus-pre.austinrdc.dev"
+          - "loderunner/loderunner-northcentralus-pre.austinrdc.dev"
 
         - op: add
           path: "/spec/servers/0/tls"
@@ -41,7 +41,7 @@ patches:
 
         - op: replace
           path: "/spec/components/ingressGateways/0/k8s/service/loadBalancerIP"
-          value: 10.242.4.4
+          value: 10.241.4.4
     target:
       kind: IstioOperator
       name: istio-default
@@ -50,11 +50,11 @@ patches:
   - patch: |
         - op: replace
           path: "/spec/resourceID"
-          value: "/subscriptions/648dcb5a-de1e-48b2-af6b-fe6ef28d355c/resourceGroups/rg-ngsa-asb-pre/providers/Microsoft.ManagedIdentity/userAssignedIdentities/podmi-ingress-controller"
+          value: "/subscriptions/5dc45b2f-bf13-4281-b763-a53f57290aa3/resourceGroups/rg-wcnp-pre/providers/Microsoft.ManagedIdentity/userAssignedIdentities/podmi-ingress-controller"
 
         - op: replace
           path: "/spec/clientID"
-          value: "056ce182-3da5-4ab8-afff-a90deb2b9a84"
+          value: "84bed9de-aaf5-4763-a3e4-ac569f1dc791"
     target:
       kind: AzureIdentity
       name: istio-ingress-id
@@ -63,7 +63,7 @@ patches:
   - patch: |
         - op: replace
           path: "/spec/parameters/keyvaultName"
-          value: "kv-aks-fykg5bqasutle"
+          value: "kv-aks-ri3aov7twb4uy"
     target:
       kind: SecretProviderClass
       name: istio-ingress-tls-secret-csi-akv

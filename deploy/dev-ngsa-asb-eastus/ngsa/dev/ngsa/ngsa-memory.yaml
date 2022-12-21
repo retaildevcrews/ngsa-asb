@@ -19,8 +19,8 @@ spec:
     metadata:
       labels:
         app: ngsa-memory
-        version: beta-2212-13-17
-        deploy: 22-12-13-17-38-33
+        version: beta-2212-18-06
+        deploy: 22-12-18-06-04-02
     spec:
       containers:
         - name: app
@@ -103,7 +103,7 @@ spec:
   gateways:
   - istio-system/istio-gateway
   hosts:
-  - ngsa-memory-eastus-dev.cse.ms
+  - ngsa-memory-eastus-dev.austinrdc.dev
   http:
   - route:
     - destination:

@@ -703,7 +703,7 @@ data:
                   "expr": "up{job=\"fluentbit\"} == 1",
                   "queryType": "Azure Monitor",
                   "refId": "A",
-                  "subscription": "648dcb5a-de1e-48b2-af6b-fe6ef28d355c"
+                  "subscription": "5dc45b2f-bf13-4281-b763-a53f57290aa3"
                 }
               ],
               "title": "FluentBit Pods Status",

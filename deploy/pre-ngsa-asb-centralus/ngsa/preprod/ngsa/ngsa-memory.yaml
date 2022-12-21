@@ -14,8 +14,8 @@ spec:
     metadata:
       labels:
         app: ngsa-memory
-        version: beta-2212-13-17
-        deploy: 22-12-13-17-38-33
+        version: beta-2212-18-06
+        deploy: 22-12-18-06-04-02
     spec:
       containers:
         - name: app
@@ -25,9 +25,9 @@ spec:
           - --in-memory
           - --prometheus
           - --zone
-          - az-centralus-pre
+          - az-northcentralus-pre
           - --region
-          - centralus
+          - northcentralus
           ports:
             - name: http
               containerPort: 8080
@@ -98,7 +98,7 @@ spec:
   gateways:
   - istio-system/istio-gateway
   hosts:
-  - ngsa-memory-centralus-pre.cse.ms
+  - ngsa-memory-northcentralus-pre.austinrdc.dev
   http:
   - route:
     - destination:

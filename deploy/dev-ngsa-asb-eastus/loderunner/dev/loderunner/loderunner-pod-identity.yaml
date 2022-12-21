@@ -2,23 +2,23 @@
 apiVersion: aadpodidentity.k8s.io/v1
 kind: AzureIdentity
 metadata:
-  name: ngsa-asb-loderunner-id
+  name: wcnp-loderunner-id
   namespace: loderunner
 spec:
   type: 0
-  resourceID: /subscriptions/648dcb5a-de1e-48b2-af6b-fe6ef28d355c/resourcegroups/rg-ngsa-asb-dev/providers/Microsoft.ManagedIdentity/userAssignedIdentities/ngsa-asb-loderunner-id
-  clientID: e73668c7-f031-4210-868f-81af377a0570
+  resourceID: /subscriptions/5dc45b2f-bf13-4281-b763-a53f57290aa3/resourcegroups/rg-wcnp-dev/providers/Microsoft.ManagedIdentity/userAssignedIdentities/wcnp-loderunner-id
+  clientID: e59cbfe0-24f4-4a60-a6ef-16c538b90683
 
 ---
 
 apiVersion: aadpodidentity.k8s.io/v1
 kind: AzureIdentityBinding
 metadata:
-  name: ngsa-asb-loderunner-id-binding
+  name: wcnp-loderunner-id-binding
   namespace: loderunner
 spec:
-  azureIdentity: ngsa-asb-loderunner-id
-  selector: ngsa-asb-loderunner-id
+  azureIdentity: wcnp-loderunner-id
+  selector: wcnp-loderunner-id
 
 ---
 
@@ -69,4 +69,4 @@ spec:
         - |
           objectName: CosmosUrl
           objectType: secret
-    tenantId: 72f988bf-86f1-41af-91ab-2d7cd011db47
+    tenantId: 16b3c013-d300-468d-ac64-7eda0820b6d3

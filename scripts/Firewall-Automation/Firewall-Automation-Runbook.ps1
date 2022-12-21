@@ -1,16 +1,16 @@
 param (
     [Parameter(Mandatory)]
-    [String]$resource_Group_Name_with_Firewall="rg-ngsa-asb-dev-hub",
+    [String]$resource_Group_Name_with_Firewall="PLACE_HOLDER",
     [Parameter(Mandatory)]
-    [String]$resource_Group_Name_with_Alerts="rg-ngsa-asb-dev",
+    [String]$resource_Group_Name_with_Alerts="PLACE_HOLDER",
     [Parameter(Mandatory)]
-    [String]$resource_Group_Name_for_Automation="rg-asb-firewall-automation-dev",
+    [String]$resource_Group_Name_for_Automation="PLACE_HOLDER",
     [Parameter(Mandatory)]
-    [String]$automation_Account_Name="aa-asb-firewall-automation-dev",
+    [String]$automation_Account_Name="PLACE_HOLDER",
     [Parameter(Mandatory)]
-    [String]$tenant_Id="72f988bf-86f1-41af-91ab-2d7cd011db47",
+    [String]$tenant_Id="PLACE_HOLDER",
     [Parameter(Mandatory)]
-    [String]$subscription_Name="jofultz-wcnp",
+    [String]$subscription_Name="PLACE_HOLDER",
     [Parameter(Mandatory)]
     [String]$vnet_Name="vnet-eastus-hub",
     [Parameter(Mandatory)]
@@ -22,11 +22,11 @@ param (
     [Parameter(Mandatory)]
     [String]$pip_Name_Default="pip-fw-eastus-default",
     [Parameter(Mandatory)]
-    [String]$managed_Identity_Name="mi-asb-firewall-automation-dev",
+    [String]$managed_Identity_Name="PLACE_HOLDER",
     [Parameter(Mandatory)]
     [String]$action="start",
     [Parameter(Mandatory)]
-    [String]$environment="dev",
+    [String]$environment="PLACE_HOLDER",
     [Parameter(Mandatory)]
     [String]$location="eastus"
 )
@@ -86,7 +86,7 @@ function Update-Metric-Alert {
         [Parameter(Mandatory)]
         [String]$rule_Name, 
 
-        [Parameter(Mandatory)]
+        #This cannot be Mandatory because is a Switch type
         [Switch]$enable_Rule
     )
    
@@ -108,7 +108,7 @@ function Update-Log-Alert {
         [Parameter(Mandatory)]
         [String]$rule_Name, 
 
-        [Parameter(Mandatory)]
+        #This cannot be Mandatory because is a Switch type
         [Switch]$enable_Rule
     )
 
@@ -204,14 +204,19 @@ function Enable-Log-Alerts {
     Update-Log-Alert -resource_Group_Name_with_Alerts $resource_Group_Name_with_Alerts -rule_Name "NGSA-Server-TooManyRequests" -enable_Rule
 }
 
-
-
     # Ensures you do not inherit an AzContext in your runbook
     Write-Output "Disabling AzContext Autosave"
     Disable-AzContextAutosave -Scope Process | Out-Null
+    
+	# Connect using a Managed Service Identity
+    Write-Output "Using system-assigned managed identity"
+	
+	Connect-AzAccount -Identity
+	
+	$identity = Get-AzUserAssignedIdentity -ResourceGroupName $resource_Group_Name_for_Automation -Name $managed_Identity_Name
 
-    $identity = Get-AzUserAssignedIdentity -ResourceGroupName $resource_Group_Name_for_Automation -Name $managed_Identity_Name
     Connect-AzAccount -Identity -AccountId $identity.Id
+
     $AzureContext = Set-AzContext -SubscriptionName $subscription_Name -Tenant $tenant_Id
     Write-Output "Using user-assigned managed identity"
 

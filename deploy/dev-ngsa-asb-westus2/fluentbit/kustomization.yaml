@@ -10,12 +10,12 @@ patches:
         name: fluentbit-log-config
         namespace: fluentbit
       data:
-        zone: az-westus2-dev
-        region: westus2
+        zone: az-westus3-dev
+        region: westus3
   - patch: |
         - op: replace
           path: "/spec/template/spec/containers/0/image"
-          value: "acraks3i2qzkkxofr7c.azurecr.io/fluent/fluent-bit:1.9.5"        
+          value: "acraksjxdthrti3j3qu.azurecr.io/fluent/fluent-bit:1.9.5"        
     target:
       kind: DaemonSet
       name: fluentbit

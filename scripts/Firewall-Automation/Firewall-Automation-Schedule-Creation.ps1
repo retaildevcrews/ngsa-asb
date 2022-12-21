@@ -1,5 +1,13 @@
-foreach ($line in (Get-Content -Path './firewall-automation-dev-westus.env')) {
+param (
+    [Parameter(Mandatory)]
+    [String]$spclientid,
+    [Parameter(Mandatory)]
+    [String]$spsecret
+)
+
+foreach ($line in (Get-Content -Path './scripts/Firewall-Automation/Firewall-Automation-Infrastructure-Variables.env')) {
   if ($line.Contains('export ')) {
+    $line = $line.Trim()
     $line = $line -replace 'export ', ''
     $line = $line.Replace("'", "")
     $lineItems = $line -split '='
@@ -9,12 +17,11 @@ foreach ($line in (Get-Content -Path './firewall-automation-dev-westus.env')) {
 
 $tenantId = $env:ASB_FW_Tenant_Id
 $subscriptionName = $env:ASB_FW_Subscription_Name
-$baseName = $env:ASB_FW_Base_NSGA_Name
+$baseName = $env:ASB_FW_Deployment_Name
 $baseAutomationName = $env:ASB_FW_Base_Automation_System_Name
 $environment = $env:ASB_FW_Environment
 $location = $env:ASB_FW_Location
 
-Write-Output((Get-ChildItem env:*).GetEnumerator() | Sort-Object Name | Out-String)
 
 function New-Schedule {
 
@@ -124,23 +131,22 @@ function Edit-ScheduleAndRunbook {
 }
 
 function Authenticate {  
-  Connect-AzAccount -UseDeviceAuth  
+  
+  $password=ConvertTo-SecureString $spsecret -AsPlainText -Force
+
+  $Credential=New-Object -TypeName System.Management.Automation.PSCredential ($spclientid, $password)
+  
+  try{
+    Connect-AzAccount -ServicePrincipal -Tenant $tenantId -Subscription $subscriptionName -Credential $Credential
+    Write-Host "Successfully connected to Azure account."
+  }
+  catch{
+    Write-Host "Unexpected error occurred when trying to connect to Azure account."
+  }
+
   Set-AzContext -Subscription $subscriptionName
 }
 
-function Import-Modules {
-  Write-Host "Installing & Importing Azure Powershell Az Module for Automation."
-
-  Install-Module -Name Az.Automation -Force | out-null
-  Import-Module -Name Az.Automation -Force | out-null
-
-  Write-Host "Installing & Importing Azure Powershell Az Module for Monitor."
-
-  Install-Module -Name Az.Monitor -Force | out-null
-  Import-Module -Name Az.Monitor -Force | out-null
-
-  Write-Host "Completed installing & importing Azure Powershell Az Modules for Authentication and Monitor."
-}
 $automationResourceGroup = "rg-" + $baseName + "-" + $baseAutomationName + "-" + $environment
 $firewallResourceGroup = "rg-" + $baseName + "-" + $environment + "-hub"
 $alertsResourceGroup = "rg-" + $baseName + "-" + $environment
@@ -163,18 +169,14 @@ $end_Time = (Get-Date $start_Time).AddYears(3)
 
 Authenticate -Subscription_Name $subscriptionName
 
-Import-Modules
-
 $start_Action_Name = $baseScheduleName + "-start"
 $stop_Action_Name = $baseScheduleName + "-stop"
 
 New-Schedule -automation_Account_Name $automationAccountName -resource_Group_Name_for_Automation $automationResourceGroup -schedule_Name $start_Action_Name -start_Time $start_Time -end_Time $end_Time
-New-Schedule -automation_Account_Name $automationAccountName -resource_Group_Name_for_Automation $automationResourceGroup -schedule_Name $stop_Action_Name -start_Time $stop_Time -end_Time $stop_Time
+New-Schedule -automation_Account_Name $automationAccountName -resource_Group_Name_for_Automation $automationResourceGroup -schedule_Name $stop_Action_Name -start_Time $stop_Time -end_Time $end_Time
 
 Edit-ScheduleAndRunbook -resource_Group_Name_with_Firewall $firewallResourceGroup -Location $location -resource_Group_Name_for_Automation $automationResourceGroup -resource_Group_Name_with_Alerts $alertsResourceGroup -tenant_Id $tenantId -schedule_Name $start_Action_Name -powerShell_Runbook_Name $runbookName -automation_Account_Name $automationAccountName -subscription_Name $subscriptionName -vnet_Name $vnetName -firewall_Name $firewallName -pip_Name1 $publicIpName1 -pip_Name2 $publicIpName2 -pip_Name_Default $publicIpNameDefault -managed_Identity_Name $managedIdentityName -action "start"
 Edit-ScheduleAndRunbook -resource_Group_Name_with_Firewall $firewallResourceGroup -Location $location -resource_Group_Name_for_Automation $automationResourceGroup -resource_Group_Name_with_Alerts $alertsResourceGroup -tenant_Id $tenantId -schedule_Name $stop_Action_Name -powerShell_Runbook_Name $runbookName -automation_Account_Name $automationAccountName -subscription_Name $subscriptionName -vnet_Name $vnetName -firewall_Name $firewallName -pip_Name1 $publicIpName1 -pip_Name2 $publicIpName2 -pip_Name_Default $publicIpNameDefault -managed_Identity_Name $managedIdentityName -action "stop"
-
-Publish-AzAutomationRunbook -AutomationAccountName $automationAccountName -Name $runbookName -ResourceGroupName $automationResourceGroup
 
 # Disable the schedule after creation
 Set-AzAutomationSchedule -AutomationAccountName $automationAccountName -Name $start_Action_Name -IsEnabled $false -ResourceGroupName $automationResourceGroup

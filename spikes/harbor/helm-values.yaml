@@ -33,8 +33,8 @@ expose:
       notarySecretName: ""
   ingress:
     hosts:
-      core: https://harbor-core-eastus-dev.cse.ms
-      notary: https://harbor-core-eastus-dev.cse.ms
+      core: https://harbor-core-eastus-dev.austinrdc.dev
+      notary: https://harbor-core-eastus-dev.austinrdc.dev
     # set to the type of ingress controller if it has specific requirements.
     # leave as `default` for most ingress controllers.
     # set to `gce` if using the GCE ingress controller
@@ -122,7 +122,7 @@ expose:
 # the IP address of k8s node
 #
 # If Harbor is deployed behind the proxy, set it as the URL of proxy
-externalURL: https://harbor-core-eastus-dev.cse.ms
+externalURL: https://harbor-core-eastus-dev.austinrdc.dev
 
 # The internal TLS used for harbor components secure communicating. In order to enable https
 # in each components tls cert files need to provided in advance.
@@ -399,8 +399,8 @@ enableMigrateHelmHook: false
 # If service exposed via "ingress", the Nginx will not be used
 nginx:
   image:
-    repository: acraks3i2qzkkxofr7c.azurecr.io/goharbor/nginx-photon
-    tag: v2.5.3
+    repository: acraksjxdthrti3j3qu.azurecr.io/goharbor/nginx-photon
+    tag: v2.6.2
   # set the service account to be used, default if left empty
   serviceAccountName: ""
   # mount the service account token
@@ -424,8 +424,8 @@ nginx:
 
 portal:
   image:
-    repository: acraks3i2qzkkxofr7c.azurecr.io/goharbor/harbor-portal
-    tag: v2.5.3
+    repository: acraksjxdthrti3j3qu.azurecr.io/goharbor/harbor-portal
+    tag: v2.6.2
   # set the service account to be used, default if left empty
   serviceAccountName: ""
   # mount the service account token
@@ -449,8 +449,8 @@ portal:
 
 core:
   image:
-    repository: acraks3i2qzkkxofr7c.azurecr.io/goharbor/harbor-core
-    tag: v2.5.3
+    repository: acraksjxdthrti3j3qu.azurecr.io/goharbor/harbor-core
+    tag: v2.6.2
   # set the service account to be used, default if left empty
   serviceAccountName: ""
   # mount the service account token
@@ -495,8 +495,8 @@ core:
 
 jobservice:
   image:
-    repository: acraks3i2qzkkxofr7c.azurecr.io/goharbor/harbor-jobservice
-    tag: v2.5.3
+    repository: acraksjxdthrti3j3qu.azurecr.io/goharbor/harbor-jobservice
+    tag: v2.6.2
   replicas: 1
   revisionHistoryLimit: 10
   # set the service account to be used, default if left empty
@@ -538,8 +538,8 @@ registry:
   automountServiceAccountToken: false
   registry:
     image:
-      repository: acraks3i2qzkkxofr7c.azurecr.io/goharbor/registry-photon
-      tag: v2.5.3
+      repository: acraksjxdthrti3j3qu.azurecr.io/goharbor/registry-photon
+      tag: v2.6.2
     resources:
       requests:
         memory: 128Mi
@@ -549,8 +549,8 @@ registry:
         cpu: 100m
   controller:
     image:
-      repository: acraks3i2qzkkxofr7c.azurecr.io/goharbor/harbor-registryctl
-      tag: v2.5.3
+      repository: acraksjxdthrti3j3qu.azurecr.io/goharbor/harbor-registryctl
+      tag: v2.6.2
 
     resources:
       requests:
@@ -610,8 +610,8 @@ chartmuseum:
   # Harbor defaults ChartMuseum to returning relative urls, if you want using absolute url you should enable it by change the following value to 'true'
   absoluteUrl: false
   image:
-    repository: acraks3i2qzkkxofr7c.azurecr.io/goharbor/chartmuseum-photon
-    tag: v2.5.3
+    repository: acraksjxdthrti3j3qu.azurecr.io/goharbor/chartmuseum-photon
+    tag: v2.6.2
   replicas: 1
   revisionHistoryLimit: 10
   resources:
@@ -636,9 +636,9 @@ trivy:
   enabled: true
   image:
     # repository the repository for Trivy adapter image
-    repository: acraks3i2qzkkxofr7c.azurecr.io/goharbor/trivy-adapter-photon
+    repository: acraksjxdthrti3j3qu.azurecr.io/goharbor/trivy-adapter-photon
     # tag the tag for Trivy adapter image
-    tag: v2.5.3
+    tag: v2.6.2
   # set the service account to be used, default if left empty
   serviceAccountName: ""
   # mount the service account token
@@ -710,8 +710,8 @@ notary:
     # mount the service account token
     automountServiceAccountToken: false
     image:
-      repository: acraks3i2qzkkxofr7c.azurecr.io/goharbor/notary-server-photon
-      tag: v2.5.3
+      repository: acraksjxdthrti3j3qu.azurecr.io/goharbor/notary-server-photon
+      tag: v2.6.2
     replicas: 1
     resources:
       requests:
@@ -733,8 +733,8 @@ notary:
     # mount the service account token
     automountServiceAccountToken: false
     image:
-      repository: acraks3i2qzkkxofr7c.azurecr.io/goharbor/notary-signer-photon
-      tag: v2.5.3
+      repository: acraksjxdthrti3j3qu.azurecr.io/goharbor/notary-signer-photon
+      tag: v2.6.2
     replicas: 1
     resources:
       requests:
@@ -768,8 +768,8 @@ database:
     # mount the service account token
     automountServiceAccountToken: false
     image:
-      repository: acraks3i2qzkkxofr7c.azurecr.io/goharbor/harbor-db
-      tag: v2.5.3
+      repository: acraksjxdthrti3j3qu.azurecr.io/goharbor/harbor-db
+      tag: v2.6.2
     # The initial superuser password for internal database
     password: "changeit"
     # The size limit for Shared memory, pgSQL use it for shared_buffer
@@ -841,8 +841,8 @@ redis:
     # mount the service account token
     automountServiceAccountToken: false
     image:
-      repository: acraks3i2qzkkxofr7c.azurecr.io/goharbor/redis-photon
-      tag: v2.5.3
+      repository: acraksjxdthrti3j3qu.azurecr.io/goharbor/redis-photon
+      tag: v2.6.2
     resources:
       requests:
         memory: 64Mi
@@ -888,8 +888,8 @@ exporter:
   # mount the service account token
   automountServiceAccountToken: false
   image:
-    repository: acraks3i2qzkkxofr7c.azurecr.io/goharbor/harbor-exporter
-    tag: v2.5.3
+    repository: acraksjxdthrti3j3qu.azurecr.io/goharbor/harbor-exporter
+    tag: v2.6.2
   nodeSelector: {}
   tolerations: []
   affinity: {}

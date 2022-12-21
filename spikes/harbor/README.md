@@ -1,18 +1,18 @@
 
-# Deploy Harbor
+# Harbor Deployment
 
-## Azure ASB Cluster
+## Deploy Harbor in Azure ASB Cluster
 
 > The steps below are guidelines for the dev cluster, but is replicable for the pre-prod as well
 
-* Create a dns entry for Harbor (e.g. `harbor-core-westus2-dev` for WestUS2)
-  in `rg-ngsa-asb-dev/cse.ms` private dns and put the LoadBalancer IP address for the region.
-  * You can find LoadBalancer for your cluster under `rg-ngsa-asb-dev-nodepools-{REGION}`
+* Create a dns entry for Harbor (e.g. `harbor-core-eastus-dev` for EastUS)
+  in `rg-wcnp-dev/austinrdc.dev` private dns and put the LoadBalancer IP address for the region.
+  * You can find LoadBalancer for your cluster under `rg-wcnp-dev-nodepools-{REGION}`
   * Or you can check existing dns entries for same region
-* Create a public dns entry (e.g. `harbor-core-westus2-dev` for WestUS2)
-  in `dns-rg/cse.ms` and put the public ip for the regional cluster
+* Create a public dns entry (e.g. `harbor-core-eastus-dev` for EastUS)
+  in `dns-rg/austinrdc.dev` and put the public ip for the regional cluster
   * You can find the public IP in Application Gateway for the cluster
-    (e.g `rg-ngsa-asb-dev/apw-aks-{HASH}-{REGION}` )
+    (e.g `rg-wcnp-dev/apw-aks-{HASH}-{REGION}` )
   * Or you can check existing dns entries for same region
 * Add the settings below for Harbor (similar to NGSA apps) in Application Gateway:
   * Backend pool
@@ -20,13 +20,43 @@
     * If using a health probe, use `/api/v2.0/health` Harbor endpoint
   * Listeners (http and https)
   * Rules (http and https)
-* [Optional] Add an exception for the harbor-host in the WAF policy (e.g. for
-  WestUS2-dev you'll add it in `rg-ngsa-asb-dev/ngsa-asb-waf-policy-westus2`)
+* Add an exception to allow image push traffic (otherwise app gateway blocks some API calls) in the WAF policy (e.g. for
+  Eastus-dev you'll add it in `rg-wcnp-dev/wcnp-waf-policy-eastus`)
 
-At this point Harbor should be ready to deploy.
+  ```bash
+  # Change these variables as needed
+  ASB_WAF_POLICY_RULE_AAD=harborImgPushRule
+  ASB_WAF_POLICY_NAME=wcnp-waf-policy-eastus
+  ASB_RG_CORE=rg-wcnp-dev
+  ASB_WAF_POLICY_RULE_PRIORITY_AAD=12
+
+  # Create a Match type rule
+  az network application-gateway waf-policy custom-rule create \
+    -n $ASB_WAF_POLICY_RULE_AAD --policy-name $ASB_WAF_POLICY_NAME -g $ASB_RG_CORE \
+    --action Allow --priority $ASB_WAF_POLICY_RULE_PRIORITY_AAD --rule-type MatchRule
+
+  # Add Hostname condition to the rule
+  az network application-gateway waf-policy custom-rule match-condition add \
+    -n $ASB_WAF_POLICY_RULE_AAD --policy-name $ASB_WAF_POLICY_NAME -g $ASB_RG_CORE \
+    --match-variables RequestHeaders.Host --operator Regex --values "^harbor-core.*.austinrdc.dev$" \
+    --transforms RemoveNulls Lowercase
+
+  # Now add second URI condition to the rule
+  az network application-gateway waf-policy custom-rule match-condition add \
+    -n $ASB_WAF_POLICY_RULE_AAD --policy-name $ASB_WAF_POLICY_NAME -g $ASB_RG_CORE \
+    --match-variables RequestUri --operator BeginsWith --values "/v2/" \
+    --transforms UrlDecode Lowercase
+  ```
+
+* Also, to pull from Harbor from inside our AKS cluster, Harbor url needs to be added to `rg-wcnp-dev` group Policy
+  * Azure Portal -> `rg-wcnp-dev` --> Policies --> Click on "Kubernetes cluster containers should only use allowed images" policy
+  * Then Edit Assignment --> Parameters
+  * Now under "Allowed registry or registries regex" textbox, append `|harbor-core-eastus-dev.austinrdc.dev.+$` at the end and save
+
+At this point Harbor should be ready to deploy and used for push and pull.
 Now we need to make sure our cluster can pull the Harbor container images.
 We will push Harbor images into our cluster's private ACR repo
-  (e.g. `rg-ngsa-asb-dev/acraks3i2qzkkxofr7c`).
+  (e.g. `rg-wcnp-dev/acraksjxdthrti3j3qu`).
 
 * Goto your private ACR instance, and click on `Networking`
 * Check `Add your client IP address` and save
@@ -36,24 +66,24 @@ We will push Harbor images into our cluster's private ACR repo
 
   ```bash
   # Select proper subscription for your ACR and login to the account
-  az account set -s "jofultz-wcnp" --output table
+  az account set -s "MCAPS-43649-AUS-DEVCREWS" --output table
   az login --scope https://management.core.windows.net//.default
 
   # Now push images to ACR
-  ## Here we're using docker image TAG v2.5.3 and ACR acraks3i2qzkkxofr7c
-  az acr import --source docker.io/goharbor/chartmuseum-photon:v2.5.3 -n acraks3i2qzkkxofr7c
-  az acr import --source docker.io/goharbor/harbor-core:v2.5.3 -n acraks3i2qzkkxofr7c
-  az acr import --source docker.io/goharbor/harbor-db:v2.5.3 -n acraks3i2qzkkxofr7c
-  az acr import --source docker.io/goharbor/harbor-exporter:v2.5.3 -n acraks3i2qzkkxofr7c
-  az acr import --source docker.io/goharbor/harbor-jobservice:v2.5.3 -n acraks3i2qzkkxofr7c
-  az acr import --source docker.io/goharbor/harbor-portal:v2.5.3 -n acraks3i2qzkkxofr7c
-  az acr import --source docker.io/goharbor/harbor-registryctl:v2.5.3 -n acraks3i2qzkkxofr7c
-  az acr import --source docker.io/goharbor/nginx-photon:v2.5.3 -n acraks3i2qzkkxofr7c
-  az acr import --source docker.io/goharbor/notary-server-photon:v2.5.3 -n acraks3i2qzkkxofr7c
-  az acr import --source docker.io/goharbor/notary-signer-photon:v2.5.3 -n acraks3i2qzkkxofr7c
-  az acr import --source docker.io/goharbor/redis-photon:v2.5.3 -n acraks3i2qzkkxofr7c
-  az acr import --source docker.io/goharbor/registry-photon:v2.5.3 -n acraks3i2qzkkxofr7c
-  az acr import --source docker.io/goharbor/trivy-adapter-photon:v2.5.3 -n acraks3i2qzkkxofr7c
+  ## Here we're using docker image TAG v2.6.2 and ACR acraksjxdthrti3j3qu
+  az acr import --source docker.io/goharbor/chartmuseum-photon:v2.6.2 -n acraksjxdthrti3j3qu
+  az acr import --source docker.io/goharbor/harbor-core:v2.6.2 -n acraksjxdthrti3j3qu
+  az acr import --source docker.io/goharbor/harbor-db:v2.6.2 -n acraksjxdthrti3j3qu
+  az acr import --source docker.io/goharbor/harbor-exporter:v2.6.2 -n acraksjxdthrti3j3qu
+  az acr import --source docker.io/goharbor/harbor-jobservice:v2.6.2 -n acraksjxdthrti3j3qu
+  az acr import --source docker.io/goharbor/harbor-portal:v2.6.2 -n acraksjxdthrti3j3qu
+  az acr import --source docker.io/goharbor/harbor-registryctl:v2.6.2 -n acraksjxdthrti3j3qu
+  az acr import --source docker.io/goharbor/nginx-photon:v2.6.2 -n acraksjxdthrti3j3qu
+  az acr import --source docker.io/goharbor/notary-server-photon:v2.6.2 -n acraksjxdthrti3j3qu
+  az acr import --source docker.io/goharbor/notary-signer-photon:v2.6.2 -n acraksjxdthrti3j3qu
+  az acr import --source docker.io/goharbor/redis-photon:v2.6.2 -n acraksjxdthrti3j3qu
+  az acr import --source docker.io/goharbor/registry-photon:v2.6.2 -n acraksjxdthrti3j3qu
+  az acr import --source docker.io/goharbor/trivy-adapter-photon:v2.6.2 -n acraksjxdthrti3j3qu
   ```
 
 After that, modify the required YAML files to prepare for deployment:
@@ -61,8 +91,10 @@ After that, modify the required YAML files to prepare for deployment:
 * In [helm-values.yaml](./spikes/harbor/helm-values.yaml):
   * Change the `repository:` and `tag:` value pairs (13 of them) to point to the proper ACR repo and tag
   * Set the Harbor portal admin password (`harborAdminPassword:` )
+  * Replace (`https://harbor-core-eastus-dev.austinrdc.dev`) with proper Harbor URL
 * In [harbor-virtual-svc.yaml](./spikes/harbor/harbor-virtual-svc.yaml)
   * If deploying to a different namespace than `harbor`, change the namespace value
+  * Replace the Harbor URL here as well
 
 Now that all of the setup is done, we're ready to deploy:
 > Default user for Harbor portal is admin.
@@ -80,17 +112,83 @@ helm install -f spikes/harbor/helm-values.yaml harbor harbor/harbor -n harbor --
 kubectl apply -f spikes/harbor/harbor-virtual-svc.yaml
 ```
 
-### Use images in Harbor for deployments/pods
+## AAD Integration via OIDC (Open ID Connect)
+
+> Steps are loosely based on the this [Github issue link](https://github.com/goharbor/harbor/issues/9193#issuecomment-1317557916)
+
+To enable Azure Action Directory integration, we'll use OIDC (Open ID Connect).
+Follow the steps below:
+
+* Login as local admin (username: admin, password: set in `helm-values.yaml`)
+* Goto Configuration --> Authentication
+  * Select Auth Mode --> OIDC
+  * Copy the Redirect URI specified at the end of the page (something like `https://harbor-core-eastus-dev.austinrdc.dev/c/oidc/callback`)
+* Now to create an App registration for login purpose
+  * In a new tab, login to Azure Portal --> Active Directory --> App Registrations --> New Registration
+  * Give it a name, then choose `Accounts in this organizational directory only`
+  * _Very important step:_ Redirect URI type: Web, value: `https://harbor-core-eastus-dev.austinrdc.dev/c/oidc/callback` <-- The URI copied from Harbor Config Page
+    > _Save/copy_ the Application (client) ID & the Directory (tenant) ID
+  * Goto Certificates & secrets --> Client secrets --> Create new secret
+    > _Save/copy_ the secret
+  * Goto Token Configuration, Add groups claim --> Select Security Groups --> Save
+  * [Optional] You can create a Group with users in AAD, then provide those users access to specific project via group ID in Harbor Portal.
+* Now, we'll add a WAF Rule exception for Harbor AAD login:
+
+  ```bash
+    # Change these variables as needed
+    ASB_WAF_POLICY_RULE_AAD=harborAADRule
+    ASB_WAF_POLICY_NAME=wcnp-waf-policy-eastus
+    ASB_RG_CORE=rg-wcnp-dev
+    ASB_WAF_POLICY_RULE_PRIORITY_AAD=10
+
+    # Create a Match type rule
+    az network application-gateway waf-policy custom-rule create \
+      -n $ASB_WAF_POLICY_RULE_AAD --policy-name $ASB_WAF_POLICY_NAME -g $ASB_RG_CORE \
+      --action Allow --priority $ASB_WAF_POLICY_RULE_PRIORITY_AAD --rule-type MatchRule
+
+    # Add Hostname condition to the rule
+    az network application-gateway waf-policy custom-rule match-condition add \
+      -n $ASB_WAF_POLICY_RULE_AAD --policy-name $ASB_WAF_POLICY_NAME -g $ASB_RG_CORE \
+      --match-variables RequestHeaders.Host --operator Regex --values "^harbor-core.*.austinrdc.dev$" \
+      --transforms RemoveNulls Lowercase
+
+    # Now add second URI condition to the rule
+    az network application-gateway waf-policy custom-rule match-condition add \
+      -n $ASB_WAF_POLICY_RULE_AAD --policy-name $ASB_WAF_POLICY_NAME -g $ASB_RG_CORE \
+      --match-variables RequestUri --operator BeginsWith --values "/c/oidc/callback" \
+      --transforms UrlDecode Lowercase
+  ```
+
+* Back in the Harbor dashboard Tab goto Configuration --> Authentication
+  * Auth Mode: `OIDC`
+  * OIDC Endpoint: `https://login.microsoftonline.com/<Directory (tenant) ID from above>/v2.0`
+  * OIDC Client ID: `Application (client) ID from above`
+  * OIDC Client Secret: `Client secret from above`
+  * Group Claim Name: `groups`
+  * OIDC Scope: `openid,email,profile,offline_access`
+  * Click on Test then Save
+* Logout and test with `OIDC Login Provider`
+
+> **NOTE:** After logging in, each user will have their own user created in Harbor DB.
+>
+> Each user has to login at least once, to create their user in Harbor DB.
+> OIDC created users are not admin by default for security purpose.
+>
+> Hence, after OIDC user creation, logout and login back to `admin` account.
+>
+> Then Administration --> Users --> [Select User] --> Set as Admin to grant admin privileges.
+
+## Use Harbor registry for deployments/pods
 
 To pull directly from Harbor repo, since Harbor is a is a private repo, we need to add our Harbor auth information to kubernetes.
 
 Follow the steps below:
 
 * We need to add our Harbor Repo Url to Policy and Firewall whitelist:
-  * Add the repo url `harbor-core-eastus-dev.cse.ms/` to Image-pull whitelist Policy under `rg-ngsa-dev-asb` resource group
-    * Policy location: Azure Portal -> `rg-ngsa-asb-dev` resource group -> Policies -> Assignments -> Under `Kubernetes cluster containers should only use allowed images` add the url to the regex.
-  * Add the repo url `harbor-core-eastus-dev.cse.ms` to ASB Firewall whitelist as well.
-    * Region specific FireWall: Azure Portal -> `rg-ngsa-asb-dev-hub` resource group -> `fw-policies-<REGION>` -> Rule Collection
+  * Add the repo url `harbor-core-eastus-dev.austinrdc.dev/` to Image-pull whitelist Policy under `rg-ngsa-dev-asb` resource group
+    * Policy location: Azure Portal -> `rg-wcnp-dev` resource group -> Policies -> Assignments -> Under `Kubernetes cluster containers should only use allowed images` add the url to the regex.
+  * Add the repo url `harbor-core-eastus-dev.austinrdc.dev` to ASB Firewall whitelist as well.
+    * Region specific FireWall: Azure Portal -> `rg-wcnp-dev-hub` resource group -> `fw-policies-<REGION>` -> Rule Collection
 * Now create a user account in a Harbor Project.
   * Project's page -> `Robot Accounts` -> `Add a new robot account` with at least pull permission.
   * Upon the user creation, it will provide a one-time key which can be used as password.
@@ -99,11 +197,11 @@ Follow the steps below:
 
   ```bash
     read -sr PASSWORD # In this way the password won't be saved to shell history
-    kubectl create secret docker-registry harbor-regcred --docker-server=https://harbor-core-eastus-dev.cse.ms --docker-username='<USERNAME>' --docker-password="$PASSWORD" -n ngsa
+    kubectl create secret docker-registry harbor-regcred --docker-server=https://harbor-core-eastus-dev.austinrdc.dev --docker-username='<USERNAME>' --docker-password="$PASSWORD" -n ngsa
   ```
 
 * Note: the `harbor-regcred` is the secret name, which will be used by deployments to pull from Harbor. So it should be in the same namespace as the deployment (in above cmd, its `ngsa`).
-* In the deployment file, add imagePullSecrets to allow the deployment to pull from the repo:
+* In the deployment file, add `imagePullSecrets` to allow the deployment to pull from the repo:
 
 ```yaml
 ...
@@ -127,7 +225,7 @@ With these steps, Kubernetes should be able to pull the image from Harbor repo.
 
 > Followed the steps in official Kubernetes documentation: ["Pulling from private repo"](https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/#create-a-secret-by-providing-credentials-on-the-command-line)
 
-## Locally or in a VM with Docker
+## Deploy Locally or in a VM with Docker
 
 For deploying Harbor locally we need to have these tools available:
 
@@ -156,7 +254,7 @@ Follow the steps below (based on [installation config](https://goharbor.io/docs/
 
 5. Change `certificate` and `private_key` entry in `harbor.yml` file and point to `$HARBOR_PATH/harbor-ssl.crt` and `$HARBOR_PATH/harbor-ssl.key`.
 
-    > *Note:* Use full path for `certificate` and `private_key`
+    > _Note:_ Use full path for `certificate` and `private_key`
 
 6. Run the installer
 
