@@ -2,28 +2,58 @@
 
 The following instructions will guide you on how to renew  the existing ssl certificates for the ngsa-asb setup.
 
-## Create Cerificate bundle
-	
-	Before getting started, ensure that the ssl certificate issuer provided you with the star certificate (star_austinrdc_dev.crt), My_CA_Bundle.crt and the keey file. Next, we are going to combine the star certificate with My_CA_Bundle.crt to create the certificate that will be deployed.
+## Create Certificate bundle
 
-	``` bash
-		cat star_austinrdc_dev.crt My_CA_Bundle.crt  > newbundle.crt
-	```
+Before getting started, ensure that the ssl issuer has provided you with following:
 
+- star certificate (e.g. star_austinrdc_dev.crt)
+- My_CA_Bundle.crt
+- key file
 
+Next, we are going to combine the star certificate with My_CA_Bundle.crt to create a new certificate that will be installed in our infrastructure.
 
-## Generate PFX Certificate to be used by Application Gateway
+``` bash
+cat star_austinrdc_dev.crt My_CA_Bundle.crt  > ngsa_bundle.crt
+```
 
-	openssl pkcs12 -export -inkey _.austinrdc.dev.key -in CER\ -\ CRT\ Files/newbundle.crt -out certificate.pfx
+## Generate PFX Certificate to be used by the Application Gateways
 
-	SecretValue=$(cat certificate.pfx | base64)
+The Application Gateways require an additional PFX file, this can be created using `openssl` cli tool and exporting it to KeyVault.
 
-	az keyvault secret set --vault-name kv-aks-jxdthrti3j3qu --name sslcertAustinRdc --value ${SecretValue}
+``` bash
+openssl pkcs12 -export -inkey _.austinrdc.dev.key -in ngsa_bundle.crt -out certificate.pfx
 
-	az network application-gateway ssl-cert create -g rg-wcnp-dev --gateway-name apw-aks-jxdthrti3j3qu-eastus -n apw-aks-jxdthrti3j3qu-eastus-ssl-certificate-austinrdc --key-vault-secret-id https://kv-aks-jxdthrti3j3qu.vault.azure.net/secrets/sslcertAustinRdc/cc0c81ff5fc94ef0aa949994aa7a57cb
+SecretValue=$(cat certificate.pfx | base64)
 
+export KEYVAULT_NAME=<keyvault-name>
 
-## Certificates for Istio
-	az keyvault secret set --vault-name "kv-aks-jxdthrti3j3qu" --name "test-appgw-ingress-internal-aks-ingress-tls" --file "newbundle.crt"
+az keyvault secret set --vault-name $KEYVAULT_NAME --name sslcert --value ${SecretValue}
 
-	az keyvault secret set --vault-name "kv-aks-jxdthrti3j3qu" --name "test-appgw-ingress-internal-aks-ingress-key" --file "_.austinrdc.dev.key"
+export APP_GATEWAY_RG_NAME=<app-gateway-rg-name>
+export APP_GATEWAY_NAME=<app-gateway-name>
+export KEYVAULT_SECRET_ID=<kv-secret-id> # must be full format e.g. https://kv-aks-xxx.vault.azure.net/secrets/sslcertAustinRdc/xyz123
+
+az network application-gateway ssl-cert create -g $APP_GATEWAY_RG_NAME --gateway-name $APP_GATEWAY_NAME -n $APP_GATEWAY_NAME-ssl-certificate-austinrdc --key-vault-secret-id $KEYVAULT_SECRET_ID
+
+# Note: you may need to check the app gateway listeners on the portal to ensure the change was reflected.
+```
+
+## Renew Certificates for Istio
+
+Next steps involve uploading the certificates to keyvault so that they can be used by Istio (you will need to re-create the istio pods after this step)
+
+``` bash
+az keyvault secret set --vault-name $KEYVAULT_NAME --name "appgw-ingress-internal-aks-ingress-tls" --file "ngsa_bundle.crt"
+
+az keyvault secret set --vault-name $KEYVAULT_NAME --name "appgw-ingress-internal-aks-ingress-key" --file "_.austinrdc.dev.key"
+```
+
+## Renew Codespaces secrets
+
+Last step is to refresh the following codespace secrets with the contents its respective file
+
+```text
+APP_GW_CERT_CSMS -> certificate.pfx
+INGRESS_CERT_CSMS -> ngsa_bundle.crt
+INGRESS_KEY_CSMS -> austinrdc.dev.key
+```
