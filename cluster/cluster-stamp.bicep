@@ -226,6 +226,9 @@ resource targetVirtualNetwork 'Microsoft.Network/virtualNetworks@2022-05-01' exi
   resource snetApplicationGateway 'subnets' existing = {
     name: 'snet-applicationgateway'
   }
+  resource snetClusterIngressServices 'subnets' existing = {
+    name: 'snet-clusteringressservices'
+  }
 }
 
 /*** RESOURCES ***/
@@ -731,11 +734,11 @@ module EnsureClusterIdentityHasRbacToSelfManagedResources './nested_EnsureCluste
   scope: resourceGroup(split(targetVnetResourceId, '/')[4])
   params: {
     resourceId_Microsoft_ManagedIdentity_userAssignedIdentities_variables_clusterControlPlaneIdentityName: clusterControlPlaneIdentity.properties
-    variables_vnetNodePoolSubnetResourceId: '${targetVnetResourceId}/subnets/snet-clusternodes' // TODO
+    variables_vnetNodePoolSubnetResourceId: targetVirtualNetwork::snetClusterNodes.id
     variables_networkContributorRole: networkContributorRole.id
     variables_clusterControlPlaneIdentityName: 'mi-${clusterName}-controlplane'
     variables_vnetName: split(targetVnetResourceId, '/')[8]
-    variables_vnetIngressServicesSubnetResourceId: '${targetVnetResourceId}/subnets/snet-cluster-ingressservices' // TODO
+    variables_vnetIngressServicesSubnetResourceId: targetVirtualNetwork::snetClusterIngressServices.id
     location: location
   }
 }
