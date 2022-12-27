@@ -27,11 +27,10 @@ SecretValue=$(cat certificate.pfx | base64)
 
 export KEYVAULT_NAME=<keyvault-name>
 
-az keyvault secret set --vault-name $KEYVAULT_NAME --name sslcert --value ${SecretValue}
+export KEYVAULT_SECRET_ID=$(az keyvault secret set --vault-name $KEYVAULT_NAME --name sslcert --value ${SecretValue} --query id -o tsv)
 
 export APP_GATEWAY_RG_NAME=<app-gateway-rg-name>
 export APP_GATEWAY_NAME=<app-gateway-name>
-export KEYVAULT_SECRET_ID=<kv-secret-id> # must be full format e.g. https://kv-aks-xxx.vault.azure.net/secrets/sslcertAustinRdc/xyz123
 
 az network application-gateway ssl-cert create -g $APP_GATEWAY_RG_NAME --gateway-name $APP_GATEWAY_NAME -n $APP_GATEWAY_NAME-ssl-certificate-austinrdc --key-vault-secret-id $KEYVAULT_SECRET_ID
 
