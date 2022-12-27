@@ -49,10 +49,12 @@ az keyvault secret set --vault-name $KEYVAULT_NAME --name "appgw-ingress-interna
 
 ## Renew Codespaces secrets
 
-Last step is to refresh the following codespace secrets with the contents its respective file
+The final step is to update the codespaces secrets with the contents of its respective file.
+
+**Note** these must be encoded in base 64.
 
 ```text
-APP_GW_CERT_CSMS -> certificate.pfx
-INGRESS_CERT_CSMS -> ngsa_bundle.crt
-INGRESS_KEY_CSMS -> austinrdc.dev.key
+APP_GW_CERT_CSMS = certificate.pfx
+INGRESS_CERT_CSMS = ngsa_bundle.crt
+INGRESS_KEY_CSMS = austinrdc.dev.key
 ```
