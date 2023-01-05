@@ -6,7 +6,7 @@ export ASB_ENV=dev
 export ASB_FD_ROOT_NAME=fdauto-ngsa
 export ASB_FD_NAME=${ASB_FD_ROOT_NAME}-${ASB_ENV}
 export ASB_FD_RG_NAME=rg-front-door-${ASB_FD_NAME}
-export ASB_FD_LOCATION=centralus
+export ASB_FD_LOCATION=northcentralus
 
 az group create --name $ASB_FD_RG_NAME --location $ASB_FD_LOCATION
 
@@ -110,7 +110,7 @@ az network front-door backend-pool create   --resource-group $ASB_FD_RG_NAME \
                                             --disabled false
 
 # - add additional backends to backend pool
-export ASB_FD_LOCATION2=westus2
+export ASB_FD_LOCATION2=westus3
 export ASB_FD_BACKEND_ADDRESS2=${ASB_FD_ROOT_NAME}-${ASB_NGSA_APP}-${ASB_FD_LOCATION2}-${ASB_ENV}.${ASB_DNS_ZONE}
 az network front-door backend-pool backend add --resource-group $ASB_FD_RG_NAME \
                                             --front-door-name $ASB_FD_NAME \

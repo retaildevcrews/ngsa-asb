@@ -2,7 +2,7 @@
 
 ## Summary
 
-After deploying your clusters using the AKS Secure Baseline method outlined in this repository, [Azure Front Door](https://azure.microsoft.com/en-us/products/frontdoor/#documentation) can also be used as a global load balancer for your deployed apps. For example, if you have ***ngsa-memory*** deployed on different clusters in different regions, each with a distinct public endpoint, i.e., ***ngsa-memory-eastus-dev.cse.ms*** and ***ngsa-memory-westus2-dev.cse.ms*** you can create a single front end (***ngsa-memory-dev.cse.ms***, perhaps) for both instances using Azure Front Door. The Azure CLI setup instructions to create and deploy Azure Front Door as a global load balancer are included below, using ngsa-memory as an example. In summary, we
+After deploying your clusters using the AKS Secure Baseline method outlined in this repository, [Azure Front Door](https://azure.microsoft.com/en-us/products/frontdoor/#documentation) can also be used as a global load balancer for your deployed apps. For example, if you have ***ngsa-memory*** deployed on different clusters in different regions, each with a distinct public endpoint, i.e., ***ngsa-memory-eastus-dev.cse.ms*** and ***ngsa-memory-westus3-dev.cse.ms*** you can create a single front end (***ngsa-memory-dev.cse.ms***, perhaps) for both instances using Azure Front Door. The Azure CLI setup instructions to create and deploy Azure Front Door as a global load balancer are included below, using ngsa-memory as an example. In summary, we
 
 - create and configure the Azure Front Door resource
 - create a front end endpoint
@@ -19,7 +19,7 @@ export ASB_ENV=dev
 export ASB_FD_ROOT_NAME=ngsa
 export ASB_FD_NAME=${ASB_FD_ROOT_NAME}-${ASB_ENV}
 export ASB_FD_RG_NAME=rg-front-door-${ASB_FD_NAME}
-export ASB_FD_LOCATION=centralus
+export ASB_FD_LOCATION=northcentralus
 
 az group create --name $ASB_FD_RG_NAME --location $ASB_FD_LOCATION
 
@@ -150,7 +150,7 @@ az network front-door backend-pool create   --resource-group $ASB_FD_RG_NAME \
 
 # - (OPTIONAL) add additional backend addresses to backend pool
 # - Repeat with updated address for as many back ends as you need to connect to the new front end endpoint
-export ASB_FD_LOCATION2=westus2
+export ASB_FD_LOCATION2=westus3
 export ASB_FD_BACKEND_ADDRESS2=${ASB_FD_ROOT_NAME}-${ASB_NGSA_APP}-${ASB_FD_LOCATION2}-${ASB_ENV}.${ASB_DNS_ZONE}
 az network front-door backend-pool backend add --resource-group $ASB_FD_RG_NAME \
                                             --front-door-name $ASB_FD_NAME \

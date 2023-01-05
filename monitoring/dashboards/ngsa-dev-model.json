@@ -863,8 +863,8 @@
       "scopedVars": {
         "Zone": {
           "selected": true,
-          "text": "West US2",
-          "value": "westus2"
+          "text": "West US3",
+          "value": "westus3"
         }
       },
       "targets": [
@@ -952,8 +952,8 @@
       "scopedVars": {
         "Zone": {
           "selected": true,
-          "text": "West US2",
-          "value": "westus2"
+          "text": "West US3",
+          "value": "westus3"
         }
       },
       "targets": [
@@ -1041,8 +1041,8 @@
       "scopedVars": {
         "Zone": {
           "selected": true,
-          "text": "West US2",
-          "value": "westus2"
+          "text": "West US3",
+          "value": "westus3"
         }
       },
       "targets": [
@@ -1823,8 +1823,8 @@
       "scopedVars": {
         "Zone": {
           "selected": true,
-          "text": "West US2",
-          "value": "westus2"
+          "text": "West US3",
+          "value": "westus3"
         }
       },
       "targets": [
@@ -1920,8 +1920,8 @@
       "scopedVars": {
         "Zone": {
           "selected": true,
-          "text": "West US2",
-          "value": "westus2"
+          "text": "West US3",
+          "value": "westus3"
         }
       },
       "targets": [
@@ -2017,8 +2017,8 @@
       "scopedVars": {
         "Zone": {
           "selected": true,
-          "text": "West US2",
-          "value": "westus2"
+          "text": "West US3",
+          "value": "westus3"
         }
       },
       "targets": [
@@ -3177,8 +3177,8 @@
       "scopedVars": {
         "Zone": {
           "selected": true,
-          "text": "West US2",
-          "value": "westus2"
+          "text": "West US3",
+          "value": "westus3"
         }
       },
       "targets": [
@@ -3269,8 +3269,8 @@
       "scopedVars": {
         "Zone": {
           "selected": true,
-          "text": "West US2",
-          "value": "westus2"
+          "text": "West US3",
+          "value": "westus3"
         }
       },
       "targets": [
@@ -3361,8 +3361,8 @@
       "scopedVars": {
         "Zone": {
           "selected": true,
-          "text": "West US2",
-          "value": "westus2"
+          "text": "West US3",
+          "value": "westus3"
         }
       },
       "targets": [
@@ -4775,8 +4775,8 @@
       "scopedVars": {
         "Zone": {
           "selected": true,
-          "text": "West US2",
-          "value": "westus2"
+          "text": "West US3",
+          "value": "westus3"
         }
       },
       "seriesOverrides": [],
@@ -4906,8 +4906,8 @@
       "scopedVars": {
         "Zone": {
           "selected": true,
-          "text": "West US2",
-          "value": "westus2"
+          "text": "West US3",
+          "value": "westus3"
         }
       },
       "seriesOverrides": [],
@@ -5037,8 +5037,8 @@
       "scopedVars": {
         "Zone": {
           "selected": true,
-          "text": "West US2",
-          "value": "westus2"
+          "text": "West US3",
+          "value": "westus3"
         }
       },
       "seriesOverrides": [],
@@ -6022,8 +6022,8 @@
       "scopedVars": {
         "Zone": {
           "selected": true,
-          "text": "West US2",
-          "value": "westus2"
+          "text": "West US3",
+          "value": "westus3"
         }
       },
       "seriesOverrides": [],
@@ -6153,8 +6153,8 @@
       "scopedVars": {
         "Zone": {
           "selected": true,
-          "text": "West US2",
-          "value": "westus2"
+          "text": "West US3",
+          "value": "westus3"
         }
       },
       "seriesOverrides": [],
@@ -6284,8 +6284,8 @@
       "scopedVars": {
         "Zone": {
           "selected": true,
-          "text": "West US2",
-          "value": "westus2"
+          "text": "West US3",
+          "value": "westus3"
         }
       },
       "seriesOverrides": [],
@@ -6915,8 +6915,8 @@
       "scopedVars": {
         "Zone": {
           "selected": true,
-          "text": "West US2",
-          "value": "westus2"
+          "text": "West US3",
+          "value": "westus3"
         }
       },
       "targets": [
@@ -7063,8 +7063,8 @@
       "scopedVars": {
         "Zone": {
           "selected": true,
-          "text": "West US2",
-          "value": "westus2"
+          "text": "West US3",
+          "value": "westus3"
         }
       },
       "targets": [
@@ -7223,8 +7223,8 @@
       "scopedVars": {
         "Zone": {
           "selected": true,
-          "text": "West US2",
-          "value": "westus2"
+          "text": "West US3",
+          "value": "westus3"
         }
       },
       "targets": [
@@ -7280,11 +7280,11 @@
           "tags": [],
           "text": [
             "East US",
-            "West US2"
+            "West US3"
           ],
           "value": [
             "eastus",
-            "westus2"
+            "westus3"
           ]
         },
         "error": null,
@@ -7301,11 +7301,11 @@
           },
           {
             "selected": true,
-            "text": "West US2",
-            "value": "westus2"
+            "text": "West US3",
+            "value": "westus3"
           }
         ],
-        "query": "East US: eastus, West US2: westus2",
+        "query": "East US: eastus, West US3: westus3",
         "queryValue": "",
         "skipUrlSync": false,
         "type": "custom"

@@ -30,29 +30,29 @@ flowchart TD
     end
     subgraph dev-ngsa-asb-eastus[Cluster dev-ngsa-asb-eastus]
         direction LR
-        apps-devwest2
+        apps-deveast
     end     
-    subgraph dev-ngsa-asb-westus2[Cluster dev-ngsa-asb-westus2]
+    subgraph dev-ngsa-asb-westus3[Cluster dev-ngsa-asb-westus3]
         direction LR
         apps-deveast
     end
-    subgraph pre-ngsa-asb-centralus[Cluster pre-ngsa-asb-centralus]
+    subgraph pre-ngsa-asb-northcentralus[Cluster pre-ngsa-asb-northcentralus]
         direction LR
-        apps-precentral
+        apps-prenorthcentral
     end
     subgraph pre-ngsa-asb-eastus[Cluster pre-ngsa-asb-eastus]
         direction LR
         apps-preeast
     end
-    subgraph pre-ngsa-asb-westus2[Cluster pre-ngsa-asb-westus2]
+    subgraph pre-ngsa-asb-westus3[Cluster pre-ngsa-asb-westus3]
         direction LR
-        apps-prewest2
+        apps-prewest3
     end
     dev-ngsa-asb-eastus --> environment-dev
-    dev-ngsa-asb-westus2 --> environment-dev
+    dev-ngsa-asb-westus3 --> environment-dev
     pre-ngsa-asb-eastus --> environment-pre
-    pre-ngsa-asb-westus2 --> environment-pre
-    pre-ngsa-asb-centralus --> environment-pre
+    pre-ngsa-asb-westus3 --> environment-pre
+    pre-ngsa-asb-northcentralus --> environment-pre
     environment-dev --> Base
     environment-pre --> Base 
 ```

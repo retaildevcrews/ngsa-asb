@@ -15,7 +15,7 @@
         "criteria": {
             "allOf": [
                 {
-                    "query": "ingress_CL | where k_app_s == 'ngsa-cosmos' and x_load_feedback_s == '' and user_agent_s startswith 'l8r' and Zone_s == 'westus2' | summarize FailedRequests=count() by bin(TimeGenerated, 5m), Zone_s | project-rename AggregatedValue=FailedRequests",
+                    "query": "ingress_CL | where k_app_s == 'ngsa-cosmos' and x_load_feedback_s == '' and user_agent_s startswith 'l8r' and Zone_s == 'westus3' | summarize FailedRequests=count() by bin(TimeGenerated, 5m), Zone_s | project-rename AggregatedValue=FailedRequests",
                     "timeAggregation": "Average",
                     "metricMeasureColumn": "AggregatedValue",
                     "dimensions": [

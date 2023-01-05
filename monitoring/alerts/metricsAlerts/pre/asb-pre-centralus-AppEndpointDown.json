@@ -1,12 +1,12 @@
 {
-    "name": "asb-pre-centralus-AppEndpointDown",
+    "name": "asb-pre-northcentralus-AppEndpointDown",
     "location": "global",
     "properties": {
         "description": "One or more application endpoints are down",
         "severity": 0,
         "enabled": true,
         "scopes": [
-            "/subscriptions/${Ngsa_Subscription_Guid}/resourceGroups/${Ngsa_Common_Services_RG}/providers/Microsoft.Network/applicationGateways/apw-aks-fykg5bqasutle-centralus"
+            "/subscriptions/${Ngsa_Subscription_Guid}/resourceGroups/${Ngsa_Common_Services_RG}/providers/Microsoft.Network/applicationGateways/apw-aks-fykg5bqasutle-northcentralus"
         ],
         "evaluationFrequency": "PT30M",
         "windowSize": "PT1H",
@@ -22,10 +22,10 @@
                             "name": "BackendSettingsPool",
                             "operator": "Include",
                             "values": [
-                                "grafana-centralus-pre.cse.ms~grafana-centralus-pre-httpsettings",
-                                "ngsa-cosmos-centralus-pre.cse.ms~ngsa-cosmos-centralus-pre-httpsettings",
-                                "ngsa-java-centralus-pre.cse.ms~ngsa-java-centralus-pre-httpsettings",
-                                "ngsa-memory-centralus-pre.cse.ms~ngsa-memory-centralus-pre-httpsettings"
+                                "grafana-northcentralus-pre.cse.ms~grafana-northcentralus-pre-httpsettings",
+                                "ngsa-cosmos-northcentralus-pre.cse.ms~ngsa-cosmos-northcentralus-pre-httpsettings",
+                                "ngsa-java-northcentralus-pre.cse.ms~ngsa-java-northcentralus-pre-httpsettings",
+                                "ngsa-memory-northcentralus-pre.cse.ms~ngsa-memory-northcentralus-pre-httpsettings"
                             ]
                         }
                     ],

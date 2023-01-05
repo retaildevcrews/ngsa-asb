@@ -1,12 +1,12 @@
 {
-    "name": "asb-pre-westus2-AppEndpointDown",
+    "name": "asb-pre-westus3-AppEndpointDown",
     "location": "global",
     "properties": {
         "description": "One or more application endpoints are down",
         "severity": 0,
         "enabled": true,
         "scopes": [
-            "/subscriptions/${Ngsa_Subscription_Guid}/resourceGroups/${Ngsa_Common_Services_RG}/providers/Microsoft.Network/applicationGateways/apw-aks-fykg5bqasutle-westus2"
+            "/subscriptions/${Ngsa_Subscription_Guid}/resourceGroups/${Ngsa_Common_Services_RG}/providers/Microsoft.Network/applicationGateways/apw-aks-fykg5bqasutle-westus3"
         ],
         "evaluationFrequency": "PT30M",
         "windowSize": "PT1H",
@@ -22,10 +22,10 @@
                             "name": "BackendSettingsPool",
                             "operator": "Include",
                             "values": [
-                                "grafana-westus2-pre.cse.ms~grafana-westus2-pre-httpsettings",
-                                "ngsa-cosmos-westus2-pre.cse.ms~ngsa-cosmos-westus2-pre-httpsettings",
-                                "ngsa-java-westus2-pre.cse.ms~ngsa-java-westus2-pre-httpsettings",
-                                "ngsa-memory-westus2-pre.cse.ms~ngsa-memory-westus2-pre-httpsettings"
+                                "grafana-westus3-pre.cse.ms~grafana-westus3-pre-httpsettings",
+                                "ngsa-cosmos-westus3-pre.cse.ms~ngsa-cosmos-westus3-pre-httpsettings",
+                                "ngsa-java-westus3-pre.cse.ms~ngsa-java-westus3-pre-httpsettings",
+                                "ngsa-memory-westus3-pre.cse.ms~ngsa-memory-westus3-pre-httpsettings"
                             ]
                         }
                     ],
