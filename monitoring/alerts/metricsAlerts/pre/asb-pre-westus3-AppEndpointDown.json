@@ -1,12 +1,12 @@
 {
-    "name": "asb-pre-eastus-AppEndpointDown",
+    "name": "asb-pre-westus3-AppEndpointDown",
     "location": "global",
     "properties": {
         "description": "One or more application endpoints are down",
         "severity": 0,
         "enabled": true,
         "scopes": [
-            "/subscriptions/${Ngsa_Subscription_Guid}/resourceGroups/${Ngsa_Common_Services_RG}/providers/Microsoft.Network/applicationGateways/apw-aks-ri3aov7twb4uy-eastus"
+            "/subscriptions/${Ngsa_Subscription_Guid}/resourceGroups/${Ngsa_Common_Services_RG}/providers/Microsoft.Network/applicationGateways/apw-aks-ri3aov7twb4uy-westus3"
         ],
         "evaluationFrequency": "PT30M",
         "windowSize": "PT1H",
@@ -22,10 +22,10 @@
                             "name": "BackendSettingsPool",
                             "operator": "Include",
                             "values": [
-                                "grafana-eastus-pre.austinrdc.dev~grafana-eastus-pre-httpsettings",
-                                "ngsa-cosmos-eastus-pre.austinrdc.dev~ngsa-cosmos-eastus-pre-httpsettings",
-                                "ngsa-java-eastus-pre.austinrdc.dev~ngsa-java-eastus-pre-httpsettings",
-                                "ngsa-memory-eastus-pre.austinrdc.dev~ngsa-memory-eastus-pre-httpsettings"
+                                "grafana-westus3-pre.austinrdc.dev~grafana-westus3-pre-httpsettings",
+                                "ngsa-cosmos-westus3-pre.austinrdc.dev~ngsa-cosmos-westus3-pre-httpsettings",
+                                "ngsa-java-westus3-pre.austinrdc.dev~ngsa-java-westus3-pre-httpsettings",
+                                "ngsa-memory-westus3-pre.austinrdc.dev~ngsa-memory-westus3-pre-httpsettings"
                             ]
                         }
                     ],

@@ -94,7 +94,7 @@ spec:
                 type: string
               location:
                 description: 'Location is a string matching one of the canonical Azure
-                  region names. Examples: "westus2", "eastus".'
+                  region names. Examples: "westus3", "eastus".'
                 type: string
               networkPlugin:
                 description: NetworkPlugin used for building Kubernetes network.
@@ -352,7 +352,7 @@ spec:
                 type: string
               location:
                 description: 'Location is a string matching one of the canonical Azure
-                  region names. Examples: "westus2", "eastus".'
+                  region names. Examples: "westus3", "eastus".'
                 type: string
               networkPlugin:
                 description: NetworkPlugin used for building Kubernetes network.
@@ -677,7 +677,7 @@ spec:
                 type: string
               location:
                 description: 'Location is a string matching one of the canonical Azure
-                  region names. Examples: "westus2", "eastus".'
+                  region names. Examples: "westus3", "eastus".'
                 type: string
               networkPlugin:
                 description: NetworkPlugin used for building Kubernetes network.

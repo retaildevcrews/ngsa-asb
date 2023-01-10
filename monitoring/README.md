@@ -242,7 +242,7 @@ Add, commit and push the modified files using git to your working branch.
 
 ```bash
 # app DNS name, in subdomain format
-# format [app]-[region]-[env].cse.ms
+# format [app]-[region]-[env].austinrdc.dev
 export ASB_APP_NAME=grafana
 export ASB_APP_DNS_NAME=${ASB_APP_NAME}-${ASB_SPOKE_LOCATION}-${ASB_ENV}
 export ASB_APP_DNS_FULL_NAME=${ASB_APP_DNS_NAME}.${ASB_DNS_ZONE}

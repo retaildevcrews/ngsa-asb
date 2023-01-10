@@ -51,7 +51,7 @@ func InitFlags(fs *pflag.FlagSet) {
 	// HTTPS is required according to the Cluster API documentation.
 	// cert-manager is added to the management cluster when initialized with clusterctl.
 	// This cert-manager is used in this setup to generate the required secrets.
-	// Existing certs can be used instead if they're available. ex: cse.ms certs.
+	// Existing certs can be used instead if they're available. ex: austinrdc.dev certs.
 	fs.StringVar(&webhookCertDir, "webhook-cert-dir", "/tmp/k8s-webhook-server/serving-certs/",
 		"Webhook cert dir, only used when webhook-port is specified.")
 }

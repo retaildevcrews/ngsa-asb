@@ -6,7 +6,7 @@
         "severity": 0,
         "enabled": true,
         "scopes": [
-            "/subscriptions/${Ngsa_Subscription_Guid}/resourceGroups/${Ngsa_Common_Services_RG}/providers/Microsoft.Network/applicationGateways/apw-aks-3i2qzkkxofr7c-eastus"
+            "/subscriptions/${Ngsa_Subscription_Guid}/resourceGroups/${Ngsa_Common_Services_RG}/providers/Microsoft.Network/applicationGateways/apw-aks-jxdthrti3j3qu-eastus"
         ],
         "evaluationFrequency": "PT30M",
         "windowSize": "PT1H",
@@ -22,11 +22,11 @@
                             "name": "BackendSettingsPool",
                             "operator": "Include",
                             "values": [
-                                "grafana-eastus-dev.cse.ms~grafana-eastus-dev-httpsettings",
-                                "ngsa-cosmos-eastus-dev.cse.ms~ngsa-cosmos-eastus-dev-httpsettings",
-                                "ngsa-java-eastus-dev.cse.ms~ngsa-java-eastus-dev-httpsettings",
-                                "ngsa-memory-eastus-dev.cse.ms~ngsa-memory-eastus-dev-httpsettings",
-                                "loderunner-eastus-dev.cse.ms~loderunner-eastus-dev-httpsettings"
+                                "grafana-eastus-dev.austinrdc.dev~grafana-eastus-dev-httpsettings",
+                                "ngsa-cosmos-eastus-dev.austinrdc.dev~ngsa-cosmos-eastus-dev-httpsettings",
+                                "ngsa-java-eastus-dev.austinrdc.dev~ngsa-java-eastus-dev-httpsettings",
+                                "ngsa-memory-eastus-dev.austinrdc.dev~ngsa-memory-eastus-dev-httpsettings",
+                                "loderunner-eastus-dev.austinrdc.dev~loderunner-eastus-dev-httpsettings"
                             ]
                         }
                     ],
