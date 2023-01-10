@@ -52,7 +52,7 @@ spec:
       key: key
   parameters:
     usePodIdentity: "true"
-    keyvaultName: "kv-aks-jxdthrti3j3qu"
+    keyvaultName: kv-aks-jxdthrti3j3qu
     objects: |
       array:
         - |

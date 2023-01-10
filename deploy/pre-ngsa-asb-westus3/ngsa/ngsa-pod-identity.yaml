@@ -1,7 +1,7 @@
 apiVersion: aadpodidentity.k8s.io/v1
 kind: AzureIdentity
 metadata:
-  name: ngsa-asb-ngsa-id
+  name: wcnp-ngsa-id
   namespace: ngsa
 spec:
   type: 0
@@ -13,11 +13,11 @@ spec:
 apiVersion: aadpodidentity.k8s.io/v1
 kind: AzureIdentityBinding
 metadata:
-  name: ngsa-asb-ngsa-id-binding
+  name: wcnp-ngsa-id-binding
   namespace: ngsa
 spec:
-  azureIdentity: ngsa-asb-ngsa-id
-  selector: ngsa-asb-ngsa-id
+  azureIdentity: wcnp-ngsa-id
+  selector: wcnp-ngsa-id
 
 ---
 

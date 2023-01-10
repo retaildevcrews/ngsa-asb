@@ -12,7 +12,7 @@ Follow ASB Setup Until [Resource Group Creation](/README.md#set-aks-environment-
 # Create hub network
 az deployment group create \
   -g $ASB_RG_HUB \
-  -f networking/hub-default.json \
+  -f networking/hub-default.bicep \
   -p location=${ASB_HUB_LOCATION} \
   -c --query name
 
@@ -25,7 +25,7 @@ export ASB_SPOKE_IP_PREFIX="10.240"
 az deployment group create \
   -n spoke-$ASB_ORG_APP_ID_NAME \
   -g $ASB_RG_SPOKE \
-  -f networking/spoke-default.json \
+  -f networking/spoke-default.bicep \
   -p deploymentName=${ASB_DEPLOYMENT_NAME} \
      hubLocation=${ASB_HUB_LOCATION} \
      hubVnetResourceId=${ASB_HUB_VNET_ID} \

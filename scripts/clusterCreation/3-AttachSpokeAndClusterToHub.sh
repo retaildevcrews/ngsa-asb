@@ -60,7 +60,7 @@ function deployDefaultSpoke()
   az deployment group create \
     -n spoke-$ASB_ORG_APP_ID_NAME \
     -g $ASB_RG_SPOKE \
-    -f networking/spoke-default.json \
+    -f networking/spoke-default.bicep \
     -p deploymentName=${ASB_DEPLOYMENT_NAME} \
       hubLocation=${ASB_HUB_LOCATION} \
       hubVnetResourceId=${ASB_HUB_VNET_ID} \
@@ -95,7 +95,7 @@ function deployHubRegionA()
   # Create Region A hub network
   az deployment group create \
     -g $ASB_RG_HUB \
-    -f networking/hub-regionA.json \
+    -f networking/hub-regionA.bicep \
     -p location=${ASB_HUB_LOCATION} nodepoolSubnetResourceIds="['${ASB_NODEPOOLS_SUBNET_ID}']" \
     -c --query name
 
@@ -150,7 +150,7 @@ function deployAks()
 
   # Create AKS
   az deployment group create -g $ASB_RG_CORE \
-    -f cluster/cluster-stamp.json \
+    -f cluster/cluster-stamp.bicep \
     -n cluster-${ASB_DEPLOYMENT_NAME}-${ASB_CLUSTER_LOCATION} \
     -p appGatewayListenerCertificate=${APP_GW_CERT_CSMS} \
       asbDomainSuffix=${ASB_DOMAIN_SUFFIX} \
