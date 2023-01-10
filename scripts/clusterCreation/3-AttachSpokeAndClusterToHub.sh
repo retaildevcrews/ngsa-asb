@@ -289,13 +289,6 @@ function createDeploymentFiles()
   # istio ingress config
   cat templates/istio/istio-ingress.yaml | envsubst > $ASB_GIT_PATH/istio/istio-ingress.yaml
 
-  # GitOps (flux v2)
-  rm -f deploy/bootstrap/flux-system/gotk-repo.yaml
-  cat templates/flux-system/gotk-repo.yaml | envsubst  >| deploy/bootstrap/flux-system/gotk-repo.yaml
-  # Note: if separate bootstrap folder (dev-bootstrap) for dev env exists, then replace `bootstrap` with `dev-bootstrap`
-  # rm -f deploy/dev-bootstrap/flux-system/gotk-repo.yaml
-  # cat templates/flux-system/gotk-repo.yaml | envsubst  >| deploy/dev-bootstrap/flux-system/gotk-repo.yaml
-
   echo "Completed Creating Deployment Files."
 
   export ASB_SPOKE_STEP=pushToGit
@@ -322,17 +315,11 @@ function pushToGit()
 
   git commit -m "added cluster config"
 
-  # Add and push Flux branch and repo info
-  git add deploy/bootstrap/flux-system/
-  # Note: if separate bootstrap folder (dev-bootstrap) for dev env exists, then replace `bootstrap` with `dev-bootstrap`
-  # git add deploy/dev-bootstrap/flux-system/
-  git commit -m "added flux bootstrap config"
-
   git push
 
   echo "Completed Pushing To Github."
 
-  export ASB_SPOKE_STEP=deployFluxPrerequisites
+  export ASB_SPOKE_STEP=deployMonitoringPrerequisites
   # Save environment variables
   ./saveenv.sh -y
 
@@ -340,11 +327,11 @@ function pushToGit()
   $ASB_SPOKE_STEP
 }
 
-function deployFluxPrerequisites()
+function deployMonitoringPrerequisites()
 {
-  echo "Deploying Flux Prerequisites..."
+  echo "Deploying Monitoring Prerequisites..."
 
-  # Import Flux Dependencies To ACR
+  # Import Monitoring Dependencies To ACR
   az acr import --source docker.io/fluent/fluent-bit:1.9.5 -n $ASB_ACR_NAME
   az acr import --source docker.io/prom/prometheus:v2.30.0 -n $ASB_ACR_NAME
   az acr import --source docker.io/grafana/grafana:8.5.5 -n $ASB_ACR_NAME
@@ -353,51 +340,6 @@ function deployFluxPrerequisites()
   echo "Creating secrets to authenticate with log analytics..."
   # Create secrets to authenticate with log analytics
   kubectl create secret generic fluentbit-secrets --from-literal=WorkspaceId=$(az monitor log-analytics workspace show -g $ASB_RG_CORE -n $ASB_LA_NAME --query customerId -o tsv)   --from-literal=SharedKey=$(az monitor log-analytics workspace get-shared-keys -g $ASB_RG_CORE -n $ASB_LA_NAME --query primarySharedKey -o tsv) -n fluentbit
-
-  export ASB_SPOKE_STEP=deployFlux
-  # Save environment variables
-  ./saveenv.sh -y
-
-  # Invoke Next Step In Setup
-  $ASB_SPOKE_STEP
-}
-
-function deployFlux()
-{
-  echo "Deploying Flux.."
-
-  # ASB uses `Flux v2` for `GitOps`
-
-  # Before deploying flux we need to import the flux images to ACR.
-
-  # Make sure your IP is added to ACR for image push access.
-  # Goto the ACR in Azure Portal -> Networking -> Add your client IP -> Save
-
-  # Import all Flux images to private ACR
-  grep 'image:' flux-init/base/gotk-components.yaml | awk '{print $2}' | xargs -I_ az acr import --source "_" -n $ASB_ACR_NAME
-
-  # Setup flux base system (replace bootstrap folder with dev-bootstrap for dev env)
-  kubectl create -k ${ASB_FLUX_INIT_DIR}
-  # Note: If flux v2 exists in cluster, use "kubectl apply -k"
-  # Note: if "kubectl create/apply -k" fails once (sometimes CRD takes some time to be injected into the API), then simply reapply
-
-  # Setup zone specific deployment
-  kubectl apply -f $ASB_DEPLOYMENT_PATH/flux-kustomization/${ASB_CLUSTER_LOCATION}-kustomization.yaml
-
-  # 🛑 Check the pods until everything is running
-  kubectl get pods -n flux-system
-
-  # Check flux syncing git repo logs
-  kubectl logs -n flux-system -l app=source-controller
-
-  # Check flux syncing kustomization logs
-  kubectl logs -n flux-system -l app=kustomize-controller
-
-  # List all flux kustmization in the cluster
-  # It also shows the state of each kustomization
-  flux get kustomizations -A
-
-  echo "Completed Deploying Flux."
 
   export ASB_SPOKE_STEP=showNextSteps
   # Save environment variables

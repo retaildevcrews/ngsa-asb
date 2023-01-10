@@ -116,6 +116,14 @@ param geoRedundancyLocation string
 
 param kubernetesVersion string = '1.20.9'
 
+@description('Your cluster will be bootstrapped from this git repo.')
+@minLength(9)
+param gitOpsBootstrappingRepoHttpsUrl string = 'https://github.com/retaildevcrews/ngsa-asb'
+
+@description('You cluster will be bootstrapped from this branch in the identified git repo.')
+@minLength(1)
+param gitOpsBootstrappingRepoBranch string = 'main'
+
 /*** VARIABLES ***/
 
 var clusterName = '${'aks-${uniqueString('aks', subscription().subscriptionId, resourceGroup().id)}'}-${location}'
@@ -929,17 +937,14 @@ resource defaultAcr 'Microsoft.ContainerRegistry/registries@2020-11-01-preview' 
   }
 }
 
-resource defaultAcrName_Microsoft_Authorization_Microsoft_ContainerService_managedClusters_clusterName_acrPullRole 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
+resource acrKubeletAcrPullRole_roleAssignment 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
   name: guid(cluster.id, acrPullRole.id)
   properties: {
     roleDefinitionId: acrPullRole.id
     principalId: reference(cluster.id, '2020-12-01').identityProfile.kubeletidentity.objectId
     principalType: 'ServicePrincipal'
   }
-  dependsOn: [
-    defaultAcr
-
-  ]
+  scope: defaultAcr
 }
 
 resource defaultAcrName_geoRedundancyLocation 'Microsoft.ContainerRegistry/registries/replications@2019-05-01' = {
@@ -1206,6 +1211,75 @@ resource clusterName_Microsoft_Insights_default 'Microsoft.Insights/diagnosticSe
   scope: cluster
   dependsOn: [
     laNewWorkspace
+  ]
+}
+
+// Ensures that flux add-on (extension) is installed.
+resource mcFlux_extension 'Microsoft.KubernetesConfiguration/extensions@2021-09-01' = {
+  scope: cluster
+  name: 'flux'
+  properties: {
+    extensionType: 'microsoft.flux'
+    autoUpgradeMinorVersion: true
+    releaseTrain: 'Stable'
+    scope: {
+      cluster: {
+        releaseNamespace: 'flux-system'
+      }
+    }
+    configurationSettings: {
+      'helm-controller.enabled': 'true'
+      'source-controller.enabled': 'true'
+      'kustomize-controller.enabled': 'true'
+      'notification-controller.enabled': 'true'  // As of testing on 29-Dec, this is required to avoid an error.  Normally it's not a required controller. YMMV
+      'image-automation-controller.enabled': 'false'
+      'image-reflector-controller.enabled': 'false'
+    }
+    configurationProtectedSettings: {}
+  }
+  dependsOn: [
+    acrKubeletAcrPullRole_roleAssignment
+  ]
+}
+
+// Bootstraps your cluster using content from your repo.
+resource mc_fluxConfiguration 'Microsoft.KubernetesConfiguration/fluxConfigurations@2022-03-01' = {
+  scope: cluster
+  name: 'bootstrap'
+  properties: {
+    scope: 'cluster'
+    namespace: 'flux-system'
+    sourceKind: 'GitRepository'
+    gitRepository: {
+      url: gitOpsBootstrappingRepoHttpsUrl
+      timeoutInSeconds: 180
+      syncIntervalInSeconds: 300
+      repositoryRef: {
+        branch: gitOpsBootstrappingRepoBranch
+        tag: null
+        semver: null
+        commit: null
+      }
+      sshKnownHosts: ''
+      httpsUser: null
+      httpsCACert: null
+      localAuthRef: null
+    }
+    kustomizations: {
+      unified: {
+        path: './cluster-manifests'
+        dependsOn: []
+        timeoutInSeconds: 300
+        syncIntervalInSeconds: 300
+        retryIntervalInSeconds: 300
+        prune: true
+        force: false
+      }
+    }
+  }
+  dependsOn: [
+    mcFlux_extension
+    acrKubeletAcrPullRole_roleAssignment
   ]
 }
 
