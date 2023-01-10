@@ -629,7 +629,7 @@
                                         "fqdnTags": [],
                                         "webCategories": [],
                                         "targetFqdns": [
-                                            "*-dev.cse.ms"
+                                            "*-dev.austinrdc.dev"
                                         ],
                                         "targetUrls": [],
                                         "terminateTLS": false,

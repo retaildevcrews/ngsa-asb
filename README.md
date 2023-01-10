@@ -306,16 +306,16 @@ Please see Instructions to deploy Grafana and Prometheus [here](./monitoring/REA
 
 ### Motivation
 
-It's common to expose various public facing applications through different paths on the same endpoint (eg: `my-asb.cse.ms/cosmos`, `my-asb.cse.ms/grafana` and etc). A notable problem with this approach is that within the App Gateway, we can only configure a single health probe for all apps in the cluster. This can bring down the entire endpoint if the health probe fails, when only a single app was affected.
+It's common to expose various public facing applications through different paths on the same endpoint (eg: `my-asb.austinrdc.dev/cosmos`, `my-asb.austinrdc.dev/grafana` and etc). A notable problem with this approach is that within the App Gateway, we can only configure a single health probe for all apps in the cluster. This can bring down the entire endpoint if the health probe fails, when only a single app was affected.
 
-A better approach would be to use a unique subdomain for each app instance. The subdomain format is `[app].[region]-[env].cse.ms`, where the order is in decreasing specificity. Ideally, grafana in the north central dev region can be accessed as `grafana.northcentral-dev.cse.ms`. However, adding a second level subdomain means that we will need to purchase an additional cert. We currently own the `*.cse.ms` wildcard cert but we cannot use the same cert for a a secondary level such as `*.northcentral-dev.cse.ms` ([more info](https://serverfault.com/questions/104160/wildcard-ssl-certificate-for-second-level-subdomain/658109#658109)). Therefore, for our ASB installation, we will use a workaround by modifying the subdomain format to `[app]-[region]-[env].cse.ms`, which still maintains the same specificity order and each app can still have its own unique endpoint.
+A better approach would be to use a unique subdomain for each app instance. The subdomain format is `[app].[region]-[env].austinrdc.dev`, where the order is in decreasing specificity. Ideally, grafana in the north central dev region can be accessed as `grafana.northcentral-dev.austinrdc.dev`. However, adding a second level subdomain means that we will need to purchase an additional cert. We currently own the `*.austinrdc.dev` wildcard cert but we cannot use the same cert for a a secondary level such as `*.northcentral-dev.austinrdc.dev` ([more info](https://serverfault.com/questions/104160/wildcard-ssl-certificate-for-second-level-subdomain/658109#658109)). Therefore, for our ASB installation, we will use a workaround by modifying the subdomain format to `[app]-[region]-[env].austinrdc.dev`, which still maintains the same specificity order and each app can still have its own unique endpoint.
 
 ### Create a subdomain endpoint
 
 ```bash
 
 # app DNS name, in subdomain format
-# format [app]-[region]-[env].cse.ms
+# format [app]-[region]-[env].austinrdc.dev
 export ASB_APP_NAME=[application-name] # e.g: ngsa-cosmos, ngsa-java, ngsa-memory, loderunner.
 export ASB_APP_DNS_NAME=${ASB_APP_NAME}-${ASB_SPOKE_LOCATION}-${ASB_ENV}
 export ASB_APP_DNS_FULL_NAME=${ASB_APP_DNS_NAME}.${ASB_DNS_ZONE}

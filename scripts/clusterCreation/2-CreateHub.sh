@@ -208,7 +208,7 @@ else
 fi
 
 # Validate script being run from CodeSpaces
-# These env vars are already set in Codespaces enviroment for "cse.ms"
+# These env vars are already set in Codespaces enviroment for "austinrdc.dev"
 # Check certificates
 if [ -z $APP_GW_CERT_CSMS ]; then >&2 echo "Please run script using CodeSpaces"; exit 1; fi
 if [ -z $INGRESS_CERT_CSMS ]; then >&2 echo "Please run script using CodeSpaces"; exit 1; fi
