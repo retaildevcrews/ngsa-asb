@@ -6,7 +6,7 @@
         "severity": 0,
         "enabled": true,
         "scopes": [
-            "/subscriptions/${Ngsa_Subscription_Guid}/resourceGroups/${Ngsa_Common_Services_RG}/providers/Microsoft.Network/applicationGateways/apw-aks-fykg5bqasutle-eastus"
+            "/subscriptions/${Ngsa_Subscription_Guid}/resourceGroups/${Ngsa_Common_Services_RG}/providers/Microsoft.Network/applicationGateways/apw-aks-ri3aov7twb4uy-eastus"
         ],
         "evaluationFrequency": "PT30M",
         "windowSize": "PT1H",
@@ -22,10 +22,10 @@
                             "name": "BackendSettingsPool",
                             "operator": "Include",
                             "values": [
-                                "grafana-eastus-pre.cse.ms~grafana-eastus-pre-httpsettings",
-                                "ngsa-cosmos-eastus-pre.cse.ms~ngsa-cosmos-eastus-pre-httpsettings",
-                                "ngsa-java-eastus-pre.cse.ms~ngsa-java-eastus-pre-httpsettings",
-                                "ngsa-memory-eastus-pre.cse.ms~ngsa-memory-eastus-pre-httpsettings"
+                                "grafana-eastus-pre.austinrdc.dev~grafana-eastus-pre-httpsettings",
+                                "ngsa-cosmos-eastus-pre.austinrdc.dev~ngsa-cosmos-eastus-pre-httpsettings",
+                                "ngsa-java-eastus-pre.austinrdc.dev~ngsa-java-eastus-pre-httpsettings",
+                                "ngsa-memory-eastus-pre.austinrdc.dev~ngsa-memory-eastus-pre-httpsettings"
                             ]
                         }
                     ],

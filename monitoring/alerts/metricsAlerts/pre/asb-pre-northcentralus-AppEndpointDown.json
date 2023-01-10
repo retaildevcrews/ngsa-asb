@@ -1,12 +1,12 @@
 {
-    "name": "asb-dev-westus3-AppEndpointDown",
+    "name": "asb-pre-northcentralus-AppEndpointDown",
     "location": "global",
     "properties": {
         "description": "One or more application endpoints are down",
         "severity": 0,
         "enabled": true,
         "scopes": [
-            "/subscriptions/${Ngsa_Subscription_Guid}/resourceGroups/${Ngsa_Common_Services_RG}/providers/Microsoft.Network/applicationGateways/apw-aks-3i2qzkkxofr7c-westus3"
+            "/subscriptions/${Ngsa_Subscription_Guid}/resourceGroups/${Ngsa_Common_Services_RG}/providers/Microsoft.Network/applicationGateways/apw-aks-ri3aov7twb4uy-northcentralus"
         ],
         "evaluationFrequency": "PT30M",
         "windowSize": "PT1H",
@@ -22,11 +22,10 @@
                             "name": "BackendSettingsPool",
                             "operator": "Include",
                             "values": [
-                                "grafana-westus3-dev.cse.ms~grafana-westus3-dev-httpsettings",
-                                "ngsa-cosmos-westus3-dev.cse.ms~ngsa-cosmos-westus3-dev-httpsettings",
-                                "ngsa-java-westus3-dev.cse.ms~ngsa-java-westus3-dev-httpsettings",
-                                "ngsa-memory-westus3-dev.cse.ms~ngsa-memory-westus3-dev-httpsettings",
-                                "loderunner-westus3-dev.cse.ms~loderunner-westus3-dev-httpsettings"
+                                "grafana-northcentralus-pre.austinrdc.dev~grafana-northcentralus-pre-httpsettings",
+                                "ngsa-cosmos-northcentralus-pre.austinrdc.dev~ngsa-cosmos-northcentralus-pre-httpsettings",
+                                "ngsa-java-northcentralus-pre.austinrdc.dev~ngsa-java-northcentralus-pre-httpsettings",
+                                "ngsa-memory-northcentralus-pre.austinrdc.dev~ngsa-memory-northcentralus-pre-httpsettings"
                             ]
                         }
                     ],
