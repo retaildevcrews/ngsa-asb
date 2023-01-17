@@ -145,12 +145,12 @@ function main(){
   
   CollectInputParameters
   
-  local automationResourceGroup="rg-${ASB_FW_Deployment_Name}-${ASB_FW_Base_Automation_System_Name}-${ASB_FW_Environment}"
+  local automationResourceGroup="$ASB_AGW_Automation_Account_Resource_Group"
 
-  local runbookName="rb-${ASB_FW_Deployment_Name}-agw-automation-${ASB_FW_Environment}"
+  local runbookName="rb-${ASB_AGW_Deployment_Name}-agw-automation-${ASB_AGW_Environment}"
   local runbookDescription="Runbook to schedule restarting of app gateways"
-  local runbookFileName="App-Gateway-Automation-Runbook.ps1"
-  local runbookFilePath="./scripts/Firewall-Automation/"
+  local runbookFileName="$ASB_AGW_PowerShell_Runbook_File_Name"
+  local runbookFilePath="./scripts/App-Gateway-Schedule-Automation/"
   local runbookFilePathAndName=@"${runbookFilePath}${runbookFileName}"
 
   echo
@@ -164,22 +164,22 @@ function main(){
   AddAzureCLIExtension
 
   # Set the subscription to the one specified in the parameters
-  SetSubscription $ASB_FW_Subscription_Name $ASB_FW_Tenant_Id
+  SetSubscription $ASB_AGW_Subscription_Name $ASB_AGW_Tenant_Id
 
-  local automationAccountName="aa-${ASB_FW_Deployment_Name}-${ASB_FW_Base_Automation_System_Name}-${ASB_FW_Environment}"
+  local automationAccountName="$ASB_AGW_Automation_Account_Name"
   
-  local userAssignedManagedIdentityName="mi-${ASB_FW_Deployment_Name}-${ASB_FW_Base_Automation_System_Name}-${ASB_FW_Environment}"
+  local userAssignedManagedIdentityName="$ASB_AGW_UAMI_Name"
 
   local identityPrincipalId=$(az identity list --resource-group ${automationResourceGroup} --query "[?name=='${userAssignedManagedIdentityName}'].{name:name,principalId:principalId}|[0].principalId" --output tsv)
 
-  CreateAzureAutomationPowerShellRunbook $runbookName $automationResourceGroup $automationAccountName $location # $ASB_FW_Tenant_Id $subscriptionId
+  CreateAzureAutomationPowerShellRunbook $runbookName $automationResourceGroup $automationAccountName $location # $ASB_AGW_Tenant_Id $subscriptionId
 
   # Grant SignedInUser Access to KeyVault 
   GrantSignedInUserAccessToKeyVault
 
   # Read secrets from key vault
-  local automationClientId=$(az keyvault secret show --subscription $ASB_FW_Subscription_Name --vault-name $ASB_KV_Name -n AutomationClientId --query value -o tsv)
-  local automationClientSecret=$(az keyvault secret show --subscription $ASB_FW_Subscription_Name --vault-name $ASB_KV_Name -n AutomationClientSecret --query value -o tsv)
+  local automationClientId=$(az keyvault secret show --subscription $ASB_AGW_Subscription_Name --vault-name $ASB_KV_Name -n AutomationClientId --query value -o tsv)
+  local automationClientSecret=$(az keyvault secret show --subscription $ASB_AGW_Subscription_Name --vault-name $ASB_KV_Name -n AutomationClientSecret --query value -o tsv)
 
   # Remove SignedInUser Access to KeyVault 
   RemoveSignedInUserAccessToKeyVault
