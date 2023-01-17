@@ -1,7 +1,7 @@
-#!/bin/bash
+#!/bin/bashASB_AGW
 
 function CollectInputParameters(){
-  source ./scripts/Firewall-Automation/Firewall-Automation-Infrastructure-Variables.env
+  source ./scripts/App-Gateway-Automation/App-Gateway-Automation-Infrastructure-Variables.env
 }
 
 function SetSubscription(){
@@ -127,7 +127,7 @@ function CreateSchedule(){
     # parameter position 1 = AutomationClientId
     # parameter position 2 = AutomationClientSecret
 
-  pwsh --command "./scripts/Firewall-Automation/App-Gateway-Automation-Schedule-Creation.ps1 ${1} ${2}"
+  pwsh --command "./scripts/App-Gateway-Automation/App-Gateway-Automation-Schedule-Creation.ps1 ${1} ${2}"
 }
 
 function GrantSignedInUserAccessToKeyVault(){
@@ -150,7 +150,7 @@ function main(){
   local runbookName="rb-${ASB_AGW_Deployment_Name}-agw-automation-${ASB_AGW_Environment}"
   local runbookDescription="Runbook to schedule restarting of app gateways"
   local runbookFileName="$ASB_AGW_PowerShell_Runbook_File_Name"
-  local runbookFilePath="./scripts/App-Gateway-Schedule-Automation/"
+  local runbookFilePath="./scripts/App-Gateway-Automation/"
   local runbookFilePathAndName=@"${runbookFilePath}${runbookFileName}"
 
   echo
@@ -188,7 +188,7 @@ function main(){
 
   PublishRunbook $runbookName $automationResourceGroup $automationAccountName
 
-  CreateSchedule $automationClientId $automationClientSecret
+  CreateSchedule $automationClientId $automationClientSecret $runbookName
 
   
   echo

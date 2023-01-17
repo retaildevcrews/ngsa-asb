@@ -2,7 +2,9 @@ param (
     [Parameter(Mandatory)]
     [String]$spclientid,
     [Parameter(Mandatory)]
-    [String]$spsecret
+    [String]$spsecret,
+    [Parameter(Mandatory)]
+    [String]$runbookName
 )
 
 foreach ($line in (Get-Content -Path './scripts/Firewall-Automation/Firewall-Automation-Infrastructure-Variables.env')) {
@@ -15,12 +17,19 @@ foreach ($line in (Get-Content -Path './scripts/Firewall-Automation/Firewall-Aut
   }
 }
 
-$tenantId = $env:ASB_FW_Tenant_Id
-$subscriptionName = $env:ASB_FW_Subscription_Name
-$baseName = $env:ASB_FW_Deployment_Name
-$baseAutomationName = $env:ASB_FW_Base_Automation_System_Name
-$environment = $env:ASB_FW_Environment
+$tenantId = $env:ASB_AGW_Tenant_Id
+$subscriptionName = $env:ASB_AGW_Subscription_Name
+$baseName = $env:ASB_AGW_Deployment_Name
+$environment = $env:ASB_AGW_Environment
 $location = $env:ASB_FW_Location
+
+$automationResourceGroup = $env:ASB_AGW_Automation_Account_Resource_Group
+$appGatewayResourceGroup = $env:ASB_AGW_App_Gateway_Resource_Group
+$automationAccountName = $env:ASB_AGW_App_Gateway_Name
+$appGatewayName = $env:ASB_AGW_App_Gateway_Name
+
+$managedIdentityName = $env:ASB_AGW_UAMI_Name
+$baseScheduleName = "as-" + $baseName + "-agw-automation-" + $location + "-" + $environment
 
 
 function New-Schedule {
@@ -43,7 +52,6 @@ function New-Schedule {
   )
 
   Write-Host "Creating new Azure Automation Schedule..."
- 
   
   New-AzAutomationSchedule -AutomationAccountName $automation_Account_Name -Name $schedule_Name -StartTime $start_Time -ExpiryTime $end_Time -DayInterval 1 -ResourceGroupName $resource_Group_Name_for_Automation
   
@@ -121,17 +129,6 @@ function Authenticate {
 
   Set-AzContext -Subscription $subscriptionName
 }
-
-# Should be inputs
-$automationResourceGroup = 
-$appGatewayResourceGroup = 
-$automationAccountName = 
-$runbookName = "rb-" + $baseName + "-agw-automation-" + $environment
-$managedIdentityName = 
-
-$appGatewayName =
-$baseScheduleName = "as-" + $baseName + "-agw-automation-" + $environment
-
 
 $start_Time = (Get-Date "06:00:00").AddHours(+4).AddDays(1)
 $end_Time = (Get-Date $start_Time).AddYears(3)
