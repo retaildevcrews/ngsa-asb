@@ -126,8 +126,9 @@ function CreateSchedule(){
   # Arguments: 
     # parameter position 1 = AutomationClientId
     # parameter position 2 = AutomationClientSecret
+    # parameter position 2 = RunbookName
 
-  pwsh --command "./scripts/App-Gateway-Automation/App-Gateway-Automation-Schedule-Creation.ps1 ${1} ${2}"
+  pwsh --command "./scripts/App-Gateway-Automation/App-Gateway-Automation-Schedule-Creation.ps1 ${1} ${2} ${3}"
 }
 
 function GrantSignedInUserAccessToKeyVault(){

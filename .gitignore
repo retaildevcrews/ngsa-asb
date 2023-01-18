@@ -14,3 +14,4 @@ thanos-storage-config.yaml
 .current-deployment
 
 scripts/Firewall-Automation/Firewall-Automation-Infrastructure-Variables.env
+scripts/App-Gateway-Automation/App-Gateway-Automation-Infrastructure-Variables.env

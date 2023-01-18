@@ -7,7 +7,7 @@ param (
     [String]$runbookName
 )
 
-foreach ($line in (Get-Content -Path './scripts/Firewall-Automation/Firewall-Automation-Infrastructure-Variables.env')) {
+foreach ($line in (Get-Content -Path './scripts/App-Gateway-Automation/App-Gateway-Automation-Infrastructure-Variables.env')) {
   if ($line.Contains('export ')) {
     $line = $line.Trim()
     $line = $line -replace 'export ', ''
