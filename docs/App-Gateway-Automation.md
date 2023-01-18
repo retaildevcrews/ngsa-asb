@@ -40,5 +40,5 @@ source scripts/App-Gateway-Schedule-Automation/App-Gateway-Automation-Infrastruc
 Once the variables are set, the setup script must be run from Visual Studio Code (thick client) using Codespaces. The script does not require input parameters because the required parameters are stored as environment variables when the variable script is run. Run this command from the top-level directory of this repository. A browser with a login prompt will open while the script is running. Complete the login, and the script will continue to run.
 
 ```bash
-./scripts/App-Gateway-Schedule-Automation/App-Gateway-Automation-Infrastructure.sh
+./scripts/App-Gateway-Automation/App-Gateway-Automation-Infrastructure.sh
 ```
