@@ -12,8 +12,6 @@ param(
     [Parameter(Mandatory)]
     [String]$tenant_Id,
     [Parameter(Mandatory)]
-    [String]$subscription_Id,
-    [Parameter(Mandatory)]
     [String]$subscription_Name,
     [Parameter(Mandatory)]
     [String]$managed_Identity_Name
