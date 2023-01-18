@@ -1,6 +1,6 @@
 # Application Gateway Restart Automation
 
-The instructions below describe how to implement an Azure Automation Runbook that will automate and schedule stopping and starting the application gateways on each spoke. Though the runbook enables stopping and restarting the application gateways, the scheduled jobs created in this section only restart the application gateways.
+The instructions below describe how to implement an Azure Automation Runbook that will automate and schedule stopping and starting the application gateways in the ngsa-asb setup. Though the runbook enables stopping and restarting the application gateways, the scheduled jobs created in this section only restart the application gateways.
 
 ## Prerequisites
 
@@ -27,7 +27,7 @@ export agwName=''# application gateway name
 export agwRGName=''# application gateway resource group name
 export agwUAMIName=''# user-assigned managed identity name
 
-# Create Firewall-Automation-Infrastructure-Variables.sh from template with values from local variables set above.
+# Create App-Gateway-Automation-Infrastructure-Variables.sh from template with values from local variables set above.
 cat scripts/App-Gateway-Automation/App-Gateway-Automation-Infrastructure-Variables-Template.txt | envsubst > scripts/App-Gateway-Automation/App-Gateway-Automation-Infrastructure-Variables.env
 
 # Set environment variables 

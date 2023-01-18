@@ -57,11 +57,11 @@ $aksCluster = Get-AzResource -ResourceId $aksClusterId
 
 Write-Output $aksCluster.Properties.powerState.code
 
-if ($enable -eq $true -and $aksCluster.Properties.powerState.code -eq "Stopped") {
+if ($enable -eq $true) {
     Write-Output "Starting the aks cluster."
     Start-AzAksCluster -Name $aks_Cluster_Name -ResourceGroupName $resource_Group_Name_for_AKS_Cluster
 }
-if ($enable -eq $false -and $aksCluster.Properties.powerState.code -eq "Running") {
+if ($enable -eq $false) {
     Write-Output "Stopping the aks cluster."
     Stop-AzAksCluster -Name $aks_Cluster_Name -ResourceGroupName $resource_Group_Name_for_AKS_Cluster
 }
