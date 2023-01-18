@@ -21,11 +21,11 @@ $tenantId = $env:ASB_AGW_Tenant_Id
 $subscriptionName = $env:ASB_AGW_Subscription_Name
 $baseName = $env:ASB_AGW_Deployment_Name
 $environment = $env:ASB_AGW_Environment
-$location = $env:ASB_FW_Location
+$location = $env:ASB_AGW_Location
 
 $automationResourceGroup = $env:ASB_AGW_Automation_Account_Resource_Group
 $appGatewayResourceGroup = $env:ASB_AGW_App_Gateway_Resource_Group
-$automationAccountName = $env:ASB_AGW_App_Gateway_Name
+$automationAccountName = $env:ASB_AGW_Automation_Account_Name
 $appGatewayName = $env:ASB_AGW_App_Gateway_Name
 
 $managedIdentityName = $env:ASB_AGW_UAMI_Name

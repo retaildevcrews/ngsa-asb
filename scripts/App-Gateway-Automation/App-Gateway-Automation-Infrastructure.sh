@@ -1,4 +1,4 @@
-#!/bin/bashASB_AGW
+#!/bin/bash
 
 function CollectInputParameters(){
   source ./scripts/App-Gateway-Automation/App-Gateway-Automation-Infrastructure-Variables.env
