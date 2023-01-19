@@ -167,11 +167,11 @@ function main(){
   # Set the subscription to the one specified in the parameters
   SetSubscription $ASB_AKS_Subscription_Name $ASB_AKS_Tenant_Id
 
-  local automationAccountName="$ASB_AKS_Automation_Account_Name"
-
   if [ $1 = 'create_run_book' ]
   then
-    CreateAzureAutomationPowerShellRunbook $runbookName $automationResourceGroup $automationAccountName $location # $ASB_AKS_Tenant_Id $subscriptionId
+    local automationAccountName="$ASB_AKS_Automation_Account_Name"
+
+    CreateAzureAutomationPowerShellRunbook $runbookName $automationResourceGroup $automationAccountName $location 
 
     ImportPowerShellRunbookContent $runbookName $automationResourceGroup $runbookFilePathAndName $automationAccountName
 
