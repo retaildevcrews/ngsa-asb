@@ -4,7 +4,13 @@ The instructions below describe how to implement an Azure Automation Runbook tha
 
 ## Prerequisites
 
-It is assumed that the Firewall Automation has already been set up, as some of the infrastructure created in that process will be reused here. The automation service principal used for firewall automation setup, as well as the associated role assignments need to be reused here.
+It is assumed that the Firewall Automation has already been set up, as some of the infrastructure created in that process will be reused here, specifically
+
+- the automation resource group
+- the automation account
+- the user-assigned managed identity and associated role assignments
+
+Additionally, the automation service principal used for firewall automation setup, as well as the associated role assignments need to be reused here. The service principal's client ID and secret need to still be accessible in the keyvault. If they have been deleted, they can be recreated using [these steps](./Firewall-Automation.md#create-service-principal-and-role-assignments-and-store-secrets-in-key-vault).
 
 ## Set Environment Variables
 
