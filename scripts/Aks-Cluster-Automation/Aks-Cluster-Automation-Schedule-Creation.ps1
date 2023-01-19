@@ -137,7 +137,7 @@ Authenticate -Subscription_Name $subscriptionName
 
 $start_Action_Name = $baseScheduleName + "-start"
 
-New-Schedule -automation_Account_Name $automationAccountName -resource_Grup_Name_for_Automation $automationResourceGroup -schedule_Name $start_Action_Name -start_Time $start_Time -end_Time $end_Time
+New-Schedule -automation_Account_Name $automationAccountName -resource_Group_Name_for_Automation $automationResourceGroup -schedule_Name $start_Action_Name -start_Time $start_Time -end_Time $end_Time
 
 Edit-ScheduleAndRunbook -resource_Group_Name_for_AKS_Cluster $aksClusterResourceGroup -resource_Group_Name_for_Automation $automationResourceGroup -tenant_Id $tenantId -schedule_Name $start_Action_Name -powerShell_Runbook_Name $runbookName -automation_Account_Name $automationAccountName -subscription_Name $subscriptionName -aks_Cluster_Name $aksClusterName -managed_Identity_Name $managedIdentityName -enable $true
 

@@ -11,8 +11,8 @@ export ASB_AKS_Sku='Basic'
 
 export ASB_AKS_Automation_Account_Name='${aksAutomationAccountName}'
 export ASB_AKS_Automation_Account_Resource_Group='${aksAutomationAccountRGName}'
-export ASB_AKS_Cluster_Name='${aksName}'
-export ASB_AKS_Cluster_Resource_Group='${aksRGName}'
+export ASB_AKS_Cluster_Name='${aksClusterName}'
+export ASB_AKS_Cluster_Resource_Group='${aksClusterRGName}'
 export ASB_AKS_UAMI_Name='${aksUAMIName}'
 
 export ASB_KV_Name='${keyVaultName}'

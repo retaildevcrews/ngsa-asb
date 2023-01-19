@@ -23,8 +23,8 @@ export keyVaultRGName=''#key vault resource group name
 
 export aksAutomationAccountName=''# automation acount name
 export aksAutomationAccountRGName=''# automation acount resource group name
-export aksName=''# application gateway name
-export aksRGName=''# application gateway resource group name
+export aksClusterName=''# application gateway name
+export aksClusterRGName=''# application gateway resource group name
 export aksUAMIName=''# user-assigned managed identity name
 
 # Create Aks-Cluster-Automation-Infrastructure-Variables.env from template with values from local variables set above.
@@ -37,8 +37,16 @@ source scripts/Aks-Cluster-Automation/Aks-Cluster-Automation-Infrastructure-Vari
 
 ## Execute Script
 
-Once the variables are set, the setup script must be run from Visual Studio Code (thick client) using Codespaces. The script does not require input parameters because the required parameters are stored as environment variables when the variable script is run. Run this command from the top-level directory of this repository. A browser with a login prompt will open while the script is running. Complete the login, and the script will continue to run.
+Once the variables are set, the setup script must be run from Visual Studio Code (thick client) using Codespaces. The script does not require input parameters because the required parameters are stored as environment variables when the variable script is run. Run this command from the top-level directory of this repository. A browser with a login prompt will open while the script is running. Complete the login, and the script will continue to run. This script will create a runbook and one scheduled job using the inputs from the set environment variables.
 
 ```bash
-./scripts/Aks-Cluster-Automation/Aks-Cluster-Automation-Infrastructure.sh
+./scripts/Aks-Cluster-Automation/Aks-Cluster-Automation-Infrastructure.sh "create_run_book"
+```
+
+## Creating Additional Scheduled Jobs
+
+To create additional scheduled jobs for the same runbook, update the environment variables as needed by repeating [this step](#set-environment-variables). Next, run the script as shown below.
+
+```bash
+./scripts/Aks-Cluster-Automation/Aks-Cluster-Automation-Infrastructure.sh "create_schedule_only"
 ```
