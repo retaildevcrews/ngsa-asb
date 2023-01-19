@@ -167,13 +167,19 @@ function main(){
   # Set the subscription to the one specified in the parameters
   SetSubscription $ASB_AGW_Subscription_Name $ASB_AGW_Tenant_Id
 
-  local automationAccountName="$ASB_AGW_Automation_Account_Name"
-  
-  local userAssignedManagedIdentityName="$ASB_AGW_UAMI_Name"
+  if [ ! -z "$1" ] 
+  then
+    if [ $1 = 'create_run_book' ]
+    then
+      local automationAccountName="$ASB_AGW_Automation_Account_Name"
 
-  local identityPrincipalId=$(az identity list --resource-group ${automationResourceGroup} --query "[?name=='${userAssignedManagedIdentityName}'].{name:name,principalId:principalId}|[0].principalId" --output tsv)
+      CreateAzureAutomationPowerShellRunbook $runbookName $automationResourceGroup $automationAccountName $location # $ASB_AGW_Tenant_Id $subscriptionId
 
-  CreateAzureAutomationPowerShellRunbook $runbookName $automationResourceGroup $automationAccountName $location # $ASB_AGW_Tenant_Id $subscriptionId
+      ImportPowerShellRunbookContent $runbookName $automationResourceGroup $runbookFilePathAndName $automationAccountName
+
+      PublishRunbook $runbookName $automationResourceGroup $automationAccountName
+    fi
+  fi
 
   # Grant SignedInUser Access to KeyVault 
   GrantSignedInUserAccessToKeyVault
@@ -185,10 +191,6 @@ function main(){
   # Remove SignedInUser Access to KeyVault 
   RemoveSignedInUserAccessToKeyVault
 
-  ImportPowerShellRunbookContent $runbookName $automationResourceGroup $runbookFilePathAndName $automationAccountName
-
-  PublishRunbook $runbookName $automationResourceGroup $automationAccountName
-
   CreateSchedule $automationClientId $automationClientSecret $runbookName
 
   
@@ -199,4 +201,4 @@ function main(){
   echo
 }
 
-main
+main $1

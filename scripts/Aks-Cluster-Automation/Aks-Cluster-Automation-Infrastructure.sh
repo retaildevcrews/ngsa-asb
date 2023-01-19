@@ -167,15 +167,18 @@ function main(){
   # Set the subscription to the one specified in the parameters
   SetSubscription $ASB_AKS_Subscription_Name $ASB_AKS_Tenant_Id
 
-  if [ $1 = 'create_run_book' ]
+  if [ ! -z "$1" ] 
   then
-    local automationAccountName="$ASB_AKS_Automation_Account_Name"
+    if [ $1 = 'create_run_book' ]
+    then
+      local automationAccountName="$ASB_AKS_Automation_Account_Name"
 
-    CreateAzureAutomationPowerShellRunbook $runbookName $automationResourceGroup $automationAccountName $location 
+      CreateAzureAutomationPowerShellRunbook $runbookName $automationResourceGroup $automationAccountName $location 
 
-    ImportPowerShellRunbookContent $runbookName $automationResourceGroup $runbookFilePathAndName $automationAccountName
+      ImportPowerShellRunbookContent $runbookName $automationResourceGroup $runbookFilePathAndName $automationAccountName
 
-    PublishRunbook $runbookName $automationResourceGroup $automationAccountName
+      PublishRunbook $runbookName $automationResourceGroup $automationAccountName
+    fi
   fi
 
   # Grant SignedInUser Access to KeyVault 

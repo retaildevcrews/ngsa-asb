@@ -48,5 +48,5 @@ Once the variables are set, the setup script must be run from Visual Studio Code
 To create additional scheduled jobs for the same runbook, update the environment variables as needed by repeating [this step](#set-environment-variables). Next, run the script as shown below.
 
 ```bash
-./scripts/Aks-Cluster-Automation/Aks-Cluster-Automation-Infrastructure.sh "create_schedule_only"
+./scripts/Aks-Cluster-Automation/Aks-Cluster-Automation-Infrastructure.sh 
 ```
