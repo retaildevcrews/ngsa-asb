@@ -17,7 +17,7 @@ jobs:
         with:
           directory: deploy/
           framework: kustomize
-          skip_check: [CKV_K8S_43, CKV2_K8S_6] # optional: skip a specific check_id. can be comma separated list
+          skip_check: CKV_K8S_43, CKV2_K8S_6 # optional: skip a specific check_id. can be comma separated list
           quiet: true
           output_format: github_failed_only
           soft_fail: false
