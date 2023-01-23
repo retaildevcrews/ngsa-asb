@@ -1,6 +1,6 @@
 # AKS Cluster Restart Automation
 
-The instructions below describe how to implement an Azure Automation Runbook that will automate and schedule stopping and starting the AKS clusters in the ngsa-asb setup. Though the runbook enables stopping and restarting the AKS clusters, the scheduled jobs created in this section only restart the application gateways.
+The instructions below describe how to implement an Azure Automation Runbook that will automate and schedule stopping and starting the AKS clusters in the ngsa-asb setup. Though the runbook enables stopping and restarting the AKS clusters, the scheduled jobs created in this section only restart the AKS clusters.
 
 ## Prerequisites
 
