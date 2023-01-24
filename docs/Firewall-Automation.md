@@ -173,6 +173,13 @@ Please note that short after have started the script, it will open up a browser 
   ./scripts/Firewall-Automation/Firewall-Automation-Infrastructure.sh
 ```
 
+### Reusing the infrastructure for further automation
+
+Infrastructure costs can be further optimized by stopping and restarting the application gateways and AKS clusters as needed. Instructions to schedule automated stopping and restarting of these services using runbooks and scheduled jobs can be found here:
+
+- [App Gateway Automation](./App-Gateway-Automation.md)
+- [AKS Cluster Automation](./Aks-Cluster-Automation.md)
+
 ## Delete Service Principal, Role Assignments and Secrets from Key Vault
 
 After have completed the setup proccess if no longer needed, then it is recommended to delete the Service Principal.

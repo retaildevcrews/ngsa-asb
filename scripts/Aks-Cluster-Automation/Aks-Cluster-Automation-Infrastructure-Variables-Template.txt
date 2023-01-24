@@ -1,0 +1,19 @@
+export ASB_AKS_Deployment_Name='${deploymentName}'
+export ASB_AKS_Environment='${environment}'
+export ASB_AKS_Location='${location}'
+export ASB_AKS_Subscription_Name='${subscriptionName}'
+export ASB_AKS_Tenant_Id='${tenantId}'
+
+export ASB_AKS_Base_Automation_System_Name='aks-automation'
+export ASB_AKS_PowerShell_Runbook_Description='This runbook automates the scheduled restart of the AKS cluster.'
+export ASB_AKS_PowerShell_Runbook_File_Name='Aks-Cluster-Automation-Runbook.ps1'
+export ASB_AKS_Sku='Basic'
+
+export ASB_AKS_Automation_Account_Name='${aksAutomationAccountName}'
+export ASB_AKS_Automation_Account_Resource_Group='${aksAutomationAccountRGName}'
+export ASB_AKS_Cluster_Name='${aksClusterName}'
+export ASB_AKS_Cluster_Resource_Group='${aksClusterRGName}'
+export ASB_AKS_UAMI_Name='${aksUAMIName}'
+
+export ASB_KV_Name='${keyVaultName}'
+export ASB_KV_ResourceGroupName='${keyVaultRGName}'
