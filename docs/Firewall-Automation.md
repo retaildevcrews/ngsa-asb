@@ -5,7 +5,7 @@ Azure Firewall has [costs (Azure Firewall pricing link)](https://azure.microsoft
 ## Login to Azure
 
 ```bash
-az login 
+az login
 
 ###  show your Azure accounts
 az account list -o table
@@ -56,7 +56,7 @@ export keyVaultRGName=''#key vault resource group name
 # Create Firewall-Automation-Infrastructure-Variables.sh from template with values from local variables set above.
 cat scripts/Firewall-Automation/Firewall-Automation-Infrastructure-Variables-Template.txt | envsubst > scripts/Firewall-Automation/Firewall-Automation-Infrastructure-Variables.env
 
-# Set environment variables 
+# Set environment variables
 source scripts/Firewall-Automation/Firewall-Automation-Infrastructure-Variables.env
 
 ```
@@ -87,19 +87,19 @@ Run the commands below to create the service principal and the required role ass
 # Replace the correct SP name e.g 'firewall-automation-sp'
 local servicePrincipalName=''
 
-# Get the current Susbcription Id 
+# Get the current Susbcription Id
 local subscriptionId=$(az account show -o tsv --query id)
 
-# Create SP and get secret 
+# Create SP and get secret
 local automationClientSecret=$(az ad sp create-for-rbac -n $servicePrincipalName --query password -o tsv)
 
-# Get Service principal ClientId 
+# Get Service principal ClientId
 local automationClientId=$(az ad sp list --all --filter "displayname eq '${servicePrincipalName}'" --query "[].appId" -o tsv)
 
-# Create Managed Identity Operator role assignment 
+# Create Managed Identity Operator role assignment
 az role assignment create --role "Managed Identity Operator" --assignee $automationClientId --scope "/subscriptions/${subscriptionId}"
 
-# Create Automation Contributor role assignment 
+# Create Automation Contributor role assignment
 az role assignment create --role "Automation Contributor" --assignee $automationClientId --scope "/subscriptions/${subscriptionId}"
 
 # Add Automation Client secrets to key vault
@@ -136,11 +136,11 @@ az keyvault delete-policy --object-id $(az ad signed-in-user show --query id -o 
 
 ### Parameters for PowerShell Execution
 
-The PowerShell file needed to create the runbook schedules is called from the bash script, and re-uses the environment variables to then generate all parameters needed.  
+The PowerShell file needed to create the runbook schedules is called from the bash script, and re-uses the environment variables to then generate all parameters needed.
 
 ## Infrastructure & Assets Creation List
 
-The following infrastructure assets should be established in the subscription with the Azure Firewall(s) to be managed once all aspects of this document are fulfilled.  Though six (6) items are listed, technically one (1) item is an import of content to the body of the Azure Automation Runbook so this item will not show up in the portal without deeper investigation.  
+The following infrastructure assets should be established in the subscription with the Azure Firewall(s) to be managed once all aspects of this document are fulfilled.  Though six (6) items are listed, technically one (1) item is an import of content to the body of the Azure Automation Runbook so this item will not show up in the portal without deeper investigation.
 
 |     | Resource                                  |                                                                                       Links                                                                                      | Description                                                                                                                                                                 |
 | :-: | :---------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -180,16 +180,20 @@ Infrastructure costs can be further optimized by stopping and restarting the app
 - [App Gateway Automation](./App-Gateway-Automation.md)
 - [AKS Cluster Automation](./Aks-Cluster-Automation.md)
 
+### Observability
+
+TODO: add some context here for [observability docs](./Automation-Observability.md).
+
 ## Delete Service Principal, Role Assignments and Secrets from Key Vault
 
 After have completed the setup proccess if no longer needed, then it is recommended to delete the Service Principal.
 
 ```bash
 
-# Deleting role assignment 
+# Deleting role assignment
 az role assignment delete --assignee $automationClientId --role "Managed Identity Operator" --scope "/subscriptions/${subscriptionId}"
 
-# Deleting role assignment 
+# Deleting role assignment
 az role assignment delete --assignee $automationClientId --role "Automation Contributor" --scope "/subscriptions/${subscriptionId}"
 
 # Get servicePrincipalId
