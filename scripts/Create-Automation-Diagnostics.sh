@@ -16,9 +16,6 @@ elif [ ! "$LA_WORKSPACE_NAME" ]; then
 elif [ ! "$LA_WORKSPACE_RG" ]; then
   echo "LA_WORKSPACE_RG is required"
   exit 1
-elif [ ! "$DIAGNOSTIC_SETTING_LOG_CONFIG_PATH" ]; then
-  echo "DIAGNOSTIC_SETTING_LOG_CONFIG_PATH is required"
-  exit 1
 fi
 
 # fetch log analytics workspace id where to send logs

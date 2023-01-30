@@ -57,47 +57,92 @@ Run the script to create the Diagnostic Setting.
 
 ```
 
-## Observability
+## Grafana Dashboard Setup
 
-### Grafana Dashboard
+- TODO: how the grafana dashboard is setup with flux, including how to add to different clusters
 
-TODO: how the grafana dashboard is setup with flux, including how to add to different clusters
+## Troubleshooting Automation Runbook Jobs
 
-- what information is displayed in grafana dashboard?
-  - time series of job status. ex: x number of completed, y number of failed
-  - status of automation, ex: is job currently running?
+Below, you'll find guidance on how to use the information from the diagnostic setting for troubleshooting.
 
 ### Troubleshooting with Grafana Dashboard
 
-TODO: how to use grafana dashboard for troubleshooting
-
-- dashboard will be created to show history of runbook job status
-- will also attempt to show state of resources that runbooks affect. ex: status of clusters, firewall, and gateway
-- will include documentation of how to use the information of the dashboard to troubleshoot
+- TODO: how to use grafana dashboard for troubleshooting
+  - what information is displayed in grafana dashboard?
+  - how to interpret it?
+  - when to take action?
 
 ### Troubleshooting with Log Analytics
 
-TODO: how to use data from log analytics for troublehooting, with example queries
+- TODO: how to use data from log analytics for troublehooting, with description of example queries
 
-- which log analytics?
-  - dev hub log analytics
-  - automation account has multiple runbooks that span hub/spoke and dev/preprod resources
-  - not taking on the scope of reorganizing in this task
-  - TODO:
-    - there might be a task for this already. find and link.
-    - make a note about this decision in this task.
+completed jobs with errors in the job logs
+
+```kql
+
+AzureDiagnostics |
+  where ResourceProvider == "MICROSOFT.AUTOMATION"
+  and Category == "JobStreams"
+  and StreamType_s == "Error" |
+project TimeGenerated, ResourceGroup, Resource, ResultType, ResultDescription, JobId_g, RunbookName_s, StreamType_s
+
+```
+
+breakdown by job status
+
+```kql
+
+AzureDiagnostics |
+where ResourceProvider == "MICROSOFT.AUTOMATION"
+  and Category == "JobLogs"
+  and ResultType != "Started" |
+summarize AggregatedValue = count() by ResultType, bin(TimeGenerated, 1h) |
+order by ResultType desc
+
+```
+
+entries for the jobs with Failed job status
+
+```kql
+
+AzureDiagnostics |
+where ResourceProvider == "MICROSOFT.AUTOMATION"
+  and Category == "JobLogs"
+  and ResultType == "Failed" |
+project TimeGenerated, ResourceGroup, Resource, ResultType, JobId_g,RunbookName_s
+
+```
+
+view all the logs for a specific job
+
+```kql
+
+AzureDiagnostics |
+where Category == "JobStreams"
+  and JobId_g == "<replace with specific job id>" |
+order by TimeGenerated desc
+
+```
+
+For more example queries when troubleshooting Automation runbook jobs, refer to this [Azure documentation](https://learn.microsoft.com/en-us/azure/automation/automation-manage-send-joblogs-log-analytics#sample-queries-for-job-logs-and-job-streams).
 
 ### Fixing issues
 
-TODO: how to potentially resolve specific issues. eg: manually start resource that was not restarted
+- TODO: how to potentially resolve specific issues. eg: manually start resource that was not restarted
 
 ## TODO: clean up rough notes below
 
-TODO: check how much data will be added to logs and how that would affect subscription costs
+- TODO: check how much data will be added to logs and how that would affect subscription costs
 
-TODO: Create follow up task for alerts
+- TODO: create follow up task for alerts
+  - how are alerts structured? query, time range, threshold, group or individual alerts per runbooks, etc?
+  - which action group?
 
-- how are alerts structured? query, time range, threshold, group or individual alerts per runbooks, etc?
+- TODO: take notes in current task
+  - which log analytics and why?
+    - dev hub log analytics
+    - automation account has multiple runbooks that span hub/spoke and dev/preprod resources
+    - not taking on the scope of reorganizing in this task
+    - TODO:
+      - there might be a task for this already. find and link.
   - saving alerts for a separate conversation after we see what logs and metrics are available
-- which action group?
-  - TODO: find location of team action group
