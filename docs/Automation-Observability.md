@@ -21,9 +21,35 @@ sequenceDiagram
 
 TODO: list prereqs and other assumptions
 
+- These resources already exist
+  - Automation Account
+  - Runbooks
+  - Log Analytics
+  - Action Group
+  - Grafana
+- point to documentation there the resources are there
+
 ## Diagnostic Setting Setup
 
-TODO: how to run setup
+TODO: set env vars and describe their purpose
+
+```bash
+
+export DIAGNOSTIC_SETTING_NAME="automation-diagnostic-setting"
+export AUTOMATION_ACCOUNT_NAME="aa-wcnp-firewall-automation-dev"
+export AUTOMATION_ACCOUNT_RG="rg-wcnp-firewall-automation-dev"
+export LA_WORKSPACE_NAME="la-hub-eastus-zsgmpltrjrhy6"
+export LA_WORKSPACE_RG="rg-wcnp-dev-hub"
+
+```
+
+TODO: run script
+
+```bash
+
+./scripts/Create-Automation-Diagnostics.sh
+
+```
 
 ## Observability
 
@@ -31,33 +57,6 @@ TODO: how to run setup
 
 TODO: how to use data from log analytics for troublehooting, with example queries
 
-### Grafana Dashboard
-
-TODO: how the grafana dashboard is setup with flux, including how to add to different clusters
-
-### Troubleshooting with Grafana Dashboard
-
-TODO: how to use grafana dashboard for troubleshooting
-
-### Fixing issues
-
-TODO: how to potentially resolve specific issues. eg: manually start resource that was not restarted
-
-## TODO: plan notes
-
-TODO: plan is to address these points in the designs, docs, and implementation
-
-implementation
-
-- what assumptions are being made about the environment during implementation?
-  - TODO: incorporate into prereq section of docs
-  - These resources already exist
-    - Automation Account
-    - Runbooks
-    - Log Analytics
-    - Action Group
-    - Grafana
-  - point to documentation there the resources are there
 - which log analytics?
   - dev hub log analytics
   - automation account has multiple runbooks that span hub/spoke and dev/preprod resources
@@ -65,39 +64,34 @@ implementation
   - TODO:
     - there might be a task for this already. find and link.
     - make a note about this decision in this task.
-- which diagnostic settings?
-  - JobLogs
-  - JobStreams
+
+### Grafana Dashboard
+
+TODO: how the grafana dashboard is setup with flux, including how to add to different clusters
+
 - what information is displayed in grafana dashboard?
   - time series of job status. ex: x number of completed, y number of failed
   - status of automation, ex: is job currently running?
 
-dev experience and operations
+### Troubleshooting with Grafana Dashboard
 
-- plans to make setup repeatable
-  - TODO: incorporate into setup instructions and scripts
-  - Solution makes no internal assumptions about resource names, location, subscription, or tenant by doing string interpolation.
-  - These can be done outside the solution for easier setup, but should still allow user to change without editing solution.
-- how to test without deploying entire aks baseline setup?
-  - TODO: incorporate into dev and test cycle while working on solution
-  - should be able to test in any subscription if prereq resources are created
-- impact to point dev experience
-  - TODO: incorporate into docs and dhasboards
-  - dashboard will be created to show history of runbook job status
-  - will also attempt to show state of resources that runbooks affect. ex: status of clusters, firewall, and gateway
-  - will include documentation of how to use the information of the dashboard to troubleshoot
-  - will include manual remediation steps for any known error states
-- impact to spend in subscription
-  - solution will add new diagnostic setting for send logs to log analytics
-  - TODO:
-    - check on pricing for diagnostic settings
-    - check on how much data runbook is sending during testing and use a estimate for for final solution
-    - make a note of finding in the task
+TODO: how to use grafana dashboard for troubleshooting
 
-next steps
+- dashboard will be created to show history of runbook job status
+- will also attempt to show state of resources that runbooks affect. ex: status of clusters, firewall, and gateway
+- will include documentation of how to use the information of the dashboard to troubleshoot
 
-- Create follow up task for alerts
-  - how are alerts structured? query, time range, threshold, group or individual alerts per runbooks, etc?
-    - saving alerts for a separate conversation after we see what logs and metrics are available
-  - which action group?
-    - TODO: find location of team action group
+### Fixing issues
+
+TODO: how to potentially resolve specific issues. eg: manually start resource that was not restarted
+
+## TODO: clean up rough notes below
+
+TODO: check how much data will be added to logs and how that would affect subscription costs
+
+TODO: Create follow up task for alerts
+
+- how are alerts structured? query, time range, threshold, group or individual alerts per runbooks, etc?
+  - saving alerts for a separate conversation after we see what logs and metrics are available
+- which action group?
+  - TODO: find location of team action group
