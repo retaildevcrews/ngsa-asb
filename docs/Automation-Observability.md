@@ -1,6 +1,6 @@
 # Azure Automation Account Observability
 
-TODO: goal of this doc
+These instructions guide you through setting up observability for Azure Automation Account. Diagnostic settings and Grafana dashboards will be created, including guidance on how to use the information they provide.
 
 ## Diagram
 
@@ -19,31 +19,37 @@ sequenceDiagram
 
 ## Prerequisites
 
-TODO: list prereqs and other assumptions
+These instructions assume the following resources have already been created as part of the [main infrastructure setup](/README.md).
 
-- These resources already exist
-  - Automation Account
-  - Runbooks
-  - Log Analytics
-  - Action Group
-  - Grafana
-- point to documentation there the resources are there
+- [Automation Account and Runbooks](/docs/Firewall-Automation.md)
+- [Grafana](/monitoring/README.md)
+- [Log Analytics](/README.md#2-createhubsh)
 
 ## Diagnostic Setting Setup
 
-TODO: set env vars and describe their purpose
+Set the environment variables described below for the Diagnostic Setting configuration.
 
 ```bash
 
+# Name of the Diagnostic Setting
 export DIAGNOSTIC_SETTING_NAME="automation-diagnostic-setting"
-export AUTOMATION_ACCOUNT_NAME="aa-wcnp-firewall-automation-dev"
-export AUTOMATION_ACCOUNT_RG="rg-wcnp-firewall-automation-dev"
-export LA_WORKSPACE_NAME="la-hub-eastus-zsgmpltrjrhy6"
-export LA_WORKSPACE_RG="rg-wcnp-dev-hub"
+
+# Name of the Automation Account to attach the Diagnostic Setting to
+export AUTOMATION_ACCOUNT_NAME=<name of automation account>
+
+# Resource Group of the Automation Account to attach the Diagnostic Setting to
+export AUTOMATION_ACCOUNT_RG=<resource group of automation account>
+
+# Name of Log Analytics where logs will be sent
+# Recommend using hub log analytics if automation affects both hub and spoke resources
+export LA_WORKSPACE_NAME=<name of log analytics workspace>
+
+# Resource group of Log Analytics where logs will be sent
+export LA_WORKSPACE_RG=<resource group of log analytics workspace>
 
 ```
 
-TODO: run script
+Run the script to create the Diagnostic Setting.
 
 ```bash
 
@@ -52,18 +58,6 @@ TODO: run script
 ```
 
 ## Observability
-
-### Troubleshooting with Log Analytics
-
-TODO: how to use data from log analytics for troublehooting, with example queries
-
-- which log analytics?
-  - dev hub log analytics
-  - automation account has multiple runbooks that span hub/spoke and dev/preprod resources
-  - not taking on the scope of reorganizing in this task
-  - TODO:
-    - there might be a task for this already. find and link.
-    - make a note about this decision in this task.
 
 ### Grafana Dashboard
 
@@ -80,6 +74,18 @@ TODO: how to use grafana dashboard for troubleshooting
 - dashboard will be created to show history of runbook job status
 - will also attempt to show state of resources that runbooks affect. ex: status of clusters, firewall, and gateway
 - will include documentation of how to use the information of the dashboard to troubleshoot
+
+### Troubleshooting with Log Analytics
+
+TODO: how to use data from log analytics for troublehooting, with example queries
+
+- which log analytics?
+  - dev hub log analytics
+  - automation account has multiple runbooks that span hub/spoke and dev/preprod resources
+  - not taking on the scope of reorganizing in this task
+  - TODO:
+    - there might be a task for this already. find and link.
+    - make a note about this decision in this task.
 
 ### Fixing issues
 

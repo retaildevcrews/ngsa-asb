@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# check for required environment variables
 if [ ! "$DIAGNOSTIC_SETTING_NAME" ]; then
   echo "DIAGNOSTIC_SETTING_NAME is required"
   exit 1
