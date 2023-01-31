@@ -1,0 +1,21 @@
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: monitoring-flux-variable-substitution
+  namespace: monitoring
+spec:
+  dependsOn:
+  - name: istio
+    namespace: istio-system
+  interval: 1m0s
+  prune: true
+  targetNamespace: monitoring
+  path: ./deploy/dev-ngsa-asb-eastus/monitoring/grafana/dashboards/flux-variable-substitution
+  sourceRef:
+    kind: GitRepository
+    name: automation-test
+    namespace: flux-system
+  postBuild:
+    substitute:
+      REPLACE_ME: "world"
