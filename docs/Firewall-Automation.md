@@ -26,11 +26,11 @@ Before proceeding, verify that the correct version of Azure CLI and required ext
 
 - Azure CLI Extension for Automation
   - Run the command `az extension show --name automation -o table`
-  - If the Azure CLI extension for automation is not installed, install it from [here](https://github.com/Azure/azure-cli-extensions/tree/main/src/automation#how-to-use).
+  - If the Azure CLI extension for automation is not installed, install by running command `az extension add --name automation`   [reference here](https://github.com/Azure/azure-cli-extensions/tree/main/src/automation#how-to-use).
 
 - Azure CLI Extension for Monitor
   - Run the command `az extension show --name monitor-control-service -o table`
-  - If the Azure CLI extension for monitor-control-service is not installed, install it from [here](https://github.com/Azure/azure-cli-extensions/tree/main/src/monitor-control-service#how-to-use)
+  - If the Azure CLI extension for monitor-control-service is not installed, install by running command `az extension add --name monitor-control-service` [reference here](https://github.com/Azure/azure-cli-extensions/tree/main/src/monitor-control-service#how-to-use)
 
 - Azure Powershell modules
   - Open up a PowerShell Terminal
