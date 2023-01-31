@@ -1,13 +1,19 @@
 targetScope='resourceGroup'
 
-@description('Name of user assigned managed identity')
-param AA_Name string = 'aa-automation'
+@description('URL of the shutdown script')
+param resourceShutdownRunbookURL string= 'https://raw.githubusercontent.com/retaildevcrews/ngsa-asb/main/scripts/Aks-Cluster-Automation/Aks-Cluster-Automation-Runbook.ps1'
+
+@description('URL of the bringup script')
+param resourceBringupRunbookURL string= 'https://raw.githubusercontent.com/retaildevcrews/ngsa-asb/main/scripts/Aks-Cluster-Automation/Aks-Cluster-Automation-Runbook.ps1'
 
 @description('Name of location')
 param location string = resourceGroup().location
 
 @description('Name of user assigned managed identity')
-param MI_Name string = 'mi-automation'
+param AA_Name string 
+
+@description('Name of user assigned managed identity')
+param MI_Name string 
 
 @description('Role definition ID')
 param RA_role_def_id string = 'b24988ac-6180-42a0-ab88-20f7382dd24c'
@@ -91,5 +97,33 @@ resource weekdaysEndOfDay 'Microsoft.Automation/automationAccounts/schedules@202
   }
 }
 
+resource resourceShutdownRunbook 'Microsoft.Automation/automationAccounts/runbooks@2022-08-08' = {
+  name: 'resource-shutdown'
+  location: location
+  parent: automationAccount
+  properties: {
+    description: 'Runbook to shut down resources at the end of the day'
+    logProgress: true
+    logVerbose: true
+    publishContentLink: {
+      uri: resourceShutdownRunbookURL
+    }
+    runbookType: 'PowerShell'
+  }
+}
 
+resource resourceBringupRunbook 'Microsoft.Automation/automationAccounts/runbooks@2022-08-08' = {
+  name: 'resource-bringup'
+  location: location
+  parent: automationAccount
+  properties: {
+    description: 'Runbook to shut down resources at the end of the day'
+    logProgress: true
+    logVerbose: true
+    publishContentLink: {
+      uri: resourceBringupRunbookURL
+    }
+    runbookType: 'PowerShell'
+  }
+}
 

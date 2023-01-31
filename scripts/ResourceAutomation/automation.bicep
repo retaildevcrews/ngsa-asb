@@ -1,21 +1,20 @@
 targetScope = 'subscription'
 
+@description('Unique portion of automation account resource names')
+param AA_accountSuffix string='automation'
+
 @description('Name of resource group')
-@minLength(1)
-@maxLength(90)
-param RG_Name string = 'rg-automation'
+param RG_Name string = 'rg-${AA_accountSuffix}'
+
+@description('Name of user assigned automation account')
+param AA_Name string = 'aa-${AA_accountSuffix}'
+
+@description('Name of user assigned managed identity')
+param MI_Name string = 'mi-${AA_accountSuffix}'
 
 @description('Name of location')
 @allowed([ 'centralus', 'eastus', 'westus3' ])
 param location string = 'eastus'
-
-@description('Name of user assigned automation account')
-param AA_Name string = 'aa-automation'
-
-@description('Name of user assigned managed identity')
-param MI_Name string = 'mi-automation'
-
-
 
 resource automationRG 'Microsoft.Resources/resourceGroups@2021-04-01' = { name: RG_Name, location: location }
 
