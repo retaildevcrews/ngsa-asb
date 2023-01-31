@@ -14,7 +14,7 @@ resource AA_RoleAssignment 'Microsoft.Authorization/roleAssignments@2020-04-01-p
   scope: subscription()
   properties: {
     principalId: userPrincipalId
-    roleDefinitionId:roleDefId
+    roleDefinitionId: roleDefId
     principalType: 'ServicePrincipal'
   }
 }

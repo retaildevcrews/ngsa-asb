@@ -45,7 +45,7 @@ module roleAssignment 'roleAssignment.bicep' = {
    scope: subscription()
    params: {
     roleAssignmentName:guid(subscription().id,automationMI.properties.principalId,RA_role_def_id)
-    roleDefId: RA_role_def_id
+    roleDefId: resourceId('Microsoft.Authorization/roleDefinitions', RA_role_def_id)
     userPrincipalId:automationMI.properties.principalId
    }
 }

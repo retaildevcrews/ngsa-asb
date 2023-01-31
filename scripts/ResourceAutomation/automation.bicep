@@ -27,6 +27,7 @@ module automationAccountModule 'automationAccount.bicep' = {
     AA_Name:AA_Name
     MI_Name:MI_Name
   }
+  dependsOn:[automationRG]
 }
 
 
