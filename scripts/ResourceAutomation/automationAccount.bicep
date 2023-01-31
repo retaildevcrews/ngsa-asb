@@ -65,7 +65,7 @@ module roleAssignment 'roleAssignment.bicep' = {
    }
 }
 
-resource weekdaysStartOfDay 'Microsoft.Automation/automationAccounts/schedules@2022-08-08' = {
+resource weekdaysStartOfDaySchedule 'Microsoft.Automation/automationAccounts/schedules@2022-08-08' = {
   name: 'weekdays-start-of-day'
   parent: automationAccount
   properties: {
@@ -81,7 +81,7 @@ resource weekdaysStartOfDay 'Microsoft.Automation/automationAccounts/schedules@2
   }
 }
 
-resource weekdaysEndOfDay 'Microsoft.Automation/automationAccounts/schedules@2022-08-08' = {
+resource weekdaysEndOfDaySchedule 'Microsoft.Automation/automationAccounts/schedules@2022-08-08' = {
   name: 'weekdays-end-of-day'
   parent: automationAccount
   properties: {
@@ -125,5 +125,35 @@ resource resourceBringupRunbook 'Microsoft.Automation/automationAccounts/runbook
     }
     runbookType: 'PowerShell'
   }
+}
+
+resource resourceShutdownRunbookSchedule 'Microsoft.Automation/automationAccounts/jobSchedules@2022-08-08' = {
+  name: guid('resource-shutdown-schedule')
+  parent: automationAccount
+  properties: {
+    parameters: {}
+    runbook: {
+      name: 'resource-shutdown'
+    }
+    schedule: {
+      name: 'weekdays-end-of-day'
+    }
+  }
+  dependsOn:[resourceShutdownRunbook,weekdaysEndOfDaySchedule]
+}
+
+resource resourceBringupRunbookSchedule 'Microsoft.Automation/automationAccounts/jobSchedules@2022-08-08' = {
+  name: guid('resource-bringup-schedule')
+  parent: automationAccount
+  properties: {
+    parameters: {}
+    runbook: {
+      name: 'resource-bringup'
+    }
+    schedule: {
+      name: 'weekdays-start-of-day'
+    }
+  }
+  dependsOn:[resourceBringupRunbook,weekdaysStartOfDaySchedule]
 }
 
