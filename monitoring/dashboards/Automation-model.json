@@ -419,6 +419,153 @@
       "fieldConfig": {
         "defaults": {
           "color": {
+            "mode": "continuous-RdYlGr"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 15,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineStyle": {
+              "fill": "solid"
+            },
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "normal"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "AggregatedValue Completed"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "green",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "AggregatedValue Created"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "blue",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "AggregatedValue Failed"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "red",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 21,
+        "x": 0,
+        "y": 13
+      },
+      "id": 13,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "table",
+          "placement": "right"
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "8.5.5",
+      "targets": [
+        {
+          "azureLogAnalytics": {
+            "query": "AzureDiagnostics |\r\nwhere \r\n  $__timeFilter(TimeGenerated) \r\n  and ResourceProvider == \"MICROSOFT.AUTOMATION\"\r\n  and Category == \"JobLogs\"\r\n  and ResultType != \"Started\" |\r\nsummarize AggregatedValue = count() by ResultType, bin(TimeGenerated, 1h) |\r\norder by TimeGenerated asc",
+            "resource": "/subscriptions/5dc45b2f-bf13-4281-b763-a53f57290aa3/resourceGroups/rg-wcnp-dev-hub/providers/Microsoft.OperationalInsights/workspaces/la-hub-eastus-zsgmpltrjrhy6",
+            "resultFormat": "time_series"
+          },
+          "azureMonitor": {
+            "allowedTimeGrainsMs": [],
+            "dimensionFilters": [],
+            "timeGrain": "auto"
+          },
+          "datasource": {
+            "type": "grafana-azure-monitor-datasource",
+            "uid": "P1EB995EACC6832D3"
+          },
+          "queryType": "Azure Log Analytics",
+          "refId": "A",
+          "subscription": "5dc45b2f-bf13-4281-b763-a53f57290aa3"
+        }
+      ],
+      "title": "TESTING",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "grafana-azure-monitor-datasource",
+        "uid": "P1EB995EACC6832D3"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
             "mode": "thresholds"
           },
           "custom": {
@@ -447,7 +594,7 @@
         "h": 9,
         "w": 21,
         "x": 0,
-        "y": 13
+        "y": 21
       },
       "id": 2,
       "options": {
@@ -518,7 +665,7 @@
         "h": 9,
         "w": 21,
         "x": 0,
-        "y": 22
+        "y": 30
       },
       "id": 6,
       "options": {
@@ -570,6 +717,6 @@
   "timezone": "",
   "title": "Automation",
   "uid": "IVhemSA4z",
-  "version": 10,
+  "version": 19,
   "weekStart": ""
 }
