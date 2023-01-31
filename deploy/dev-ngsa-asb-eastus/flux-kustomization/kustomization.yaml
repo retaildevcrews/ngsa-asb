@@ -5,6 +5,7 @@ resources:
 - ../istio/istio-flux-kustomization.yaml
 - ../fluentbit/fluentbit-flux-kustomization.yaml
 - ../monitoring/monitoring-flux-kustomization.yaml
+- ../monitoring/grafana/dashboards/flux-variable-substitution/flux-kustomization.yaml
 - ../loderunner/loderunner-flux-kustomization.yaml
 - ../ngsa/ngsa-flux-kustomization.yaml
 
