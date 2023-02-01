@@ -722,8 +722,8 @@ data:
           },
           "timepicker": {},
           "timezone": "",
-          "title": "Automation Runbooks - flux testing",
+          "title": "Automation Runbooks",
           "uid": "AK563S0Vz",
-          "version": 3
+          "version": 3,
           "weekStart": ""
         }
