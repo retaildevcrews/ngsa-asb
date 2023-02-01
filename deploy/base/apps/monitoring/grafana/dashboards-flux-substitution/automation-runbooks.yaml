@@ -31,7 +31,7 @@ data:
           "editable": true,
           "fiscalYearStartMonth": 0,
           "graphTooltip": 0,
-          "id": 11,
+          "id": 9,
           "links": [],
           "liveNow": false,
           "panels": [
@@ -51,7 +51,7 @@ data:
             {
               "datasource": {
                 "type": "grafana-azure-monitor-datasource",
-                "uid": "$${DS_AZURE_MONITOR}"
+                "uid": "P1EB995EACC6832D3"
               },
               "description": "This is the number of jobs created in the selected time interval.",
               "fieldConfig": {
@@ -102,7 +102,7 @@ data:
                 {
                   "azureLogAnalytics": {
                     "query": "AzureDiagnostics |\r\nwhere \r\n  $__timeFilter(TimeGenerated) \r\n  and ResourceProvider == \"MICROSOFT.AUTOMATION\"\r\n  and Category == \"JobLogs\"\r\n  and ResultType == \"Created\" \r\n| summarize Count=count() by ResultType",
-                    "resource": "${HUB_LOG_ANALYTICS_RESOURCE_ID}",
+                    "resource": "/subscriptions/5dc45b2f-bf13-4281-b763-a53f57290aa3/resourceGroups/rg-wcnp-dev-hub/providers/Microsoft.OperationalInsights/workspaces/la-hub-eastus-zsgmpltrjrhy6",
                     "resultFormat": "table"
                   },
                   "azureMonitor": {
@@ -112,7 +112,7 @@ data:
                   },
                   "datasource": {
                     "type": "grafana-azure-monitor-datasource",
-                    "uid": "$${DS_AZURE_MONITOR}"
+                    "uid": "P1EB995EACC6832D3"
                   },
                   "queryType": "Azure Log Analytics",
                   "refId": "A",
@@ -125,7 +125,7 @@ data:
             {
               "datasource": {
                 "type": "grafana-azure-monitor-datasource",
-                "uid": "$${DS_AZURE_MONITOR}"
+                "uid": "P1EB995EACC6832D3"
               },
               "description": "This is the number of jobs completed in the selected time interval.",
               "fieldConfig": {
@@ -176,7 +176,7 @@ data:
                 {
                   "azureLogAnalytics": {
                     "query": "AzureDiagnostics |\r\nwhere \r\n  $__timeFilter(TimeGenerated) \r\n  and ResourceProvider == \"MICROSOFT.AUTOMATION\"\r\n  and Category == \"JobLogs\"\r\n  and ResultType == \"Completed\" \r\n| summarize Count=count() by ResultType",
-                    "resource": "${HUB_LOG_ANALYTICS_RESOURCE_ID}",
+                    "resource": "/subscriptions/5dc45b2f-bf13-4281-b763-a53f57290aa3/resourceGroups/rg-wcnp-dev-hub/providers/Microsoft.OperationalInsights/workspaces/la-hub-eastus-zsgmpltrjrhy6",
                     "resultFormat": "table"
                   },
                   "azureMonitor": {
@@ -186,41 +186,535 @@ data:
                   },
                   "datasource": {
                     "type": "grafana-azure-monitor-datasource",
-                    "uid": "$${DS_AZURE_MONITOR}"
+                    "uid": "P1EB995EACC6832D3"
                   },
                   "queryType": "Azure Log Analytics",
                   "refId": "A",
-                  "subscription": "${SUBSCRIPTION}"
+                  "subscription": "5dc45b2f-bf13-4281-b763-a53f57290aa3"
                 }
               ],
               "title": "Number of Jobs Completed",
               "type": "stat"
+            },
+            {
+              "datasource": {
+                "type": "grafana-azure-monitor-datasource",
+                "uid": "P1EB995EACC6832D3"
+              },
+              "description": "Number of jobs with error log entries",
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "thresholds"
+                  },
+                  "mappings": [],
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "orange",
+                        "value": null
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  }
+                },
+                "overrides": []
+              },
+              "gridPos": {
+                "h": 4,
+                "w": 5,
+                "x": 10,
+                "y": 1
+              },
+              "id": 12,
+              "options": {
+                "colorMode": "value",
+                "graphMode": "area",
+                "justifyMode": "auto",
+                "orientation": "auto",
+                "reduceOptions": {
+                  "calcs": [
+                    "lastNotNull"
+                  ],
+                  "fields": "/^count_$/",
+                  "values": true
+                },
+                "textMode": "auto"
+              },
+              "pluginVersion": "8.5.5",
+              "targets": [
+                {
+                  "azureLogAnalytics": {
+                    "query": "AzureDiagnostics |\r\nwhere \r\n  $__timeFilter(TimeGenerated) \r\n  and ResourceProvider == \"MICROSOFT.AUTOMATION\"\r\n  and Category == \"JobStreams\"\r\n  and StreamType_s == \"Error\"\r\n  | distinct JobId_g\r\n  | summarize count()",
+                    "resource": "/subscriptions/5dc45b2f-bf13-4281-b763-a53f57290aa3/resourceGroups/rg-wcnp-dev-hub/providers/Microsoft.OperationalInsights/workspaces/la-hub-eastus-zsgmpltrjrhy6",
+                    "resultFormat": "table"
+                  },
+                  "azureMonitor": {
+                    "allowedTimeGrainsMs": [],
+                    "dimensionFilters": [],
+                    "timeGrain": "auto"
+                  },
+                  "datasource": {
+                    "type": "grafana-azure-monitor-datasource",
+                    "uid": "P1EB995EACC6832D3"
+                  },
+                  "queryType": "Azure Log Analytics",
+                  "refId": "A",
+                  "subscription": "5dc45b2f-bf13-4281-b763-a53f57290aa3"
+                }
+              ],
+              "title": "Number of Jobs with Errors",
+              "type": "stat"
+            },
+            {
+              "datasource": {
+                "type": "grafana-azure-monitor-datasource",
+                "uid": "P1EB995EACC6832D3"
+              },
+              "description": "Number of Jobs that finished in a failed state.",
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "thresholds"
+                  },
+                  "mappings": [],
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "red",
+                        "value": null
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  }
+                },
+                "overrides": []
+              },
+              "gridPos": {
+                "h": 4,
+                "w": 6,
+                "x": 15,
+                "y": 1
+              },
+              "id": 9,
+              "options": {
+                "colorMode": "value",
+                "graphMode": "area",
+                "justifyMode": "auto",
+                "orientation": "auto",
+                "reduceOptions": {
+                  "calcs": [
+                    "lastNotNull"
+                  ],
+                  "fields": "/^Count$/",
+                  "values": true
+                },
+                "textMode": "auto"
+              },
+              "pluginVersion": "8.5.5",
+              "targets": [
+                {
+                  "azureLogAnalytics": {
+                    "query": "AzureDiagnostics |\r\nwhere \r\n  $__timeFilter(TimeGenerated) \r\n  and ResourceProvider == \"MICROSOFT.AUTOMATION\"\r\n  and Category == \"JobLogs\"\r\n  and ResultType == \"Failed\" \r\n| summarize Count=count() by ResultType",
+                    "resource": "/subscriptions/5dc45b2f-bf13-4281-b763-a53f57290aa3/resourceGroups/rg-wcnp-dev-hub/providers/Microsoft.OperationalInsights/workspaces/la-hub-eastus-zsgmpltrjrhy6",
+                    "resultFormat": "table"
+                  },
+                  "azureMonitor": {
+                    "allowedTimeGrainsMs": [],
+                    "dimensionFilters": [],
+                    "timeGrain": "auto"
+                  },
+                  "datasource": {
+                    "type": "grafana-azure-monitor-datasource",
+                    "uid": "P1EB995EACC6832D3"
+                  },
+                  "queryType": "Azure Log Analytics",
+                  "refId": "A",
+                  "subscription": "5dc45b2f-bf13-4281-b763-a53f57290aa3"
+                }
+              ],
+              "title": "Number of Jobs Failed",
+              "type": "stat"
+            },
+            {
+              "datasource": {
+                "type": "grafana-azure-monitor-datasource",
+                "uid": "P1EB995EACC6832D3"
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "thresholds"
+                  },
+                  "custom": {
+                    "align": "auto",
+                    "displayMode": "auto",
+                    "inspect": false
+                  },
+                  "mappings": [],
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": null
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  }
+                },
+                "overrides": []
+              },
+              "gridPos": {
+                "h": 8,
+                "w": 21,
+                "x": 0,
+                "y": 5
+              },
+              "id": 4,
+              "options": {
+                "footer": {
+                  "fields": "",
+                  "reducer": [
+                    "sum"
+                  ],
+                  "show": false
+                },
+                "showHeader": true
+              },
+              "pluginVersion": "8.5.5",
+              "targets": [
+                {
+                  "azureLogAnalytics": {
+                    "query": "AzureDiagnostics |\r\nwhere \r\n  $__timeFilter(TimeGenerated) \r\n  and ResourceProvider == \"MICROSOFT.AUTOMATION\"\r\n  and Category == \"JobLogs\"\r\n  and ResultType != \"Started\" |\r\nsummarize AggregatedValue = count() by ResultType, bin(TimeGenerated, 1h) |\r\norder by ResultType desc",
+                    "resource": "/subscriptions/5dc45b2f-bf13-4281-b763-a53f57290aa3/resourceGroups/rg-wcnp-dev-hub/providers/Microsoft.OperationalInsights/workspaces/la-hub-eastus-zsgmpltrjrhy6",
+                    "resultFormat": "table"
+                  },
+                  "azureMonitor": {
+                    "allowedTimeGrainsMs": [],
+                    "dimensionFilters": [],
+                    "timeGrain": "auto"
+                  },
+                  "datasource": {
+                    "type": "grafana-azure-monitor-datasource",
+                    "uid": "P1EB995EACC6832D3"
+                  },
+                  "queryType": "Azure Log Analytics",
+                  "refId": "A",
+                  "subscription": "5dc45b2f-bf13-4281-b763-a53f57290aa3"
+                }
+              ],
+              "title": "Breakdown by job status",
+              "type": "table"
+            },
+            {
+              "datasource": {
+                "type": "grafana-azure-monitor-datasource",
+                "uid": "P1EB995EACC6832D3"
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "continuous-RdYlGr"
+                  },
+                  "custom": {
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "drawStyle": "line",
+                    "fillOpacity": 15,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "lineInterpolation": "linear",
+                    "lineStyle": {
+                      "fill": "solid"
+                    },
+                    "lineWidth": 1,
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "auto",
+                    "spanNulls": false,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "normal"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  },
+                  "mappings": [],
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": null
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  }
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "AggregatedValue Completed"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "green",
+                          "mode": "fixed"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "AggregatedValue Created"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "blue",
+                          "mode": "fixed"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "AggregatedValue Failed"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "red",
+                          "mode": "fixed"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              },
+              "gridPos": {
+                "h": 8,
+                "w": 21,
+                "x": 0,
+                "y": 13
+              },
+              "id": 13,
+              "options": {
+                "legend": {
+                  "calcs": [],
+                  "displayMode": "table",
+                  "placement": "right"
+                },
+                "tooltip": {
+                  "mode": "single",
+                  "sort": "none"
+                }
+              },
+              "pluginVersion": "8.5.5",
+              "targets": [
+                {
+                  "azureLogAnalytics": {
+                    "query": "AzureDiagnostics |\r\nwhere \r\n  $__timeFilter(TimeGenerated) \r\n  and ResourceProvider == \"MICROSOFT.AUTOMATION\"\r\n  and Category == \"JobLogs\"\r\n  and ResultType != \"Started\" |\r\nsummarize AggregatedValue = count() by ResultType, bin(TimeGenerated, 1h) |\r\norder by TimeGenerated asc",
+                    "resource": "/subscriptions/5dc45b2f-bf13-4281-b763-a53f57290aa3/resourceGroups/rg-wcnp-dev-hub/providers/Microsoft.OperationalInsights/workspaces/la-hub-eastus-zsgmpltrjrhy6",
+                    "resultFormat": "time_series"
+                  },
+                  "azureMonitor": {
+                    "allowedTimeGrainsMs": [],
+                    "dimensionFilters": [],
+                    "timeGrain": "auto"
+                  },
+                  "datasource": {
+                    "type": "grafana-azure-monitor-datasource",
+                    "uid": "P1EB995EACC6832D3"
+                  },
+                  "queryType": "Azure Log Analytics",
+                  "refId": "A",
+                  "subscription": "5dc45b2f-bf13-4281-b763-a53f57290aa3"
+                }
+              ],
+              "title": "TESTING",
+              "type": "timeseries"
+            },
+            {
+              "datasource": {
+                "type": "grafana-azure-monitor-datasource",
+                "uid": "P1EB995EACC6832D3"
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "thresholds"
+                  },
+                  "custom": {
+                    "align": "auto",
+                    "displayMode": "auto",
+                    "inspect": false
+                  },
+                  "mappings": [],
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": null
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  }
+                },
+                "overrides": []
+              },
+              "gridPos": {
+                "h": 9,
+                "w": 21,
+                "x": 0,
+                "y": 21
+              },
+              "id": 2,
+              "options": {
+                "footer": {
+                  "fields": "",
+                  "reducer": [
+                    "sum"
+                  ],
+                  "show": false
+                },
+                "showHeader": true
+              },
+              "pluginVersion": "8.5.5",
+              "targets": [
+                {
+                  "azureLogAnalytics": {
+                    "query": "AzureDiagnostics |\r\nwhere \r\n  $__timeFilter(TimeGenerated) \r\n  and ResourceProvider == \"MICROSOFT.AUTOMATION\"\r\n  and Category == \"JobStreams\"\r\n  and StreamType_s == \"Error\" |\r\nproject TimeGenerated,  JobId_g, ResourceGroup, Resource, ResultType, ResultDescription, RunbookName_s, StreamType_s",
+                    "resource": "/subscriptions/5dc45b2f-bf13-4281-b763-a53f57290aa3/resourceGroups/rg-wcnp-dev-hub/providers/Microsoft.OperationalInsights/workspaces/la-hub-eastus-zsgmpltrjrhy6",
+                    "resultFormat": "table"
+                  },
+                  "azureMonitor": {
+                    "allowedTimeGrainsMs": [],
+                    "dimensionFilters": [],
+                    "timeGrain": "auto"
+                  },
+                  "datasource": {
+                    "type": "grafana-azure-monitor-datasource",
+                    "uid": "P1EB995EACC6832D3"
+                  },
+                  "queryType": "Azure Log Analytics",
+                  "refId": "A",
+                  "subscription": "5dc45b2f-bf13-4281-b763-a53f57290aa3"
+                }
+              ],
+              "title": "Completed jobs with errors in the job logs",
+              "type": "table"
+            },
+            {
+              "datasource": {
+                "type": "grafana-azure-monitor-datasource",
+                "uid": "P1EB995EACC6832D3"
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "custom": {
+                    "align": "auto",
+                    "displayMode": "auto",
+                    "inspect": false
+                  },
+                  "mappings": [],
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": null
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  }
+                },
+                "overrides": []
+              },
+              "gridPos": {
+                "h": 9,
+                "w": 21,
+                "x": 0,
+                "y": 30
+              },
+              "id": 6,
+              "options": {
+                "footer": {
+                  "fields": "",
+                  "reducer": [
+                    "sum"
+                  ],
+                  "show": false
+                },
+                "showHeader": true
+              },
+              "pluginVersion": "8.5.5",
+              "targets": [
+                {
+                  "azureLogAnalytics": {
+                    "query": "AzureDiagnostics |\r\nwhere \r\n  $__timeFilter(TimeGenerated) \r\n  and ResourceProvider == \"MICROSOFT.AUTOMATION\"\r\n  and Category == \"JobLogs\"\r\n  and ResultType == \"Failed\" |\r\nproject TimeGenerated,  JobId_g, ResourceGroup, Resource, ResultType, RunbookName_s",
+                    "resource": "/subscriptions/5dc45b2f-bf13-4281-b763-a53f57290aa3/resourceGroups/rg-wcnp-dev-hub/providers/Microsoft.OperationalInsights/workspaces/la-hub-eastus-zsgmpltrjrhy6"
+                  },
+                  "azureMonitor": {
+                    "allowedTimeGrainsMs": [],
+                    "dimensionFilters": [],
+                    "timeGrain": "auto"
+                  },
+                  "datasource": {
+                    "type": "grafana-azure-monitor-datasource",
+                    "uid": "P1EB995EACC6832D3"
+                  },
+                  "queryType": "Azure Log Analytics",
+                  "refId": "A",
+                  "subscription": "5dc45b2f-bf13-4281-b763-a53f57290aa3"
+                }
+              ],
+              "title": "Entries for the jobs with Failed job status",
+              "type": "table"
             }
           ],
           "schemaVersion": 36,
           "style": "dark",
           "tags": [],
           "templating": {
-            "list": [
-              {
-                "current": {
-                  "selected": false,
-                  "text": "Azure Monitor",
-                  "value": "Azure Monitor"
-                },
-                "hide": 2,
-                "includeAll": false,
-                "label": "AzDatasource",
-                "multi": false,
-                "name": "DS_AZURE_MONITOR",
-                "options": [],
-                "query": "grafana-azure-monitor-datasource",
-                "refresh": 1,
-                "regex": "/Azure Monitor/",
-                "skipUrlSync": false,
-                "type": "datasource"
-              }
-            ]
+            "list": []
           },
           "time": {
             "from": "now-24h",
@@ -230,6 +724,6 @@ data:
           "timezone": "",
           "title": "Automation Runbooks - flux testing",
           "uid": "AK563S0Vz",
-          "version": 2,
+          "version": 3
           "weekStart": ""
         }
