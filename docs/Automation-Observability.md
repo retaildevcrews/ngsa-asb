@@ -115,19 +115,6 @@ order by TimeGenerated desc
 
 ```
 
-TODO: saving for dashboard. remove from docs?
-
-```kql
-
-AzureDiagnostics |
-where ResourceProvider == "MICROSOFT.AUTOMATION"
-  and Category == "JobLogs"
-  and ResultType != "Started" |
-summarize AggregatedValue = count() by ResultType, bin(TimeGenerated, 1h) |
-order by ResultType desc
-
-```
-
 For more example queries when troubleshooting Automation runbook jobs, refer to this [Azure documentation](https://learn.microsoft.com/en-us/azure/automation/automation-manage-send-joblogs-log-analytics#sample-queries-for-job-logs-and-job-streams).
 
 ### Fixing issues
