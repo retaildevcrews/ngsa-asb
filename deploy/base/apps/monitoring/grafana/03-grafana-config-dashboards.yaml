@@ -60,7 +60,7 @@ data:
       type: file
       disableDeletion: false
     - name: automation-runbooks
-      folder: General
+      folder: NGSA
       options:
         path: /var/lib/grafana/dashboards/automation-runbooks
       orgId: 1
