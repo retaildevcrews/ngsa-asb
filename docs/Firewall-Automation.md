@@ -182,7 +182,7 @@ Infrastructure costs can be further optimized by stopping and restarting the app
 
 ### Observability
 
-TODO: add some context here for [observability docs](./Automation-Observability.md).
+After creating the Automation resources, follow the [observability documentation](./Automation-Observability.md) to setup diagnostic settings. The documentation also includes guidance on using the Grafana dashboard and Log Analytics for troubleshooting.
 
 ## Delete Service Principal, Role Assignments and Secrets from Key Vault
 

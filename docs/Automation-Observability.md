@@ -121,25 +121,18 @@ For more example queries when troubleshooting Automation runbook jobs, refer to 
 
 - TODO: how to potentially resolve specific issues. eg: manually start resource that was not restarted
 
-## TODO: clean up rough notes below
+## TODO: add notes to eventual PR or as comment in task 1124
 
-- TODO: create follow up task for alerts
-  - how are alerts structured? query, time range, threshold, group or individual alerts per runbooks, etc?
-  - which action group?
-
-- TODO: take notes in current task 1124
-  - which log analytics and why?
-    - dev hub log analytics
-    - automation account has multiple runbooks that span hub/spoke and dev/preprod resources
-    - not taking on the scope of reorganizing in this task
-    - TODO:
-      - there might be a task for this already. find and link.
-  - saving alerts for a separate conversation after we see what logs and metrics are available
-  - subscription costs
-    - around 0.02 GB per day increase in logs during testing
-    - includes entries from test jobs that were running every hour
-    - around 5 cents per day for log analytics ingestion
-  - add notes about why new directory is being used for grafana dashboard.
-    - need to target specific dashboard config maps for substitution so others are not affected
-    - alternative is disable all other dashboard config maps by adding special annotation
-    - worried about situation someone forgets to disable and flux messes up dashboard accidentally
+- removed alerts from the scope and added an item to the board for future discussion
+- removed powershell updates from the scope and added an item to the board for future discussion
+- using the dev hub log analytics for the diagnostic setting
+  - automation account runbooks affect resources in dev, preprod, hub, and spoke
+  - picked dev with the assumption that solution would go through more iterations before preprod
+  - picked hub because it felt more natural to have spoke data in the hub instead of the other way around
+- observed little to no changes in Log Analytics costs with new diagnostic setting sending logs
+  - Jobs do not run often and they output minimal logs
+- created a new dashboard directory for flux kustomization variable substitution
+  - <https://fluxcd.io/flux/components/kustomize/kustomization/#variable-substitution>
+  - needed a way to target specific dashboard config maps for variable substitution so other dashboards are not affected
+  - an alternative is to reuse the existing kustomizations and disable specific ones with a special annotation, `kustomize.toolkit.fluxcd.io/substitute: disabled`
+    - a potential downside is all current and future resources under the kustomization would require this annotation if substitution is not desired
