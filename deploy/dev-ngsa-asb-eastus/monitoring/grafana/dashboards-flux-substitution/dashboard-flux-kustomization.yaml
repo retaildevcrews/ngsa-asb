@@ -18,6 +18,5 @@ spec:
     namespace: flux-system
   postBuild:
     substitute:
-      REPLACE_ME: "world"
       HUB_LOG_ANALYTICS_RESOURCE_ID: "/subscriptions/5dc45b2f-bf13-4281-b763-a53f57290aa3/resourceGroups/rg-wcnp-dev-hub/providers/Microsoft.OperationalInsights/workspaces/la-hub-eastus-zsgmpltrjrhy6"
       SUBSCRIPTION: "5dc45b2f-bf13-4281-b763-a53f57290aa3"

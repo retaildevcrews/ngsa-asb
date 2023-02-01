@@ -51,7 +51,7 @@ data:
             {
               "datasource": {
                 "type": "grafana-azure-monitor-datasource",
-                "uid": "P1EB995EACC6832D3"
+                "uid": "$${DS_AZURE_MONITOR}"
               },
               "description": "This is the number of jobs created in the selected time interval.",
               "fieldConfig": {
@@ -102,7 +102,7 @@ data:
                 {
                   "azureLogAnalytics": {
                     "query": "AzureDiagnostics |\r\nwhere \r\n  $__timeFilter(TimeGenerated) \r\n  and ResourceProvider == \"MICROSOFT.AUTOMATION\"\r\n  and Category == \"JobLogs\"\r\n  and ResultType == \"Created\" \r\n| summarize Count=count() by ResultType",
-                    "resource": "/subscriptions/5dc45b2f-bf13-4281-b763-a53f57290aa3/resourceGroups/rg-wcnp-dev-hub/providers/Microsoft.OperationalInsights/workspaces/la-hub-eastus-zsgmpltrjrhy6",
+                    "resource": "${HUB_LOG_ANALYTICS_RESOURCE_ID}",
                     "resultFormat": "table"
                   },
                   "azureMonitor": {
@@ -112,11 +112,11 @@ data:
                   },
                   "datasource": {
                     "type": "grafana-azure-monitor-datasource",
-                    "uid": "P1EB995EACC6832D3"
+                    "uid": "$${DS_AZURE_MONITOR}"
                   },
                   "queryType": "Azure Log Analytics",
                   "refId": "A",
-                  "subscription": "5dc45b2f-bf13-4281-b763-a53f57290aa3"
+                  "subscription": "${SUBSCRIPTION}"
                 }
               ],
               "title": "Number of Jobs Created",
@@ -125,7 +125,7 @@ data:
             {
               "datasource": {
                 "type": "grafana-azure-monitor-datasource",
-                "uid": "P1EB995EACC6832D3"
+                "uid": "$${DS_AZURE_MONITOR}"
               },
               "description": "This is the number of jobs completed in the selected time interval.",
               "fieldConfig": {
@@ -176,7 +176,7 @@ data:
                 {
                   "azureLogAnalytics": {
                     "query": "AzureDiagnostics |\r\nwhere \r\n  $__timeFilter(TimeGenerated) \r\n  and ResourceProvider == \"MICROSOFT.AUTOMATION\"\r\n  and Category == \"JobLogs\"\r\n  and ResultType == \"Completed\" \r\n| summarize Count=count() by ResultType",
-                    "resource": "/subscriptions/5dc45b2f-bf13-4281-b763-a53f57290aa3/resourceGroups/rg-wcnp-dev-hub/providers/Microsoft.OperationalInsights/workspaces/la-hub-eastus-zsgmpltrjrhy6",
+                    "resource": "${HUB_LOG_ANALYTICS_RESOURCE_ID}",
                     "resultFormat": "table"
                   },
                   "azureMonitor": {
@@ -186,11 +186,11 @@ data:
                   },
                   "datasource": {
                     "type": "grafana-azure-monitor-datasource",
-                    "uid": "P1EB995EACC6832D3"
+                    "uid": "$${DS_AZURE_MONITOR}"
                   },
                   "queryType": "Azure Log Analytics",
                   "refId": "A",
-                  "subscription": "5dc45b2f-bf13-4281-b763-a53f57290aa3"
+                  "subscription": "${SUBSCRIPTION}"
                 }
               ],
               "title": "Number of Jobs Completed",
@@ -199,7 +199,7 @@ data:
             {
               "datasource": {
                 "type": "grafana-azure-monitor-datasource",
-                "uid": "P1EB995EACC6832D3"
+                "uid": "$${DS_AZURE_MONITOR}"
               },
               "description": "Number of jobs with error log entries",
               "fieldConfig": {
@@ -250,7 +250,7 @@ data:
                 {
                   "azureLogAnalytics": {
                     "query": "AzureDiagnostics |\r\nwhere \r\n  $__timeFilter(TimeGenerated) \r\n  and ResourceProvider == \"MICROSOFT.AUTOMATION\"\r\n  and Category == \"JobStreams\"\r\n  and StreamType_s == \"Error\"\r\n  | distinct JobId_g\r\n  | summarize count()",
-                    "resource": "/subscriptions/5dc45b2f-bf13-4281-b763-a53f57290aa3/resourceGroups/rg-wcnp-dev-hub/providers/Microsoft.OperationalInsights/workspaces/la-hub-eastus-zsgmpltrjrhy6",
+                    "resource": "${HUB_LOG_ANALYTICS_RESOURCE_ID}",
                     "resultFormat": "table"
                   },
                   "azureMonitor": {
@@ -260,11 +260,11 @@ data:
                   },
                   "datasource": {
                     "type": "grafana-azure-monitor-datasource",
-                    "uid": "P1EB995EACC6832D3"
+                    "uid": "$${DS_AZURE_MONITOR}"
                   },
                   "queryType": "Azure Log Analytics",
                   "refId": "A",
-                  "subscription": "5dc45b2f-bf13-4281-b763-a53f57290aa3"
+                  "subscription": "${SUBSCRIPTION}"
                 }
               ],
               "title": "Number of Jobs with Errors",
@@ -273,7 +273,7 @@ data:
             {
               "datasource": {
                 "type": "grafana-azure-monitor-datasource",
-                "uid": "P1EB995EACC6832D3"
+                "uid": "$${DS_AZURE_MONITOR}"
               },
               "description": "Number of Jobs that finished in a failed state.",
               "fieldConfig": {
@@ -324,7 +324,7 @@ data:
                 {
                   "azureLogAnalytics": {
                     "query": "AzureDiagnostics |\r\nwhere \r\n  $__timeFilter(TimeGenerated) \r\n  and ResourceProvider == \"MICROSOFT.AUTOMATION\"\r\n  and Category == \"JobLogs\"\r\n  and ResultType == \"Failed\" \r\n| summarize Count=count() by ResultType",
-                    "resource": "/subscriptions/5dc45b2f-bf13-4281-b763-a53f57290aa3/resourceGroups/rg-wcnp-dev-hub/providers/Microsoft.OperationalInsights/workspaces/la-hub-eastus-zsgmpltrjrhy6",
+                    "resource": "${HUB_LOG_ANALYTICS_RESOURCE_ID}",
                     "resultFormat": "table"
                   },
                   "azureMonitor": {
@@ -334,11 +334,11 @@ data:
                   },
                   "datasource": {
                     "type": "grafana-azure-monitor-datasource",
-                    "uid": "P1EB995EACC6832D3"
+                    "uid": "$${DS_AZURE_MONITOR}"
                   },
                   "queryType": "Azure Log Analytics",
                   "refId": "A",
-                  "subscription": "5dc45b2f-bf13-4281-b763-a53f57290aa3"
+                  "subscription": "${SUBSCRIPTION}"
                 }
               ],
               "title": "Number of Jobs Failed",
@@ -347,7 +347,7 @@ data:
             {
               "datasource": {
                 "type": "grafana-azure-monitor-datasource",
-                "uid": "P1EB995EACC6832D3"
+                "uid": "$${DS_AZURE_MONITOR}"
               },
               "fieldConfig": {
                 "defaults": {
@@ -398,7 +398,7 @@ data:
                 {
                   "azureLogAnalytics": {
                     "query": "AzureDiagnostics |\r\nwhere \r\n  $__timeFilter(TimeGenerated) \r\n  and ResourceProvider == \"MICROSOFT.AUTOMATION\"\r\n  and Category == \"JobLogs\"\r\n  and ResultType != \"Started\" |\r\nsummarize AggregatedValue = count() by ResultType, bin(TimeGenerated, 1h) |\r\norder by ResultType desc",
-                    "resource": "/subscriptions/5dc45b2f-bf13-4281-b763-a53f57290aa3/resourceGroups/rg-wcnp-dev-hub/providers/Microsoft.OperationalInsights/workspaces/la-hub-eastus-zsgmpltrjrhy6",
+                    "resource": "${HUB_LOG_ANALYTICS_RESOURCE_ID}",
                     "resultFormat": "table"
                   },
                   "azureMonitor": {
@@ -408,11 +408,11 @@ data:
                   },
                   "datasource": {
                     "type": "grafana-azure-monitor-datasource",
-                    "uid": "P1EB995EACC6832D3"
+                    "uid": "$${DS_AZURE_MONITOR}"
                   },
                   "queryType": "Azure Log Analytics",
                   "refId": "A",
-                  "subscription": "5dc45b2f-bf13-4281-b763-a53f57290aa3"
+                  "subscription": "${SUBSCRIPTION}"
                 }
               ],
               "title": "Breakdown by job status",
@@ -421,7 +421,7 @@ data:
             {
               "datasource": {
                 "type": "grafana-azure-monitor-datasource",
-                "uid": "P1EB995EACC6832D3"
+                "uid": "$${DS_AZURE_MONITOR}"
               },
               "fieldConfig": {
                 "defaults": {
@@ -545,7 +545,7 @@ data:
                 {
                   "azureLogAnalytics": {
                     "query": "AzureDiagnostics |\r\nwhere \r\n  $__timeFilter(TimeGenerated) \r\n  and ResourceProvider == \"MICROSOFT.AUTOMATION\"\r\n  and Category == \"JobLogs\"\r\n  and ResultType != \"Started\" |\r\nsummarize AggregatedValue = count() by ResultType, bin(TimeGenerated, 1h) |\r\norder by TimeGenerated asc",
-                    "resource": "/subscriptions/5dc45b2f-bf13-4281-b763-a53f57290aa3/resourceGroups/rg-wcnp-dev-hub/providers/Microsoft.OperationalInsights/workspaces/la-hub-eastus-zsgmpltrjrhy6",
+                    "resource": "${HUB_LOG_ANALYTICS_RESOURCE_ID}",
                     "resultFormat": "time_series"
                   },
                   "azureMonitor": {
@@ -555,11 +555,11 @@ data:
                   },
                   "datasource": {
                     "type": "grafana-azure-monitor-datasource",
-                    "uid": "P1EB995EACC6832D3"
+                    "uid": "$${DS_AZURE_MONITOR}"
                   },
                   "queryType": "Azure Log Analytics",
                   "refId": "A",
-                  "subscription": "5dc45b2f-bf13-4281-b763-a53f57290aa3"
+                  "subscription": "${SUBSCRIPTION}"
                 }
               ],
               "title": "TESTING",
@@ -568,7 +568,7 @@ data:
             {
               "datasource": {
                 "type": "grafana-azure-monitor-datasource",
-                "uid": "P1EB995EACC6832D3"
+                "uid": "$${DS_AZURE_MONITOR}"
               },
               "fieldConfig": {
                 "defaults": {
@@ -619,7 +619,7 @@ data:
                 {
                   "azureLogAnalytics": {
                     "query": "AzureDiagnostics |\r\nwhere \r\n  $__timeFilter(TimeGenerated) \r\n  and ResourceProvider == \"MICROSOFT.AUTOMATION\"\r\n  and Category == \"JobStreams\"\r\n  and StreamType_s == \"Error\" |\r\nproject TimeGenerated,  JobId_g, ResourceGroup, Resource, ResultType, ResultDescription, RunbookName_s, StreamType_s",
-                    "resource": "/subscriptions/5dc45b2f-bf13-4281-b763-a53f57290aa3/resourceGroups/rg-wcnp-dev-hub/providers/Microsoft.OperationalInsights/workspaces/la-hub-eastus-zsgmpltrjrhy6",
+                    "resource": "${HUB_LOG_ANALYTICS_RESOURCE_ID}",
                     "resultFormat": "table"
                   },
                   "azureMonitor": {
@@ -629,11 +629,11 @@ data:
                   },
                   "datasource": {
                     "type": "grafana-azure-monitor-datasource",
-                    "uid": "P1EB995EACC6832D3"
+                    "uid": "$${DS_AZURE_MONITOR}"
                   },
                   "queryType": "Azure Log Analytics",
                   "refId": "A",
-                  "subscription": "5dc45b2f-bf13-4281-b763-a53f57290aa3"
+                  "subscription": "${SUBSCRIPTION}"
                 }
               ],
               "title": "Completed jobs with errors in the job logs",
@@ -642,7 +642,7 @@ data:
             {
               "datasource": {
                 "type": "grafana-azure-monitor-datasource",
-                "uid": "P1EB995EACC6832D3"
+                "uid": "$${DS_AZURE_MONITOR}"
               },
               "fieldConfig": {
                 "defaults": {
@@ -690,7 +690,7 @@ data:
                 {
                   "azureLogAnalytics": {
                     "query": "AzureDiagnostics |\r\nwhere \r\n  $__timeFilter(TimeGenerated) \r\n  and ResourceProvider == \"MICROSOFT.AUTOMATION\"\r\n  and Category == \"JobLogs\"\r\n  and ResultType == \"Failed\" |\r\nproject TimeGenerated,  JobId_g, ResourceGroup, Resource, ResultType, RunbookName_s",
-                    "resource": "/subscriptions/5dc45b2f-bf13-4281-b763-a53f57290aa3/resourceGroups/rg-wcnp-dev-hub/providers/Microsoft.OperationalInsights/workspaces/la-hub-eastus-zsgmpltrjrhy6"
+                    "resource": "${HUB_LOG_ANALYTICS_RESOURCE_ID}"
                   },
                   "azureMonitor": {
                     "allowedTimeGrainsMs": [],
@@ -699,11 +699,11 @@ data:
                   },
                   "datasource": {
                     "type": "grafana-azure-monitor-datasource",
-                    "uid": "P1EB995EACC6832D3"
+                    "uid": "$${DS_AZURE_MONITOR}"
                   },
                   "queryType": "Azure Log Analytics",
                   "refId": "A",
-                  "subscription": "5dc45b2f-bf13-4281-b763-a53f57290aa3"
+                  "subscription": "${SUBSCRIPTION}"
                 }
               ],
               "title": "Entries for the jobs with Failed job status",
@@ -714,7 +714,26 @@ data:
           "style": "dark",
           "tags": [],
           "templating": {
-            "list": []
+            "list": [
+              {
+                "current": {
+                  "selected": false,
+                  "text": "Azure Monitor",
+                  "value": "Azure Monitor"
+                },
+                "hide": 2,
+                "includeAll": false,
+                "label": "azureMonitor",
+                "multi": false,
+                "name": "DS_AZURE_MONITOR",
+                "options": [],
+                "query": "grafana-azure-monitor-datasource",
+                "refresh": 1,
+                "regex": "/Azure Monitor/",
+                "skipUrlSync": false,
+                "type": "datasource"
+              }
+            ]
           },
           "time": {
             "from": "now-24h",
@@ -724,6 +743,6 @@ data:
           "timezone": "",
           "title": "Automation Runbooks",
           "uid": "AK563S0Vz",
-          "version": 3,
+          "version": 1,
           "weekStart": ""
         }
