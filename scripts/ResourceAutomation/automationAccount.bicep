@@ -1,10 +1,7 @@
 targetScope='resourceGroup'
 
 @description('URL of the shutdown script')
-param resourceShutdownRunbookURL string= 'https://raw.githubusercontent.com/retaildevcrews/ngsa-asb/main/scripts/Aks-Cluster-Automation/Aks-Cluster-Automation-Runbook.ps1'
-
-@description('URL of the bringup script')
-param resourceBringupRunbookURL string= 'https://raw.githubusercontent.com/retaildevcrews/ngsa-asb/main/scripts/Aks-Cluster-Automation/Aks-Cluster-Automation-Runbook.ps1'
+param resourceStartStopRunbookURL string= 'https://raw.githubusercontent.com/retaildevcrews/ngsa-asb/pragmatical/azureautomation/scripts/ResourceAutomation/runbooks/resource_start_stop.ps1'
 
 @description('Name of location')
 param location string = resourceGroup().location
@@ -106,22 +103,7 @@ resource resourceShutdownRunbook 'Microsoft.Automation/automationAccounts/runboo
     logProgress: true
     logVerbose: true
     publishContentLink: {
-      uri: resourceShutdownRunbookURL
-    }
-    runbookType: 'PowerShell'
-  }
-}
-
-resource resourceBringupRunbook 'Microsoft.Automation/automationAccounts/runbooks@2022-08-08' = {
-  name: 'resource-bringup'
-  location: location
-  parent: automationAccount
-  properties: {
-    description: 'Runbook to shut down resources at the end of the day'
-    logProgress: true
-    logVerbose: true
-    publishContentLink: {
-      uri: resourceBringupRunbookURL
+      uri: resourceStartStopRunbookURL
     }
     runbookType: 'PowerShell'
   }
@@ -141,19 +123,3 @@ resource resourceShutdownRunbookSchedule 'Microsoft.Automation/automationAccount
   }
   dependsOn:[resourceShutdownRunbook,weekdaysEndOfDaySchedule]
 }
-
-resource resourceBringupRunbookSchedule 'Microsoft.Automation/automationAccounts/jobSchedules@2022-08-08' = {
-  name: guid('resource-bringup-schedule')
-  parent: automationAccount
-  properties: {
-    parameters: {}
-    runbook: {
-      name: 'resource-bringup'
-    }
-    schedule: {
-      name: 'weekdays-start-of-day'
-    }
-  }
-  dependsOn:[resourceBringupRunbook,weekdaysStartOfDaySchedule]
-}
-
