@@ -125,7 +125,7 @@ spec:
         - name: dashboards-flux-control-plane
           configMap:
             name: grafana-dashboards-flux-control-plane
-        - name: grafana-dashboards-automation-runbooks
+        - name: dashboards-automation-runbooks
           configMap:
             name: grafana-dashboards-automation-runbooks
 ---
