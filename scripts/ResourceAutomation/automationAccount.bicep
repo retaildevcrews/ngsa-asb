@@ -1,5 +1,7 @@
 targetScope='resourceGroup'
 
+
+
 @description('URL of the shutdown script')
 param resourceStartStopRunbookURL string= 'https://raw.githubusercontent.com/retaildevcrews/ngsa-asb/pragmatical/azureautomation/scripts/ResourceAutomation/runbooks/resource_start_stop.ps1'
 
@@ -26,6 +28,35 @@ param scheduleStartOfDayTime string = '2023-02-01T09:00:00-06:00'
 
 @description('Time Zone for Schedules')
 param scheduleEndOfDayTime string = '2023-02-01T17:00:00-06:00'
+
+
+param resourcesToAutomate array= [
+  {
+    resourceGroup: 'rg-wcnp-pre'
+    clusterName: 'aks-ri3aov7twb4uy-eastus'
+    gatewayName: 'apw-ri3aov7twb4uy-eastus'
+  }
+  {
+    resourceGroup: 'rg-wcnp-pre'
+    clusterName: 'aks-ri3aov7twb4uy-northcentralus'
+    gatewayName: 'apw-ri3aov7twb4uy-northcentralus'
+  }
+  {
+    resourceGroup: 'rg-wcnp-pre'
+    clusterName: 'aks-ri3aov7twb4uy-westus3'
+    gatewayName: 'apw-ri3aov7twb4uy-westus3'
+  }
+  {
+    resourceGroup: 'rg-wcnp-dev'
+    clusterName: 'aks-jxdthrti3j3qu-eastus'
+    gatewayName: 'apw-jxdthrti3j3qu-eastus'
+  }
+  {
+    resourceGroup: 'rg-wcnp-dev'
+    clusterName: 'aks-jxdthrti3j3qu-westus3'
+    gatewayName: 'apw-jxdthrti3j3qu-westus3'
+  }
+]
 
 resource automationMI 'Microsoft.ManagedIdentity/userAssignedIdentities@2022-01-31-preview' = {
   name: MI_Name
@@ -94,12 +125,12 @@ resource weekdaysEndOfDaySchedule 'Microsoft.Automation/automationAccounts/sched
   }
 }
 
-resource resourceShutdownRunbook 'Microsoft.Automation/automationAccounts/runbooks@2022-08-08' = {
-  name: 'resource-shutdown'
+resource resourceShutdownRunbooks 'Microsoft.Automation/automationAccounts/runbooks@2022-08-08' = [for resourceToAutomate in resourcesToAutomate: {
+  name: 'runbook-${resourceToAutomate.resourceName}'
   location: location
   parent: automationAccount
   properties: {
-    description: 'Runbook to shut down resources at the end of the day'
+    description: 'Runbook to shut down ${resourceToAutomate.resourceName} at the end of the day'
     logProgress: true
     logVerbose: true
     publishContentLink: {
@@ -107,19 +138,29 @@ resource resourceShutdownRunbook 'Microsoft.Automation/automationAccounts/runboo
     }
     runbookType: 'PowerShell'
   }
-}
+}]
 
-resource resourceShutdownRunbookSchedule 'Microsoft.Automation/automationAccounts/jobSchedules@2022-08-08' = {
-  name: guid('resource-shutdown-schedule')
+resource resourceShutdownRunbookSchedules 'Microsoft.Automation/automationAccounts/jobSchedules@2022-08-08' = [for resourceToAutomate in resourcesToAutomate: {
+  name: guid('resource-shutdown-schedule ${resourceToAutomate.resourceName}')
   parent: automationAccount
   properties: {
-    parameters: {}
+    parameters: {
+      tenantId: tenant().tenantId
+      subscriptionName: subscription().displayName
+      automationAccountResourceGroup: resourceGroup().name
+      automationAccountName: AA_Name
+      managedIdentityName: MI_Name
+      resourceGroup: resourceToAutomate.resourceGroup
+      clusterName: resourceToAutomate.resourceName
+      gatewayName: resourceToAutomate.gatewayName
+      operation: 'start'
+    }
     runbook: {
-      name: 'resource-shutdown'
+      name: 'runbook-${resourceToAutomate.resourceName}'
     }
     schedule: {
       name: 'weekdays-end-of-day'
     }
   }
-  dependsOn:[resourceShutdownRunbook,weekdaysEndOfDaySchedule]
-}
+  dependsOn:[resourceShutdownRunbooks,weekdaysEndOfDaySchedule]
+}]
