@@ -1,7 +1,7 @@
 targetScope = 'subscription'
 
 @description('Unique portion of automation account resource names')
-param AA_accountSuffix string='automation'
+param AA_accountSuffix string='automation-test'
 
 @description('Name of resource group')
 param RG_Name string = 'rg-${AA_accountSuffix}'

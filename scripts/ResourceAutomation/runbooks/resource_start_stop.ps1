@@ -50,7 +50,7 @@ else {
     exit
 }
 
-Write-Output "Starting "$resourceType" "$resourceName
+Write-Output "Starting $resourceType and $resourceName"
 switch($operation.ToLower())
 {
     "start"{
@@ -68,5 +68,5 @@ switch($operation.ToLower())
     }
 }
 
-Write-Output "$resourceType $resourceName Started"
+Write-Output "Operation $operation $resourceType $resourceName completed."
 return $LASTEXITCODE

@@ -24,10 +24,10 @@ param RA_module string = 'ra-module'
 param scheduleTimezone string = 'America/Chicago'
 
 @description('Time Zone for Schedules')
-param scheduleStartOfDayTime string = '2023-02-01T09:00:00-06:00'
+param scheduleStartOfDayTime string = '2023-02-02T09:00:00-06:00'
 
 @description('Time Zone for Schedules')
-param scheduleEndOfDayTime string = '2023-02-01T17:00:00-06:00'
+param scheduleEndOfDayTime string = '2023-02-02T17:00:00-06:00'
 
 
 param resourcesToAutomate array= [
@@ -67,7 +67,7 @@ resource automationAccount 'Microsoft.Automation/automationAccounts@2022-08-08' 
   name: AA_Name
   location: location
   identity: {
-    type: 'UserAssigned'
+    type: 'SystemAssigned, UserAssigned'
     userAssignedIdentities:{'${automationMI.id}': {}}
   }
   properties: {
@@ -125,12 +125,52 @@ resource weekdaysEndOfDaySchedule 'Microsoft.Automation/automationAccounts/sched
   }
 }
 
-resource resourceShutdownRunbooks 'Microsoft.Automation/automationAccounts/runbooks@2022-08-08' = [for resourceToAutomate in resourcesToAutomate: {
-  name: 'runbook-${resourceToAutomate.resourceName}'
+resource resourceBringupRunbooks 'Microsoft.Automation/automationAccounts/runbooks@2022-08-08' = [for resourceToAutomate in resourcesToAutomate: {
+  name: 'runbook-${resourceToAutomate.clusterName}-bringup'
   location: location
   parent: automationAccount
   properties: {
-    description: 'Runbook to shut down ${resourceToAutomate.resourceName} at the end of the day'
+    description: 'Runbook to bring up ${resourceToAutomate.clusterName} and ${resourceToAutomate.gatewayName} at the beginning of the day'
+    logProgress: true
+    logVerbose: true
+    publishContentLink: {
+      uri: resourceStartStopRunbookURL
+    }
+    runbookType: 'PowerShell'
+  }
+}]
+
+resource resourceBringupRunbookSchedules 'Microsoft.Automation/automationAccounts/jobSchedules@2022-08-08' = [for resourceToAutomate in resourcesToAutomate: {
+  name: guid('resource-bringup-schedule',resourceToAutomate.clusterName,'bringup',AA_Name)
+  parent: automationAccount
+  properties: {
+    parameters: {
+      tenantId: tenant().tenantId
+      subscriptionName: subscription().displayName
+      automationAccountResourceGroup: resourceGroup().name
+      automationAccountName: AA_Name
+      managedIdentityName: MI_Name
+      resourceGroup: resourceToAutomate.resourceGroup
+      clusterName: resourceToAutomate.clusterName
+      gatewayName: resourceToAutomate.gatewayName
+      operation: 'start'
+    }
+    runbook: {
+      name: 'runbook-${resourceToAutomate.clusterName}-bringup'
+    }
+    schedule: {
+      name: 'weekdays-start-of-day'
+    }
+  }
+  dependsOn:[resourceBringupRunbooks,weekdaysStartOfDaySchedule]
+}]
+
+resource resourceShutdownRunbooks 'Microsoft.Automation/automationAccounts/runbooks@2022-08-08' = [for resourceToAutomate in resourcesToAutomate: {
+  name: 'runbook-${resourceToAutomate.clusterName}-shutdown'
+  location: location
+  parent: automationAccount
+  properties: {
+    description: 'Runbook to shut down ${resourceToAutomate.clusterName} and ${resourceToAutomate.gatewayName} at the end of the day'
     logProgress: true
     logVerbose: true
     publishContentLink: {
@@ -141,7 +181,7 @@ resource resourceShutdownRunbooks 'Microsoft.Automation/automationAccounts/runbo
 }]
 
 resource resourceShutdownRunbookSchedules 'Microsoft.Automation/automationAccounts/jobSchedules@2022-08-08' = [for resourceToAutomate in resourcesToAutomate: {
-  name: guid('resource-shutdown-schedule ${resourceToAutomate.resourceName}')
+  name: guid('resource-shutdown-schedule',resourceToAutomate.clusterName,'shutdown',AA_Name)
   parent: automationAccount
   properties: {
     parameters: {
@@ -151,12 +191,12 @@ resource resourceShutdownRunbookSchedules 'Microsoft.Automation/automationAccoun
       automationAccountName: AA_Name
       managedIdentityName: MI_Name
       resourceGroup: resourceToAutomate.resourceGroup
-      clusterName: resourceToAutomate.resourceName
+      clusterName: resourceToAutomate.clusterName
       gatewayName: resourceToAutomate.gatewayName
-      operation: 'start'
+      operation: 'stop'
     }
     runbook: {
-      name: 'runbook-${resourceToAutomate.resourceName}'
+      name: 'runbook-${resourceToAutomate.clusterName}-shutdown'
     }
     schedule: {
       name: 'weekdays-end-of-day'
