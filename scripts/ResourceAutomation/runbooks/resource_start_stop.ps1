@@ -6,7 +6,9 @@ param(
     [Parameter(Mandatory)]
     [String]$resourceGroup,
     [Parameter(Mandatory)]
-    [String]$resourceName,
+    [String]$clusterName,
+    [Parameter(Mandatory)]
+    [String]$gatewayName,
     [Parameter(Mandatory)]
     [String]$automationAccountResourceGroup,
     [Parameter(Mandatory)]
@@ -14,9 +16,7 @@ param(
     [Parameter(Mandatory)]
     [String]$managedIdentityName,
     [Parameter(Mandatory)]
-    [String]$operation,
-    [Parameter(Mandatory)]
-    [String]$resourceType
+    [String]$operation
 )
 
 # Ensures you do not inherit an AzContext in your runbook
@@ -51,33 +51,22 @@ else {
 }
 
 Write-Output "Starting "$resourceType" "$resourceName
-$operation=$operation.ToLower()
-switch($resourceType.ToLower())
+switch($operation.ToLower())
 {
-    "akscluster"{
-        if($operation -eq "start"){
-            Start-AzAksCluster -Name $resourceName -ResourceGroupName $resourceGroup
-         } elseif($operation -eq "stop"){
-            Stop-AzAksCluster -Name $resourceName -ResourceGroupName $resourceGroup
-         } else {
-            Write-Output "Invalid operation"
-         }
+    "start"{
+        $appGateway = Get-AzApplicationGateway -Name $gatewayName -ResourceGroupName $resourceGroup
+        Start-AzApplicationGateway -ApplicationGateway $appGateway
+        Start-AzAksCluster -Name $clusterName -ResourceGroupName $resourceGroup
     }
-    "applicationgateway"{
-        $appGateway = Get-AzApplicationGateway -Name $resourcename -ResourceGroupName $resourceGroup
-        if($operation -eq "start"){
-            Start-AzApplicationGateway -ApplicationGateway $appGateway
-         } elseif($operation -eq "stop"){
-            Stop-AzApplicationGateway -ApplicationGateway $appGateway
-         } else {
-            Write-Output "Invalid operation"
-         }
+    "stop"{
+        Stop-AzAksCluster -Name $clusterName -ResourceGroupName $resourceGroup
+        $appGateway = Get-AzApplicationGateway -Name $gatewayName -ResourceGroupName $resourceGroup
+        Stop-AzApplicationGateway -ApplicationGateway $appGateway
     }
     Default {
-        Write-Output "$resourceType Not supported"
+        Write-Output "Invalid Operation, supported operations are start and stop"
     }
 }
-
 
 Write-Output "$resourceType $resourceName Started"
 return $LASTEXITCODE
