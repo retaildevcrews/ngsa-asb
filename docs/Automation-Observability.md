@@ -120,6 +120,8 @@ For more example queries when troubleshooting Automation runbook jobs, refer to 
 ### Fixing issues
 
 - TODO: how to potentially resolve specific issues. eg: manually start resource that was not restarted
+  - start individual cluster example command
+  - restart individual vmss example command
 
 ## TODO: add notes to eventual PR or as comment in task 1124
 
