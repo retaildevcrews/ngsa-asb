@@ -152,3 +152,7 @@ For more example queries when troubleshooting Automation runbook jobs, refer to 
     - around 0.02 GB per day increase in logs during testing
     - includes entries from test jobs that were running every hour
     - around 5 cents per day for log analytics ingestion
+  - add notes about why new directory is being used for grafana dashboard.
+    - need to target specific dashboard config maps for substitution so others are not affected
+    - alternative is disable all other dashboard config maps by adding special annotation
+    - worried about situation someone forgets to disable and flux messes up dashboard accidentally

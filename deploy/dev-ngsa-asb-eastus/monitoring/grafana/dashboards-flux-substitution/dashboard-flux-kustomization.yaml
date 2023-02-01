@@ -2,7 +2,7 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
 kind: Kustomization
 metadata:
-  name: monitoring-flux-variable-substitution
+  name: dashboard-flux-substitution
   namespace: monitoring
 spec:
   dependsOn:
@@ -11,7 +11,7 @@ spec:
   interval: 1m0s
   prune: true
   targetNamespace: monitoring
-  path: ./deploy/dev-ngsa-asb-eastus/monitoring/grafana/dashboards/flux-variable-substitution
+  path: ./deploy/dev-ngsa-asb-eastus/monitoring/grafana/dashboards-flux-substitution
   sourceRef:
     kind: GitRepository
     name: automation-test
