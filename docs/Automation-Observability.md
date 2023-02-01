@@ -116,25 +116,3 @@ order by TimeGenerated desc
 ```
 
 For more example queries when troubleshooting Automation runbook jobs, refer to this [Azure documentation](https://learn.microsoft.com/en-us/azure/automation/automation-manage-send-joblogs-log-analytics#sample-queries-for-job-logs-and-job-streams).
-
-### Fixing issues
-
-- TODO: how to potentially resolve specific issues. eg: manually start resource that was not restarted
-  - start individual cluster example command
-  - restart individual vmss example command
-
-## TODO: add notes to eventual PR or as comment in task 1124
-
-- removed alerts from the scope and added an item to the board for future discussion
-- removed powershell updates from the scope and added an item to the board for future discussion
-- using the dev hub log analytics for the diagnostic setting
-  - automation account runbooks affect resources in dev, preprod, hub, and spoke
-  - picked dev with the assumption that solution would go through more iterations before preprod
-  - picked hub because it felt more natural to have spoke data in the hub instead of the other way around
-- observed little to no changes in Log Analytics costs with new diagnostic setting sending logs
-  - Jobs do not run often and they output minimal logs
-- created a new dashboard directory for flux kustomization variable substitution
-  - <https://fluxcd.io/flux/components/kustomize/kustomization/#variable-substitution>
-  - needed a way to target specific dashboard config maps for variable substitution so other dashboards are not affected
-  - an alternative is to reuse the existing kustomizations and disable specific ones with a special annotation, `kustomize.toolkit.fluxcd.io/substitute: disabled`
-    - a potential downside is all current and future resources under the kustomization would require this annotation if substitution is not desired
