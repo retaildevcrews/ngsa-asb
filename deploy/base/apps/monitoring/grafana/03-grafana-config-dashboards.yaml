@@ -30,7 +30,7 @@ data:
         path: /var/lib/grafana/dashboards/ngsa-az-monitor-rel
       orgId: 1
       type: file
-      disableDeletion: false         
+      disableDeletion: false
     - name: ngsa-azure-blocked-traffic
       folder: NGSA
       options:
@@ -56,6 +56,13 @@ data:
       folder: NGSA
       options:
         path: /var/lib/grafana/dashboards/flux-control-plane
+      orgId: 1
+      type: file
+      disableDeletion: false
+    - name: automation-runbooks
+      folder: General
+      options:
+        path: /var/lib/grafana/dashboards/automation-runbooks
       orgId: 1
       type: file
       disableDeletion: false

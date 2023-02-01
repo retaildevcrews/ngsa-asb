@@ -14,5 +14,5 @@ spec:
   path: ./deploy/dev-ngsa-asb-eastus/monitoring
   sourceRef:
     kind: GitRepository
-    name: asb-repo-flux
+    name: automation-test
     namespace: flux-system # points to namespace where this GitRepository is
