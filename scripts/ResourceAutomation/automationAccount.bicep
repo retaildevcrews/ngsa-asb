@@ -24,10 +24,10 @@ param RA_module string = 'ra-module'
 param scheduleTimezone string = 'America/Chicago'
 
 @description('Time Zone for Schedules')
-param scheduleStartOfDayTime string = '2023-02-02T09:00:00-06:00'
+param scheduleStartOfDayTime string = '2023-02-03T09:00:00-06:00'
 
 @description('Time Zone for Schedules')
-param scheduleEndOfDayTime string = '2023-02-02T17:00:00-06:00'
+param scheduleEndOfDayTime string = '2023-02-03T17:00:00-06:00'
 
 
 param resourcesToAutomate array= [
@@ -141,7 +141,7 @@ resource resourceBringupRunbooks 'Microsoft.Automation/automationAccounts/runboo
 }]
 
 resource resourceBringupRunbookSchedules 'Microsoft.Automation/automationAccounts/jobSchedules@2022-08-08' = [for resourceToAutomate in resourcesToAutomate: {
-  name: guid('resource-bringup-schedule',resourceToAutomate.clusterName,'bringup',AA_Name)
+  name: guid(uniqueString('resource-bringup-schedule',resourceToAutomate.clusterName,'bringup',AA_Name))
   parent: automationAccount
   properties: {
     parameters: {
@@ -181,7 +181,7 @@ resource resourceShutdownRunbooks 'Microsoft.Automation/automationAccounts/runbo
 }]
 
 resource resourceShutdownRunbookSchedules 'Microsoft.Automation/automationAccounts/jobSchedules@2022-08-08' = [for resourceToAutomate in resourcesToAutomate: {
-  name: guid('resource-shutdown-schedule',resourceToAutomate.clusterName,'shutdown',AA_Name)
+  name: guid(uniqueString('resource-shutdown-schedule',resourceToAutomate.clusterName,'shutdown',AA_Name))
   parent: automationAccount
   properties: {
     parameters: {
@@ -189,7 +189,7 @@ resource resourceShutdownRunbookSchedules 'Microsoft.Automation/automationAccoun
       subscriptionName: subscription().displayName
       automationAccountResourceGroup: resourceGroup().name
       automationAccountName: AA_Name
-      managedIdentityClientId: automationMI  <--------Need to figure out how to get client id in bicep
+      managedIdentityClientId: automationMI.properties.clientId
       resourceGroup: resourceToAutomate.resourceGroup
       clusterName: resourceToAutomate.clusterName
       gatewayName: resourceToAutomate.gatewayName
