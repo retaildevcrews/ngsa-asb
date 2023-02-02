@@ -189,7 +189,7 @@ resource resourceShutdownRunbookSchedules 'Microsoft.Automation/automationAccoun
       subscriptionName: subscription().displayName
       automationAccountResourceGroup: resourceGroup().name
       automationAccountName: AA_Name
-      managedIdentityName: MI_Name
+      managedIdentityClientId: automationMI  <--------Need to figure out how to get client id in bicep
       resourceGroup: resourceToAutomate.resourceGroup
       clusterName: resourceToAutomate.clusterName
       gatewayName: resourceToAutomate.gatewayName
