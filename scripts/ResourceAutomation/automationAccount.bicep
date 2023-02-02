@@ -67,7 +67,7 @@ resource automationAccount 'Microsoft.Automation/automationAccounts@2022-08-08' 
   name: AA_Name
   location: location
   identity: {
-    type: 'SystemAssigned, UserAssigned'
+    type: 'UserAssigned'
     userAssignedIdentities:{'${automationMI.id}': {}}
   }
   properties: {
