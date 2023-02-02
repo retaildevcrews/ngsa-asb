@@ -14,59 +14,52 @@ param(
     [Parameter(Mandatory)]
     [String]$automationAccountName,
     [Parameter(Mandatory)]
-    [String]$managedIdentityName,
+    [String]$managedIdentityClientId,
     [Parameter(Mandatory)]
     [String]$operation
 )
-
-# Ensures you do not inherit an AzContext in your runbook
-Write-Output "Disabling AzContext Autosave"
-Disable-AzContextAutosave -Scope Process | Out-Null
-
-# Connect using a Managed Service Identity
-Write-Output "Using system-assigned managed identity"
-
-Connect-AzAccount -Identity
-
-$identity = Get-AzUserAssignedIdentity -ResourceGroupName $automationAccountResourceGroup -Name $managedIdentityName
-
-Connect-AzAccount -Identity -AccountId $identity.Id
-
-$AzureContext = Set-AzContext -SubscriptionName $subscriptionName -Tenant $tenantId
-Write-Output "Using user-assigned managed identity"
-
-# Connects using the Managed Service Identity of the named user-assigned managed identity
-$identity = Get-AzUserAssignedIdentity -ResourceGroupName $automationAccountResourceGroup -Name $managedIdentityName -DefaultProfile $AzureContext
-
-# validates assignment only, not perms
-if ((Get-AzAutomationAccount -ResourceGroupName $automationAccountResourceGroup -Name $automationAccountName -DefaultProfile $AzureContext).Identity.UserAssignedIdentities.Values.PrincipalId.Contains($identity.PrincipalId)) {
-    $AzureContext = (Connect-AzAccount -Identity -AccountId $identity.ClientId).context
-
+try{
+    # Ensures you do not inherit an AzContext in your runbook
+    Write-Output "Disabling AzContext Autosave"
+    Disable-AzContextAutosave -Scope Process | Out-Null
+    
+    #Write-Output "Get-AzUserAssignedIdentity -Name $managedIdentityName -ResourceGroupName $automationAccountResourceGroup -SubscriptionId $subscriptionId" 
+    #$identity = Get-AzUserAssignedIdentity -Name $managedIdentityName -ResourceGroupName $automationAccountResourceGroup 
+    Write-Output "Connect-AzAccount -Identity -AccountId" $managedIdentityClientId
+    $AzureContext = (Connect-AzAccount -Identity -AccountId $managedIdentityClientId).context
     # set and store context
     $AzureContext = Set-AzContext -SubscriptionName $AzureContext.Subscription -DefaultProfile $AzureContext
-}
-else {
-    Write-Output "Invalid or unassigned user-assigned managed identity"
-    exit
-}
-
-Write-Output "Starting $resourceType and $resourceName"
-switch($operation.ToLower())
-{
-    "start"{
-        $appGateway = Get-AzApplicationGateway -Name $gatewayName -ResourceGroupName $resourceGroup
-        Start-AzApplicationGateway -ApplicationGateway $appGateway
-        Start-AzAksCluster -Name $clusterName -ResourceGroupName $resourceGroup
+    Write-Output "Finished setting the Azure context for subscription" 
+    
+    Write-Output "Executing operation: $operation on cluster: $clusterName and gateway: $gatewayName"
+    switch($operation.ToLower())
+    {
+        "start"{
+            Write-Output "Start-AzAksCluster -Name $clusterName -ResourceGroupName $resourceGroup"
+            Start-AzAksCluster -Name $clusterName -ResourceGroupName $resourceGroup
+            Write-Output "Get-AzApplicationGateway -Name $gatewayName -ResourceGroupName $resourceGroup"
+            $appGateway = Get-AzApplicationGateway -Name $gatewayName -ResourceGroupName $resourceGroup
+            Write-Output "Start-AzApplicationGateway -ApplicationGateway $appGateway"
+            Start-AzApplicationGateway -ApplicationGateway $appGateway
+        }
+        "stop"{
+            Write-Output "$appGateway = Get-AzApplicationGateway -Name $gatewayName -ResourceGroupName $resourceGroup"
+            $appGateway = Get-AzApplicationGateway -Name $gatewayName -ResourceGroupName $resourceGroup
+            Write-Output "Stop-AzApplicationGateway -ApplicationGateway $appGateway"
+            Stop-AzApplicationGateway -ApplicationGateway $appGateway
+            Write-Output "Stop-AzAksCluster -Name $clusterName -ResourceGroupName $resourceGroup"
+            Stop-AzAksCluster -Name $clusterName -ResourceGroupName $resourceGroup
+        }
+        Default {
+            Write-Output "Invalid Operation, supported operations are start and stop"
+        }
     }
-    "stop"{
-        Stop-AzAksCluster -Name $clusterName -ResourceGroupName $resourceGroup
-        $appGateway = Get-AzApplicationGateway -Name $gatewayName -ResourceGroupName $resourceGroup
-        Stop-AzApplicationGateway -ApplicationGateway $appGateway
+    
+    Write-Output "Completed operation: $operation on cluster: $clusterName and gateway: $gatewayName"
+    return $LASTEXITCODE
     }
-    Default {
-        Write-Output "Invalid Operation, supported operations are start and stop"
+    catch{
+        $message = $_
+        Write-Output "Script exiting with the following error:  $message"
+        throw $_
     }
-}
-
-Write-Output "Operation $operation $resourceType $resourceName completed."
-return $LASTEXITCODE
