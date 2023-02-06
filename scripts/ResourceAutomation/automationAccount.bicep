@@ -1,6 +1,10 @@
 targetScope='resourceGroup'
 
+@description('Log analytics workspace name')
+param logAnalyticsWorkspaceName string='la-hub-eastus-zsgmpltrjrhy6'
 
+@description('Log analytics workspace id')
+param logAnalyticsWorkspaceId string='/subscriptions/5dc45b2f-bf13-4281-b763-a53f57290aa3/resourcegroups/rg-wcnp-dev-hub/providers/microsoft.operationalinsights/workspaces/la-hub-eastus-zsgmpltrjrhy6'
 
 @description('URL of the shutdown script')
 param resourceStartStopRunbookURL string= 'https://raw.githubusercontent.com/retaildevcrews/ngsa-asb/pragmatical/azureautomation/scripts/ResourceAutomation/runbooks/resource_start_stop.ps1'
@@ -80,6 +84,43 @@ resource automationAccount 'Microsoft.Automation/automationAccounts@2022-08-08' 
       keySource: 'Microsoft.Automation'
       identity: {}
     }
+  }
+}
+
+
+resource diagnosticSettings 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
+  name: '${automationAccount.name}-diagnostic-settings'
+  scope: automationAccount
+  properties: {
+    workspaceId: logAnalyticsWorkspaceId
+    logs: [
+      {
+        category: 'JobLogs'
+        enabled: true
+        retentionPolicy: {
+          enabled: true
+          days: 0
+        }
+      }
+      {
+        category: 'JobStreams'
+        enabled: true
+        retentionPolicy: {
+          enabled: true
+          days: 0
+        }
+      }
+    ]
+    metrics: [
+      {
+        category: 'AllMetrics'
+        enabled: true
+        retentionPolicy: {
+          enabled: true
+          days: 0
+        }
+      }
+    ]
   }
 }
 
