@@ -8,7 +8,7 @@ param resourceStartStopRunbookURL string= 'https://raw.githubusercontent.com/ret
 @description('Name of location')
 param location string = resourceGroup().location
 
-@description('Name of user assigned managed identity')
+@description('Name of automation account')
 param AA_Name string 
 
 @description('Name of user assigned managed identity')
@@ -141,7 +141,7 @@ resource resourceBringupRunbooks 'Microsoft.Automation/automationAccounts/runboo
 }]
 
 resource resourceBringupRunbookSchedules 'Microsoft.Automation/automationAccounts/jobSchedules@2022-08-08' = [for resourceToAutomate in resourcesToAutomate: {
-  name: guid('resource-bringup-schedule',resourceToAutomate.clusterName,'bringup',AA_Name)
+  name: guid('resource-bringup-schedule',resourceToAutomate.clusterName,AA_Name,'bringup')
   parent: automationAccount
   properties: {
     parameters: {
@@ -149,7 +149,6 @@ resource resourceBringupRunbookSchedules 'Microsoft.Automation/automationAccount
       subscriptionName: subscription().displayName
       automationAccountResourceGroup: resourceGroup().name
       automationAccountName: AA_Name
-      managedIdentityName: MI_Name
       managedIdentityClientId: automationMI.properties.clientId
       resourceGroup: resourceToAutomate.resourceGroup
       clusterName: resourceToAutomate.clusterName
@@ -182,7 +181,7 @@ resource resourceShutdownRunbooks 'Microsoft.Automation/automationAccounts/runbo
 }]
 
 resource resourceShutdownRunbookSchedules 'Microsoft.Automation/automationAccounts/jobSchedules@2022-08-08' = [for resourceToAutomate in resourcesToAutomate: {
-  name: guid('resource-shutdown-schedule',resourceToAutomate.clusterName,'shutdown',AA_Name)
+  name: guid('resource-shutdown-schedule',resourceToAutomate.clusterName,AA_Name,'shutdown')
   parent: automationAccount
   properties: {
     parameters: {
