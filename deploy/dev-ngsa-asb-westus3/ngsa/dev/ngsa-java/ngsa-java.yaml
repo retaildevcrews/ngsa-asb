@@ -20,8 +20,8 @@ spec:
       labels:
         aadpodidbinding: wcnp-ngsa-id
         app: ngsa-java
-        deploy: 23-02-05-06-07-17
-        version: beta-2302-05-06
+        deploy: 23-02-06-17-39-24
+        version: beta-2302-06-17
     spec:
       automountServiceAccountToken: false
       securityContext:
@@ -79,7 +79,7 @@ spec:
             volumeAttributes:
               secretProviderClass: ngsa-secrets
       nodeSelector:
-        agentpool: npuser01
+        kubernetes.azure.com/mode: user
 
 ---
 
