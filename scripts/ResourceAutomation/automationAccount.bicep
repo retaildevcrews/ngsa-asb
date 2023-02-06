@@ -28,7 +28,7 @@ param scheduleTimezone string = 'America/Chicago'
 param scheduleStartOfDayTime string = '${dateTimeAdd(utcNow(), 'P1D', 'yyyy-MM-dd')}T09:00:00-06:00'
 
 @description('End of day datetime for schedule')
-param scheduleEndOfDayTime string = '${dateTimeAdd(utcNow(), 'P1D', 'yyyy-MM-dd')}T17:00:00-06:00'
+param scheduleEndOfDayTime string = '${dateTimeAdd(utcNow(), 'P1D', 'yyyy-MM-dd')}T18:00:00-06:00'
 
 
 param resourcesToAutomate array= [
