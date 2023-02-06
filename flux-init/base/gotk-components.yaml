@@ -5567,8 +5567,7 @@ spec:
         - mountPath: /tmp
           name: temp
       nodeSelector:
-        kubernetes.io/os: linux
-        agentpool: npuser01 # Azure Node selector
+        kubernetes.azure.com/mode: user
       securityContext:
         fsGroup: 1337
         seccompProfile:
@@ -5655,8 +5654,7 @@ spec:
         - mountPath: /tmp
           name: temp
       nodeSelector:
-        kubernetes.io/os: linux
-        agentpool: npuser01 # Azure Node selector
+        kubernetes.azure.com/mode: user
       securityContext:
         fsGroup: 1337
         seccompProfile:
@@ -5748,8 +5746,7 @@ spec:
         - mountPath: /tmp
           name: temp
       nodeSelector:
-        kubernetes.io/os: linux
-        agentpool: npuser01 # Azure Node selector
+        kubernetes.azure.com/mode: user
       securityContext:
         fsGroup: 1337
         seccompProfile:
@@ -5845,8 +5842,7 @@ spec:
         - mountPath: /tmp
           name: tmp
       nodeSelector:
-        kubernetes.io/os: linux
-        agentpool: npuser01 # Azure Node selector
+        kubernetes.azure.com/mode: user
       securityContext:
         fsGroup: 1337
         seccompProfile:

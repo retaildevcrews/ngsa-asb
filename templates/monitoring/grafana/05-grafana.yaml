@@ -130,7 +130,7 @@ spec:
             volumeAttributes:
               secretProviderClass: grafana-secrets
       nodeSelector:
-        agentpool: npuser01
+        kubernetes.azure.com/mode: user
 ---
 apiVersion: v1
 kind: Service

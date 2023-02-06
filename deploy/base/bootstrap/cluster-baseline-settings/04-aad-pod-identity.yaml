@@ -587,8 +587,7 @@ spec:
         seccompProfile:
           type: RuntimeDefault
       nodeSelector:
-        kubernetes.io/os: linux
-        agentpool: npuser01
+        kubernetes.azure.com/mode: user
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -666,8 +665,7 @@ spec:
         hostPath:
           path: /etc/kubernetes/azure.json
       nodeSelector:
-        kubernetes.io/os: linux
-        agentpool: npuser01
+        kubernetes.azure.com/mode: user
 ---
 apiVersion: "aadpodidentity.k8s.io/v1"
 kind: AzurePodIdentityException
