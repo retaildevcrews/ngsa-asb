@@ -61,7 +61,32 @@ Run the script to create the Diagnostic Setting.
 
 ## Grafana Dashboard Setup
 
-- TODO: how the grafana dashboard is setup with flux, including how to add to different clusters
+The Grafana dashboard is setup through Flux. The [Flux Kustomization variable substitution](https://fluxcd.io/flux/components/kustomize/kustomization/#variable-substitution) feature is used to replace specific template variables in the configmap dashboard json. This allows us to deploy the dashboard to multiple clusters without duplicating the dashboard json across the cluster directories.
+
+To deploy the dashboard to additional clusters, create a Kustomization and Flux Kustomization in the cluster specific directory. Then update the Flux Kustomization variables with the appropriate values.
+
+example flux kustomization:
+
+```yaml
+
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: dashboard-flux-substitution
+  namespace: monitoring
+spec:
+  ...
+  postBuild:
+    substitute:
+      TEST_EXAMPLE1: "myValue"
+      TEST_EXAMPLE2: "anotherValue"
+
+```
+
+Use the dev east cluster as an example.
+
+- [Flux Kustomization with variable substitution](/deploy/dev-ngsa-asb-eastus/monitoring/grafana/dashboards-flux-substitution/dashboard-flux-kustomization.yaml)
+- [Kustomization](/deploy/dev-ngsa-asb-eastus/monitoring/grafana/dashboards-flux-substitution/kustomization.yaml)
 
 ## Troubleshooting Automation Runbook Jobs
 
