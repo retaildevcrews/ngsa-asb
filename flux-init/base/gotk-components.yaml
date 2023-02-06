@@ -5567,7 +5567,7 @@ spec:
         - mountPath: /tmp
           name: temp
       nodeSelector:
-        kubernetes.azure.com/mode: user
+        kubernetes.azure.com/mode: system
       securityContext:
         fsGroup: 1337
         seccompProfile:
@@ -5654,7 +5654,7 @@ spec:
         - mountPath: /tmp
           name: temp
       nodeSelector:
-        kubernetes.azure.com/mode: user
+        kubernetes.azure.com/mode: system
       securityContext:
         fsGroup: 1337
         seccompProfile:
@@ -5746,7 +5746,7 @@ spec:
         - mountPath: /tmp
           name: temp
       nodeSelector:
-        kubernetes.azure.com/mode: user
+        kubernetes.azure.com/mode: system
       securityContext:
         fsGroup: 1337
         seccompProfile:
@@ -5842,7 +5842,7 @@ spec:
         - mountPath: /tmp
           name: tmp
       nodeSelector:
-        kubernetes.azure.com/mode: user
+        kubernetes.azure.com/mode: system
       securityContext:
         fsGroup: 1337
         seccompProfile:
