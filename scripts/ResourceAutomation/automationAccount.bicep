@@ -23,38 +23,38 @@ param RA_module string = 'ra-module'
 @description('Time Zone for Schedules')
 param scheduleTimezone string = 'America/Chicago'
 
-@description('Time Zone for Schedules')
-param scheduleStartOfDayTime string = '2023-02-03T09:00:00-06:00'
-
-@description('Time Zone for Schedules')
-param scheduleEndOfDayTime string = '2023-02-03T17:00:00-06:00'
-
+@description('Start of day datetime for schedule')
+param scheduleStartOfDayTime string = '${dateTimeAdd(utcNow(), 'P1D', 'yyyy-MM-dd')}T09:00:00-06:00'
+output startOfDayOutput string = scheduleStartOfDayTime
+@description('End of day datetime for schedule')
+param scheduleEndOfDayTime string = '${dateTimeAdd(utcNow(), 'P1D', 'yyyy-MM-dd')}T17:00:00-06:00'
+output endOfDayOutput string = scheduleEndOfDayTime
 
 param resourcesToAutomate array= [
   {
     resourceGroup: 'rg-wcnp-pre'
     clusterName: 'aks-ri3aov7twb4uy-eastus'
-    gatewayName: 'apw-ri3aov7twb4uy-eastus'
+    gatewayName: 'apw-aks-ri3aov7twb4uy-eastus'
   }
   {
     resourceGroup: 'rg-wcnp-pre'
     clusterName: 'aks-ri3aov7twb4uy-northcentralus'
-    gatewayName: 'apw-ri3aov7twb4uy-northcentralus'
+    gatewayName: 'apw-aks-ri3aov7twb4uy-northcentralus'
   }
   {
     resourceGroup: 'rg-wcnp-pre'
     clusterName: 'aks-ri3aov7twb4uy-westus3'
-    gatewayName: 'apw-ri3aov7twb4uy-westus3'
+    gatewayName: 'apw-aks-ri3aov7twb4uy-westus3'
   }
   {
     resourceGroup: 'rg-wcnp-dev'
     clusterName: 'aks-jxdthrti3j3qu-eastus'
-    gatewayName: 'apw-jxdthrti3j3qu-eastus'
+    gatewayName: 'apw-aks-jxdthrti3j3qu-eastus'
   }
   {
     resourceGroup: 'rg-wcnp-dev'
     clusterName: 'aks-jxdthrti3j3qu-westus3'
-    gatewayName: 'apw-jxdthrti3j3qu-westus3'
+    gatewayName: 'apw-aks-jxdthrti3j3qu-westus3'
   }
 ]
 
@@ -141,7 +141,7 @@ resource resourceBringupRunbooks 'Microsoft.Automation/automationAccounts/runboo
 }]
 
 resource resourceBringupRunbookSchedules 'Microsoft.Automation/automationAccounts/jobSchedules@2022-08-08' = [for resourceToAutomate in resourcesToAutomate: {
-  name: guid(uniqueString('resource-bringup-schedule',resourceToAutomate.clusterName,'bringup',AA_Name))
+  name: guid('resource-bringup-schedule',resourceToAutomate.clusterName,'bringup',AA_Name)
   parent: automationAccount
   properties: {
     parameters: {
@@ -150,6 +150,7 @@ resource resourceBringupRunbookSchedules 'Microsoft.Automation/automationAccount
       automationAccountResourceGroup: resourceGroup().name
       automationAccountName: AA_Name
       managedIdentityName: MI_Name
+      managedIdentityClientId: automationMI.properties.clientId
       resourceGroup: resourceToAutomate.resourceGroup
       clusterName: resourceToAutomate.clusterName
       gatewayName: resourceToAutomate.gatewayName
@@ -181,7 +182,7 @@ resource resourceShutdownRunbooks 'Microsoft.Automation/automationAccounts/runbo
 }]
 
 resource resourceShutdownRunbookSchedules 'Microsoft.Automation/automationAccounts/jobSchedules@2022-08-08' = [for resourceToAutomate in resourcesToAutomate: {
-  name: guid(uniqueString('resource-shutdown-schedule',resourceToAutomate.clusterName,'shutdown',AA_Name))
+  name: guid('resource-shutdown-schedule',resourceToAutomate.clusterName,'shutdown',AA_Name)
   parent: automationAccount
   properties: {
     parameters: {
