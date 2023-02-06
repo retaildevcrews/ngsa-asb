@@ -107,9 +107,6 @@ spec:
           value: "true"
       hostPID: true # Facilitate entering the host mount namespace via init
       restartPolicy: Always
-      nodeSelector:
-        kubernetes.io/arch: amd64
-        kubernetes.io/os: linux
       containers:
         - name: kured
           image: docker.io/weaveworks/kured:1.9.0
