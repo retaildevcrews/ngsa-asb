@@ -1,8 +1,5 @@
 targetScope='resourceGroup'
 
-@description('Log analytics workspace name')
-param logAnalyticsWorkspaceName string='la-hub-eastus-zsgmpltrjrhy6'
-
 @description('Log analytics workspace id')
 param logAnalyticsWorkspaceId string='/subscriptions/5dc45b2f-bf13-4281-b763-a53f57290aa3/resourcegroups/rg-wcnp-dev-hub/providers/microsoft.operationalinsights/workspaces/la-hub-eastus-zsgmpltrjrhy6'
 
