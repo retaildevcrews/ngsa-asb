@@ -31,7 +31,7 @@ param scheduleStartOfDayTime string = '${dateTimeAdd(utcNow(), 'P1D', 'yyyy-MM-d
 param scheduleEndOfDayTime string = '${dateTimeAdd(utcNow(), 'P1D', 'yyyy-MM-dd')}T18:00:00-06:00'
 
 @description('Log Verbose Messages')
-param logVerbose bool = false
+param logVerbose bool = true
 
 param resourcesToAutomate array= [
   {
