@@ -47,6 +47,8 @@ flowchart TD;
     |automationSuffix| string |String that will be used to name the resource group, automation account, and managed identity |
     |logAnalyticsWorkspaceId| string |Resource Id for the log analytics workspace, this is fully qualified id wiht subscription , resource group, etc.|
     |clusterGwStartStopRunbookURL| string |URL to the raw format script that will be used to create the runbooks for stopping and starting the cluster and gateways - we are using the Github URL to the raw file |
+    |scheduleStartOfDayTime| string |Time to run star of day jobs in the format HH:MM:SS|
+    |scheduleEndOfDayTime| string |Time to run end of day jobs in the format HH:MM:SS|
     |scheduleTimezone| string |timezone to use for schedules|
     |logVerbose |bool |turn verbose logging on/off|
     |logProgress|bool |turn log progress on/off|
