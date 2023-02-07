@@ -119,8 +119,8 @@ az network private-dns link vnet create -n "to_vnet-spoke-$ASB_ORG_APP_ID_NAME-0
 # 3. Click "Change size" in the Node Size setting
 
 # Set VM attributes
-export ASB_VM_SIZE=standard_d4plds_v5 # e.g: westus3: standard_d4plds_v5, centralus: standard_d4plds_v5
-export ASB_OS_DISK_SIZE_GB=150 # e.g: westus3: 150, northcentralus: 150
+export ASB_VM_SIZE=Standard_B4ms # e.g: westus3: standard_d4plds_v5, centralus: standard_d4plds_v5
+export ASB_OS_DISK_SIZE_GB=128 # e.g: westus3: 150, northcentralus: 150
 export ASB_AVAILABILITY_ZONES=["\"1\"","\"2\"","\"3\""] # e.g: westus3: ["\"1\"","\"2\"","\"3\""], northcentralus: ["\"1\"","\"3\""]
 
 # Create AKS

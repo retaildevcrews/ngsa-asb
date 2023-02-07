@@ -172,7 +172,7 @@
             }
         },
         "kubernetesVersion": {
-            "defaultValue": "1.20.9",
+            "defaultValue": "1.23.12",
             "type": "string"
         }
     },
@@ -1211,15 +1211,15 @@
                 "agentPoolProfiles": [
                     {
                         "name": "npsystem",
-                        "count": 3,
-                        "vmSize": "Standard_A4_v2",
-                        "osDiskSizeGB": 80,
+                        "count": 1,
+                        "vmSize": "Standard_B4ms",
+                        "osDiskSizeGB": 128,
                         "osDiskType": "Managed",
                         "osType": "Linux",
-                        "minCount": 3,
-                        "maxCount": 4,
+                        "minCount": 1,
+                        "maxCount": 1,
                         "vnetSubnetID": "[variables('vnetNodePoolSubnetResourceId')]",
-                        "enableAutoScaling": true,
+                        "enableAutoScaling": false,
                         "type": "VirtualMachineScaleSets",
                         "mode": "System",
                         "scaleSetPriority": "Regular",
@@ -1239,11 +1239,11 @@
                     {
                         "name": "npuser01",
                         "count": 2,
-                        "vmSize": "Standard_A4_v2",
-                        "osDiskSizeGB": 120,
+                        "vmSize": "Standard_B4ms",
+                        "osDiskSizeGB": 128,
                         "osDiskType": "Managed",
                         "osType": "Linux",
-                        "minCount": 2,
+                        "minCount": 1,
                         "maxCount": 5,
                         "vnetSubnetID": "[variables('vnetNodePoolSubnetResourceId')]",
                         "enableAutoScaling": true,

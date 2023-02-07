@@ -146,7 +146,7 @@ function deployAks()
   # This section takes 15-20 minutes
 
   # Set Kubernetes Version
-  export ASB_K8S_VERSION=1.23.8
+  export ASB_K8S_VERSION=1.23.12
 
   # Create AKS
   az deployment group create -g $ASB_RG_CORE \
