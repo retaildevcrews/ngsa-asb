@@ -36,6 +36,7 @@ param logVerbose bool = false
 @description('Log Progress Messages in Runbooks')
 param logProgress bool = false
 
+@description('Array of objects that define what needs to be automated  - gateway, and cluster (assumes they are in the same resource group)')
 param resourcesToAutomate array
 
 resource automationMI 'Microsoft.ManagedIdentity/userAssignedIdentities@2022-01-31-preview' = {

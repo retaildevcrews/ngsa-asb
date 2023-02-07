@@ -32,6 +32,9 @@ param logVerbose bool = false
 @description('Log Progress Messages in Runbooks')
 param logProgress bool = false
 
+@description('Array of objects that define what needs to be automated  - gateway, and cluster (assumes they are in the same resource group)')
+param resourcesToAutomate array
+
 resource automationRG 'Microsoft.Resources/resourceGroups@2021-04-01' = { name: RG_Name, location: location }
 
 module automationAccountModule 'automationAccount.bicep' = {
@@ -46,6 +49,7 @@ module automationAccountModule 'automationAccount.bicep' = {
     scheduleTimezone:scheduleTimezone
     logProgress:logProgress
     logVerbose:logVerbose
+    resourcesToAutomate:resourcesToAutomate
   }
   dependsOn:[automationRG]
 }
