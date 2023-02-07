@@ -2,8 +2,52 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "AA_accountSuffix": {
-            "value": "automation"
-          }
+        "automationSuffix": {
+            "value": "automation-test1"
+        },
+        "logAnalyticsWorkspaceId": {
+            "value": "/subscriptions/5dc45b2f-bf13-4281-b763-a53f57290aa3/resourcegroups/rg-wcnp-dev-hub/providers/microsoft.operationalinsights/workspaces/la-hub-eastus-zsgmpltrjrhy6"
+        },
+        "resourceStartStopRunbookURL": {
+            "value": "https://raw.githubusercontent.com/retaildevcrews/ngsa-asb/pragmatical/azureautomation/scripts/ResourceAutomation/runbooks/resource_start_stop.ps1"
+        },
+        "scheduleTimezone": {
+            "value": "America/Chicago"
+        },
+        "logVerbose": {
+            "value": true
+        },
+        "logProgress": {
+            "value": true
+        },
+        "resourcesToAutomate": {
+            "value": [
+                {
+                "resourceGroup": "rg-wcnp-pre",
+                "clusterName": "aks-ri3aov7twb4uy-eastus",
+                "gatewayName": "apw-aks-ri3aov7twb4uy-eastus"
+                },
+                {
+                "resourceGroup": "rg-wcnp-pre",
+                "clusterName": "aks-ri3aov7twb4uy-northcentralus",
+                "gatewayName": "apw-aks-ri3aov7twb4uy-northcentralus"
+                },
+                {
+                "resourceGroup": "rg-wcnp-pre",
+                "clusterName": "aks-ri3aov7twb4uy-westus3",
+                "gatewayName": "apw-aks-ri3aov7twb4uy-westus3"
+                },
+                {
+                "resourceGroup": "rg-wcnp-dev",
+                "clusterName": "aks-jxdthrti3j3qu-eastus",
+                "gatewayName": "apw-aks-jxdthrti3j3qu-eastus"
+                },
+                {
+                "resourceGroup": "rg-wcnp-dev",
+                "clusterName": "aks-jxdthrti3j3qu-westus3",
+                "gatewayName": "apw-aks-jxdthrti3j3qu-westus3"
+                }
+            ]
+        }
     }
-  }
+}

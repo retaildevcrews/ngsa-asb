@@ -1,16 +1,16 @@
 targetScope = 'subscription'
 
 @description('Unique portion of automation resource names used for naming resource group, automation account, and managed identity')
-param AA_accountSuffix string='automation-test1'
+param automationSuffix string='automation-test1'
 
 @description('Name of resource group')
-param RG_Name string = 'rg-${AA_accountSuffix}'
+param RG_Name string = 'rg-${automationSuffix}'
 
 @description('Name of automation account')
-param AA_Name string = 'aa-${AA_accountSuffix}'
+param AA_Name string = 'aa-${automationSuffix}'
 
 @description('Name of user assigned managed identity')
-param MI_Name string = 'mi-${AA_accountSuffix}'
+param MI_Name string = 'mi-${automationSuffix}'
 
 @description('Name of location')
 @allowed([ 'centralus', 'eastus', 'westus3' ])
