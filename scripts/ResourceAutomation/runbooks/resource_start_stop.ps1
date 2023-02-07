@@ -17,7 +17,7 @@ param(
     [String]$managedIdentityClientId,
     [Parameter(Mandatory)]
     [String]$operation,
-    [bool]$skiprun = $false
+    [bool]$skipRun = $false
 )
 try{
     if ($skiprun){

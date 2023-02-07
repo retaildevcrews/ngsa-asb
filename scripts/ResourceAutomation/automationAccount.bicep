@@ -30,6 +30,11 @@ param scheduleStartOfDayTime string = '${dateTimeAdd(utcNow(), 'P1D', 'yyyy-MM-d
 @description('End of day datetime for schedule')
 param scheduleEndOfDayTime string = '${dateTimeAdd(utcNow(), 'P1D', 'yyyy-MM-dd')}T18:00:00-06:00'
 
+@description('Putting a switch to skip running of jobs')
+param skipJobs string = '$false'
+
+@description('Log Verbose Messages')
+param logVerbose bool = false
 
 param resourcesToAutomate array= [
   {
@@ -170,7 +175,7 @@ resource resourceBringupRunbooks 'Microsoft.Automation/automationAccounts/runboo
   properties: {
     description: 'Runbook to bring up ${resourceToAutomate.clusterName} and ${resourceToAutomate.gatewayName} at the beginning of the day'
     logProgress: true
-    logVerbose: true
+    logVerbose: logVerbose
     publishContentLink: {
       uri: resourceStartStopRunbookURL
     }
@@ -179,7 +184,7 @@ resource resourceBringupRunbooks 'Microsoft.Automation/automationAccounts/runboo
 }]
 
 resource resourceBringupRunbookSchedules 'Microsoft.Automation/automationAccounts/jobSchedules@2022-08-08' = [for resourceToAutomate in resourcesToAutomate: {
-  name: guid('resource-bringup-schedule',resourceToAutomate.clusterName,AA_Name,'bringup')
+  name: guid('resource-bringup-schedule',resourceToAutomate.clusterName,AA_Name,'bringup1')
   parent: automationAccount
   properties: {
     parameters: {
@@ -192,6 +197,7 @@ resource resourceBringupRunbookSchedules 'Microsoft.Automation/automationAccount
       clusterName: resourceToAutomate.clusterName
       gatewayName: resourceToAutomate.gatewayName
       operation: 'start'
+      skipRun:skipJobs
     }
     runbook: {
       name: 'runbook-${resourceToAutomate.clusterName}-bringup'
@@ -210,7 +216,7 @@ resource resourceShutdownRunbooks 'Microsoft.Automation/automationAccounts/runbo
   properties: {
     description: 'Runbook to shut down ${resourceToAutomate.clusterName} and ${resourceToAutomate.gatewayName} at the end of the day'
     logProgress: true
-    logVerbose: true
+    logVerbose: logVerbose
     publishContentLink: {
       uri: resourceStartStopRunbookURL
     }
@@ -219,7 +225,7 @@ resource resourceShutdownRunbooks 'Microsoft.Automation/automationAccounts/runbo
 }]
 
 resource resourceShutdownRunbookSchedules 'Microsoft.Automation/automationAccounts/jobSchedules@2022-08-08' = [for resourceToAutomate in resourcesToAutomate: {
-  name: guid('resource-shutdown-schedule',resourceToAutomate.clusterName,AA_Name,'shutdown')
+  name: guid('resource-shutdown-schedule',resourceToAutomate.clusterName,AA_Name,'shutdown1')
   parent: automationAccount
   properties: {
     parameters: {
