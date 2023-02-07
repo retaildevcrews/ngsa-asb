@@ -28,7 +28,7 @@ param scheduleTimezone string
 param scheduleStartOfDayTime string = '${dateTimeAdd(utcNow(), 'P1D', 'yyyy-MM-dd')}T09:00:00-06:00'
 
 @description('End of day datetime for schedule')
-param scheduleEndOfDayTime string = '${dateTimeAdd(utcNow(), 'P1D', 'yyyy-MM-dd')}T18:00:00-06:00'
+param scheduleEndOfDayTime string = '${dateTimeAdd(utcNow(), 'P1D', 'yyyy-MM-dd')}T20:00:00-06:00'
 
 @description('Log Verbose Messages in Runbooks')
 param logVerbose bool = false
