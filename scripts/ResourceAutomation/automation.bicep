@@ -22,6 +22,11 @@ param logAnalyticsWorkspaceId string
 @description('URL of the bringup/shutdown script')
 param clusterGwStartStopRunbookURL string
 
+@description('Start of day datetime for schedule')
+param scheduleStartOfDayTime string='09:00:00'
+
+@description('End of day datetime for schedule')
+param scheduleEndOfDayTime string='20:00:00' 
 
 @description('Time Zone for Schedules')
 param scheduleTimezone string
@@ -46,6 +51,8 @@ module automationAccountModule 'automationAccount.bicep' = {
     MI_Name:MI_Name
     logAnalyticsWorkspaceId:logAnalyticsWorkspaceId
     clusterGwStartStopRunbookURL:clusterGwStartStopRunbookURL
+    scheduleStartOfDayTime:scheduleStartOfDayTime
+    scheduleEndOfDayTime:scheduleEndOfDayTime
     scheduleTimezone:scheduleTimezone
     logProgress:logProgress
     logVerbose:logVerbose
