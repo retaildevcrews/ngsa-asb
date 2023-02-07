@@ -30,8 +30,11 @@ param scheduleStartOfDayTime string = '${dateTimeAdd(utcNow(), 'P1D', 'yyyy-MM-d
 @description('End of day datetime for schedule')
 param scheduleEndOfDayTime string = '${dateTimeAdd(utcNow(), 'P1D', 'yyyy-MM-dd')}T18:00:00-06:00'
 
-@description('Log Verbose Messages')
+@description('Log Verbose Messages in Runbooks')
 param logVerbose bool = true
+
+@description('Log Progress Messages in Runbooks')
+param logProgress bool = true
 
 param resourcesToAutomate array= [
   {
@@ -171,7 +174,7 @@ resource resourceBringupRunbooks 'Microsoft.Automation/automationAccounts/runboo
   parent: automationAccount
   properties: {
     description: 'Runbook to bring up ${resourceToAutomate.clusterName} and ${resourceToAutomate.gatewayName} at the beginning of the day'
-    logProgress: true
+    logProgress: logProgress
     logVerbose: logVerbose
     publishContentLink: {
       uri: resourceStartStopRunbookURL
@@ -211,7 +214,7 @@ resource resourceShutdownRunbooks 'Microsoft.Automation/automationAccounts/runbo
   parent: automationAccount
   properties: {
     description: 'Runbook to shut down ${resourceToAutomate.clusterName} and ${resourceToAutomate.gatewayName} at the end of the day'
-    logProgress: true
+    logProgress: logProgress
     logVerbose: logVerbose
     publishContentLink: {
       uri: resourceStartStopRunbookURL
