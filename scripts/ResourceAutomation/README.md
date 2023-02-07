@@ -18,7 +18,26 @@ Requirements for using this bicep deployment:
 - Account to execute bicep deployments on that subscription (account should have at least contributor role to subscription)
 - Log analytics workspace for automation to log to.
 
-## Running the bicep deployment
+## Deployment Structure
+
+```mermaid
+flowchart TD;
+    top[automation.bicep - Deployment: Subcription Scope]-->account[automationAccount.bicep - Module];
+    account[automationAccount.bicep - Module: Resource Group Scope]-->roleAssignment[roleAssignment.bicep - Module: Subcription Scope];
+```
+
+### The following resources are created by running deployment
+
+- Resource Group (All resources will be created inside this resource group)
+- User Assigned Managed Identity (Will be used by the automation account to run the runbooks)
+  - Role Assignment (adds contributor role to the subscription for managed identity)
+- Automation Account (Account that performs all autmation tasks and contains schedules, runbooks, and jobschedules)
+  - Schedules (Two schedules are created, one for start of the workday and one for end of the workday, these execute on weekdays only and are set to timezone specified in a parameter)
+  - Runbooks (Runbooks that will be used for the automation)
+  - Job Schedules (Assigns a schedule and run parameters to the runbooks)
+  - Diagnostic Settings (Adds diagnostic settings to the Automation Account)
+
+## Running the bicep deployment (Azure CLI)
 
 1. Log into Azure Subscription with Account that has Contributor role
 2. Set up the bicep parameters to match your environment, this is done in automation.parameters.json file
@@ -51,14 +70,3 @@ Requirements for using this bicep deployment:
    ```
 
    ❗NOTE: Run the above command with --what-if switch to show what changes running the deployment would make
-
-### The following resources are created by running deployment
-
-- Resource Group
-- User Assigned Managed Identity
-  - Role Assignment
-- Automation Account
-  - Schedules
-  - Runbooks
-  - Job Schedules
-  - Diagnostic Settings
