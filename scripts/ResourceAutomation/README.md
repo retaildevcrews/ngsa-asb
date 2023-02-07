@@ -33,12 +33,20 @@ Requirements for using this bicep deployment:
     |logProgress|bool |turn log progress on/off|
     |resourcesToAutomate|array[object]|Array of objects that define what needs to be automated  - gateway, and cluster (assumes they are in the same resource group) |
 
-3. Run the following command
+3. Change directory to ResourceAutomation directory, this is the directory that contains the automation.bicep file as well as automation.parameters.json file
+
+   ``` shell
+      cd /workspaces/ngsa-asb/scripts/ResourceAutomation
+   ```
+
+   ❗NOTE: The path above is the path if you are working in a codespace, if you are working on a local version the path may be different
+
+4. Run the following command
 
    ``` shell
       az deployment sub create \
         --location eastus \
-        --template-file /workspaces/ngsa-asb/scripts/ResourceAutomation/automation.bicep \
+        --template-file automation.bicep \
         --parameters @automation.parameters.json
    ```
 
