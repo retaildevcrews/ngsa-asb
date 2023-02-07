@@ -4,7 +4,7 @@ targetScope='resourceGroup'
 param logAnalyticsWorkspaceId string
 
 @description('URL of the bringup/shutdown script')
-param resourceStartStopRunbookURL string
+param clusterGwStartStopRunbookURL string
 
 @description('Name of location')
 param location string = resourceGroup().location
@@ -152,7 +152,7 @@ resource resourceBringupRunbooks 'Microsoft.Automation/automationAccounts/runboo
     logProgress: logProgress
     logVerbose: logVerbose
     publishContentLink: {
-      uri: resourceStartStopRunbookURL
+      uri: clusterGwStartStopRunbookURL
     }
     runbookType: 'PowerShell'
   }
@@ -192,7 +192,7 @@ resource resourceShutdownRunbooks 'Microsoft.Automation/automationAccounts/runbo
     logProgress: logProgress
     logVerbose: logVerbose
     publishContentLink: {
-      uri: resourceStartStopRunbookURL
+      uri: clusterGwStartStopRunbookURL
     }
     runbookType: 'PowerShell'
   }

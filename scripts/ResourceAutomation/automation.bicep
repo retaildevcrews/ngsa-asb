@@ -20,7 +20,7 @@ param location string = 'eastus'
 param logAnalyticsWorkspaceId string
 
 @description('URL of the bringup/shutdown script')
-param resourceStartStopRunbookURL string
+param clusterGwStartStopRunbookURL string
 
 
 @description('Time Zone for Schedules')
@@ -45,7 +45,7 @@ module automationAccountModule 'automationAccount.bicep' = {
     AA_Name:AA_Name
     MI_Name:MI_Name
     logAnalyticsWorkspaceId:logAnalyticsWorkspaceId
-    resourceStartStopRunbookURL:resourceStartStopRunbookURL
+    clusterGwStartStopRunbookURL:clusterGwStartStopRunbookURL
     scheduleTimezone:scheduleTimezone
     logProgress:logProgress
     logVerbose:logVerbose
