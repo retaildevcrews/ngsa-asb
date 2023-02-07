@@ -23,7 +23,6 @@ Requirements for using this bicep deployment:
 ```mermaid
 flowchart TD;
     top[automation.bicep - Deployment: Subcription Scope]-->account[automationAccount.bicep - Module];
-    account[automationAccount.bicep - Module: Resource Group Scope]-->roleAssignment[roleAssignment.bicep - Module: Subcription Scope];
 ```
 
 ### The following resources are created by running deployment
