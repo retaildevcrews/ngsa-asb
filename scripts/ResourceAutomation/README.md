@@ -37,7 +37,7 @@ flowchart TD;
   - Job Schedules (Assigns a schedule and run parameters to the runbooks)
   - Diagnostic Settings (Adds diagnostic settings to the Automation Account)
 
-## Running the bicep deployment (Azure CLI)
+## Running the Bicep Deployment (Azure CLI)
 
 1. Log into Azure Subscription with Account that has Contributor role
 2. Set up the bicep parameters to match your environment, this is done in automation.parameters.json file
