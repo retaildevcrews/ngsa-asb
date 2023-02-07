@@ -114,7 +114,7 @@ param location string
 ])
 param geoRedundancyLocation string
 
-param kubernetesVersion string = '1.20.9'
+param kubernetesVersion string = '1.23.12'
 
 /*** VARIABLES ***/
 
@@ -1026,15 +1026,15 @@ resource cluster 'Microsoft.ContainerService/managedClusters@2021-02-01' = {
     agentPoolProfiles: [
       {
         name: 'npsystem'
-        count: 3
-        vmSize: 'Standard_A4_v2'
-        osDiskSizeGB: 80
+        count: 1
+        vmSize: 'Standard_B4ms'
+        osDiskSizeGB: 128
         osDiskType: 'Managed'
         osType: 'Linux'
-        minCount: 3
-        maxCount: 4
+        minCount: 1
+        maxCount: 1
         vnetSubnetID: targetVirtualNetwork::snetClusterNodes.id
-        enableAutoScaling: true
+        enableAutoScaling: false
         type: 'VirtualMachineScaleSets'
         mode: 'System'
         scaleSetPriority: 'Regular'
@@ -1054,11 +1054,11 @@ resource cluster 'Microsoft.ContainerService/managedClusters@2021-02-01' = {
       {
         name: 'npuser01'
         count: 2
-        vmSize: 'Standard_A4_v2'
-        osDiskSizeGB: 120
+        vmSize: 'Standard_B4ms'
+        osDiskSizeGB: 128
         osDiskType: 'Managed'
         osType: 'Linux'
-        minCount: 2
+        minCount: 1
         maxCount: 5
         vnetSubnetID: targetVirtualNetwork::snetClusterNodes.id
         enableAutoScaling: true
