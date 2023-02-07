@@ -25,7 +25,7 @@ Requirements for using this bicep deployment:
 
     | Parameter Name | Type |Description |
     |----------------|------|-------|
-    |automationSuffix| string |String that will be used to name the automation account, managed identity, and role assignment |
+    |automationSuffix| string |String that will be used to name the resource group, automation account, and managed identity |
     |logAnalyticsWorkspaceId| string |Resource Id for the log analytics workspace, this is fully qualified id wiht subscription , resource group, etc.|
     |resourceStartStopRunbookURL| string |URL to the raw format script that will be used to create the runbooks for stopping and starting the cluster and gateways |
     |scheduleTimezone| string |timezone to use for schedules|
