@@ -16,7 +16,7 @@ Requirements for using this bicep deployment:
 
 - Azure subscription
 - Account to execute bicep deployments on that subscription (account should have at least contributor role to subscription)
-- Log analytics workspace for automation to log to.
+- Log analytics workspace for automation logging
 
 ## Deployment Structure
 
