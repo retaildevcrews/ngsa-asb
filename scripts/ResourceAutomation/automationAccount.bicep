@@ -31,38 +31,12 @@ param scheduleStartOfDayTime string = '${dateTimeAdd(utcNow(), 'P1D', 'yyyy-MM-d
 param scheduleEndOfDayTime string = '${dateTimeAdd(utcNow(), 'P1D', 'yyyy-MM-dd')}T18:00:00-06:00'
 
 @description('Log Verbose Messages in Runbooks')
-param logVerbose bool = true
+param logVerbose bool = false
 
 @description('Log Progress Messages in Runbooks')
-param logProgress bool = true
+param logProgress bool = false
 
-param resourcesToAutomate array= [
-  {
-    resourceGroup: 'rg-wcnp-pre'
-    clusterName: 'aks-ri3aov7twb4uy-eastus'
-    gatewayName: 'apw-aks-ri3aov7twb4uy-eastus'
-  }
-  {
-    resourceGroup: 'rg-wcnp-pre'
-    clusterName: 'aks-ri3aov7twb4uy-northcentralus'
-    gatewayName: 'apw-aks-ri3aov7twb4uy-northcentralus'
-  }
-  {
-    resourceGroup: 'rg-wcnp-pre'
-    clusterName: 'aks-ri3aov7twb4uy-westus3'
-    gatewayName: 'apw-aks-ri3aov7twb4uy-westus3'
-  }
-  {
-    resourceGroup: 'rg-wcnp-dev'
-    clusterName: 'aks-jxdthrti3j3qu-eastus'
-    gatewayName: 'apw-aks-jxdthrti3j3qu-eastus'
-  }
-  {
-    resourceGroup: 'rg-wcnp-dev'
-    clusterName: 'aks-jxdthrti3j3qu-westus3'
-    gatewayName: 'apw-aks-jxdthrti3j3qu-westus3'
-  }
-]
+param resourcesToAutomate array
 
 resource automationMI 'Microsoft.ManagedIdentity/userAssignedIdentities@2022-01-31-preview' = {
   name: MI_Name

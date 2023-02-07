@@ -31,9 +31,13 @@ Requirements for using:
 ### Running the bicep deployment
 
 1. Log into Azure Subscription with Account that has Contributor role
-2. Set up the bicep parameters to match your environment
+2. Set up the bicep parameters to match your environment, this is done in automation.parameters.json file
 3. Run the following command
 
    ``` shell
-      az deployment sub create --debug --location <location> --template-file /workspaces/ngsa-asb/scripts/ResourceAutomation/automation.bicep
+      az deployment sub create \
+        --debug \
+        --location eastus \
+        --template-file /workspaces/ngsa-asb/scripts/ResourceAutomation/automation.bicep \
+        --parmeters @automation.parameters.json
    ```
