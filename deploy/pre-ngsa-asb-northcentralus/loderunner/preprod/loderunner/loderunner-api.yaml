@@ -20,8 +20,8 @@ spec:
       labels:
         app: loderunner-api
         aadpodidbinding: wcnp-loderunner-id
-        deploy: 23-02-06-17-07-43
-        version: beta-2302-06-17
+        deploy: 23-02-07-06-03-37
+        version: beta-2302-07-06
     spec:
       containers:
         - name: app
