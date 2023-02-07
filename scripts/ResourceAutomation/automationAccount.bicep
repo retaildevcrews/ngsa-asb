@@ -3,7 +3,7 @@ targetScope='resourceGroup'
 @description('Log analytics workspace id')
 param logAnalyticsWorkspaceId string='/subscriptions/5dc45b2f-bf13-4281-b763-a53f57290aa3/resourcegroups/rg-wcnp-dev-hub/providers/microsoft.operationalinsights/workspaces/la-hub-eastus-zsgmpltrjrhy6'
 
-@description('URL of the shutdown script')
+@description('URL of the bringup/shutdown script')
 param resourceStartStopRunbookURL string= 'https://raw.githubusercontent.com/retaildevcrews/ngsa-asb/pragmatical/azureautomation/scripts/ResourceAutomation/runbooks/resource_start_stop.ps1'
 
 @description('Name of location')
@@ -18,7 +18,7 @@ param MI_Name string
 @description('Role definition ID')
 param RA_role_def_id string = 'b24988ac-6180-42a0-ab88-20f7382dd24c'
 
-@description('Role definition ID')
+@description('Role assignment module name')
 param RA_module string = 'ra-module'
 
 @description('Time Zone for Schedules')
