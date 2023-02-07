@@ -16,18 +16,22 @@ param(
     [Parameter(Mandatory)]
     [String]$managedIdentityClientId,
     [Parameter(Mandatory)]
-    [String]$operation
+    [String]$operation,
+    [bool]$skiprun = $false
 )
 try{
+    if ($skiprun){
+        Write-Output "Skipping run."
+        Exit(0)
+    }
     # Ensures you do not inherit an AzContext in your runbook
     Write-Output "Disabling AzContext Autosave"
     Disable-AzContextAutosave -Scope Process | Out-Null
     
-    #Write-Output "Get-AzUserAssignedIdentity -Name $managedIdentityName -ResourceGroupName $automationAccountResourceGroup -SubscriptionId $subscriptionId" 
-    #$identity = Get-AzUserAssignedIdentity -Name $managedIdentityName -ResourceGroupName $automationAccountResourceGroup 
     Write-Output "Connect-AzAccount -Identity -AccountId" $managedIdentityClientId
     $AzureContext = (Connect-AzAccount -Identity -AccountId $managedIdentityClientId).context
     # set and store context
+    Write-Output "Setting context"
     $AzureContext = Set-AzContext -SubscriptionName $AzureContext.Subscription -DefaultProfile $AzureContext
     Write-Output "Finished setting the Azure context for subscription" 
     
