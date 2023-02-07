@@ -25,10 +25,16 @@ param RA_module string = 'ra-module'
 param scheduleTimezone string
 
 @description('Start of day datetime for schedule')
-param scheduleStartOfDayTime string = '${dateTimeAdd(utcNow(), 'P1D', 'yyyy-MM-dd')}T09:00:00-06:00'
+param scheduleStartOfDayTime string='09:00:00'
 
 @description('End of day datetime for schedule')
-param scheduleEndOfDayTime string = '${dateTimeAdd(utcNow(), 'P1D', 'yyyy-MM-dd')}T20:00:00-06:00'
+param scheduleEndOfDayTime string='20:00:00' 
+
+@description('Start of day datetime for schedule')
+param scheduleStartOfDayDateTime string = '${dateTimeAdd(utcNow(), 'P1D', 'yyyy-MM-dd')}T${scheduleStartOfDayTime}-06:00'
+
+@description('End of day datetime for schedule')
+param scheduleEndOfDayDateTime string = '${dateTimeAdd(utcNow(), 'P1D', 'yyyy-MM-dd')}T${scheduleEndOfDayTime}-06:00'
 
 @description('Log Verbose Messages in Runbooks')
 param logVerbose bool = false
@@ -121,7 +127,7 @@ resource weekdaysStartOfDaySchedule 'Microsoft.Automation/automationAccounts/sch
     description: 'Schedule that runs every weekday at specified time'
     interval: 1
     frequency: 'Week'
-    startTime: scheduleStartOfDayTime 
+    startTime: scheduleStartOfDayDateTime 
     expiryTime: '9999-12-31T17:59:00-06:00'
     timeZone: scheduleTimezone
   }
@@ -137,7 +143,7 @@ resource weekdaysEndOfDaySchedule 'Microsoft.Automation/automationAccounts/sched
     description: 'Schedule that runs every weekday at specified time'
     interval: 1
     frequency: 'Week'
-    startTime: scheduleEndOfDayTime
+    startTime: scheduleEndOfDayDateTime
     expiryTime: '9999-12-31T17:59:00-06:00'
     timeZone: scheduleTimezone
   }
