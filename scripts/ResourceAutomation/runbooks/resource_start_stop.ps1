@@ -16,14 +16,9 @@ param(
     [Parameter(Mandatory)]
     [String]$managedIdentityClientId,
     [Parameter(Mandatory)]
-    [String]$operation,
-    [bool]$skipRun = $false
+    [String]$operation
 )
 try{
-    if ($skiprun){
-        Write-Output "Skipping run."
-        Exit(0)
-    }
     # Ensures you do not inherit an AzContext in your runbook
     Write-Output "Disabling AzContext Autosave"
     Disable-AzContextAutosave -Scope Process | Out-Null
