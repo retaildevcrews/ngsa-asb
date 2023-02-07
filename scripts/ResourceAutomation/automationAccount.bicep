@@ -15,12 +15,6 @@ param AA_Name string
 @description('Name of user assigned managed identity')
 param MI_Name string 
 
-@description('Role definition ID')
-param RA_role_def_id string = 'b24988ac-6180-42a0-ab88-20f7382dd24c'
-
-@description('Role assignment module name')
-param RA_module string = 'ra-module'
-
 @description('Time Zone for Schedules')
 param scheduleTimezone string
 
@@ -105,16 +99,6 @@ resource diagnosticSettings 'Microsoft.Insights/diagnosticSettings@2021-05-01-pr
       }
     ]
   }
-}
-
-module roleAssignment 'roleAssignment.bicep' = {
-   name: RA_module
-   scope: subscription()
-   params: {
-    roleAssignmentName:guid(subscription().id,automationMI.properties.principalId,RA_role_def_id)
-    roleDefId: resourceId('Microsoft.Authorization/roleDefinitions', RA_role_def_id)
-    userPrincipalId:automationMI.properties.principalId
-   }
 }
 
 resource weekdaysStartOfDaySchedule 'Microsoft.Automation/automationAccounts/schedules@2022-08-08' = {
@@ -228,3 +212,5 @@ resource resourceShutdownRunbookSchedules 'Microsoft.Automation/automationAccoun
   }
   dependsOn:[resourceShutdownRunbooks,weekdaysEndOfDaySchedule]
 }]
+
+output aaMIPrincipalId string =automationMI.properties.principalId
