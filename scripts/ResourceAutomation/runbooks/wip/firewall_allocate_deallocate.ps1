@@ -254,4 +254,3 @@ function Enable-Log-Alerts {
 
    Write-Output "Firewall Status Updated"
    return $LASTEXITCODE
-   
