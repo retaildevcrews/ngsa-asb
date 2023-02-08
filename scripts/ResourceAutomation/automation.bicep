@@ -6,6 +6,9 @@ param automationSuffix string='automation-test1'
 @description('Name of resource group')
 param RG_Name string = 'rg-${automationSuffix}'
 
+@description('Role definition ID')
+param RA_role_def_id string = 'b24988ac-6180-42a0-ab88-20f7382dd24c'
+
 @description('Name of automation account')
 param AA_Name string = 'aa-${automationSuffix}'
 
@@ -61,6 +64,12 @@ module automationAccountModule 'automationAccount.bicep' = {
   dependsOn:[automationRG]
 }
 
-
-
-
+resource AA_RoleAssignment 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
+  name: guid(subscription().id,MI_Name)
+  scope: subscription()
+  properties: {
+    principalId: automationAccountModule.outputs.aaMIPrincipalId
+    roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', RA_role_def_id)
+    principalType: 'ServicePrincipal'
+  }
+}
