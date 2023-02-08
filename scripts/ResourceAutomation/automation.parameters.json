@@ -3,13 +3,13 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "automationSuffix": {
-            "value": "resource-automation"
+            "value": "fdpo-automation"
         },
         "logAnalyticsWorkspaceId": {
             "value": "/subscriptions/5dc45b2f-bf13-4281-b763-a53f57290aa3/resourcegroups/rg-wcnp-dev-hub/providers/microsoft.operationalinsights/workspaces/la-hub-eastus-zsgmpltrjrhy6"
         },
         "clusterGwStartStopRunbookURL": {
-            "value": "https://raw.githubusercontent.com/retaildevcrews/ngsa-asb/pragmatical/azureautomation/scripts/ResourceAutomation/runbooks/cluster_gw_startstop.ps1"
+            "value": "https://raw.githubusercontent.com/retaildevcrews/ngsa-asb/main/scripts/ResourceAutomation/runbooks/cluster_gw_startstop.ps1"
         },
         "scheduleTimezone": {
             "value": "America/Chicago"
