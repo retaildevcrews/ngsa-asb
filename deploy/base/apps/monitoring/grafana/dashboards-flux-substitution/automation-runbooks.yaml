@@ -53,7 +53,7 @@ data:
                 "type": "grafana-azure-monitor-datasource",
                 "uid": "$${DS_AZURE_MONITOR}"
               },
-              "description": "This is the number of jobs created in the selected time interval.",
+              "description": "This is the number of dautomation job instances created for running in the selected time interval.",
               "fieldConfig": {
                 "defaults": {
                   "color": {
@@ -119,7 +119,7 @@ data:
                   "subscription": "${SUBSCRIPTION}"
                 }
               ],
-              "title": "Number of Jobs Created",
+              "title": "Number of Job Instances Created",
               "type": "stat"
             },
             {

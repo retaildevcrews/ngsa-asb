@@ -94,7 +94,7 @@ Below, you'll find guidance on how to use the information from the diagnostic se
 
 ### Grafana Automation Dashboard Tool
 
-Below is a detailed explanation of all elements on the Grafana dashboard for trouble shooting automation jobs.  
+Below is a detailed explanation of all elements on the Grafana dashboard for trouble shooting automation jobs.
 
 #### Log in for Dashboard
 
@@ -108,11 +108,11 @@ Figure 1:  Grafana login
 ![Dashboard](./assets/Automation-Dashboard/DashboardForAutomation.png)
 Figure 2:  Grafana Automation Dashboard
 
-Once a user has logged in the dashboard, depicted in Figure 2 will display.  The graph has several areas of note that will each be discussed below.  The following list is a list and description of the elements.  
+Once a user has logged in the dashboard, depicted in Figure 2 will display.  The graph has several areas of note that will each be discussed below.  The following list is a list and description of the elements.
 
 | Element Name | Element Description | Figure Number | Image |
 | ------------ | ------------------- | ------------- | ----- |
-| Login | Allows for seamless login to the Grafana environment. | [Figure 1](#log-into-automation-dashboard) | [<img src="./assets/Automation-Dashboard/grafanaLogIn.png" width="250"/>](./assets/Automation-Dashboard/grafanaLogIn.png) |
+| Login | Allows for seamless login to the Grafana environment. | [Figure 1](#log-in-for-dashboard) | [<img src="./assets/Automation-Dashboard/grafanaLogIn.png" width="250"/>](./assets/Automation-Dashboard/grafanaLogIn.png) |
 | Dashboard | This is the overall dashboard, each element will be described below. | [Figure 2](#dashboard-elements) |[<img src="./assets/Automation-Dashboard/DashboardForAutomation.png" width="250"/>](./assets/Automation-Dashboard/grafanaLogIn.png) |
 |Duration Selector | This selector allows a user to filter based on different time slices.  The default selector is set for 2 days. | [Figure 3](#time-range-selector) |[<img src="./assets/Automation-Dashboard/grafana-Timeline.png" width="250"/>](./assets/Automation-Dashboard/grafanaLogIn.png) |
 | Number of Jobs Created | Number of automation jobs "created" within the time segment selected. | [Figure 4](#number-of-jobs-created) |[<img src="./assets/Automation-Dashboard/grafanaJobs-Created.png" width="250"/>](./assets/Automation-Dashboard/grafanaLogIn.png) |
@@ -142,16 +142,16 @@ In [figure 4](#number-of-jobs-created) the number of jobs created to run during 
 ![Jobs Completed](./assets/Automation-Dashboard/grafanaJobs-Completed.png)
 Figure 5:  Grafana Jobs Completed
 
-In [figure 5](#number-of-jobs-completed) the number of jobs completed during this time segment.  A job can complete with errors; do not consider jobs completed the difference between Jobs created, and Jobs with errors.  This is incorrect.  
+In [figure 5](#number-of-jobs-completed) the number of jobs completed during this time segment.  A job can complete with errors; do not consider jobs completed the difference between Jobs created, and Jobs with errors.  This is incorrect.
 
-A job can complete with errors, completed without errors, or error out and not complete.  These states can all be represented.  
+A job can complete with errors, completed without errors, or error out and not complete.  These states can all be represented.
 
 #### Number of Job Errors
 
 ![Jobs with Error](./assets/Automation-Dashboard/grafanaJobs-Errors.png)
 Figure 6:  Grafana Automation Dashboard
 
-In [figure 6](#number-of-job-errors) the number of jobs with errors is listed.  This number can be jobs completed with errors, and jobs that errored without completing.  
+In [figure 6](#number-of-job-errors) the number of jobs with errors is listed.  This number can be jobs completed with errors, and jobs that errored without completing.
 
 #### Time Series Diagram
 
@@ -165,7 +165,7 @@ The diagram above is used to graphically see if jobs are diverging.  For example
 ![Grafana Dashboard](./assets/Automation-Dashboard/grafana-Logs.png)
 Figure 8:  Grafana Automation Dashboard
 
-In the log element section in [figure 8](#error-log-entries) shows the errors that have happened during the time segment selected.  This will allow a user to quickly scan the chart for any anomalies or issues.  
+In the log element section in [figure 8](#error-log-entries) shows the errors that have happened during the time segment selected.  This will allow a user to quickly scan the chart for any anomalies or issues.
 
 ### Troubleshooting with Log Analytics
 
