@@ -21,43 +21,7 @@ sequenceDiagram
 
 ## Prerequisites
 
-These instructions assume the following resources have already been created as part of the [main infrastructure setup](/README.md).
-
-- [Automation Account and Runbooks](/docs/Firewall-Automation.md)
-- [Grafana](/monitoring/README.md)
-- [Log Analytics](/README.md#2-createhubsh)
-
-## Diagnostic Setting Setup
-
-Set the environment variables described below for the Diagnostic Setting configuration.
-
-```bash
-
-# Name of the Diagnostic Setting
-export DIAGNOSTIC_SETTING_NAME="automation-diagnostic-setting"
-
-# Name of the Automation Account to attach the Diagnostic Setting to
-export AUTOMATION_ACCOUNT_NAME=<name of automation account>
-
-# Resource Group of the Automation Account to attach the Diagnostic Setting to
-export AUTOMATION_ACCOUNT_RG=<resource group of automation account>
-
-# Name of Log Analytics where logs will be sent
-# Recommend using hub log analytics if automation affects both hub and spoke resources
-export LA_WORKSPACE_NAME=<name of log analytics workspace>
-
-# Resource group of Log Analytics where logs will be sent
-export LA_WORKSPACE_RG=<resource group of log analytics workspace>
-
-```
-
-Run the script to create the Diagnostic Setting.
-
-```bash
-
-./scripts/Create-Automation-Diagnostics.sh
-
-```
+These instructions assume Automation resources have already been created as part of the [automation infrastructure setup](/scripts/ResourceAutomation/README.md).
 
 ## Grafana Dashboard Setup
 
@@ -135,7 +99,7 @@ As show above a user can use the dropdown to adjust the timeline by which the da
 ![Jobs Created](./assets/Automation-Dashboard/grafanaJobs-Created.png)
 Figure 4:  Grafana Jobs Created
 
-In [figure 4](#number-of-jobs-created) the number of jobs created to run during this time segment is listed.  This number is misleading, as it does not mean "new automation jobs" were created, but rather automation job instances created for running.  This is similar to the concept in American game baseball of "[On Deck](https://www.dictionary.com/browse/on--deck)".
+In [figure 4](#number-of-jobs-created) the number of jobs created to run during this time segment is listed. This number is misleading, as it does not mean "new automation jobs" were created, but rather automation job instances created for running.  This is similar to the concept in American game baseball of "[On Deck](https://www.dictionary.com/browse/on--deck)".
 
 #### Number of Jobs Completed
 
