@@ -62,8 +62,7 @@ spec:
         app: flux
     spec:
       nodeSelector:
-        kubernetes.io/os: linux
-        agentpool: npuser01
+        kubernetes.azure.com/mode: user
       serviceAccountName: flux
       volumes:
       - name: git-key
@@ -139,8 +138,7 @@ spec:
         app.kubernetes.io/name: memcached
     spec:
       nodeSelector:
-        kubernetes.io/os: linux
-        agentpool: npuser01
+        kubernetes.azure.com/mode: user
       containers:
       - name: memcached
         image: docker.io/library/memcached:1.5.20

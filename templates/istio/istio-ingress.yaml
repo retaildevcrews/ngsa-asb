@@ -62,7 +62,7 @@ spec:
             cpu: 50m
             memory: 128M
         nodeSelector:
-          agentpool: npuser01
+          kubernetes.azure.com/mode: user
         service:
           type: LoadBalancer
           loadBalancerIP: ${ASB_SPOKE_IP_PREFIX}.4.4

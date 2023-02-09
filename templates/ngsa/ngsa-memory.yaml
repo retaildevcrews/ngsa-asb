@@ -45,7 +45,7 @@ spec:
               memory: 128Mi
 
       nodeSelector:
-        agentpool: npuser01
+        kubernetes.azure.com/mode: user
 
 ---
 apiVersion: v1
