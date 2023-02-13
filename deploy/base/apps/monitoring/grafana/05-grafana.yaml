@@ -59,7 +59,7 @@ spec:
             limits:
               memory: "512Mi"
               cpu: "200m"
-            requests: 
+            requests:
               memory: "128Mi"
               cpu: "50m"
           securityContext:
@@ -92,6 +92,8 @@ spec:
               mountPath: /var/lib/grafana/dashboards/flux-cluster
             - name: dashboards-flux-control-plane
               mountPath: /var/lib/grafana/dashboards/flux-control-plane
+            - name: dashboards-automation-runbooks
+              mountPath: /var/lib/grafana/dashboards/automation-runbooks
       volumes:
         - name: grafana-config
           configMap:
@@ -123,6 +125,9 @@ spec:
         - name: dashboards-flux-control-plane
           configMap:
             name: grafana-dashboards-flux-control-plane
+        - name: dashboards-automation-runbooks
+          configMap:
+            name: grafana-dashboards-automation-runbooks
 ---
 apiVersion: v1
 kind: Service
