@@ -52,7 +52,7 @@
                 }
             ]
         },
-        "firewallToAutomate": {
+        "firewallsToAutomate": {
             "value": [
                 {
                 "resourceGroup": "rg-wcnp-dev-hub",
