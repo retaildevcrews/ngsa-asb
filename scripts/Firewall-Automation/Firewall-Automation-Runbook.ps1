@@ -8,9 +8,9 @@ param (
     [Parameter(Mandatory)]
     [String]$automation_Account_Name="PLACE_HOLDER",
     [Parameter(Mandatory)]
-    [String]$tenant_Id="PLACE_HOLDER",
+    [String]$tenantId="PLACE_HOLDER",
     [Parameter(Mandatory)]
-    [String]$subscription_Name="PLACE_HOLDER",
+    [String]$subscriptionName="PLACE_HOLDER",
     [Parameter(Mandatory)]
     [String]$vnet_Name="vnet-eastus-hub",
     [Parameter(Mandatory)]
@@ -22,7 +22,7 @@ param (
     [Parameter(Mandatory)]
     [String]$pip_Name_Default="pip-fw-eastus-default",
     [Parameter(Mandatory)]
-    [String]$managed_Identity_Name="PLACE_HOLDER",
+    [String]$managedIdentityClientId="PLACE_HOLDER"
     [Parameter(Mandatory)]
     [String]$action="start",
     [Parameter(Mandatory)]
@@ -204,54 +204,51 @@ function Enable-Log-Alerts {
     Update-Log-Alert -resource_Group_Name_with_Alerts $resource_Group_Name_with_Alerts -rule_Name "NGSA-Server-TooManyRequests" -enable_Rule
 }
 
+try{
     # Ensures you do not inherit an AzContext in your runbook
     Write-Output "Disabling AzContext Autosave"
     Disable-AzContextAutosave -Scope Process | Out-Null
     
-	# Connect using a Managed Service Identity
-    Write-Output "Using system-assigned managed identity"
-	
-	Connect-AzAccount -Identity
-	
-	$identity = Get-AzUserAssignedIdentity -ResourceGroupName $resource_Group_Name_for_Automation -Name $managed_Identity_Name
+    Write-Output "Connect-AzAccount -Identity -AccountId" $managedIdentityClientId
+    $AzureContext = (Connect-AzAccount -Identity -AccountId $managedIdentityClientId).context
+    # set and store context
+    Write-Output "Setting context"
+    $AzureContext = Set-AzContext -SubscriptionName $AzureContext.Subscription -DefaultProfile $AzureContext
+    Write-Output "Finished setting the Azure context for subscription" 
 
-    Connect-AzAccount -Identity -AccountId $identity.Id
-
-    $AzureContext = Set-AzContext -SubscriptionName $subscription_Name -Tenant $tenant_Id
-    Write-Output "Using user-assigned managed identity"
-
-    # Connects using the Managed Service Identity of the named user-assigned managed identity
-    $identity = Get-AzUserAssignedIdentity -ResourceGroupName $resource_Group_Name_for_Automation -Name $managed_Identity_Name -DefaultProfile $AzureContext
-
-    # validates assignment only, not perms
-    if ((Get-AzAutomationAccount -ResourceGroupName $resource_Group_Name_for_Automation -Name $automation_Account_Name -DefaultProfile $AzureContext).Identity.UserAssignedIdentities.Values.PrincipalId.Contains($identity.PrincipalId)) {
-        $AzureContext = (Connect-AzAccount -Identity -AccountId $identity.ClientId).context
-
-        # set and store context
-        $AzureContext = Set-AzContext -SubscriptionName $AzureContext.Subscription -DefaultProfile $AzureContext
-    }
-    else {
-       Write-Output "Invalid or unassigned user-assigned managed identity"
-        exit
-    }
-
-
+    Write-Output "Executing operation: $action on resource group: $resource_Group_Name_with_Firewall"
     $dynamic_Rule_Name="asb-" + $environment + "-" + $location + "-AppEndpointDown"
     
-    if ($action.ToLower() -eq "stop") {
-        Stop-Firewall -resource_Group_Name_with_Firewall $resource_Group_Name_with_Firewall -firewall_Name $firewall_Name
-       
-        Disable-Metric-Alerts -resource_Group_Name_with_Alerts $resource_Group_Name_with_Alerts -location $location -environment $environment -rule_Name $dynamic_Rule_Name
-        Disable-Log-Alerts -resource_Group_Name_with_Alerts $resource_Group_Name_with_Alerts
-    }
-    
-    elseif ($action.ToLower() -eq "start") {
-        Restart-Firewall -resource_Group_Name_with_Firewall $resource_Group_Name_with_Firewall -firewall_Name $firewall_Name -vnet_Name $vnet_Name -pip_Name1 $pip_Name1 -pip_Name2 $pip_Name2 -pip_Name_Default $pip_Name_Default
-                
-        Enable-Metric-Alerts -resource_Group_Name_with_Alerts $resource_Group_Name_with_Alerts -location $location -environment $environment -rule_Name $dynamic_Rule_Name
-        Enable-Log-Alerts -resource_Group_Name_with_Alerts $resource_Group_Name_with_Alerts
+    switch($action.ToLower())
+    {
+        "stop"{
+            Write-Output "Stop-Firewall -resource_Group_Name_with_Firewall $resource_Group_Name_with_Firewall -firewall_Name $firewall_Name"
+            Stop-Firewall -resource_Group_Name_with_Firewall $resource_Group_Name_with_Firewall -firewall_Name $firewall_Name
+        
+            Write-Output "Disable-Metric-Alerts -resource_Group_Name_with_Alerts $resource_Group_Name_with_Alerts -location $location -environment $environment -rule_Name $dynamic_Rule_Name"
+            Disable-Metric-Alerts -resource_Group_Name_with_Alerts $resource_Group_Name_with_Alerts -location $location -environment $environment -rule_Name $dynamic_Rule_Name
+            
+            Write-Output "Disable-Log-Alerts -resource_Group_Name_with_Alerts $resource_Group_Name_with_Alerts"
+            Disable-Log-Alerts -resource_Group_Name_with_Alerts $resource_Group_Name_with_Alerts
+        }
+        "start"{
+            Write-Output "Restart-Firewall -resource_Group_Name_with_Firewall $resource_Group_Name_with_Firewall -firewall_Name $firewall_Name"
+            Restart-Firewall -resource_Group_Name_with_Firewall $resource_Group_Name_with_Firewall -firewall_Name $firewall_Name -vnet_Name $vnet_Name -pip_Name1 $pip_Name1 -pip_Name2 $pip_Name2 -pip_Name_Default $pip_Name_Default
+
+            Write-Output "Enable-Metric-Alerts -resource_Group_Name_with_Alerts $resource_Group_Name_with_Alerts -location $location -environment $environment -rule_Name $dynamic_Rule_Name"                    
+            Enable-Metric-Alerts -resource_Group_Name_with_Alerts $resource_Group_Name_with_Alerts -location $location -environment $environment -rule_Name $dynamic_Rule_Name
+
+            Write-Output "Enable-Log-Alerts -resource_Group_Name_with_Alerts $resource_Group_Name_with_Alerts"
+            Enable-Log-Alerts -resource_Group_Name_with_Alerts $resource_Group_Name_with_Alerts
+        }
     }
 
-   Write-Output "Firewall Status Updated"
-   return $LASTEXITCODE
+    Write-Output "Completed operation: $action on cluster: resource group: $resource_Group_Name_with_Firewall"
+    return $LASTEXITCODE
    
+    }
+    catch{
+        $message = $_
+        Write-Output "Script exiting with the following error:  $message"
+        throw $_
+    }
