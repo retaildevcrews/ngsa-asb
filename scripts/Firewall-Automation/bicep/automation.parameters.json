@@ -61,8 +61,8 @@
                 "environment": "dev"
                 }
                 ,{
-                "firewallResourceGroupName": "rg-wcnp-pre-hub",
-                "resourceGroupNameWithAlerts": "rg-wcnp-pre",
+                "resourceGroup": "rg-wcnp-pre-hub",
+                "resourceGroupWithAlerts": "rg-wcnp-pre",
                 "firewallLocation": "eastus",
                 "environment": "pre"
                 }
