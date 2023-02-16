@@ -290,7 +290,6 @@ resource firewallBringupRunbookSchedules 'Microsoft.Automation/automationAccount
       tenantId: tenant().tenantId
       subscriptionName: subscription().displayName
       automationAccountResourceGroup: resourceGroup().name
-       // runbook powershell script was updated to use managedIdentityClientId instead of $managed_Identity_Name
       managedIdentityClientId: automationMI.properties.clientId
       resource_Group_Name_with_Firewall: firewallToAutomate.resourceGroup
       resource_Group_Name_with_Alerts: firewallToAutomate.resourceGroupWithAlerts
@@ -340,7 +339,6 @@ resource firewallShutdownRunbookSchedules 'Microsoft.Automation/automationAccoun
       tenantId: tenant().tenantId
       subscriptionName: subscription().displayName
       automationAccountResourceGroup: resourceGroup().name
-       // runbook powershell script was updated to use managedIdentityClientId instead of $managed_Identity_Name
       managedIdentityClientId: automationMI.properties.clientId
       resource_Group_Name_with_Firewall: firewallToAutomate.resourceGroup
       resource_Group_Name_with_Alerts: firewallToAutomate.resourceGroupWithAlerts
