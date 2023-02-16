@@ -36,14 +36,8 @@ param scheduleEndOfDayDateTime string = '${dateTimeAdd(utcNow(), 'P1D', 'yyyy-MM
 @description('Firewall start of day datetime for schedule')
 param firewallScheduleStartOfDayTime string='08:00:00'
 
-@description('Firewall end of day datetime for schedule')
-param firewallScheduleEndOfDayTime string='20:00:00' 
-
 @description('Firewall start of day datetime for schedule')
 param firewallScheduleStartOfDayDateTime string = '${dateTimeAdd(utcNow(), 'P1D', 'yyyy-MM-dd')}T${firewallScheduleStartOfDayTime}-06:00'
-
-@description('Firewall end of day datetime for schedule')
-param firewallScheduleEndOfDayDateTime string = '${dateTimeAdd(utcNow(), 'P1D', 'yyyy-MM-dd')}T${firewallScheduleEndOfDayTime}-06:00'
 
 @description('Log Verbose Messages in Runbooks')
 param logVerbose bool = false
@@ -54,7 +48,7 @@ param logProgress bool = false
 @description('Array of objects that define what needs to be automated  - gateway, and cluster (assumes they are in the same resource group)')
 param resourcesToAutomate array
 
-@description('Array of Firewall objects that needs to be automated - (assumes it is in the same resource group)')
+@description('Array of Firewall objects that need to be automated')
 param firewallsToAutomate array
 
 resource automationMI 'Microsoft.ManagedIdentity/userAssignedIdentities@2022-01-31-preview' = {
@@ -261,7 +255,7 @@ resource firewallWeekdaysEndOfDaySchedule 'Microsoft.Automation/automationAccoun
     description: 'Schedule that runs every weekday at specified time'
     interval: 1
     frequency: 'Week'
-    startTime: firewallScheduleEndOfDayDateTime
+    startTime: scheduleEndOfDayDateTime
     expiryTime: '9999-12-31T17:59:00-06:00'
     timeZone: scheduleTimezone
   }

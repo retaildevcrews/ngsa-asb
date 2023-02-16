@@ -46,7 +46,7 @@ param logProgress bool = false
 @description('Array of objects that define what needs to be automated  - gateway, and cluster (assumes they are in the same resource group)')
 param resourcesToAutomate array
 
-@description('Array of Firewall objects that needs to be automated - (assumes it is in the same resource group)')
+@description('Array of Firewall objects that need to be automated')
 param firewallsToAutomate array
 
 
