@@ -25,6 +25,9 @@ param logAnalyticsWorkspaceId string
 @description('URL of the bringup/shutdown script')
 param clusterGwStartStopRunbookURL string
 
+@description('Firewall URL of the bringup/shutdown script')
+param firewallStartStopRunbookURL string
+
 @description('Start of day datetime for schedule')
 param scheduleStartOfDayTime string='09:00:00'
 
@@ -43,6 +46,10 @@ param logProgress bool = false
 @description('Array of objects that define what needs to be automated  - gateway, and cluster (assumes they are in the same resource group)')
 param resourcesToAutomate array
 
+@description('Array of Firewall objects that needs to be automated - (assumes it is in the same resource group)')
+param firewallsToAutomate array
+
+
 resource automationRG 'Microsoft.Resources/resourceGroups@2021-04-01' = { name: RG_Name, location: location }
 
 module automationAccountModule 'automationAccount.bicep' = {
@@ -54,12 +61,14 @@ module automationAccountModule 'automationAccount.bicep' = {
     MI_Name:MI_Name
     logAnalyticsWorkspaceId:logAnalyticsWorkspaceId
     clusterGwStartStopRunbookURL:clusterGwStartStopRunbookURL
+    firewallStartStopRunbookURL: firewallStartStopRunbookURL
     scheduleStartOfDayTime:scheduleStartOfDayTime
     scheduleEndOfDayTime:scheduleEndOfDayTime
     scheduleTimezone:scheduleTimezone
     logProgress:logProgress
     logVerbose:logVerbose
     resourcesToAutomate:resourcesToAutomate
+    firewallsToAutomate:firewallsToAutomate
   }
   dependsOn:[automationRG]
 }
