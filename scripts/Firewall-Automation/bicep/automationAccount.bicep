@@ -22,7 +22,7 @@ param MI_Name string
 param scheduleTimezone string
 
 @description('Start of day datetime for schedule')
-param scheduleStartOfDayTime string='09:00:00'
+param scheduleStartOfDayTime string='08:10:00'
 
 @description('End of day datetime for schedule')
 param scheduleEndOfDayTime string='20:00:00' 
