@@ -314,24 +314,25 @@ resource firewallBringupRunbookSchedules 'Microsoft.Automation/automationAccount
   dependsOn:[firewallBringupRunbooks,firewallWeekdaysStartOfDaySchedule]
 }]
 
-/*
+
 resource firewallShutdownRunbooks 'Microsoft.Automation/automationAccounts/runbooks@2022-08-08' = [for firewallToAutomate in firewallsToAutomate: {
-  name: 'runbook-${resourceToAutomate.clusterName}-shutdown'
+  name: 'runbook-fw-${firewallToAutomate.firewallLocation}-${firewallToAutomate.environment}-shutdown'
   location: location
   parent: automationAccount
   properties: {
-    description: 'Runbook to shut down ${resourceToAutomate.clusterName} and ${resourceToAutomate.gatewayName} at the end of the day'
+    description: 'Runbook to shut down fw-${firewallToAutomate.firewallLocation}-${firewallToAutomate.environment} at the end of the day'
     logProgress: logProgress
     logVerbose: logVerbose
     publishContentLink: {
-      uri: clusterGwStartStopRunbookURL
+      uri: firewallStartStopRunbookURL
     }
     runbookType: 'PowerShell'
   }
 }]
 
+
 resource firewallShutdownRunbookSchedules 'Microsoft.Automation/automationAccounts/jobSchedules@2022-08-08' = [for firewallToAutomate in firewallsToAutomate: {
-  name: guid('resource-shutdown-schedule',resourceToAutomate.clusterName,AA_Name,'shutdown')
+  name: guid('resource-shutdown-schedule','fw-${firewallToAutomate.firewallLocation}-${firewallToAutomate.environment}',AA_Name,'shutdown')
   parent: automationAccount
   properties: {
     parameters: {
@@ -339,22 +340,29 @@ resource firewallShutdownRunbookSchedules 'Microsoft.Automation/automationAccoun
       subscriptionName: subscription().displayName
       automationAccountResourceGroup: resourceGroup().name
       automationAccountName: AA_Name
+       // runbook powershell script was updated to use managedIdentityClientId instead of $managed_Identity_Name
       managedIdentityClientId: automationMI.properties.clientId
-      resourceGroup: resourceToAutomate.resourceGroup
-      clusterName: resourceToAutomate.clusterName
-      gatewayName: resourceToAutomate.gatewayName
-      operation: 'stop'
+      resource_Group_Name_with_Firewall: firewallToAutomate.resourceGroup
+      resource_Group_Name_with_Alerts: firewallToAutomate.resourceGroupWithAlerts
+      resource_Group_Name_for_Automation: resourceGroup().name
+      automation_Account_Name: AA_Name
+      vnet_Name: 'vnet-${firewallToAutomate.firewallLocation}-hub'
+      firewall_Name: 'fw-${firewallToAutomate.firewallLocation}'
+      pip_Name1: 'pip-fw-${firewallToAutomate.firewallLocation}-01'
+      pip_Name2: 'pip-fw-${firewallToAutomate.firewallLocation}-02'
+      pip_Name_Default: 'pip-fw-${firewallToAutomate.firewallLocation}-default'
+      action: 'stop'
+      environment: firewallToAutomate.environment
+      location: firewallToAutomate.firewallLocation
     }
     runbook: {
-      name: 'runbook-${resourceToAutomate.clusterName}-shutdown'
+      name: 'runbook-fw-${firewallToAutomate.firewallLocation}-${firewallToAutomate.environment}-shutdown'
     }
     schedule: {
       name: 'weekdays-end-of-day'
     }
   }
-  dependsOn:[firewallShutdownRunbooks,weekdaysEndOfDaySchedule]
+  dependsOn:[firewallShutdownRunbooks,firewallWeekdaysEndOfDaySchedule]
 }]
-*/
-
-
+  
 output aaMIPrincipalId string =automationMI.properties.principalId
