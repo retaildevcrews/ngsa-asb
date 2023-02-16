@@ -119,6 +119,8 @@ resource diagnosticSettings 'Microsoft.Insights/diagnosticSettings@2021-05-01-pr
   }
 }
 
+// -------------------------- Cluster and Appication Gateway setup ---------------------------------------------
+
 resource weekdaysStartOfDaySchedule 'Microsoft.Automation/automationAccounts/schedules@2022-08-08' = {
   name: 'weekdays-start-of-day'
   parent: automationAccount
