@@ -64,7 +64,7 @@ kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.pas
 
 ## Step 2:  Deploy a sample application with GitOps
 
-Now that ArgoCD has been installed on the cluster, you can deploy your application using GitOps in two different ways: via the UI or via kubectl.
+Now that ArgoCD has been installed on the cluster, you can deploy your application using GitOps in two different ways: via the UI or via YAML declaration.
 
 ### UI Setup
 
@@ -72,18 +72,26 @@ Add the Git repository as a new application in the ArgoCD web UI:
 
 - In the ArgoCD web UI, click on the New App button.
 - In the Create New Application form, fill in the following fields:
-  - Application Name: ngsa
-  - Project: default
-  - Sync Policy: Automatic
-  - Auto-Create Namespace: Checked
-  - Repository URL: https://github.com/retaildevcrews/ngsa-asb
-  - Path: spikes/argo-cd/deploy
-  - Cluster URL: https://kubernetes.default.svc
-  - Namespace: ngsa
+  - Application Name: `ngsa`
+  - Project: `default`
+  - Sync Policy: `Automatic`
+  - Auto-Create Namespace: `Checked`
+  - Repository URL: `https://github.com/retaildevcrews/ngsa-asb`
+  - Path: `spikes/argo-cd/deploy`
+  - Cluster URL: `https://kubernetes.default.svc`
+  - Namespace: `ngsa`
 
 Click on the Create button.
 Verify that the ngsa application is running by running the following command:
 
 ```bash
 kubectl get pods -n ngsa
+```
+
+### YAML
+
+Alternatively you can declare an argo application deployment using yaml.
+
+```bash
+kubectl apply -f spikes/argo-cd/manifests/argo-ngsa-app.yaml
 ```
