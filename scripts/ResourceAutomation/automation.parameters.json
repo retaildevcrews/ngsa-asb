@@ -11,6 +11,9 @@
         "clusterGwStartStopRunbookURL": {
             "value": "https://raw.githubusercontent.com/retaildevcrews/ngsa-asb/main/scripts/ResourceAutomation/runbooks/cluster_gw_startstop.ps1"
         },
+        "firewallStartStopRunbookURL": {
+            "value": "https://raw.githubusercontent.com/retaildevcrews/ngsa-asb/main/scripts/ResourceAutomation/runbooks/firewall_startstop.ps1"
+        },
         "scheduleTimezone": {
             "value": "America/Chicago"
         },
@@ -46,6 +49,22 @@
                 "resourceGroup": "rg-wcnp-dev",
                 "clusterName": "aks-jxdthrti3j3qu-westus3",
                 "gatewayName": "apw-aks-jxdthrti3j3qu-westus3"
+                }
+            ]
+        },
+        "firewallsToAutomate": {
+            "value": [
+                {
+                "resourceGroup": "rg-wcnp-dev-hub",
+                "resourceGroupWithAlerts": "rg-wcnp-dev",
+                "firewallLocation": "eastus", 
+                "environment": "dev"
+                }
+                ,{
+                "resourceGroup": "rg-wcnp-pre-hub",
+                "resourceGroupWithAlerts": "rg-wcnp-pre",
+                "firewallLocation": "eastus",
+                "environment": "pre"
                 }
             ]
         }
