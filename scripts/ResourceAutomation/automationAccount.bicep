@@ -34,7 +34,7 @@ param scheduleStartOfDayDateTime string = '${dateTimeAdd(utcNow(), 'P1D', 'yyyy-
 param scheduleEndOfDayDateTime string = '${dateTimeAdd(utcNow(), 'P1D', 'yyyy-MM-dd')}T${scheduleEndOfDayTime}-06:00'
 
 @description('Firewall start of day datetime for schedule')
-param firewallScheduleStartOfDayTime string='08:00:00'
+param firewallScheduleStartOfDayTime string='07:10:00'
 
 @description('Firewall start of day datetime for schedule')
 param firewallScheduleStartOfDayDateTime string = '${dateTimeAdd(utcNow(), 'P1D', 'yyyy-MM-dd')}T${firewallScheduleStartOfDayTime}-06:00'
