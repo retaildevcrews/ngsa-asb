@@ -22,7 +22,7 @@ param (
     [Parameter(Mandatory)]
     [String]$pip_Name_Default="pip-fw-eastus-default",
     [Parameter(Mandatory)]
-    [String]$managedIdentityClientId="PLACE_HOLDER"
+    [String]$managedIdentityClientId="PLACE_HOLDER",
     [Parameter(Mandatory)]
     [String]$action="start",
     [Parameter(Mandatory)]
