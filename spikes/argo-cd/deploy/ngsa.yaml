@@ -63,10 +63,9 @@ metadata:
   name: ngsa-memory
   namespace: ngsa
 spec:
-  type: NodePort
+  type: ClusterIP
   ports:
     - port: 8080
-      nodePort: 30080
       targetPort: http
       protocol: TCP
       name: http
