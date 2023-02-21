@@ -302,7 +302,7 @@ resource firewallBringupRunbookSchedules 'Microsoft.Automation/automationAccount
       name: 'runbook-fw-${firewallToAutomate.firewallLocation}-${firewallToAutomate.environment}-bringup'
     }
     schedule: {
-      name: 'weekdays-start-of-day'
+      name: 'firewallWeekdays-start-of-day'
     }
   }
   dependsOn:[firewallBringupRunbooks,firewallWeekdaysStartOfDaySchedule]
@@ -351,7 +351,7 @@ resource firewallShutdownRunbookSchedules 'Microsoft.Automation/automationAccoun
       name: 'runbook-fw-${firewallToAutomate.firewallLocation}-${firewallToAutomate.environment}-shutdown'
     }
     schedule: {
-      name: 'weekdays-end-of-day'
+      name: 'firewallWeekdays-end-of-day'
     }
   }
   dependsOn:[firewallShutdownRunbooks,firewallWeekdaysEndOfDaySchedule]
