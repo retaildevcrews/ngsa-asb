@@ -163,7 +163,7 @@ resource resourceBringupRunbooks 'Microsoft.Automation/automationAccounts/runboo
 }]
 
 resource resourceBringupRunbookSchedules 'Microsoft.Automation/automationAccounts/jobSchedules@2022-08-08' = [for resourceToAutomate in resourcesToAutomate: {
-  name: guid('resource-bringup-schedule',resourceToAutomate.clusterName,AA_Name,'bringup')
+  name: guid('resource-bringup-schedule',resourceToAutomate.clusterName,AA_Name)
   parent: automationAccount
   properties: {
     parameters: {
@@ -203,7 +203,7 @@ resource resourceShutdownRunbooks 'Microsoft.Automation/automationAccounts/runbo
 }]
 
 resource resourceShutdownRunbookSchedules 'Microsoft.Automation/automationAccounts/jobSchedules@2022-08-08' = [for resourceToAutomate in resourcesToAutomate: {
-  name: guid('resource-shutdown-schedule',resourceToAutomate.clusterName,AA_Name,'shutdown')
+  name: guid('resource-shutdown-schedule',resourceToAutomate.clusterName,AA_Name)
   parent: automationAccount
   properties: {
     parameters: {
@@ -277,7 +277,7 @@ resource firewallBringupRunbooks 'Microsoft.Automation/automationAccounts/runboo
 }]
 
 resource firewallBringupRunbookSchedules 'Microsoft.Automation/automationAccounts/jobSchedules@2022-08-08' = [for firewallToAutomate in firewallsToAutomate: {
-  name: guid('resource-bringup-schedule','fw-${firewallToAutomate.firewallLocation}-${firewallToAutomate.environment}',AA_Name,'bringup')
+  name: guid('resource-bringup-schedule','fw-${firewallToAutomate.firewallLocation}-${firewallToAutomate.environment}',AA_Name)
   parent: automationAccount
   properties: {
     parameters: {
@@ -326,7 +326,7 @@ resource firewallShutdownRunbooks 'Microsoft.Automation/automationAccounts/runbo
 
 
 resource firewallShutdownRunbookSchedules 'Microsoft.Automation/automationAccounts/jobSchedules@2022-08-08' = [for firewallToAutomate in firewallsToAutomate: {
-  name: guid('resource-shutdown-schedule','fw-${firewallToAutomate.firewallLocation}-${firewallToAutomate.environment}',AA_Name,'shutdown')
+  name: guid('resource-shutdown-schedule','fw-${firewallToAutomate.firewallLocation}-${firewallToAutomate.environment}',AA_Name)
   parent: automationAccount
   properties: {
     parameters: {
