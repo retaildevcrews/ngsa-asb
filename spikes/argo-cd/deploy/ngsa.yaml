@@ -28,7 +28,7 @@ spec:
           - --in-memory
           - --prometheus
           - --zone
-          - dev
+          - eastus2
           - --region
           - dev
           ports:
