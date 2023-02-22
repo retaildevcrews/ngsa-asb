@@ -13,9 +13,9 @@ Before starting, you will need the following:
 
 - You will need at least one AKS cluster, or more if you are planning to set up a multi-cluster deployment.
 
-## Step 0: Create an AKS cluster
+## Step 0: Create an ArgoCD management cluster with AKS
 
-Run the following commands to create a new AKS cluster. Otherwise, if you already have an existing AKS cluster, you can skip this step and proceed to connecting to the existing AKS cluster.
+To create a new management cluster in AKS, run the following commands. Otherwise, if you already have an existing AKS cluster, you can skip this step and proceed to connecting to the existing AKS cluster.
 
 ```bash
 # Connecting to Azure with specific tenant (e.g. microsoft.onmicrosoft.com)
@@ -44,7 +44,7 @@ You can install ArgoCD on your Kubernetes cluster by running the following comma
 
 ```bash
 kubectl create namespace argocd
-kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+kubectl apply -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml -n argocd
 
 # Verify that ArgoCD is running:
 kubectl get pods -n argocd
@@ -94,4 +94,34 @@ Alternatively you can declare an argo application deployment using yaml.
 
 ```bash
 kubectl apply -f spikes/argo-cd/manifests/argo-ngsa-app.yaml
+```
+
+## Step 3:  Target Multiple Clusters
+
+You can use ArgoCD to deploy and manage applications across different clusters without having to install ArgoCD in each cluster manually.
+
+To achieve this, ArgoCD uses Kubernetes contexts. A context is a set of access parameters for a Kubernetes cluster. These parameters include the cluster's API server URL, the credentials needed to access the cluster, and the default namespace to use for deployments.
+
+When you configure ArgoCD to target multiple clusters, you create a Kubernetes context for each cluster and configure ArgoCD to use those contexts. ArgoCD will then use the context to access the API server of each target cluster and deploy applications.
+
+```bash
+
+# Login to Argo
+argocd login localhost:8080
+
+# List the current contexts associated with the management cluster
+ argocd cluster list
+
+# Add one or more cluster contexts to argo
+argocd cluster add <cluster-context-name>
+```
+
+Now you can return the the UI and manually deploy an application to multiple clusters.
+
+The ApplicationSet controller in Argo CD is a component that enhances application automation and aims to enhance the management of multiple clusters and tenants. Argo CD Applications can be generated from various sources such as Git or Argo CD's pre-defined cluster list. You will find a sample under the manifests folder. Make sure to update the cluster reference for this to successfully work
+
+```bash
+
+kubectl apply -f spikes/argo-cd/manifests/application-set-sample.yaml -n argocd
+
 ```
