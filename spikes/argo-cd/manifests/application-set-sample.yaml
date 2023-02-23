@@ -20,7 +20,7 @@ spec:
       project: default
       source:
         repoURL: https://github.com/retaildevcrews/ngsa-asb
-        targetRevision: joaquinrz-argoSpike #HEAD
+        targetRevision: HEAD
         path: spikes/argo-cd/deploy
       destination:
         server: '{{url}}'
