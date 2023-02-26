@@ -19,8 +19,8 @@ spec:
       labels:
         aadpodidbinding: wcnp-ngsa-id
         app: ngsa-cosmos
-        deploy: 23-02-19-06-04-58
-        version: beta-2302-19-06
+        deploy: 23-02-26-06-04-05
+        version: beta-2302-26-06
         sidecar.istio.io/inject: "true"
     spec:
       containers:
