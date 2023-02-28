@@ -16,18 +16,26 @@ param(
     [Parameter(Mandatory)]
     [String]$managedIdentityClientId,
     [Parameter(Mandatory)]
-    [String]$operation
+    [String]$operation,
+    [Parameter(Mandatory=$false)]
+    [boolean] $SkipRun=$false
 )
 try{
+    # Skip run based on parameter input
+    if($SkipRun)
+    {
+        "Skipping run for operation: $operation on cluster: $clusterName and gateway: $gatewayName"
+        return $LASTEXITCODE
+    }
     # Ensures you do not inherit an AzContext in your runbook
     Write-Output "Disabling AzContext Autosave"
     Disable-AzContextAutosave -Scope Process | Out-Null
     
-    Write-Output "Connect-AzAccount -Identity -AccountId" $managedIdentityClientId
+    Write-Output "Connect-AzAccount -Identity -AccountId $managedIdentityClientId"
     $AzureContext = (Connect-AzAccount -Identity -AccountId $managedIdentityClientId).context
     # set and store context
     Write-Output "Setting context"
-    $AzureContext = Set-AzContext -SubscriptionName $AzureContext.Subscription -DefaultProfile $AzureContext
+    $AzureContext = Set-AzContext -SubscriptionName $subscriptionName -DefaultProfile $AzureContext
     Write-Output "Finished setting the Azure context for subscription" 
     
     Write-Output "Executing operation: $operation on cluster: $clusterName and gateway: $gatewayName"
