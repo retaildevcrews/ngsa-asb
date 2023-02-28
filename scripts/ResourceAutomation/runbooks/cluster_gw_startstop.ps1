@@ -18,13 +18,13 @@ param(
     [Parameter(Mandatory)]
     [String]$operation,
     [Parameter(Mandatory=$false)]
-    [boolean] $SkipRun=$false
+    [boolean] $disabled=$false
 )
 try{
     # Skip run based on parameter input
-    if($SkipRun)
+    if($disabled)
     {
-        "Skipping run for operation: $operation on cluster: $clusterName and gateway: $gatewayName"
+        "This runbook has been disabled through a parameter, operation: $operation on cluster: $clusterName and gateway: $gatewayName"
         return $LASTEXITCODE
     }
     # Ensures you do not inherit an AzContext in your runbook

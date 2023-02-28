@@ -216,6 +216,7 @@ resource resourceShutdownRunbookSchedules 'Microsoft.Automation/automationAccoun
       clusterName: resourceToAutomate.clusterName
       gatewayName: resourceToAutomate.gatewayName
       operation: 'stop'
+      disabled: '$true'
     }
     runbook: {
       name: 'runbook-${resourceToAutomate.clusterName}-shutdown'
