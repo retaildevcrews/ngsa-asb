@@ -46,8 +46,10 @@ The 'opensearch-cluster.yaml' file already was updated to pull the from Acr inst
 
 ## AKS Compliace 'Temporary' Updates
 
-> Updating policy assignment 'Kubernetes cluster containers should only use allowed images' to allow '|docker.io/opensearchproject/opensearch.+$'
-> Updating policy assignment 'Kubernetes cluster containers CPU and memory resource limits should not exceed the specified limits' to allow image 'acraksjxdthrti3j3qu.azurecr.io/opsterio/busybox:1.27.2-buildx'
+> * Updating policy assignment 'Kubernetes cluster containers should only use allowed images' to allow '|docker.io/opensearchproject/opensearch.+$'
+> * Updating policy assignment 'Kubernetes cluster containers CPU and memory resource limits should not exceed the specified limits' to allow images
+  >   - 'acraksjxdthrti3j3qu.azurecr.io/opsterio/busybox:1.27.2-buildx'
+  >   - 'docker.io/opensearchproject/opensearch:latest'
 
 
 Now that all of the setup is done, we're ready to deploy:
