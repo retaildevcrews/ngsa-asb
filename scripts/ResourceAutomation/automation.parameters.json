@@ -9,7 +9,7 @@
             "value": "/subscriptions/5dc45b2f-bf13-4281-b763-a53f57290aa3/resourcegroups/rg-wcnp-dev-hub/providers/microsoft.operationalinsights/workspaces/la-hub-eastus-zsgmpltrjrhy6"
         },
         "clusterGwStartStopRunbookURL": {
-            "value": "https://raw.githubusercontent.com/retaildevcrews/ngsa-asb/pragmatical/skipjobs/scripts/ResourceAutomation/runbooks/cluster_gw_startstop.ps1"
+            "value": "https://raw.githubusercontent.com/retaildevcrews/ngsa-asb/main/scripts/ResourceAutomation/runbooks/cluster_gw_startstop.ps1"
         },
         "firewallStartStopRunbookURL": {
             "value": "https://raw.githubusercontent.com/retaildevcrews/ngsa-asb/main/scripts/ResourceAutomation/runbooks/firewall_startstop.ps1"
