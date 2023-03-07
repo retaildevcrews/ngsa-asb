@@ -115,8 +115,8 @@ resource diagnosticSettings 'Microsoft.Insights/diagnosticSettings@2021-05-01-pr
 
 // -------------------------- Cluster and Appication Gateway setup ---------------------------------------------
 
-resource weekdaysStartOfDaySchedule 'Microsoft.Automation/automationAccounts/schedules@2022-08-08' = {
-  name: 'weekdays-start-of-day'
+resource weekdaysStartOfDaySchedules 'Microsoft.Automation/automationAccounts/schedules@2022-08-08' = [for resourceToAutomate in resourcesToAutomate:{
+  name: 'weekdays-start-of-day-${resourceToAutomate.clusterName}'
   parent: automationAccount
   properties: {
     advancedSchedule: {
@@ -129,10 +129,10 @@ resource weekdaysStartOfDaySchedule 'Microsoft.Automation/automationAccounts/sch
     expiryTime: '9999-12-31T17:59:00-06:00'
     timeZone: scheduleTimezone
   }
-}
+}]
 
-resource weekdaysEndOfDaySchedule 'Microsoft.Automation/automationAccounts/schedules@2022-08-08' = {
-  name: 'weekdays-end-of-day'
+resource weekdaysEndOfDaySchedules 'Microsoft.Automation/automationAccounts/schedules@2022-08-08' = [for resourceToAutomate in resourcesToAutomate:{
+  name: 'weekdays-end-of-day-${resourceToAutomate.clusterName}'
   parent: automationAccount
   properties: {
     advancedSchedule: {
@@ -145,7 +145,7 @@ resource weekdaysEndOfDaySchedule 'Microsoft.Automation/automationAccounts/sched
     expiryTime: '9999-12-31T17:59:00-06:00'
     timeZone: scheduleTimezone
   }
-}
+}]
 
 resource resourceBringupRunbooks 'Microsoft.Automation/automationAccounts/runbooks@2022-08-08' = [for resourceToAutomate in resourcesToAutomate: {
   name: 'runbook-${resourceToAutomate.clusterName}-bringup'
@@ -163,7 +163,7 @@ resource resourceBringupRunbooks 'Microsoft.Automation/automationAccounts/runboo
 }]
 
 resource resourceBringupRunbookSchedules 'Microsoft.Automation/automationAccounts/jobSchedules@2022-08-08' = [for resourceToAutomate in resourcesToAutomate: {
-  name: guid('resource-bringup-schedule',resourceToAutomate.clusterName,AA_Name)
+  name: guid('weekdays-start-of-day-${resourceToAutomate.clusterName}',AA_Name)
   parent: automationAccount
   properties: {
     parameters: {
@@ -181,10 +181,10 @@ resource resourceBringupRunbookSchedules 'Microsoft.Automation/automationAccount
       name: 'runbook-${resourceToAutomate.clusterName}-bringup'
     }
     schedule: {
-      name: 'weekdays-start-of-day'
+      name: 'weekdays-start-of-day-${resourceToAutomate.clusterName}'
     }
   }
-  dependsOn:[resourceBringupRunbooks,weekdaysStartOfDaySchedule]
+  dependsOn:[resourceBringupRunbooks,weekdaysStartOfDaySchedules]
 }]
 
 resource resourceShutdownRunbooks 'Microsoft.Automation/automationAccounts/runbooks@2022-08-08' = [for resourceToAutomate in resourcesToAutomate: {
@@ -203,7 +203,7 @@ resource resourceShutdownRunbooks 'Microsoft.Automation/automationAccounts/runbo
 }]
 
 resource resourceShutdownRunbookSchedules 'Microsoft.Automation/automationAccounts/jobSchedules@2022-08-08' = [for resourceToAutomate in resourcesToAutomate: {
-  name: guid('resource-shutdown-schedule',resourceToAutomate.clusterName,AA_Name)
+  name: guid('weekdays-end-of-day-${resourceToAutomate.clusterName}',AA_Name)
   parent: automationAccount
   properties: {
     parameters: {
@@ -221,10 +221,10 @@ resource resourceShutdownRunbookSchedules 'Microsoft.Automation/automationAccoun
       name: 'runbook-${resourceToAutomate.clusterName}-shutdown'
     }
     schedule: {
-      name: 'weekdays-end-of-day'
+      name: 'weekdays-end-of-day-${resourceToAutomate.clusterName}'
     }
   }
-  dependsOn:[resourceShutdownRunbooks,weekdaysEndOfDaySchedule]
+  dependsOn:[resourceShutdownRunbooks,weekdaysEndOfDaySchedules]
 }]
 
 // -------------------------- Firewall setup ---------------------------------------------
