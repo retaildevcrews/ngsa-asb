@@ -441,7 +441,7 @@ docker pull opensearchproject/opensearch:latest
 docker pull opensearchproject/opensearch-dashboards:latest
 
 # exporting the PAT to a variable.
-export CR_PAT=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;
+export CR_PAT=<YOUR-PAT>;
 
 # securly passing in the Container Registry Personal Access Token (PAT) using stdin
 echo $CR_PAT | docker login ghcr.io -u trfalls@microsoft.com --password-stdin
