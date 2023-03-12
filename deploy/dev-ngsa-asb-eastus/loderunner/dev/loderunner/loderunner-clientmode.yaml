@@ -18,8 +18,8 @@ spec:
       labels:
         app: loderunner-clientmode
         aadpodidbinding: wcnp-loderunner-id
-        deploy: 23-03-11-06-03-40
-        version: beta-2303-11-06
+        deploy: 23-03-12-06-03-43
+        version: beta-2303-12-06
     spec:
       containers:
         - name: app
