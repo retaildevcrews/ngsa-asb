@@ -104,21 +104,41 @@ To achieve this, ArgoCD uses Kubernetes contexts. A context is a set of access p
 
 When you configure ArgoCD to target multiple clusters, you create a Kubernetes context for each cluster and configure ArgoCD to use those contexts. ArgoCD will then use the context to access the API server of each target cluster and deploy applications.
 
+### Step 3.1: Create A Second Cluster
+
+Create a second cluster using the same steps outlined in step 0 and get the credentials into your kube config
+```bash
+
+# Create an AKS cluster with the following command, replacing <cluster-name> with a name for your cluster, and <node-count> with the number of nodes you want in your cluster:
+az aks create --resource-group <resource-group> --name <cluster-name> --location <location> --generate-ssh-keys
+
+# Connect to the AKS cluster:
+az aks get-credentials --resource-group <resource-group> --name <cluster-name>
+```
+
 ```bash
 
 # Login to Argo
 argocd login localhost:8080
 
 # List the current contexts associated with the management cluster
- argocd cluster list
+argocd cluster list
 
 # Add one or more cluster contexts to argo
 argocd cluster add <cluster-context-name>
 ```
 
+A url will be outputted and that will be the url Argo CD will use to connect to the second cluster.
+
 Now you can return the the UI and manually deploy an application to multiple clusters.
 
-The ApplicationSet controller in Argo CD is a component that enhances application automation and aims to enhance the management of multiple clusters and tenants. Argo CD Applications can be generated from various sources such as Git or Argo CD's pre-defined cluster list. You will find a sample under the manifests folder. Make sure to update the cluster reference for this to successfully work
+The ApplicationSet controller in Argo CD is a component that enhances application automation and aims to enhance the management of multiple clusters and tenants. Argo CD Applications can be generated from various sources such as Git or Argo CD's pre-defined cluster list. You will find a sample under the manifests folder.
+
+If deploying by yaml...
+
+- Remove the existing argo application deployment as the application-set-sample.yaml will re-deploy the application and there will be a sync issue between the two applications.
+
+- Update the cluster list url in the application-set-sample.yaml.
 
 ```bash
 
