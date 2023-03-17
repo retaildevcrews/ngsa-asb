@@ -7,7 +7,7 @@ spec:
   project: default
   source:
     repoURL: https://github.com/retaildevcrews/ngsa-asb
-    targetRevision: HEAD
+    targetRevision: anguyen/argo-spike
     path: spikes/argo-cd/deploy 
   destination: 
     server: https://kubernetes.default.svc
