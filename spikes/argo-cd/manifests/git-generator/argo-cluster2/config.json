@@ -2,6 +2,7 @@
     "app": {
         "source": "https://github.com/retaildevcrews/ngsa-asb",
         "revision": "anguyen/argo-spike",
-        "path": "spike/argo-cd/deploy/git-generator/argo-cluster2"
+        "path": "spike/argo-cd/deploy/git-generator/argo-cluster2",
+        "name":"argo-cluster2"
     }
 }

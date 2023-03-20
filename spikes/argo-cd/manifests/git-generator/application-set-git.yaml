@@ -8,19 +8,19 @@ spec:
       repoURL: https://github.com/retaildevcrews/ngsa-asb
       revision: anguyen/argo-spike
       files:
-      - path: "spikes/argo-cd/manifests/git-generator/**/config.json"
+      - path: "spikes/argo-cd/manifests/git-generator/argo-cluster/config.json"
   template:
     metadata:
       name: '{{path.basename}}'
     spec:
-      project: dev-team-one
+      project: default
       source:
-        repoURL: {{app.source}}
-        targetRevision: {{app.revision}}
-        path: {{app.path}}
+        repoURL: https://github.com/retaildevcrews/ngsa-asb
+        targetRevision: anguyen/argo-spike
+        path: "spikes/argo-cd/deploy/{{cluster.name}}"
       destination:
-        server: ArgoCluster2
-        namespace: dev-team-one
+        server: '{{cluster.address}}'
+        namespace: ngsa
       syncPolicy:
           syncOptions:
           - CreateNamespace=true

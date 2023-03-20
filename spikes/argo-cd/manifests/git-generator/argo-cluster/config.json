@@ -1,7 +1,10 @@
 {
-    "app": {
+    "test": "11223344",
+    "cluster": {
         "source": "https://github.com/retaildevcrews/ngsa-asb",
         "revision": "anguyen/argo-spike",
-        "path": "spike/argo-cd/deploy/git-generator/argo-cluster"
+        "path": "spikes/argo-cd/deploy/argo-cluster",
+        "name": "argo-cluster",
+        "address": "https://argocluste-argocd-e66e73-ynor1e4s.hcp.southcentralus.azmk8s.io:443"
     }
 }
