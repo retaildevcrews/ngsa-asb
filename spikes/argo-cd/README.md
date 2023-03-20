@@ -150,4 +150,4 @@ kubectl apply -f spikes/argo-cd/manifests/application-set-sample.yaml -n argocd
 
 If the need is to be able to pick certain applications to deploy to specific clusters, use a list generator.
 
-The folde
+The folder structure...
