@@ -8,7 +8,7 @@ spec:
   source:
     repoURL: https://github.com/retaildevcrews/ngsa-asb
     targetRevision: anguyen/argo-spike
-    path: spikes/argo-cd/deploy
+    path: spikes/argo-cd/deploy/ngsa1
   destination: 
     server: https://kubernetes.default.svc
     namespace: ngsa

@@ -1,0 +1,30 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: ngsa
+spec:
+  generators:
+  - list:
+      elements:
+      - cluster: argo-cluster
+        url: https://kubernetes.default.svc
+      - cluster: argo-cluster2
+        url: https://argocluste-argocd-e66e73-ynor1e4s.hcp.southcentralus.azmk8s.io:443
+  template:
+    metadata:
+      name: '{{cluster}}-ngsa'
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/retaildevcrews/ngsa-asb
+        targetRevision: anguyen/argo-spike
+        path: spikes/argo-cd/deploy/list-generator/{{cluster}}
+      destination:
+        server: '{{url}}'
+        namespace: ngsa
+      syncPolicy:
+          syncOptions:
+          - CreateNamespace=true
+          automated:
+            selfHeal: true
+            prune: true

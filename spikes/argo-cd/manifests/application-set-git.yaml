@@ -5,7 +5,7 @@ metadata:
 spec:
   generators:
   - git:
-      repoURL: https://github.com/retaildevcrews/ngsa-asb.git
+      repoURL: https://github.com/retaildevcrews/ngsa-asb
       revision: anguyen/argo-spike
       directories:
       - path: spikes/argo-cd/deploy/*
@@ -15,12 +15,15 @@ spec:
     spec:
       project: default
       source:
-        repoURL: https://github.com/retaildevcrews/ngsa-asb.git
+        repoURL: https://github.com/retaildevcrews/ngsa-asb
         targetRevision: anguyen/argo-spike
         path: '{{path}}'
       destination:
-        server: https://kubernetes.default.svc
+        server: ''{{cluster.address}}''
         namespace: '{{path.basename}}'
-      destination:
-        server: https://argocluste-argocd-e66e73-ynor1e4s.hcp.southcentralus.azmk8s.io:443
-        namespace: '{{path.basename}}'
+      syncPolicy:
+        syncOptions:
+        - CreateNamespace=true
+        automated:
+          selfHeal: true
+          prune: true
