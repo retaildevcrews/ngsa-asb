@@ -8,18 +8,18 @@ spec:
       repoURL: https://github.com/retaildevcrews/ngsa-asb
       revision: anguyen/argo-spike
       files:
-      - path: "spikes/argo-cd/manifests/git-generator/argo-cluster/config.json"
+      - path: "spikes/argo-cd/manifests/git-generator/**/config.json"
   template:
     metadata:
       name: '{{path.basename}}'
     spec:
-      project: default
+      project: test-project
       source:
-        repoURL: https://github.com/retaildevcrews/ngsa-asb
-        targetRevision: anguyen/argo-spike
-        path: "spikes/argo-cd/deploy/{{cluster.name}}"
+        repoURL: {{app.source}}
+        targetRevision: {{app.revision}}
+        path: {{app.path}}
       destination:
-        server: '{{cluster.address}}'
+        server: https://kubernetes.default.svc
         namespace: ngsa
       syncPolicy:
           syncOptions:

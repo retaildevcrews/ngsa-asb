@@ -1,10 +1,12 @@
 {
     "test": "11223344",
-    "cluster": {
+    "app": {
         "source": "https://github.com/retaildevcrews/ngsa-asb",
         "revision": "anguyen/argo-spike",
-        "path": "spikes/argo-cd/deploy/argo-cluster",
+        "path": "spikes/argo-cd/deploy/argo-cluster"
+    },
+    "cluster": {
         "name": "argo-cluster",
-        "address": "https://argocluste-argocd-e66e73-ynor1e4s.hcp.southcentralus.azmk8s.io:443"
+        "address": "https://kubernetes.default.svc"
     }
 }
