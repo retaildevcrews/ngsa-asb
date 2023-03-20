@@ -145,3 +145,9 @@ If deploying by yaml...
 kubectl apply -f spikes/argo-cd/manifests/application-set-sample.yaml -n argocd
 
 ```
+
+### Step 3.2: Choosing The Right ApplicationSet Controller Generator
+
+If the need is to be able to pick certain applications to deploy to specific clusters, use a list generator.
+
+The folde
