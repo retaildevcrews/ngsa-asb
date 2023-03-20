@@ -13,13 +13,13 @@ spec:
     metadata:
       name: '{{path.basename}}'
     spec:
-      project: test-project
+      project: default
       source:
-        repoURL: {{app.source}}
-        targetRevision: {{app.revision}}
-        path: {{app.path}}
+        repoURL: '{{app.source}}'
+        targetRevision: '{{app.revision}}'
+        path: '{{app.path}}'
       destination:
-        server: https://kubernetes.default.svc
+        server: '{{cluster.address}}'
         namespace: ngsa
       syncPolicy:
           syncOptions:
