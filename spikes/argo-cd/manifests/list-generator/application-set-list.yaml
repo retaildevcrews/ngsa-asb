@@ -18,7 +18,7 @@ spec:
       source:
         repoURL: https://github.com/retaildevcrews/ngsa-asb
         targetRevision: anguyen/argo-spike
-        path: spikes/argo-cd/deploy/list-generator/{{cluster}}
+        path: spikes/argo-cd/deploy/{{cluster}}
       destination:
         server: '{{url}}'
         namespace: ngsa
