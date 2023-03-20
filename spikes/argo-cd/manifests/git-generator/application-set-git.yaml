@@ -1,0 +1,28 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: ngsa
+spec:
+  generators:
+  - git:
+      repoURL: https://github.com/retaildevcrews/ngsa-asb
+      files:
+      - path: "spikes/argo-cd/deploy/git-generator/**/config.json"
+  template:
+    metadata:
+      name: '{{path.basename}}'
+    spec:
+      project: dev-team-one
+      source:
+        repoURL: {{app.source}}
+        targetRevision: {{app.revision}}
+        path: {{app.path}}
+      destination:
+        server: ArgoCluster2
+        namespace: dev-team-one
+      syncPolicy:
+          syncOptions:
+          - CreateNamespace=true
+          automated:
+            selfHeal: true
+            prune: true

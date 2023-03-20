@@ -96,6 +96,8 @@ Alternatively you can declare an argo application deployment using yaml.
 kubectl apply -f spikes/argo-cd/manifests/argo-ngsa-app.yaml
 ```
 
+- Rollbacks cannot be performed against an application with automated sync enabled
+
 ## Step 3:  Target Multiple Clusters
 
 You can use ArgoCD to deploy and manage applications across different clusters without having to install ArgoCD in each cluster manually.
@@ -151,3 +153,4 @@ kubectl apply -f spikes/argo-cd/manifests/application-set-sample.yaml -n argocd
 If the need is to be able to pick certain applications to deploy to specific clusters, use a list generator.
 
 The folder structure...
+
