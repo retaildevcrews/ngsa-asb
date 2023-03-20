@@ -1,0 +1,26 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: ngsa
+spec:
+  generators:
+  - git:
+      repoURL: https://github.com/retaildevcrews/ngsa-asb.git
+      revision: anguyen/argo-spike
+      directories:
+      - path: spikes/argo-cd/deploy/*
+  template:
+    metadata:
+      name: '{{path.basename}}'
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/retaildevcrews/ngsa-asb.git
+        targetRevision: anguyen/argo-spike
+        path: '{{path}}'
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: '{{path.basename}}'
+      destination:
+        server: https://argocluste-argocd-e66e73-ynor1e4s.hcp.southcentralus.azmk8s.io:443
+        namespace: '{{path.basename}}'
