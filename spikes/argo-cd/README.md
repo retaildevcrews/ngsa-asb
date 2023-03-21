@@ -155,3 +155,5 @@ Choosing the right application-set generator is dependent on what type of cluste
 If clusters are predefined with little to no changes to clusters, manually adding or removing clusters is adequate, and the deployment/addition of applications can be separated to different clusters/environments, use a list generator. Applications can be separated to different clusters by putting their yaml deployment in the appropriate cluster folder.
 
 If clusters are more dynamic where the creation/modification are happening more often, using a git generator may be better. A git generator is the most flexible and allows the ability for administrators to restrict some fields from being controlled by developers in the application spec. A folder can be targeted in the git repo to where if a config.json file is checked-in/modified, a cluster will be created/removed appropriately.
+
+## Step 4: Customizing Deployment Order With Sync-Waves
