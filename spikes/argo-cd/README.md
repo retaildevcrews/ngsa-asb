@@ -148,12 +148,10 @@ kubectl apply -f spikes/argo-cd/manifests/application-set-sample.yaml -n argocd
 
 ```
 
-### Step 3.2: Choosing The Right ApplicationSet Controller Generator
+### Step 3.2: Choosing The Right Application-Set Controller Generator
 
-Choosing the right application-set generator is dependent on how cluster management is needed.
+Choosing the right application-set generator is dependent on what type of cluster management is needed.
 
-If clusters are predefined with little to no changes to clusters, and the deployment/addition of applications need to be separated to different clusters/environments, use a list generator. List generators require manually updating the application-set to add or remove clusters.
+If clusters are predefined with little to no changes to clusters, manually adding or removing clusters is adequate, and the deployment/addition of applications can be separated to different clusters/environments, use a list generator. Applications can be separated to different clusters by putting their yaml deployment in the appropriate cluster folder.
 
-The folder structure...
-
-If clusters are more dynamic where the creation/modification are happening more often, using a git generator may be better. A folder can be targeted in the git repo to where if a config.json file is checked-in/modified, a cluster will be created/removed appropriately.
+If clusters are more dynamic where the creation/modification are happening more often, using a git generator may be better. A git generator is the most flexible and allows the ability for administrators to restrict some fields from being controlled by developers in the application spec. A folder can be targeted in the git repo to where if a config.json file is checked-in/modified, a cluster will be created/removed appropriately.
