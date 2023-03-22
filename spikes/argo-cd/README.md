@@ -157,3 +157,43 @@ If clusters are predefined with little to no changes to clusters, manually addin
 If clusters are more dynamic where the creation/modification are happening more often, using a git generator may be better. A git generator is the most flexible and allows the ability for administrators to restrict some fields from being controlled by developers in the application spec. A folder can be targeted in the git repo to where if a config.json file is checked-in/modified, a cluster will be created/removed appropriately.
 
 ## Step 4: Customizing Deployment Order With Sync-Waves
+
+### Step 4.1: Sync-Wave
+
+Sync-waves allow resources to be deployed in a specific order. By adding the annotation to the deployment yaml, Argo CD will control how the application rolls out. All deployment manifests are 0 by default, and can be set to a negative number as well.
+
+Argo CD won't apply the next manifest until the previous reports "healthy".
+
+```bash
+
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+
+```
+
+### Step 4.2: Hooks
+
+Hooks control the deployment even further. Hooks can be defined by the 4 stages...
+
+- PreSync - Runs before the sync operation and can be a database migration or backup.
+- Sync - Runs after PreSync successfully ran and will run with normal manifests.
+- PostSync - Runs after Sync successfully ran and can be an email notification
+- SyncFail - Runs if the Sync operation failed and can be used to send fail notifications or other operations
+
+In addition to sync operations, hook deletions state can be specified.
+
+- HookSucceeded - Resource will be deleted after it has succeeded.
+- HookFailed - Resource will be deleted if it has failed.
+- BeforeHookCreation - Resource will be deleted before a new one is created during a new sync.
+
+BeforeHookCreation is the default deletion state for hooks if not specified.
+
+```bash
+
+metadata:
+  annotations:
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+
+```
