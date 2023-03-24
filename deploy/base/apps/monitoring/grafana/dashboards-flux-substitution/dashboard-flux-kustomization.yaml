@@ -11,7 +11,7 @@ spec:
   interval: 1m0s
   prune: true
   targetNamespace: monitoring
-  path: ./deploy/dev-ngsa-asb-eastus/monitoring/grafana/dashboards-flux-substitution
+  path: ./deploy/base/apps/monitoring/grafana/dashboards-flux-substitution
   sourceRef:
     kind: GitRepository
     name: automation-test

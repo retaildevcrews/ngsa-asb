@@ -32,5 +32,5 @@ spec:
   path: ./deploy/dev-ngsa-asb-eastus/flux-kustomization # This is where the cluster kustomization.yaml resides
   sourceRef:
     kind: GitRepository
-    name: asb-repo-flux
+    name: automation-test
     namespace: flux-system # points to namespace where this GitRepository is

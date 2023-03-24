@@ -9,6 +9,8 @@ resources:
 - dashboards/ngsa-az-monitor-rel.yaml
 - dashboards/ngsa-fluentbit.yaml
 - dashboards/ngsa-prometheus.yaml
+# Variable substitution dashboards
+- dashboards-flux-substitution/dashboard-flux-kustomization.yaml
 # Grafana deployment files
 - 01-grafana-config.yaml
 - 02-grafana-config-datasources.yaml
