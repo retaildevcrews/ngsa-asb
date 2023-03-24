@@ -8,7 +8,7 @@ metadata:
 spec:
   interval: 1m0s
   ref:
-    branch: aakindele/automation-dashboard-to-base
+    branch: main
   # secretRef: # We're accessing ngs-asb as readonly repo
   #   name: flux-system
   url: https://github.com/retaildevcrews/ngsa-asb
