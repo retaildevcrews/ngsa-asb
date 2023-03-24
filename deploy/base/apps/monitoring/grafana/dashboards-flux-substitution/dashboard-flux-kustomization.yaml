@@ -14,7 +14,7 @@ spec:
   path: ./deploy/base/apps/monitoring/grafana/dashboards-flux-substitution
   sourceRef:
     kind: GitRepository
-    name: automation-test
+    name: asb-repo-flux
     namespace: flux-system
   postBuild:
     substitute:
