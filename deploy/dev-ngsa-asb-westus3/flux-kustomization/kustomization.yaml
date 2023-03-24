@@ -7,7 +7,7 @@ resources:
 - ../monitoring/monitoring-flux-kustomization.yaml
 - ../loderunner/loderunner-flux-kustomization.yaml
 - ../ngsa/ngsa-flux-kustomization.yaml
-- ../burst/burst-flux-kustomization.yaml
+- ../../base/apps/burst/burst-flux-kustomization.yaml
 
 # Quick k8s kustomize note on directory and file
 # <cur-dir> --> This is where the k8s kustomization.yaml resides
