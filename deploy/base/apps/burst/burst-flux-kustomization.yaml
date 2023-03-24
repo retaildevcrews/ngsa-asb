@@ -16,7 +16,7 @@ spec:
     namespace: istio-system
   interval: 1m0s # detect drift and undo kubectl edits every minute
   prune: true # remove stale resources from cluster
-  path: ./deploy/dev-ngsa-asb-westus3/burst
+  path: ./deploy/base/apps/burst
   sourceRef:
     kind: GitRepository
     name: asb-repo-flux
