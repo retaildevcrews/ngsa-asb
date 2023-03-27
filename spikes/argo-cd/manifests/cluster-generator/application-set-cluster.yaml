@@ -5,6 +5,12 @@ metadata:
 spec:
   generators:
   - clusters: {}
+  # Selector may be used to narrow scope of targeted clusters (Eg. label, cluster secret, etc.)
+  # - clusters:
+  #     selector:
+  #       matchLabels:
+  #         argocd.argoproj.io/secret-type: cluster
+  #         staging: true
   template:
     metadata:
       name: '{{name}}'

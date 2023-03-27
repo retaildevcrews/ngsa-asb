@@ -114,8 +114,11 @@ Create a second cluster using the same steps outlined in step 0 and get the cred
 # Create an AKS cluster with the following command, replacing <cluster-name> with a name for your cluster, and <node-count> with the number of nodes you want in your cluster:
 az aks create --resource-group <resource-group> --name <cluster-name> --location <location> --generate-ssh-keys
 
-# Connect to the AKS cluster:
+# Merge AKS cluster into local kube config:
 az aks get-credentials --resource-group <resource-group> --name <cluster-name>
+
+# Set config cluster to initial cluster where ArgoCD is installed:
+kubectl config set-cluster <cluster-name>
 ```
 
 ```bash
@@ -134,29 +137,39 @@ A url will be outputted and that will be the url Argo CD will use to connect to 
 
 Now you can return the the UI and manually deploy an application to multiple clusters.
 
-The ApplicationSet controller in Argo CD is a component that enhances application automation and aims to enhance the management of multiple clusters and tenants. Argo CD Applications can be generated from various sources such as Git or Argo CD's pre-defined cluster list. You will find a sample under the manifests folder.
-
-If deploying by yaml...
-
-- Remove the existing argo application deployment as the application-set-sample.yaml will re-deploy the application and there will be a sync issue between the two applications.
-
-- Update the cluster list url in the application-set-sample.yaml.
-
-```bash
-
-kubectl apply -f spikes/argo-cd/manifests/application-set-sample.yaml -n argocd
-
-```
-
 ### Step 3.2: Choosing The Right Application-Set Controller Generator
+
+The ApplicationSet controller in Argo CD is a component that enhances application automation and aims to enhance the management of multiple clusters and tenants. Argo CD Applications can be generated from various sources such as Git or Argo CD's pre-defined cluster list. You will find a sample under the manifests folder.
 
 Choosing the right application-set generator is dependent on what type of cluster management is needed.
 
 If clusters are predefined with little to no changes to clusters, manually adding or removing clusters is adequate, and the deployment/addition of applications can be separated to different clusters/environments, use a list generator. Applications can be separated to different clusters by putting their yaml deployment in the appropriate cluster folder.
 
+Update the cluster information in the manifest directed below and run the command to deploy an example.
+
+```bash
+
+kubectl apply -f spikes/argo-cd/manifests/list-generator/application-set-list.yaml -n argocd
+
+```
+
 If clusters are more dynamic where the creation/modification are happening more often, using a git generator may be better. A git generator is the most flexible and allows the ability for administrators to restrict some fields from being controlled by developers in the application spec. A folder can be targeted in the git repo to where if a config.json file is checked-in/modified, a cluster will be created/removed appropriately.
 
+Update the cluster information in the config.json in the directory below and run the command to deploy an example.
+
+```bash
+
+kubectl apply -f spikes/argo-cd/manifests/git-generator/application-set-git.yaml -n argocd
+
+```
+
 If a more hands-off approach to targeting cluster deployment is needed, a cluster generator can be used. Deployments can target all or specific clusters by using a "match label" to select local or remote clusters.
+
+```bash
+
+kubectl apply -f spikes/argo-cd/manifests/cluster-generator/application-set-cluster.yaml -n argocd
+
+```
 
 - Beware: Cluster name must be lowercase or it will unable to find the cluster.
 
