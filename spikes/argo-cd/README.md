@@ -93,7 +93,7 @@ kubectl get pods -n ngsa
 Alternatively you can declare an argo application deployment using yaml.
 
 ```bash
-kubectl apply -f spikes/argo-cd/manifests/argo-ngsa-app.yaml
+kubectl apply -f spikes/argo-cd/manifests/argo-ngsa-app.yaml -n argocd
 ```
 
 - Rollbacks cannot be performed against an application with automated sync enabled
