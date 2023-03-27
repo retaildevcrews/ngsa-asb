@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: ngsa-memory2
-  namespace: ngsa2
+  namespace: ngsa
   labels:
     app.kubernetes.io/name: ngsa-memory2
   annotations:
@@ -79,7 +79,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: ngsa-memory2
-  namespace: ngsa2
+  namespace: ngsa
 spec:
   type: ClusterIP
   ports:
