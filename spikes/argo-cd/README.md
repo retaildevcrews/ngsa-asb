@@ -156,6 +156,10 @@ If clusters are predefined with little to no changes to clusters, manually addin
 
 If clusters are more dynamic where the creation/modification are happening more often, using a git generator may be better. A git generator is the most flexible and allows the ability for administrators to restrict some fields from being controlled by developers in the application spec. A folder can be targeted in the git repo to where if a config.json file is checked-in/modified, a cluster will be created/removed appropriately.
 
+If a more hands-off approach to targeting cluster deployment is needed, a cluster generator can be used. Deployments can target all or specific clusters by using a "match label" to select local or remote clusters.
+
+- Beware: Cluster name must be lowercase or it will unable to find the cluster.
+
 ## Step 4: Customizing Deployment Order With Sync-Waves
 
 ### Step 4.1: Sync-Wave

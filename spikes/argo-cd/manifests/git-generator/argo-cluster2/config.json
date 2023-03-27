@@ -7,6 +7,6 @@
     },
     "cluster": {
         "name": "argo-cluster2",
-        "address": "https://argocluste-argocd-e66e73-ynor1e4s.hcp.southcentralus.azmk8s.io:443"
+        "address": "https://argocluste-argocd-ce2cc3-5c31jggv.hcp.southcentralus.azmk8s.io:443"
     }
 }

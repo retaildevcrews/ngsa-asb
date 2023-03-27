@@ -4,21 +4,18 @@ metadata:
   name: ngsa
 spec:
   generators:
-  - list:
-      elements:
-      - cluster: argo-cluster
-        url: https://kubernetes.default.svc
+  - clusters: {}
   template:
     metadata:
-      name: '{{cluster}}'
+      name: '{{name}}'
     spec:
-      project: default
+      project: "default"
       source:
         repoURL: https://github.com/retaildevcrews/ngsa-asb
         targetRevision: anguyen/argo-spike
         path: spikes/argo-cd/deploy/argo-cluster
-      destination: 
-        server: https://kubernetes.default.svc
+      destination:
+        server: '{{server}}'
         namespace: ngsa
       syncPolicy:
         syncOptions:
