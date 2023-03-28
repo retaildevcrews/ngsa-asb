@@ -7,7 +7,7 @@ spec:
   arguments:
     parameters:
       - name: repo-url
-        value: https://github.com/retaildevcrews/ngsa-asb.git
+        value: https://github.com/retaildevcrews/ngsa-asb
       - name: branch-name
         value: joaquinrz-argoWorkflow
   templates:
@@ -24,27 +24,33 @@ spec:
                 - name: branch-name
                   value: "{{workflow.parameters.branch-name}}"
                 - name: git-path
-                  value: spikes/argo-workflow/ngsa-memory
+                  value: spikes/argo-workflow/charts/ngsa-memory
         - - name: install-loderunner
             template: deploy-helm-chart
             arguments:
               parameters:
                 - name: app-name
-                  value: loderunner-instance
+                  value: loderunner
                 - name: repo-url
                   value: "{{workflow.parameters.repo-url}}"
                 - name: branch-name
                   value: "{{workflow.parameters.branch-name}}"
                 - name: git-path
-                  value: spikes/argo-workflow/loderunner
+                  value: spikes/argo-workflow/charts/loderunner
 
     - name: deploy-helm-chart
+      inputs:
+        parameters:
+        - name: app-name
+        - name: repo-url
+        - name: branch-name
+        - name: git-path
       container:
-        image: alpine/helm:latest
-        command: [sh, -c]
+        image: alpine/helm:3.11.1
+        command: [bash, -c]
         args:
           - >
-            helm plugin install https://github.com/aslafy-z/helm-git.git &&
-            helm repo add {{inputs.parameters.app-name}} git+{{inputs.parameters.repo-url}}?ref={{inputs.parameters.branch-name}}&path={{inputs.parameters.git-path}} &&
-            helm repo update &&
+            helm plugin install https://github.com/aslafy-z/helm-git.git --version 0.14.3 && 
+            helm repo add {{inputs.parameters.app-name}} 'git+{{inputs.parameters.repo-url}}@{{inputs.parameters.git-path}}?depupdate=0?&package=1&ref={{inputs.parameters.branch-name}}' && 
+            helm repo update && helm repo list &&
             helm install {{inputs.parameters.app-name}} {{inputs.parameters.app-name}}/{{inputs.parameters.app-name}} --namespace {{inputs.parameters.app-name}} --create-namespace
