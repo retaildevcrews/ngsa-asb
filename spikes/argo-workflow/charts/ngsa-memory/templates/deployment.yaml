@@ -33,19 +33,19 @@ spec:
           - {{ .Values.region }}
           ports:
             - name: http
-              containerPort: {{ .Values.port }}
+              containerPort: {{ .Values.service.port }}
               protocol: TCP
           readinessProbe:
             initialDelaySeconds: 5
             httpGet:
               path: /version
-              port: {{ .Values.port }}
+              port: {{ .Values.service.port }}
           livenessProbe:
             initialDelaySeconds: 60
             periodSeconds: 300
             httpGet:
               path: /healthz
-              port: {{ .Values.port }}
+              port: {{ .Values.service.port }}
           resources:
             limits:
               cpu: 1000m
