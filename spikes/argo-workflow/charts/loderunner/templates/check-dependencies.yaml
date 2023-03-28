@@ -15,7 +15,7 @@ data:
 
       DEPLOYED_VERSION=$(helm ls --filter "^${CHART_NAME}$" -o json | jq -r '.[].app_version')
 
-      if [ "$DEPLOYED_VERSION" == "$REQUIRED_VERSION" ]; then
+      if [ "$DEPLOYED_VERSION" = "$REQUIRED_VERSION" ]; then
         echo "Required version of ${CHART_NAME} (${REQUIRED_VERSION}) is already deployed."
         return 0
       else
@@ -25,13 +25,11 @@ data:
     }
 
     # Define your dependencies here
-    DEPENDENCIES=(
-      "ngsa-memory:1.0"
-    )
+    DEPENDENCIES="ngsa-memory:1.0"
 
     ALL_DEPENDENCIES_MET=true
 
-    for DEPENDENCY in "${DEPENDENCIES[@]}"; do
+    for DEPENDENCY in $DEPENDENCIES; do
       CHART_NAME="${DEPENDENCY%%:*}"
       REQUIRED_VERSION="${DEPENDENCY#*:}"
       check_chart_version "${CHART_NAME}" "${REQUIRED_VERSION}"
@@ -49,7 +47,6 @@ data:
       echo "Not all dependencies are met. Exiting."
       exit 1
     fi
-
 
 ---
 apiVersion: batch/v1
