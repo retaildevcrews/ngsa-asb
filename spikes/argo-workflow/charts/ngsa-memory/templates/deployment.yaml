@@ -71,5 +71,4 @@ spec:
       securityContext:
         seccompProfile:
           type: RuntimeDefault
-      nodeSelector:
-        kubernetes.azure.com/mode: user
+
