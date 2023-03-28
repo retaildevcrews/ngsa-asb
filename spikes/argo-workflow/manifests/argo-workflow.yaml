@@ -53,7 +53,7 @@ spec:
           - >
             helm plugin install https://github.com/aslafy-z/helm-git.git --version 0.14.3 && 
             helm repo add {{inputs.parameters.app-name}} 'git+{{inputs.parameters.repo-url}}@{{inputs.parameters.git-path}}?depupdate=0?&package=1&ref={{inputs.parameters.branch-name}}' && 
-            helm repo update && helm repo list &&
+            helm repo update &&
             helm upgrade --install {{inputs.parameters.app-name}} {{inputs.parameters.app-name}}/{{inputs.parameters.app-name}} --namespace default --create-namespace 
       serviceAccountName: helm-deployment-sa
 
