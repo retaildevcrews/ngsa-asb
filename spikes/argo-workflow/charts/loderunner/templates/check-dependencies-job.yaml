@@ -8,6 +8,7 @@ metadata:
 spec:
   template:
     spec:
+      serviceAccountName: default/helm-deployment-sa    
       volumes:
         - name: scripts
           configMap:

@@ -14,7 +14,7 @@ data:
       REQUIRED_VERSION="$2"
 
       # Use helm ls command to get the app version of the deployed chart
-      DEPLOYED_VERSION=$(helm ls --filter "^${CHART_NAME}$" -o json | jq -r '.[].app_version')
+      DEPLOYED_VERSION=$(helm ls --filter "^${CHART_NAME}$" -o json --all-namespaces | jq -r '.[].app_version')
 
       if [ $? -ne 0 ]; then
         echo "Error: Failed to get app version for ${CHART_NAME}." >&2
