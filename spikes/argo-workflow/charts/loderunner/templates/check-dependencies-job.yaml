@@ -1,0 +1,26 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ .Release.Name }}-check-dependencies
+  annotations:
+    helm.sh/hook: pre-install
+    helm.sh/hook-delete-policy: hook-succeeded,hook-failed
+spec:
+  template:
+    spec:
+      volumes:
+        - name: scripts
+          configMap:
+            name: {{ .Release.Name }}-check-dependencies
+      containers:
+        - name: check-dependencies
+          image: alpine/helm:3.11.1
+          command: ["/bin/sh"]
+          args: ["/scripts/check-dependencies.sh"]
+          volumeMounts:
+            - name: scripts
+              mountPath: /scripts
+              readOnly: true
+      restartPolicy: Never
+  backoffLimit: 2
+
