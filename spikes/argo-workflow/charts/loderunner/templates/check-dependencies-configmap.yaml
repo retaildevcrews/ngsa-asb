@@ -14,15 +14,21 @@ data:
       REQUIRED_VERSION="$2"
 
       # Use helm ls command to get the app version of the deployed chart
-      #DEPLOYED_VERSION=$(helm ls --filter "^${CHART_NAME}$" -o json --all-namespaces | jq -r '.[].app_version')
-      DEPLOYED_VERSION=$(helm ls --filter "^${CHART_NAME}$" -o json --all-namespaces | grep -m1 '"app_version":' | cut -d'"' -f4)
+      DEPLOYED_CHART=$(helm ls --filter "^${CHART_NAME}$" -o json --all-namespaces | grep -o '"chart":[^,}]*' | cut -d '"' -f4)
 
       if [ $? -ne 0 ]; then
-        echo "Error: Failed to get app version for ${CHART_NAME}." >&2
+        echo "Error: Failed to get the deployed chart information for ${CHART_NAME}." >&2
         exit 1
       fi
 
-      if [ "$DEPLOYED_VERSION" = "$REQUIRED_VERSION" ]; then
+      CHART_VERSION=$(echo "$DEPLOYED_CHART" | awk -F '-' '{print $NF}' | grep -Eo '[0-9]+([.][0-9]+)+')
+
+      if [ $? -ne 0 ]; then
+        echo "Error: Failed to get the deployed chart version information for ${CHART_NAME}." >&2
+        exit 1
+      fi
+
+      if [ "$CHART_VERSION=" = "$REQUIRED_VERSION" ]; then
         echo "Required version of ${CHART_NAME} (${REQUIRED_VERSION}) is already deployed."
         return 0
       else
