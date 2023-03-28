@@ -13,7 +13,13 @@ data:
       CHART_NAME="$1"
       REQUIRED_VERSION="$2"
 
+      # Use helm ls command to get the app version of the deployed chart
       DEPLOYED_VERSION=$(helm ls --filter "^${CHART_NAME}$" -o json | jq -r '.[].app_version')
+
+      if [ $? -ne 0 ]; then
+        echo "Error: Failed to get app version for ${CHART_NAME}." >&2
+        exit 1
+      fi
 
       if [ "$DEPLOYED_VERSION" = "$REQUIRED_VERSION" ]; then
         echo "Required version of ${CHART_NAME} (${REQUIRED_VERSION}) is already deployed."
@@ -47,4 +53,3 @@ data:
       echo "Not all dependencies are met. Exiting."
       exit 1
     fi
-
