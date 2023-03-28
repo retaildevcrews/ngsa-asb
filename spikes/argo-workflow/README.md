@@ -48,6 +48,16 @@ Let's break down the key components of an Argo Workflow:
 - **Workflow Controller:** A Kubernetes controller that watches for Workflow objects and manages their execution.
 - **Argo Server:** A server that provides the Argo UI and API, enabling users to visualize and manage Workflows.
 
+In Kubernetes, a ServiceAccount is used to provide an identity for processes that run in a Pod. When deploying resources with Argo Workflows, it is important to grant the necessary permissions to the Workflow to create, update, and delete resources such as Deployments, Pods, Services, and Namespaces. To achieve this, a ServiceAccount with the appropriate ClusterRole and ClusterRoleBinding is required. The ClusterRole defines the permissions needed for the Workflow, while the ClusterRoleBinding associates the ServiceAccount with the ClusterRole, allowing the Argo Workflow to perform the desired actions within the cluster.
+
+To create the required ServiceAccount, ClusterRole, and ClusterRoleBinding, run the following commands:
+
+```bash
+kubectl apply -f manifests/helm-deployment-sa.yaml
+kubectl apply -f manifests/helm-deployment-clusterrole.yaml
+kubectl apply -f manifests/helm-deployment-clusterrolebinding.yaml
+```
+
 ### Creating an Argo Workflow for Deploying Applications
 
 Now, let's install an Argo Workflow that deploys the ngsa-memory and loderunner applications using Helm charts. To do this, we have provided a YAML file under `manifests/argo-workflow.yaml` This Workflow defines a single step that deploys both the ngsa-memory and loderunner applications. Each application deployment is executed using the deploy-helm-chart template, which runs the Helm command with the appropriate parameters.
