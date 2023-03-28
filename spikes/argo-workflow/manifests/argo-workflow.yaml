@@ -1,0 +1,50 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: helm-deployment-workflow-
+spec:
+  entrypoint: deploy-addons
+  arguments:
+    parameters:
+      - name: repo-url
+        value: https://github.com/retaildevcrews/ngsa-asb.git
+      - name: branch-name
+        value: joaquinrz-argoWorkflow
+  templates:
+    - name: deploy-addons
+      steps:
+        - - name: install-ngsa-memory
+            template: deploy-helm-chart
+            arguments:
+              parameters:
+                - name: app-name
+                  value: ngsa-memory
+                - name: repo-url
+                  value: "{{workflow.parameters.repo-url}}"
+                - name: branch-name
+                  value: "{{workflow.parameters.branch-name}}"
+                - name: git-path
+                  value: spikes/argo-workflow/ngsa-memory
+        - - name: install-loderunner
+            template: deploy-helm-chart
+            arguments:
+              parameters:
+                - name: app-name
+                  value: loderunner-instance
+                - name: repo-url
+                  value: "{{workflow.parameters.repo-url}}"
+                - name: branch-name
+                  value: "{{workflow.parameters.branch-name}}"
+                - name: git-path
+                  value: spikes/argo-workflow/loderunner
+
+    - name: deploy-helm-chart
+      container:
+        image: alpine/helm:latest
+        command: [sh, -c]
+        args:
+          - >
+            helm plugin install https://github.com/aslafy-z/helm-git.git &&
+            helm repo add {{inputs.parameters.app-name}} git+{{inputs.parameters.repo-url}}?ref={{inputs.parameters.branch-name}}&path={{inputs.parameters.git-path}} &&
+            helm repo update &&
+            helm install {{inputs.parameters.app-name}} {{inputs.parameters.app-name}}/{{inputs.parameters.app-name}} --namespace {{inputs.parameters.app-name}} --create-namespace

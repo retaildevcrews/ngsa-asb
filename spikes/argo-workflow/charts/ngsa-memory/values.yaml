@@ -1,0 +1,5 @@
+replicas: 1
+image: ghcr.io/retaildevcrews/ngsa-app:beta
+zone: dev
+region: dev
+port: 8080
