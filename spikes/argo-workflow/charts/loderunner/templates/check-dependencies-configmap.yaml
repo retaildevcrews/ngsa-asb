@@ -4,7 +4,7 @@ metadata:
   name: {{ .Release.Name }}-check-dependencies
   annotations:
     helm.sh/hook: pre-install,pre-upgrade
-    helm.sh/hook-delete-policy: hook-succeeded,hook-failed
+    helm.sh/hook-delete-policy: hook-succeeded,hook-failed,before-hook-creation
 data:
   check-dependencies.sh: |
     #!/bin/sh
