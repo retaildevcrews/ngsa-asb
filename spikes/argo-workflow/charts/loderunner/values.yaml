@@ -5,8 +5,6 @@ image:
   tag: beta
   pullPolicy: Always
 
-namespace: loderunner
-
 port: 8080
 
 resources:
