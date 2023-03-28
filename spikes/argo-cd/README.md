@@ -219,9 +219,7 @@ metadata:
 
 During this time of writing (03/27/2023), this feature is in alpha and can be subjected to change or removal in future releases.
 
-Progressive syncs are similar to sync-waves to where deployments can only continue when the current resource is "healthy". However, these work at the application group level.
-
-- RollingSync will force all generated Applications to have autosync disabled
+Progressive syncs are similar to sync-waves to where deployments can only continue when the current resource is "healthy". These work at the application group level.
 
 ```bash
 
@@ -237,5 +235,8 @@ kubectl get pods -n argocd
 
 # Delete pod so it can restart with the config map changes
 kubectl delete pod <argocd-applicationset-controller-name> -n argocd
+
+# Update the cluster information in the manifest directed below and run the command to deploy an example.
+kubectl apply -f spikes/argo-cd/manifests/rolling-update/application-set-rolling.yaml -n argocd
 
 ```

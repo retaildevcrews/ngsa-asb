@@ -9,7 +9,7 @@ spec:
       - cluster: argo-cluster
         url: https://kubernetes.default.svc
       - cluster: argo-cluster2
-        url: https://sccluster2-argoresource-ce2cc3-dytsmyjk.hcp.southcentralus.azmk8s.io:443
+        url: https://argocluste-argoresource-ce2cc3-7wwuiish.hcp.southcentralus.azmk8s.io:443
   template:
     metadata:
       name: '{{cluster}}-ngsa'
