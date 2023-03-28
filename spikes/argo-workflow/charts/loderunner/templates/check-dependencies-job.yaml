@@ -3,7 +3,7 @@ kind: Job
 metadata:
   name: {{ .Release.Name }}-check-dependencies
   annotations:
-    helm.sh/hook: pre-install
+    helm.sh/hook: pre-install,pre-upgrade
     helm.sh/hook-delete-policy: hook-succeeded,hook-failed
 spec:
   template:
