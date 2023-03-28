@@ -38,7 +38,7 @@ data:
     }
 
     # Define your dependencies here
-    DEPENDENCIES="ngsa-memory:0.2.2"
+    DEPENDENCIES="ngsa-memory:0.2.1"
 
     ALL_DEPENDENCIES_MET=true
 
