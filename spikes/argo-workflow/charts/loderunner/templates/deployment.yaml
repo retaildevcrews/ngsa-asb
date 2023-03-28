@@ -53,7 +53,7 @@ spec:
           - "1000"
           - -r
           - -s
-          - http://{{ include "ngsa-memory.fullname" . }}:8080
+          - http://ngsa-memory.ngsa:8080
           - -f
           - benchmark.json
           - -p
