@@ -17,7 +17,7 @@ spec:
       project: default
       source:
         repoURL: https://github.com/retaildevcrews/ngsa-asb
-        targetRevision: anguyen/argo-spike
+        targetRevision: HEAD
         path: spikes/argo-cd/deploy/{{cluster}}
       destination:
         server: '{{url}}'

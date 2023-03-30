@@ -121,9 +121,6 @@ az aks get-credentials --resource-group <resource-group> --name <cluster-name>
 
 # Set config cluster to initial cluster where ArgoCD is installed:
 kubectl config use-context <cluster-name>
-```
-
-```bash
 
 # Login to Argo
 argocd login localhost:8080

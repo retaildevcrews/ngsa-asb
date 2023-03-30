@@ -6,7 +6,7 @@ spec:
   generators:
   - git:
       repoURL: https://github.com/retaildevcrews/ngsa-asb
-      revision: anguyen/argo-spike
+      revision: HEAD
       files:
       - path: "spikes/argo-cd/manifests/git-generator/**/config.json"
   template:
