@@ -49,17 +49,19 @@ kubectl apply -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manif
 # Verify that ArgoCD is running:
 kubectl get pods -n argocd
 
+# Retrieve the password to be used in the next step
+argocd admin initial-password -n argocd
+
+# Alternatively, you can also retrieve the credentials using kubectl.
+kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
+
 # Access the ArgoCD web UI by running the following command, and then open the URL in a web browser:
 kubectl port-forward svc/argocd-server -n argocd 8080:443
 
 # Log in to the ArgoCD web UI with the following credentials:
 # - Username: admin
-# - Password: Retrieve the ArgoCD password by running one of the following command:
+# - Password: Retrieve the ArgoCD password:
 
-argocd admin initial-password -n argocd
-
-# Alternatively, you can also retrieve the credentials using kubectl.
-kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
 ```
 
 ## Step 2:  Deploy a sample application with GitOps
