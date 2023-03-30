@@ -139,9 +139,9 @@ Now you can return the the UI and manually deploy an application to multiple clu
 
 ### Step 3.2: Choosing The Right Application-Set Controller Generator
 
-The ApplicationSet controller in Argo CD is a component that enhances application automation and aims to enhance the management of multiple clusters and tenants. Argo CD Applications can be generated from various sources such as Git or Argo CD's pre-defined cluster list. You will find a sample under the manifests folder.
+The ApplicationSet controller in Argo CD is a component that enhances application automation and aims to enhance the management of multiple clusters and tenants. Application-sets allow the ability to use a single Kubernetes manifest to target multiple Kubernetes clusters. It also improves the ability of individual cluster tenats to deploy applications without needing to involve privleged cluster administrators for multitenant clusters.
 
-Choosing the right application-set generator is dependent on what type of cluster management is needed.
+Argo CD Applications can be generated from various sources such as Git or Argo CD's pre-defined cluster list. You will find a sample under the manifests folder. Choosing the right application-set generator is dependent on what type of cluster management is needed.
 
 If clusters are predefined with little to no changes to clusters, manually adding or removing clusters is adequate, and the deployment/addition of applications can be separated to different clusters/environments, use a list generator. Applications can be separated to different clusters by putting their yaml deployment in the appropriate cluster folder.
 
