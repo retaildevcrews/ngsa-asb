@@ -10,7 +10,7 @@ spec:
         url: https://kubernetes.default.svc
         env: argo
       - cluster: argo-cluster2
-        url: https://argocluste-argoresource-ce2cc3-7wwuiish.hcp.southcentralus.azmk8s.io:443
+        url: https://argocluste-argoresource-ce2cc3-w2pcxy1e.hcp.southcentralus.azmk8s.io:443
         env: argo2
   strategy:
     type: RollingSync
