@@ -118,7 +118,7 @@ az aks create --resource-group <resource-group> --name <cluster-name> --location
 az aks get-credentials --resource-group <resource-group> --name <cluster-name>
 
 # Set config cluster to initial cluster where ArgoCD is installed:
-kubectl config set-cluster <cluster-name>
+kubectl config use-context <cluster-name>
 ```
 
 ```bash
