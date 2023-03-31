@@ -1,0 +1,25 @@
+{{- if .Values.service.type | eq "LoadBalancer" -}}
+{{- $fullName := include "ngsa-memory.fullname" . }}
+{{- $svcName := include "ngsa-memory.name" . }}
+{{- $namespace := .Values.namespace }}
+{{- $port := .Values.service.port }}
+Once the LoadBalancer is ready, you should be able to access the service at:
+  http://{{ $svcName }}.{{ $namespace }}.{{ printf "%s" $fullName }}.{{ $namespace }}.svc.cluster.local:{{ $port }}
+
+You can also retrieve the external IP address of the LoadBalancer by running:
+  kubectl get svc {{ $svcName }} -n {{ $namespace }} -o jsonpath="{.status.loadBalancer.ingress[0].ip}"
+
+{{- else if .Values.service.type | eq "NodePort" -}}
+Once the service is ready, you should be able to access it at:
+  http://{{ include "ngsa-memory.name" . }}.{{ .Values.namespace }}.svc.cluster.local:{{ .Values.service.port }}
+
+To access the service from outside the cluster, use the NodePort assigned to the service. You can retrieve the NodePort by running:
+  kubectl get svc {{ include "ngsa-memory.name" . }} -n {{ .Values.namespace }}
+
+{{- else if .Values.service.type | eq "ClusterIP" -}}
+Once the service is ready, you should be able to access it at:
+  http://{{ include "ngsa-memory.name" . }}.{{ .Values.namespace }}.svc.cluster.local:{{ .Values.service.port }}
+
+{{- else -}}
+Unsupported service type: {{ .Values.service.type }}
+{{- end }}

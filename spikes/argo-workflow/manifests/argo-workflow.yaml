@@ -1,0 +1,59 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: helm-deployment-workflow-
+spec:
+  entrypoint: deploy-addons
+  serviceAccountName: helm-deployment-sa
+  arguments:
+    parameters:
+      - name: repo-url
+        value: https://github.com/retaildevcrews/ngsa-asb
+      - name: branch-name
+        value: joaquinrz-argoWorkflow
+  templates:
+    - name: deploy-addons
+      steps:
+        - - name: install-ngsa-memory
+            template: deploy-helm-chart
+            arguments:
+              parameters:
+                - name: app-name
+                  value: ngsa-memory
+                - name: repo-url
+                  value: "{{workflow.parameters.repo-url}}"
+                - name: branch-name
+                  value: "{{workflow.parameters.branch-name}}"
+                - name: git-path
+                  value: spikes/argo-workflow/charts/ngsa-memory
+        - - name: install-loderunner
+            template: deploy-helm-chart
+            arguments:
+              parameters:
+                - name: app-name
+                  value: loderunner
+                - name: repo-url
+                  value: "{{workflow.parameters.repo-url}}"
+                - name: branch-name
+                  value: "{{workflow.parameters.branch-name}}"
+                - name: git-path
+                  value: spikes/argo-workflow/charts/loderunner
+
+    - name: deploy-helm-chart
+      inputs:
+        parameters:
+        - name: app-name
+        - name: repo-url
+        - name: branch-name
+        - name: git-path
+      container:
+        image: alpine/helm:3.11.1
+        command: [bash, -c]
+        args:
+          - >
+            helm plugin install https://github.com/aslafy-z/helm-git.git --version 0.14.3 && 
+            helm repo add {{inputs.parameters.app-name}} 'git+{{inputs.parameters.repo-url}}@{{inputs.parameters.git-path}}?depupdate=0?&package=1&ref={{inputs.parameters.branch-name}}' && 
+            helm repo update &&
+            helm upgrade --install {{inputs.parameters.app-name}} {{inputs.parameters.app-name}}/{{inputs.parameters.app-name}} --namespace default --create-namespace 
+      serviceAccountName: helm-deployment-sa
+

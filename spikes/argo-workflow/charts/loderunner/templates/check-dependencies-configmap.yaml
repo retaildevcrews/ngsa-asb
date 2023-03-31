@@ -1,0 +1,62 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-check-dependencies
+  annotations:
+    helm.sh/hook: pre-install,pre-upgrade
+    helm.sh/hook-delete-policy: hook-succeeded,hook-failed,before-hook-creation
+data:
+  check-dependencies.sh: |
+    #!/bin/sh
+
+    check_chart_version() {
+      CHART_NAME="$1"
+      REQUIRED_VERSION="$2"
+
+      # Use helm ls command to get the app version of the deployed chart
+      DEPLOYED_CHART=$(helm ls --filter "^${CHART_NAME}$" -o json --all-namespaces | grep -o '"chart":[^,}]*' | cut -d '"' -f4)
+
+      if [ $? -ne 0 ]; then
+        echo "Error: Failed to get the deployed chart information for ${CHART_NAME}." >&2
+        exit 1
+      fi
+
+      CHART_VERSION=$(echo "$DEPLOYED_CHART" | awk -F '-' '{print $NF}' | grep -Eo '[0-9]+([.][0-9]+)+')
+
+      if [ $? -ne 0 ]; then
+        echo "Error: Failed to get the deployed chart version information for ${CHART_NAME}." >&2
+        exit 1
+      fi
+
+      if [ "$CHART_VERSION" = "$REQUIRED_VERSION" ]; then
+        echo "Required version of ${CHART_NAME} (${REQUIRED_VERSION}) is already deployed."
+        return 0
+      else
+        echo "Required version of ${CHART_NAME} (${REQUIRED_VERSION}) is not deployed."
+        return 1
+      fi
+    }
+
+    # Define your dependencies here
+    DEPENDENCIES="ngsa-memory:0.2.1"
+
+    ALL_DEPENDENCIES_MET=true
+
+    for DEPENDENCY in $DEPENDENCIES; do
+      CHART_NAME="${DEPENDENCY%%:*}"
+      REQUIRED_VERSION="${DEPENDENCY#*:}"
+      check_chart_version "${CHART_NAME}" "${REQUIRED_VERSION}"
+      RESULT=$?
+
+      if [ $RESULT -ne 0 ]; then
+        ALL_DEPENDENCIES_MET=false
+      fi
+    done
+
+    if [ "$ALL_DEPENDENCIES_MET" = true ]; then
+      echo "All dependencies are met. Continuing."
+      exit 0
+    else
+      echo "Not all dependencies are met. Exiting."
+      exit 1
+    fi
