@@ -11,6 +11,7 @@ Before we dive into the installation process, ensure that you have the following
 - Kubernetes Cluster: A running Kubernetes cluster (version 1.18 or later) with administrative access.
 - Helm [download](https://helm.sh/docs/intro/install/)
 - kubectl [download](https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/)
+- Argo Workflows CLI [download](https://github.com/argoproj/argo-workflows/releases/)
 
 ## Installation
 
@@ -73,3 +74,9 @@ You can monitor the Workflow execution using the Argo UI or the argo get command
 
 - Run `kubectl port-forward svc/argo-workflows-server -n argo 2746:2746`
 - Open your browser and navigate to http://localhost:2746 `argo get <workflow-name>`
+
+### Managing Helm dependencies using Helm Hooks
+
+Helm hooks are a powerful feature within the Helm package manager that allow users to perform custom actions at specific points in a release's lifecycle. These hooks enable greater flexibility and control during the installation, upgrade, rollback, or deletion of a Helm chart. By attaching scripts or Kubernetes resources to predefined hook events, users can automate tasks such as pre-install checks, or post-delete cleanup. This functionality enhances the management of complex applications, ensuring that necessary actions are executed in the correct order and at the appropriate times during the deployment process.
+
+We have defined several Helm hooks within the manifest folder, consisting of a Job and a ConfigMap. The ConfigMap contains a script designed to check for dependencies, specifically focusing on the version of the ngsa-memory app. This dependency check ensures that our Helm chart is compatible with the ngsa-memory app version before proceeding with the installation or upgrade. The Job, which is responsible for executing the dependency check, mounts the ConfigMap within a container. By doing so, it can run the script, verifying that all required dependencies are met before the Helm chart is installed or upgraded. This setup provides an automated and reliable way to ensure compatibility between our application and the ngsa-memory app during deployment.
