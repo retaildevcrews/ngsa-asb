@@ -4,21 +4,23 @@ metadata:
   name: ngsa
 spec:
   generators:
-  - list:
-      elements:
-      - cluster: argo-cluster
-        url: https://kubernetes.default.svc
+  - clusters: {}
+  # Selector may be used to narrow scope of targeted clusters (Eg. label, cluster secret, etc.)
+  # - clusters:
+  #     selector:
+  #       matchLabels:
+  #         cluster: second
   template:
     metadata:
-      name: '{{cluster}}'
+      name: '{{name}}'
     spec:
-      project: default
+      project: "default"
       source:
         repoURL: https://github.com/retaildevcrews/ngsa-asb
         targetRevision: HEAD
         path: spikes/argo-cd/deploy/argo-cluster
-      destination: 
-        server: https://kubernetes.default.svc
+      destination:
+        server: '{{server}}'
         namespace: ngsa
       syncPolicy:
         syncOptions:
@@ -26,3 +28,4 @@ spec:
         automated:
           selfHeal: true
           prune: true
+          

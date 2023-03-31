@@ -1,0 +1,12 @@
+{
+    "test": "11223344",
+    "app": {
+        "source": "https://github.com/retaildevcrews/ngsa-asb",
+        "revision": "anguyen/argo-spike",
+        "path": "spikes/argo-cd/deploy/argo-cluster"
+    },
+    "cluster": {
+        "name": "argo-cluster",
+        "address": "https://kubernetes.default.svc"
+    }
+}
