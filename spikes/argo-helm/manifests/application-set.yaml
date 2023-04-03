@@ -1,0 +1,29 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: prometheus
+  namespace: argocd
+spec:
+  generators:
+  - git:
+      repoURL: https://github.com/retaildevcrews/ngsa-asb
+      revision: anguyen/argo-helm
+      files:
+      - path: "spikes/argo-helm/**/config.yaml"
+  template:
+    metadata:
+      name: '{{name}}' 
+    spec:
+      destination:
+        name: ''
+        namespace: '{{app_namespace}}'
+        server: '{{address}}'
+      source:
+        path: ''
+        repoURL: '{{helmchart_url}}'
+        targetRevision: '{{version}}' 
+        chart: '{{name}}'
+        helm:
+          values: | 
+            {{app_values}}
+      project: default
