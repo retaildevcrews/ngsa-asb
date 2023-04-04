@@ -4,4 +4,4 @@ app_values:
   chart: prometheus
 
 helm_values:
-  configmap_Reload_enabled: "false"
+  configmap_Reload_enabled: "true"
