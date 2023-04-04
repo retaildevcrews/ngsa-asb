@@ -9,4 +9,4 @@ helm_values:
 helm_vals: |
   configmapReload:
     prometheus:
-      enabled: false
+      enabled: true
