@@ -1,4 +1,4 @@
 app_values:
   repository: https://prometheus-community.github.io/helm-charts
-  tag: 20.1.0
-  pullPolicy: IfNotPresent
+  tag: 45.9.0
+  chart: kube-prometheus-stack
