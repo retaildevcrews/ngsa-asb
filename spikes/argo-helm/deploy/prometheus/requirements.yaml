@@ -2,4 +2,3 @@ dependencies:
 - name: prometheus
   version: 20.1.0
   repository: https://prometheus-community.github.io/helm-charts
-  valueFiles: values.yaml
