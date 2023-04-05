@@ -15,18 +15,25 @@ spec:
       name: prometheus
     spec:
       project: default
-      source:
-        chart: '{{app_values.chart}}'
-        repoURL: '{{app_values.repository}}'
-        targetRevision: '{{app_values.tag}}'
-        helm:
-          values: |
-            {{helm_vals}}
-          # valueFiles:
-          # - values.yaml
+      sources:
+        # repoURL: https://github.com/retaildevcrews/ngsa-asb
+        # targetRevision: anguyen/argo-helm
+        # path: '{{path}}'
+        - chart: '{{app_values.chart}}'
+          repoURL: '{{app_values.repository}}'
+          targetRevision: '{{app_values.tag}}'
+          helm:
+            valueFiles:
+            - $values/spikes/argo-helm/deploy/prometheus/values.yaml
+          # helm:
+            # values: |
+            #   {{helm_vals}}
           # parameters:
           # - name: "configmapReload.prometheus.enabled"
           #   value: '{{helm_values.configmap_Reload_enabled}}'
+        - ref: values
+          repoURL: https://github.com/retaildevcrews/ngsa-asb
+          targetRevision: anguyen/argo-helm
       destination:
         server: "https://kubernetes.default.svc"
         namespace: ngsa
