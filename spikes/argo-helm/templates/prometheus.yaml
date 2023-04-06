@@ -1,0 +1,3 @@
+configmapReload:
+  prometheus:
+    enabled: ${PROMETHEUS_ENABLED}
