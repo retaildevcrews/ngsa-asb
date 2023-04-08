@@ -54,9 +54,9 @@ In Kubernetes, a ServiceAccount is used to provide an identity for processes tha
 To create the required ServiceAccount, ClusterRole, and ClusterRoleBinding, run the following commands:
 
 ```bash
-kubectl apply -f manifests/helm-deployment-sa.yaml
-kubectl apply -f manifests/helm-deployment-clusterrole.yaml
-kubectl apply -f manifests/helm-deployment-clusterrolebinding.yaml
+kubectl apply -f manifests/serviceaccount.yaml
+kubectl apply -f manifests/clusterrole.yaml
+kubectl apply -f manifests/clusterrolebinding.yaml
 ```
 
 ### Creating an Argo Workflow for Deploying Applications
@@ -80,3 +80,78 @@ You can monitor the Workflow execution using the Argo UI or the argo get command
 Helm hooks are a powerful feature within the Helm package manager that allow users to perform custom actions at specific points in a release's lifecycle. These hooks enable greater flexibility and control during the installation, upgrade, rollback, or deletion of a Helm chart. By attaching scripts or Kubernetes resources to predefined hook events, users can automate tasks such as pre-install checks, or post-delete cleanup. This functionality enhances the management of complex applications, ensuring that necessary actions are executed in the correct order and at the appropriate times during the deployment process.
 
 We have defined several Helm hooks within the manifest folder, consisting of a Job and a ConfigMap. The ConfigMap contains a script designed to check for dependencies, specifically focusing on the version of the ngsa-memory app. This dependency check ensures that our Helm chart is compatible with the ngsa-memory app version before proceeding with the installation or upgrade. The Job, which is responsible for executing the dependency check, mounts the ConfigMap within a container. By doing so, it can run the script, verifying that all required dependencies are met before the Helm chart is installed or upgraded. This setup provides an automated and reliable way to ensure compatibility between our application and the ngsa-memory app during deployment.
+
+## Argo Events
+
+Argo Events is a robust workflow orchestration tool designed for Kubernetes, that operates on an event-driven architecture. This tool empowers you to craft custom workflows that react to events from a variety of sources, including webhooks, message queues, or customized event sources.
+
+### Installing Argo Events
+
+```bash
+# Add the Helm Repository for Argo Events
+helm repo add argo https://argoproj.github.io/argo-helm
+
+# Update the Helm Repository
+helm repo update
+
+# Create Argo Events namespace
+kubectl create ns argo-events
+
+# Install Argo Events
+helm install argo-events argo/argo-events --namespace argo-events
+```
+
+### Installing Eventbus and required components
+
+```bash
+# The Eventbus is a message broker that provides a central hub for event messages. It allows event sources and sensors to communicate with each other using a publish-subscribe model.  
+
+# Install Eventbus 
+kubectl apply -f manifests/events/eventbus.yaml -n argo-events
+
+# The Event Source listens for incoming events and sends them to the Eventbus for processing. In this case, the Event Source is named webhook and listens for incoming events on port 12000. The service section specifies the Kubernetes Service that exposes the Event Source deployment. The webhook section defines the details of the webhook event source. In this case, the webhook listens for incoming webhook events on port 12000 and the /example endpoint using the HTTP POST method. When an event is received, it is sent to the Eventbus for further processing. This allows the webhook event source to trigger Argo Events workflows based on incoming webhook events.
+
+# Install Event Source
+kubectl apply -f manifests/events/webhook-event-source.yaml -n argo-events
+
+# Install RBAC for sensor and workflow
+kubectl apply -f manifests/events/sensor-rbac.yaml -n argo-events
+kubectl apply -f manifests/events/workflow-rbac.yaml -n argo-events
+
+# Install Sensor
+kubectl apply -f manifests/events/webhook-sensor.yaml -n argo-events
+
+```
+
+### Create a Webhook Event Source
+
+```bash
+# Create a webhook event source that will send events to our Argo sensor. Event sources in Argo Events are used to receive events from various external systems. This YAML file defines an EventSource that listens for incoming webhook events on port 12000 and the /webhook endpoint.
+kubectl apply -f manifests/events/webhook-event-source.yaml
+```
+
+### Create a Sensor to Trigger the Workflow
+
+```bash
+# Create a sensor that listens for events from the webhook event source and triggers the "Hello World" workflow. Sensors in Argo Events are used to define event-driven rules and trigger actions based on events.
+
+# This YAML file defines a Sensor that listens for events from the webhook-event-source and triggers the webhook workflow when an event is received.
+
+kubectl apply -f manifests/events/webhook-sensor.yaml
+```
+
+### Send an Event to Trigger the Workflow
+
+We'll send a POST request to the webhook event source to trigger the "Hello World" workflow. This will simulate an external event being received by the webhook event source.
+
+```bash
+
+# First, start a port-forwarding session to make the webhook event source accessible from your local machine:
+kubectl -n argo-events port-forward $(kubectl -n argo-events get pod -l eventsource-name=webhook -o name) 12000:12000 &
+
+# Send a POST request to the webhook event source using a tool like curl:
+curl -d '{"message":"this is my first webhook"}' -H "Content-Type: application/json" -X POST http://localhost:12000/example
+
+# Verify that an Argo workflow was triggered.
+kubectl -n argo-events get workflows | grep "webhook"
+```
