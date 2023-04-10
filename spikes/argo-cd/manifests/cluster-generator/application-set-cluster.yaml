@@ -9,7 +9,7 @@ spec:
   # - clusters:
   #     selector:
   #       matchLabels:
-  #         cluster: second
+  #         labeltest: second
   template:
     metadata:
       name: '{{name}}'
@@ -21,6 +21,7 @@ spec:
         path: spikes/argo-cd/deploy/argo-cluster
       destination:
         server: '{{server}}'
+        # server: '{{server}}-{{metadata.labels.labeltest}}'
         namespace: ngsa
       syncPolicy:
         syncOptions:
