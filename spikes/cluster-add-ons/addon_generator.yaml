@@ -9,14 +9,14 @@ spec:
         generators:
           - list:
               elements:
-                # - values:
-                #     component: namespaces
-                #     branchOrTag: pragmatical/cluster-add-ons
-                #     namespace: argocd
                 - values:
-                    component: helm-guestbook
+                    component: namespaces
                     branchOrTag: pragmatical/cluster-add-ons
-                    namespace: addons
+                    namespace: argocd
+                # - values:
+                #     component: helm-guestbook
+                #     branchOrTag: pragmatical/cluster-add-ons
+                #     namespace: addons
                 # - values:
                 #     component: guestbook
                 #     branchOrTag: pragmatical/cluster-add-ons
