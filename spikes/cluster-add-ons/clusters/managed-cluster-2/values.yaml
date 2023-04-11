@@ -1,5 +1,4 @@
 cluster-name: managed-cluster-2
-spec:
-    destination:
-        server: https://kubernetes.default.svc
+destination:
+    server: https://kubernetes.default.svc
     
