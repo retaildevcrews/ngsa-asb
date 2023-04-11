@@ -1,0 +1,39 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: my-website
+spec:
+  generators:
+  - clusters:
+      selector:
+            matchLabels:
+              cluster-type: special
+  template:
+    metadata:
+      name: "my-website-{{ .name }}"
+      labels:
+        customer: "{{ .name }}"
+        environment: prod
+    spec:
+      project: default
+      destination:
+        namespace: mynamespace
+        server: https://kubernetes.default.svc
+        project: default
+      source:
+        helm:
+          values: |
+            api:
+              replicas: {{ .replicas }}
+              {{ - if .activateFeature }}
+              feature:
+                value: {{ .additional.configuration }}
+              {{ - end }}
+              configs
+              {{- range .config }}
+                 - name: {{ . | title | quote }}
+              {{- end }}    
+        path: my-website
+        repoURL: >-
+          https://github.com/myprofile/my-website.git
+        targetRevision: main

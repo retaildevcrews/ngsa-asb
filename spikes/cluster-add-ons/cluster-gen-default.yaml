@@ -15,6 +15,9 @@ spec:
         repoURL: https://github.com/argoproj/argocd-example-apps/
         targetRevision: HEAD
         path: guestbook
+        helm:
+          valueFiles:
+          - values-production.yaml
       destination:
         server: '{{server}}' # 'server' field of the secret
         namespace: guestbook
