@@ -23,27 +23,27 @@ spec:
                 #     namespace: addons
           - clusters:
               selector:
-                matchExpressions:
-                  - key: 'addon-{{values.component}}'
-                    operator: In
-                    values:
-                    - "true"
-                  - key: provider
-                    operator: In
-                    values:
-                    - "azure"
-                  - key: clusterType
-                    operator: NotIn
-                    values:
-                    - "self-managed"
                 matchLabels:
                   argocd.argoproj.io/secret-type: cluster
+                # matchExpressions:
+                # #   - key: 'addon-{{values.component}}'
+                # #     operator: In
+                # #     values:
+                # #     - "true"
+                #   - key: provider
+                #     operator: In
+                #     values:
+                #     - "azure"
+                # #   - key: clusterType
+                # #     operator: NotIn
+                # #     values:
+                # #     - "self-managed"
   template:
     metadata:
       name: '{{values.component}}-{{name}}'
       labels:
        component: '{{values.component}}'
-       component-version: '{{values.branchOrTag}}'
+      #  component-version: '{{values.branchOrTag}}'
        cluster-id: '{{name}}'
        provider: '{{metadata.labels.provider}}'
        wcnp-cluster-type: '{{metadata.labels.wcnp-cluster-type}}'
@@ -52,13 +52,13 @@ spec:
       sources:
         - repoURL: https://github.com/retaildevcrews/ngsa-asb.git
           targetRevision: '{{values.branchOrTag}}'
-          path: cluster-add-ons/spikes/cluster-add-ons/add-ons/{{values.component}}/deploy
+          path: spikes/cluster-add-ons/add-ons/{{values.component}}/deploy
           helm:
             valueFiles:
             - $values/values.yaml
         - repoURL: https://github.com/retaildevcrews/ngsa-asb.git
           targetRevision: '{{values.branchOrTag}}'
-          path: cluster-add-ons/spikes/cluster-add-ons/wcnp/{{name}}
+          path: spikes/cluster-add-ons/wcnp/{{name}}
           ref: values
       destination:
         server: '{{server}}'
