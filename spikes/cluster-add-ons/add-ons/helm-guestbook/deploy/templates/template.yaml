@@ -11,6 +11,6 @@ spec:
     server: {{ .Values.destination.server }}
   project: default
   source:
-    path: spikes/cluster-add-ons/add-ons/guestbook/deploy
+    path: spikes/cluster-add-ons/add-ons/helm-guestbook/deploy
     repoURL: {{ .Values.source.repoURL }}
     targetRevision: {{ .Values.source.targetRevision }}
