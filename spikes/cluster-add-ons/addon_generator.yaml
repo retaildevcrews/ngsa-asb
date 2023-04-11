@@ -59,7 +59,7 @@ spec:
           path: spikes/cluster-add-ons/add-ons/{{values.component}}/deploy
           helm:
             valueFiles:
-            - $values/clusters/{{name}}/values.yaml
+            - $values/spikes/cluster-add-ons/clusters/{{name}}/values.yaml
 
       destination:
         server: '{{server}}'

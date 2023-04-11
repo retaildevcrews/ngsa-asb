@@ -1,6 +1,5 @@
 cluster-name: managed-cluster-2
-destination:
-    server: https://kubernetes.default.svc
-source:
-    repoURL: https://github.com/argoproj/argocd-example-apps
-    targetRevision: HEAD
+spec:
+    destination:
+        server: https://kubernetes.default.svc
+    
