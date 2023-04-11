@@ -1,0 +1,39 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: helm-deployment-workflow-
+spec:
+  arguments:
+    parameters:
+      - name: repo-url
+        value: https://github.com/retaildevcrews/ngsa-asb
+      - name: branch-name
+        value: joaquinrz-argoWorkflow
+  templates:
+    - name: git-helm-values
+      inputs:
+        parameters:
+        - name: app-name
+        - name: repo-url
+        - name: branch-name
+        - name: git-path
+      container:
+        image: alpine/git:latest
+        command: [sh, -c]
+        args:
+          - >
+            export PROMETHEUS_ENABLED=false
+            wget https://raw.githubusercontent.com/retaildevcrews/ngsa-asb/anguyen/argo-helm/spikes/argo-helm/templates/prometheus.yaml
+            apk update && apk add gettext
+            cat prometheus.yaml | envsubst > values2ex.yaml
+
+
+
+
+            # helm plugin install https://github.com/aslafy-z/helm-git.git --version 0.14.3 && 
+            # helm repo add {{inputs.parameters.app-name}} 'git+{{inputs.parameters.repo-url}}@{{inputs.parameters.git-path}}?depupdate=0?&package=1&ref={{inputs.parameters.branch-name}}' && 
+            # helm repo update &&
+            # helm upgrade --install {{inputs.parameters.app-name}} {{inputs.parameters.app-name}}/{{inputs.parameters.app-name}} --namespace default --create-namespace 
+# Step 1: get template file from Git by curl
+# Step 2: replace values of file to file
+# Step 3: push file to Git

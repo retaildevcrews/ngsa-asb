@@ -5,11 +5,12 @@ metadata:
   namespace: argocd
 spec:
   generators:
-  - git:
-      repoURL: https://github.com/retaildevcrews/ngsa-asb
-      revision: anguyen/argo-helm
-      files:
-      - path: "spikes/argo-helm/manifests/config.yaml"
+    - clusters: {}
+  # - git:
+  #     repoURL: https://github.com/retaildevcrews/ngsa-asb
+  #     revision: anguyen/argo-helm
+  #     files:
+  #     - path: "spikes/argo-helm/manifests/config.yaml"
   template:
     metadata:
       name: prometheus
@@ -19,23 +20,30 @@ spec:
         # repoURL: https://github.com/retaildevcrews/ngsa-asb
         # targetRevision: anguyen/argo-helm
         # path: '{{path}}'
-        - chart: '{{app_values.chart}}'
-          repoURL: '{{app_values.repository}}'
-          targetRevision: '{{app_values.tag}}'
-          helm:
-            valueFiles:
-            - $values/spikes/argo-helm/deploy/prometheus/values.yaml
+        # - chart: '{{app_values.chart}}'
+        #   repoURL: '{{app_values.repository}}'
+        #   targetRevision: '{{app_values.tag}}'
+        #   helm:
+        #     valueFiles:
+        #     - $values/spikes/argo-helm/deploy/{{app_values.chart}}/values.yaml
+        - chart: prometheus
+          repoURL: https://prometheus-community.github.io/helm-charts
+          targetRevision: 20.1.0
           # helm:
+            # releaseName: prometheus
+            # valueFiles:
+            # - $values/spikes/argo-helm/deploy/prometheus/values.yaml
+          helm:
             # values: |
             #   {{helm_vals}}
-          # parameters:
-          # - name: "configmapReload.prometheus.enabled"
-          #   value: '{{helm_values.configmap_Reload_enabled}}'
-        - ref: values
-          repoURL: https://github.com/retaildevcrews/ngsa-asb
-          targetRevision: anguyen/argo-helm
+            parameters:
+            - name: '{{metadata.labels.label}}'
+              value: '{{metadata.labels.value}}'
+        # - ref: values
+        #   repoURL: https://github.com/retaildevcrews/ngsa-asb
+        #   targetRevision: anguyen/argo-helm
       destination:
-        server: "https://kubernetes.default.svc"
+        server: '{{server}}'
         namespace: ngsa
       syncPolicy:
         syncOptions:
