@@ -8,9 +8,9 @@ metadata:
 spec:
   destination:
     namespace: add-ons
-    server: {{ .Values.spec.destination.server }}
+    server: {{ .Values.destination.server }}
   project: default
   source:
     path: spikes/cluster-add-ons/add-ons/guestbook/deploy
-    repoURL: {{ .Values.spec.source.repoURL }}
-    targetRevision: {{ .Values.spec.source.targetRevision }}
+    repoURL: {{ .Values.source.repoURL }}
+    targetRevision: {{ .Values.source.targetRevision }}

@@ -16,6 +16,7 @@ spec:
                 - values:
                     component: helm-guestbook
                     branchOrTag: pragmatical/cluster-add-ons
+                    valuesBranchOrTag: main
                     namespace: addons
                 # - values:
                 #     component: guestbook
@@ -50,16 +51,15 @@ spec:
     spec:
       project: default
       sources:
-        - repoURL: https://github.com/retaildevcrews/ngsa-asb.git
-          targetRevision: '{{values.branchOrTag}}'
-          path: spikes/cluster-add-ons/wcnp/{{name}}
+        - repoURL: https://github.com/retaildevcrews/custerswithaddons.git
+          targetRevision: '{{values.valuesBranchOrTag}}'
           ref: values
         - repoURL: https://github.com/retaildevcrews/ngsa-asb.git
           targetRevision: '{{values.branchOrTag}}'
           path: spikes/cluster-add-ons/add-ons/{{values.component}}/deploy
           helm:
             valueFiles:
-            - $values/values.yaml
+            - $values/clusters/{{name}}/values.yaml
 
       destination:
         server: '{{server}}'
