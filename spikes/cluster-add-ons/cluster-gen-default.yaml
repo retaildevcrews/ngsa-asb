@@ -6,18 +6,15 @@ metadata:
 spec:
   generators:
   - clusters: {} # Automatically use all clusters defined within Argo CD
-  template:
+  template: 
     metadata:
       name: '{{name}}-guestbook' # 'name' field of the Secret
-    spec:
+    spec: 
       project: "default"
       source:
         repoURL: https://github.com/argoproj/argocd-example-apps/
         targetRevision: HEAD
         path: guestbook
-        helm:
-          valueFiles:
-          - values-production.yaml
       destination:
         server: '{{server}}' # 'server' field of the secret
         namespace: guestbook

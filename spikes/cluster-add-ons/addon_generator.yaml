@@ -1,0 +1,70 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: wcnp-addons-cloud-azure
+  namespace: argocd
+spec:
+  generators:
+    - matrix:
+        generators:
+          - list:
+              elements:
+                - values:
+                    component: namespaces
+                    branchOrTag: pragmatical/cluster-add-ons
+                    namespace: argocd
+                # - values:
+                #     component: helm-guestbook
+                #     branchOrTag: pragmatical/cluster-add-ons
+                #     namespace: addons
+                # - values:
+                #     component: guestbook
+                #     branchOrTag: pragmatical/cluster-add-ons
+                #     namespace: addons
+          - clusters:
+              selector:
+                matchExpressions:
+                  - key: 'addon-{{values.component}}'
+                    operator: In
+                    values:
+                    - "true"
+                  - key: provider
+                    operator: In
+                    values:
+                    - "azure"
+                  - key: clusterType
+                    operator: NotIn
+                    values:
+                    - "self-managed"
+                matchLabels:
+                  argocd.argoproj.io/secret-type: cluster
+  template:
+    metadata:
+      name: '{{values.component}}-{{name}}'
+      labels:
+       component: '{{values.component}}'
+       component-version: '{{values.branchOrTag}}'
+       cluster-id: '{{name}}'
+       provider: '{{metadata.labels.provider}}'
+       wcnp-cluster-type: '{{metadata.labels.wcnp-cluster-type}}'
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/retaildevcrews/ngsa-asb.git
+        targetRevision: '{{values.branchOrTag}}'
+        path: cluster-add-ons/spikes/cluster-add-ons/add-ons/{{values.component}}/deploy
+        helm:
+          ignoreMissingValueFiles: true
+          valueFiles:
+            - "https://raw.githubusercontent.com/retaildevcrews/ngsa-asb/pragmatical/cluster-add-ons/spikes/cluster-add-ons/wcnp/{{name}}/values.yaml"
+      destination:
+        server: '{{server}}'
+        namespace: '{{values.namespace}}'
+      syncPolicy:
+        automated:
+           prune: false
+           selfHeal: true
+        retry:
+          limit: 3
+#        syncOptions:      
+#        - Replace=true
