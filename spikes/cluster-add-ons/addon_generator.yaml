@@ -52,14 +52,15 @@ spec:
       sources:
         - repoURL: https://github.com/retaildevcrews/ngsa-asb.git
           targetRevision: '{{values.branchOrTag}}'
+          path: spikes/cluster-add-ons/wcnp/{{name}}
+          ref: values
+        - repoURL: https://github.com/retaildevcrews/ngsa-asb.git
+          targetRevision: '{{values.branchOrTag}}'
           path: spikes/cluster-add-ons/add-ons/{{values.component}}/deploy
           helm:
             valueFiles:
             - $values/values.yaml
-        - repoURL: https://github.com/retaildevcrews/ngsa-asb.git
-          targetRevision: '{{values.branchOrTag}}'
-          path: spikes/cluster-add-ons/wcnp/{{name}}
-          ref: values
+
       destination:
         server: '{{server}}'
         namespace: 'argocd'
