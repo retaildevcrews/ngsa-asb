@@ -14,3 +14,5 @@ spec:
     path: spikes/cluster-add-ons/add-ons/guestbook/deploy
     repoURL: {{ .Values.spec.source.repoURL }}
     targetRevision: {{ .Values.spec.source.targetRevision }}
+  helm:
+    valuesFile: {{ .Values.spec.source.repoURL }}
