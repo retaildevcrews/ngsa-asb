@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: wcnp-addons-cloud-azure
+  name: addons
   namespace: argocd
 spec:
   generators:
