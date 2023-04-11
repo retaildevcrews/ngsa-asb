@@ -6,6 +6,15 @@ An add-on is component that is deployed to a Kubernetes cluster at the cluster l
 
 Given that there may be a large number of these add-ons and that infrastructure/ops teams could be managing thousands of clusters, there is a desire to have an automated way to deploy and maintain these add-ons on the clusters.
 
+## Personas
+
+- Cluster Owner
+  - Decides which add ons are installed on their clusters
+  - Can own one or multiple clusters
+- Add-on Owner
+  - Makes add-ons available for installing on clusters
+  - Controls the build pipeline for the add on
+
 ## Needs/Functionality
 
 ### General
@@ -32,3 +41,33 @@ Given that there may be a large number of these add-ons and that infrastructure/
 
 - What is the trigger for add-ons being installed to cluster?
 - How are add-ons selected to be added to clusters?
+
+## Argo CD
+
+Argo CD is a declarative, GitOps continuous delivery tool for Kubernetes.
+
+Argo CD Resources:
+
+- [Core Concepts](https://argo-cd.readthedocs.io/en/stable/core_concepts/)
+- [Architectural Overview](https://argo-cd.readthedocs.io/en/stable/operator-manual/architecture/)
+
+### Argo Components to be Used
+
+- ApplicationSet
+- Application
+- Generators (matrix, list, cluster)
+- Sync Waves
+- Projects
+
+### Idea: Use app of apps pattern to inject values into applications (Helm or other flavors)
+
+App of app pattern: <https://argo-cd.readthedocs.io/en/stable/operator-manual/cluster-bootstrapping/#app-of-apps-pattern>
+
+In this approach the add on owner uses app of apps pattern to deploy their add-on, there is a wrapper helm chart which will take in parameters from the generator.  
+The helm chart can specify anything in its template(s) - call other helm charts, do a plain yaml deployment, etc.
+
+### Git Repo Structures
+
+#### Cluster Owner
+
+#### Add-on Owner
