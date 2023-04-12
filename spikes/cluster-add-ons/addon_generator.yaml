@@ -59,7 +59,7 @@ spec:
           helm:
             parameters:
             - name: 'spec.destination.server'
-              value: '{{server}}'
+              value: 'https://kubernetes.default.svc'
             valueFiles:
             - $values/spikes/cluster-add-ons/clusters/{{name}}/values.yaml
 

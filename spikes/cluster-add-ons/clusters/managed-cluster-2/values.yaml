@@ -1,4 +1,1 @@
-cluster-name: managed-cluster-2
-destination:
-    server: https://kubernetes.default.svc
-    
+ctestlabel: 'testlabel'
