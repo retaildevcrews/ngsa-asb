@@ -11,6 +11,6 @@ spec:
     server: {{ .Values.destination.server }}
   project: default
   source:
-    path: spikes/argo-helm/apps
+    path: spikes/argo-helm/deploy/prometheus
     repoURL: {{ .Values.source.repoURL }}
     targetRevision: {{ .Values.source.targetRevision }}

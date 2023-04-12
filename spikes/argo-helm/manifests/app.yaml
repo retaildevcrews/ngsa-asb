@@ -1,22 +1,22 @@
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: prometheus
+  name: addons
   namespace: argocd
 spec:
   generators:
     - matrix:
         generators:
-          - clusters: {}
           - list:
               elements:
                 - app:
                     component: prometheus
                     branch: anguyen/argo-helm
                     namespace: ngsa
+          - clusters: {}
   template:
     metadata:
-      name: '{{app.component}}'
+      name: '{{app.component}}-{{name}}'
       labels:
         component: '{{app.component}}'
     spec:
@@ -24,13 +24,13 @@ spec:
       sources:
         - repoURL: https://github.com/retaildevcrews/ngsa-asb
           targetRevision: '{{app.branch}}'
-          path: spikes/argo-helm/apps/templates/{{app.component}}
+          path: spikes/argo-helm/deploy/{{app.component}}
           helm:
             valueFiles:
             - $values/spikes/argo-helm/clusters/{{name}}/values.yaml
         - ref: values
           repoURL: https://github.com/retaildevcrews/ngsa-asb
-          targetRevision: anguyen/argo-helm
+          targetRevision: '{{app.branch}}'
       destination:
         server: '{{server}}'
         namespace: '{{app.namespace}}'
