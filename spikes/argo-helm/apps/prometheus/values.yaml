@@ -2,5 +2,4 @@ cluster-name: cluster name goes here
 destination:
     server: destination server goes here
 source:
-    repoURL:  https://github.com/argoproj/argocd-example-apps/
-    targetRevision: HEAD
+    repoURL: source goes here

@@ -9,34 +9,36 @@ spec:
         generators:
           - list:
               elements:
-                - app:
+                - values:
                     component: prometheus
                     branch: anguyen/argo-helm
                     namespace: ngsa
           - clusters: {}
   template:
     metadata:
-      name: '{{app.component}}-{{name}}'
+      name: '{{values.component}}-{{name}}'
       labels:
-        component: '{{app.component}}'
+        component: '{{values.component}}'
     spec:
       project: default
       sources:
         - repoURL: https://github.com/retaildevcrews/ngsa-asb
-          targetRevision: '{{app.branch}}'
-          path: spikes/argo-helm/deploy/{{app.component}}
+          targetRevision: '{{values.branch}}'
+          path: spikes/argo-helm/deploy/{{values.component}}
           helm:
             valueFiles:
             - $values/spikes/argo-helm/clusters/{{name}}/values.yaml
         - ref: values
           repoURL: https://github.com/retaildevcrews/ngsa-asb
-          targetRevision: '{{app.branch}}'
+          targetRevision: anguyen/argo-helm
       destination:
         server: '{{server}}'
-        namespace: '{{app.namespace}}'
+        namespace: '{{values.namespace}}'
       syncPolicy:
         syncOptions:
         - CreateNamespace=true
         automated:
           selfHeal: true
           prune: true
+        retry:
+          limit: 2
