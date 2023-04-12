@@ -5,12 +5,15 @@ metadata:
   namespace: {{.Values.namespace}}
   finalizers:
   - resources-finalizer.argocd.argoproj.io
+  annotations: 
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:
   destination:
     namespace: {{.Values.namespace}}
     server: {{ .Values.destination.server }}
   project: default
-  source:
+  source: 
+    # {{.Values.source}}
     path: spikes/argo-helm/apps/prometheus
     repoURL: {{ .Values.source.repoURL }}
     targetRevision: {{ .Values.source.targetRevision }}
