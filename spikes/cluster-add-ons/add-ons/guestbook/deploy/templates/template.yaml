@@ -2,15 +2,17 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: {{ .Values.clusterName }}-guestbook
+  labels:
+    testlabel: 'testlabel'
   namespace: argocd
   finalizers:
   - resources-finalizer.argocd.argoproj.io
 spec:
-  destination:
-    namespace: add-ons
-    server: {{ .Values.spec.destination.server }}
   project: default
   source:
-    path: spikes/cluster-add-ons/add-ons/guestbook/deploy
-    repoURL: {{ .Values.spec.source.repoURL }}
-    targetRevision: {{ .Values.spec.source.targetRevision }}
+    path: {{path}}
+    repoURL: {{values.source.repoURL}}
+    targetRevision: {{values.source.targetRevision}}
+  destination:
+    namespace: {{ .Values.spec.destination.namespace }}
+    server: {{ .Values.spec.destination.server }}

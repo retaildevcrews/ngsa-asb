@@ -9,18 +9,18 @@ spec:
         generators:
           - list:
               elements:
-                - values:
-                    component: namespaces
-                    branchOrTag: pragmatical/cluster-add-ons
-                    namespace: argocd
+                # - values:
+                #     component: namespaces
+                #     branchOrTag: pragmatical/cluster-add-ons
+                #     namespace: argocd
                 # - values:
                 #     component: helm-guestbook
                 #     branchOrTag: pragmatical/cluster-add-ons
                 #     namespace: addons
-                # - values:
-                #     component: guestbook
-                #     branchOrTag: pragmatical/cluster-add-ons
-                #     namespace: addons
+                - values:
+                    component: guestbook
+                    branchOrTag: pragmatical/cluster-add-ons
+                    namespace: addons
           - clusters:
               selector:
                 matchLabels:
@@ -40,7 +40,7 @@ spec:
                 # #     - "self-managed"
   template:
     metadata:
-      name: '{{values.component}}-{{name}}'
+      name: '{{values.component}}-{{name}}-wrapper'
       labels:
        component: '{{values.component}}'
       #  component-version: '{{values.branchOrTag}}'
@@ -57,6 +57,9 @@ spec:
           targetRevision: '{{values.branchOrTag}}'
           path: spikes/cluster-add-ons/add-ons/{{values.component}}/deploy
           helm:
+            parameters:
+            - name: "spec.destination.server"
+              value: {{server}}
             valueFiles:
             - $values/spikes/cluster-add-ons/clusters/{{name}}/values.yaml
 
