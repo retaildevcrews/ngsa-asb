@@ -59,14 +59,14 @@ spec:
           helm:
             parameters:
             - name: 'spec.destination.server'
-              value: 'https://kubernetes.default.svc'
+              value: '{{server}}'
             - name: 'clusterName'
               value: '{{name}}'
             valueFiles:
             - $values/spikes/cluster-add-ons/clusters/{{name}}/values.yaml
 
       destination:
-        server: '{{server}}'
+        name: 'in-cluster'
         namespace: 'argocd'
       syncPolicy:
         automated:
