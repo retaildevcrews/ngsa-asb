@@ -1,6 +1,7 @@
 cluster-name: managed-cluster-1
 destination:
-    server: https://kubernetes.default.svc
+    server: https://argocluste-argoresource-ce2cc3-g50fhd0k.hcp.southcentralus.azmk8s.io:443
 source:
-    repoURL: https://github.com/argoproj/argocd-example-apps
-    targetRevision: HEAD
+    chart: prometheus
+    repoURL: https://prometheus-community.github.io/helm-charts
+    targetRevision: 20.1.0
