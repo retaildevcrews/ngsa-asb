@@ -1,9 +1,9 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: {{ .Values.clusterName }}-guestbook
+  name: {{ .Values.clusterName }}-{{ .Values.testlabel }}-guestbook
   labels:
-    testlabel: 'testlabel'
+    testlabel: {{ .Values.testlabel }}
   namespace: argocd
   annotations:
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true

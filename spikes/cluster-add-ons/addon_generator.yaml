@@ -60,6 +60,8 @@ spec:
             parameters:
             - name: 'spec.destination.server'
               value: 'https://kubernetes.default.svc'
+            - name: 'clusterName'
+              value: '{{name}}'
             valueFiles:
             - $values/spikes/cluster-add-ons/clusters/{{name}}/values.yaml
 
