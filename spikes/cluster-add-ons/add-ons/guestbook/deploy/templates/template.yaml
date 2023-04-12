@@ -10,9 +10,9 @@ metadata:
 spec:
   project: default
   source:
-    path: {{values.source.path}}
-    repoURL: {{values.source.repoURL}}
-    targetRevision: {{values.source.targetRevision}}
+    path: {{.Values.source.path}}
+    repoURL: {{.Values.source.repoURL}}
+    targetRevision: {{.Values.source.targetRevision}}
   destination:
     namespace: {{ .Values.spec.destination.namespace }}
     server: {{ .Values.spec.destination.server }}
