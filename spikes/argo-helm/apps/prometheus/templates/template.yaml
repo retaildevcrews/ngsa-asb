@@ -7,8 +7,10 @@ metadata:
   - resources-finalizer.argocd.argoproj.io
 spec:
   destination:
-    namespace: argocd
+    namespace: {{.Values.namespace}}
     server: {{ .Values.destination.server }}
   project: default
-  source: |
-    {{.Values.source}}
+  source:
+    path: spikes/argo-helm/apps/prometheus
+    repoURL: {{ .Values.source.repoURL }}
+    targetRevision: {{ .Values.source.targetRevision }}
