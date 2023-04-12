@@ -9,6 +9,10 @@ spec:
         generators:
           - list:
               elements:
+                - values:
+                    component: guestbook
+                    branchOrTag: pragmatical/cluster-add-ons
+                    namespace: addons
                 # - values:
                 #     component: namespaces
                 #     branchOrTag: pragmatical/cluster-add-ons
@@ -17,10 +21,6 @@ spec:
                 #     component: helm-guestbook
                 #     branchOrTag: pragmatical/cluster-add-ons
                 #     namespace: addons
-                - values:
-                    component: guestbook
-                    branchOrTag: pragmatical/cluster-add-ons
-                    namespace: addons
           - clusters:
               selector:
                 matchLabels:
@@ -58,8 +58,8 @@ spec:
           path: spikes/cluster-add-ons/add-ons/{{values.component}}/deploy
           helm:
             parameters:
-            - name: "spec.destination.server"
-              value: {{server}}
+            - name: 'spec.destination.server'
+              value: '{{server}}'
             valueFiles:
             - $values/spikes/cluster-add-ons/clusters/{{name}}/values.yaml
 
