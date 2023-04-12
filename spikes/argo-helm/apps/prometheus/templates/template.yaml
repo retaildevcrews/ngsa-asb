@@ -1,13 +1,13 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: {{.Values.clusterName}}prometheus
+  name: prometheus
   namespace: {{.Values.namespace}}
   finalizers:
   - resources-finalizer.argocd.argoproj.io
 spec:
   destination:
-    namespace: {{.Values.namespace}}
+    namespace: argocd
     server: {{ .Values.destination.server }}
   project: default
   source: |
