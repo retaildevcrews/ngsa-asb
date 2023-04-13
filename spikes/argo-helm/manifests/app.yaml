@@ -13,27 +13,38 @@ spec:
                     component: prometheus
                     branch: anguyen/argo-helm
                     namespace: ngsa
-          - clusters: {}
+          - clusters: 
+              selector:
+                matchLabels:
+                  argocd.argoproj.io/secret: cluster
   template:
     metadata:
-      name: '{{values.component}}-{{name}}'
+      name: '{{values.component}}-{{name}}-root'
       labels:
         component: '{{values.component}}'
+        cluster-id: '{{name}}'
     spec:
       project: default
       sources:
         - repoURL: https://github.com/retaildevcrews/ngsa-asb
           targetRevision: '{{values.branch}}'
-          path: spikes/argo-helm/deploy/{{values.component}}
+          path: spikes/argo-helm/apps/{{values.component}}
           helm:
+            parameters:
+            - name: 'spec.destination.server'
+              value: '{{server}}'
+            - name: 'spec.destination.namespace'
+              value: '{{values.namespace}}'
+            - name: 'clusterName'
+              value: '{{name}}'
             valueFiles:
             - $values/spikes/argo-helm/clusters/{{name}}/values.yaml
         - ref: values
           repoURL: https://github.com/retaildevcrews/ngsa-asb
           targetRevision: anguyen/argo-helm
       destination:
-        server: '{{server}}'
-        namespace: '{{values.namespace}}'
+        name: 'in-cluster'
+        namespace: 'argocd'
       syncPolicy:
         syncOptions:
         - CreateNamespace=true

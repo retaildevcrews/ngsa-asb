@@ -1,9 +1,0 @@
-cluster-name: managed-cluster-2
-namespace: ngsa
-destination:
-    server: https://argocluste-argoresource-ce2cc3-g50fhd0k.hcp.southcentralus.azmk8s.io:443
-source:
-    chart: prometheus
-    path: spikes/argo-helm/apps/prometheus
-    repoURL: https://prometheus-community.github.io/helm-charts
-    targetRevision: 20.1.0

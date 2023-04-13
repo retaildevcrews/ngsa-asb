@@ -1,51 +1,23 @@
 apiVersion: v2
-name: prometheus
-appVersion: v2.43.0
-version: 20.2.0
-kubeVersion: ">=1.16.0-0"
-description: Prometheus is a monitoring system and time series database.
-home: https://prometheus.io/
-icon: https://raw.githubusercontent.com/prometheus/prometheus.github.io/master/assets/prometheus_logo-cb55bb5c346.png
-sources:
-  - https://github.com/prometheus/alertmanager
-  - https://github.com/prometheus/prometheus
-  - https://github.com/prometheus/pushgateway
-  - https://github.com/prometheus/node_exporter
-  - https://github.com/kubernetes/kube-state-metrics
-maintainers:
-  - name: gianrubio
-    email: gianrubio@gmail.com
-  - name: zanhsieh
-    email: zanhsieh@gmail.com
-  - name: Xtigyro
-    email: miroslav.hadzhiev@gmail.com
-  - name: naseemkullah
-    email: naseem@transit.app
+name: add-on-prometheus
+description: prometheus add on
+
+# A chart can be either an 'application' or a 'library' chart.
+#
+# Application charts are a collection of templates that can be packaged into versioned archives
+# to be deployed.
+#
+# Library charts provide useful utilities or functions for the chart developer. They're included as
+# a dependency of application charts to inject those utilities and functions into the rendering
+# pipeline. Library charts do not define any templates and therefore cannot be deployed.
 type: application
-dependencies:
-  - name: alertmanager
-    version: "0.24.*"
-    repository: https://prometheus-community.github.io/helm-charts
-    condition: alertmanager.enabled
-  - name: kube-state-metrics
-    version: "4.30.*"
-    repository: https://prometheus-community.github.io/helm-charts
-    condition: kube-state-metrics.enabled
-  - name: prometheus-node-exporter
-    version: "4.8.*"
-    repository: https://prometheus-community.github.io/helm-charts
-    condition: prometheus-node-exporter.enabled
-  - name: prometheus-pushgateway
-    version: "2.0.*"
-    repository: https://prometheus-community.github.io/helm-charts
-    condition: prometheus-pushgateway.enabled
-keywords:
-  - monitoring
-  - prometheus
-annotations:
-  "artifacthub.io/license": Apache-2.0
-  "artifacthub.io/links": |
-    - name: Chart Source
-      url: https://github.com/prometheus-community/helm-charts
-    - name: Upstream Project
-      url: https://github.com/prometheus/prometheus
+
+# This is the chart version. This version number should be incremented each time you make changes
+# to the chart and its templates, including the app version.
+# Versions are expected to follow Semantic Versioning (https://semver.org/)
+version: 0.0.1
+
+# This is the version number of the application being deployed. This version number should be
+# incremented each time you make changes to the application. Versions are not expected to
+# follow Semantic Versioning. They should reflect the version the application is using.
+appVersion: "1.0"

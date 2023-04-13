@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: prometheus
+  name: {{ .Values.clusterName }}-prometheus
   namespace: {{.Values.namespace}}
   finalizers:
   - resources-finalizer.argocd.argoproj.io
@@ -9,12 +9,22 @@ metadata:
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:
   destination:
-    namespace: {{.Values.namespace}}
+    namespace: {{.Values.spec.destination.namespace}}
     server: {{ .Values.destination.server }}
   project: default
   source:
-    # {{.Values.source}}
-    # path: spikes/argo-helm/apps/prometheus
-    chart: {{.Values.source.chart}}
     repoURL: {{ .Values.source.repoURL }}
     targetRevision: {{ .Values.source.targetRevision }}
+    chart: {{ .Values.source.chart }}
+    helm:
+      parameters:
+      - name: 'configmapReload.prometheus.enabled'
+        value: '{{ .Values.configmapReload.prometheus.enabled }}'
+  syncPolicy:
+    automated:
+      prune: false
+      selfHeal: true
+    retry:
+      limit: 3
+    syncOptions:      
+    - CreateNamespace=true
