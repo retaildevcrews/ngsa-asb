@@ -16,6 +16,10 @@ spec:
     repoURL: {{ .Values.source.repoURL }}
     targetRevision: {{ .Values.source.targetRevision }}
     chart: {{ .Values.source.chart }}
+    helm:
+        parameters:
+            - name: "configmapReload.prometheus.enabled"
+              value: {{ .Values.configmapReload.prometheus.enabled }}
   syncPolicy:
     automated:
         prune: false
