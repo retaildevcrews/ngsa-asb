@@ -66,8 +66,4 @@ App of app pattern: <https://argo-cd.readthedocs.io/en/stable/operator-manual/cl
 In this approach the add on owner uses app of apps pattern to deploy their add-on, there is a wrapper helm chart which will take in parameters from the generator.  
 The helm chart can specify anything in its template(s) - call other helm charts, do a plain yaml deployment, etc.
 
-### Git Repo Structures
-
-#### Cluster Owner
-
-#### Add-on Owner
+![Diagram](argo-addons.png)
