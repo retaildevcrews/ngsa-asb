@@ -1,4 +1,6 @@
-# Deploying Add-ons to K8's Clusters
+# Deploying Add-ons to K8's Clusters Using Argo CD ApplicationSets
+
+The purpose of this example is to illustrate how ArgoCD can be used to deploy cluster add-ons at scale while leveraging GitOps principles.
 
 ## What is a cluster add-on?
 
@@ -20,11 +22,10 @@ Given that there may be a large number of these add-ons and that infrastructure/
 ### General
 
 - Add-ons should be able to be installed via various methods: HELM, Kubectl, shell scripts, etc.
-- Add-ons should be able to be deployed to thousands of clusters - baseline 25k
 - Add-on install/upgrade/removal should be performed in an automated fashion
 - Add-ons should be validated after install
-- What add-ons get deployed to what clusters should be able to be defined by the person responsible for the cluster
 - Add-ons should be able to require dependencies to be available before they are installed
+- Add-ons should be able to be deployed at scale (potentially thousands of clusters of clusters)
 
 ### Add On Management
 
@@ -37,12 +38,7 @@ Given that there may be a large number of these add-ons and that infrastructure/
 - Visibility to status of install
 - Visibility to result of install (success/failure)
 
-## Questions
-
-- What is the trigger for add-ons being installed to cluster?
-- How are add-ons selected to be added to clusters?
-
-## Argo CD
+## Argo CD Overview
 
 Argo CD is a declarative, GitOps continuous delivery tool for Kubernetes.
 
@@ -51,13 +47,12 @@ Argo CD Resources:
 - [Core Concepts](https://argo-cd.readthedocs.io/en/stable/core_concepts/)
 - [Architectural Overview](https://argo-cd.readthedocs.io/en/stable/operator-manual/architecture/)
 
-### Argo Components to be Used
+### Argo Components to be Used in this Implementation
 
 - ApplicationSet
 - Application
 - Generators (matrix, list, cluster)
 - Sync Waves
-- Projects
 
 ### Idea: Use app of apps pattern to inject values into applications (Helm or other flavors)
 
