@@ -46,7 +46,7 @@ spec:
       #  component-version: '{{values.branchOrTag}}'
        cluster-id: '{{name}}'
        provider: '{{metadata.labels.provider}}'
-       wcnp-cluster-type: '{{metadata.labels.wcnp-cluster-type}}'
+       cluster-type: '{{metadata.labels.cluster-type}}'
     spec:
       project: default
       sources:
