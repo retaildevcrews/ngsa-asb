@@ -18,3 +18,11 @@ spec:
   destination:
     namespace: {{ .Values.spec.destination.namespace }}
     server: {{ .Values.spec.destination.server }}
+  syncPolicy:
+    automated:
+        prune: false
+        selfHeal: true
+    retry:
+      limit: 3
+    syncOptions:      
+    - CreateNamespace=true

@@ -46,7 +46,6 @@ spec:
       #  component-version: '{{values.branchOrTag}}'
        cluster-id: '{{name}}'
        provider: '{{metadata.labels.provider}}'
-       cluster-type: '{{metadata.labels.cluster-type}}'
     spec:
       project: default
       sources:
@@ -74,5 +73,5 @@ spec:
            selfHeal: true
         retry:
           limit: 3
-#        syncOptions:      
-#        - Replace=true
+        syncOptions:      
+        - CreateNamespace=true
