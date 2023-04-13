@@ -12,9 +12,9 @@ spec:
     namespace: {{.Values.namespace}}
     server: {{ .Values.destination.server }}
   project: default
-  source: |
-    {{.Values.source}}
+  source:
+    # {{.Values.source}}
     # path: spikes/argo-helm/apps/prometheus
-    # chart: {{.Values.source.chart}}
-    # repoURL: {{ .Values.source.repoURL }}
-    # targetRevision: {{ .Values.source.targetRevision }}
+    chart: {{.Values.source.chart}}
+    repoURL: {{ .Values.source.repoURL }}
+    targetRevision: {{ .Values.source.targetRevision }}
