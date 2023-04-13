@@ -99,6 +99,10 @@ kubectl create ns argo-events
 
 # Install Argo Events
 helm install argo-events argo/argo-events --namespace argo-events
+
+# Verify pods
+kubectl get pods -n argo-events
+
 ```
 
 ### Installing Eventbus and required components
@@ -111,33 +115,17 @@ kubectl apply -f manifests/events/eventbus.yaml -n argo-events
 
 # The Event Source listens for incoming events and sends them to the Eventbus for processing. In this case, the Event Source is named webhook and listens for incoming events on port 12000. The service section specifies the Kubernetes Service that exposes the Event Source deployment. The webhook section defines the details of the webhook event source. In this case, the webhook listens for incoming webhook events on port 12000 and the /example endpoint using the HTTP POST method. When an event is received, it is sent to the Eventbus for further processing. This allows the webhook event source to trigger Argo Events workflows based on incoming webhook events.
 
-# Install Event Source
+# Create a webhook event source that will send events to our Argo sensor. Event sources in Argo Events are used to receive events from various external systems. This YAML file defines an EventSource that listens for incoming webhook events on port 12000 and the /webhook endpoint.
 kubectl apply -f manifests/events/webhook-event-source.yaml -n argo-events
 
 # Install RBAC for sensor and workflow
 kubectl apply -f manifests/events/sensor-rbac.yaml -n argo-events
 kubectl apply -f manifests/events/workflow-rbac.yaml -n argo-events
 
-# Install Sensor
+# Create a sensor that listens for events from the webhook event source and triggers the "Hello World" workflow. Sensors in Argo Events are used to define event-driven rules and trigger actions based on events.
+# This YAML file defines a Sensor that listens for events from the webhook-event-source and triggers the webhook workflow when an event is received.
 kubectl apply -f manifests/events/webhook-sensor.yaml -n argo-events
 
-```
-
-### Create a Webhook Event Source
-
-```bash
-# Create a webhook event source that will send events to our Argo sensor. Event sources in Argo Events are used to receive events from various external systems. This YAML file defines an EventSource that listens for incoming webhook events on port 12000 and the /webhook endpoint.
-kubectl apply -f manifests/events/webhook-event-source.yaml
-```
-
-### Create a Sensor to Trigger the Workflow
-
-```bash
-# Create a sensor that listens for events from the webhook event source and triggers the "Hello World" workflow. Sensors in Argo Events are used to define event-driven rules and trigger actions based on events.
-
-# This YAML file defines a Sensor that listens for events from the webhook-event-source and triggers the webhook workflow when an event is received.
-
-kubectl apply -f manifests/events/webhook-sensor.yaml
 ```
 
 ### Send an Event to Trigger the Workflow
@@ -150,7 +138,7 @@ We'll send a POST request to the webhook event source to trigger the "Hello Worl
 kubectl -n argo-events port-forward $(kubectl -n argo-events get pod -l eventsource-name=webhook -o name) 12000:12000 &
 
 # Send a POST request to the webhook event source using a tool like curl:
-curl -d '{"message":"this is my first webhook"}' -H "Content-Type: application/json" -X POST http://localhost:12000/example
+curl -d '{"message":"Hello Team!"}' -H "Content-Type: application/json" -X POST http://localhost:12000/example
 
 # Verify that an Argo workflow was triggered.
 kubectl -n argo-events get workflows | grep "webhook"
