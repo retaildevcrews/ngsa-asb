@@ -1,4 +1,4 @@
 testlabel: 'testlabel'
 configmapReload:
   prometheus:
-    enabled: false
+    enabled: true
