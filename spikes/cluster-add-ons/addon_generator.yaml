@@ -13,14 +13,10 @@ spec:
                     component: guestbook
                     branchOrTag: pragmatical/cluster-add-ons
                     namespace: addons
-                # - values:
-                #     component: namespaces
-                #     branchOrTag: pragmatical/cluster-add-ons
-                #     namespace: argocd
-                # - values:
-                #     component: helm-guestbook
-                #     branchOrTag: pragmatical/cluster-add-ons
-                #     namespace: addons
+                - values:
+                    component: prometheus
+                    branchOrTag: pragmatical/cluster-add-ons
+                    namespace: argocd
           - clusters:
               selector:
                 matchLabels:
@@ -40,7 +36,7 @@ spec:
                 # #     - "self-managed"
   template:
     metadata:
-      name: '{{values.component}}-{{name}}-wrapper'
+      name: '{{values.component}}-{{name}}-root'
       labels:
        component: '{{values.component}}'
       #  component-version: '{{values.branchOrTag}}'
