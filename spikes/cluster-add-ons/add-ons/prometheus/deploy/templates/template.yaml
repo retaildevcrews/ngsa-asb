@@ -9,7 +9,7 @@ metadata:
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:
   destination:
-    namespace: {{.Values.spec.namespace}}
+    namespace: {{.Values.spec.destination.namespace}}
     server: {{ .Values.spec.destination.server }}
   project: default
   source:
