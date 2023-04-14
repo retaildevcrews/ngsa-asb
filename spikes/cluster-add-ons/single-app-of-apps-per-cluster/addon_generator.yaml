@@ -1,0 +1,47 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: addons
+  namespace: argocd
+spec:
+  generators:
+    - matrix:
+        generators:
+          - clusters:
+              selector:
+                matchLabels:
+                  argocd.argoproj.io/secret-type: cluster
+  template:
+    metadata:
+      name: '{{name}}-root'
+      labels:
+       cluster-id: '{{name}}'
+       provider: '{{metadata.labels.provider}}'
+    spec:
+      project: default
+      sources:
+        - repoURL: https://github.com/retaildevcrews/ngsa-asb.git
+          targetRevision: '{{values.branchOrTag}}'
+          ref: values
+        - repoURL: https://github.com/retaildevcrews/ngsa-asb.git
+          targetRevision: '{{values.branchOrTag}}'
+          path: spikes/cluster-add-ons/add-ons/{{name}}/apps
+          helm:
+            parameters:
+            - name: 'spec.destination.server'
+              value: '{{server}}'
+            - name: 'clusterName'
+              value: '{{name}}'
+            valueFiles:
+            - $values/spikes/cluster-add-ons/clusters/{{name}}/values.yaml
+      destination:
+        name: 'in-cluster'
+        namespace: 'argocd'
+      syncPolicy:
+        automated:
+           prune: false
+           selfHeal: true
+        retry:
+          limit: 3
+        syncOptions:      
+        - CreateNamespace=true
