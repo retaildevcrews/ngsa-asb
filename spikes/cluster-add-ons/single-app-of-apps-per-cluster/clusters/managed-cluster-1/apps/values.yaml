@@ -1,1 +1,3 @@
-configmapReload.prometheus.enabled: true
+configmapReload:
+  prometheus:
+    enabled: false
