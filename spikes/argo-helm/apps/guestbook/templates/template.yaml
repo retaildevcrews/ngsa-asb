@@ -2,8 +2,6 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: {{ .Values.clusterName }}-guestbook
-  labels:
-    testlabel: {{ .Values.testlabel }}
   annotations: 
     argocd.argoproj.io/sync-wave: {{.Values.syncwave}}
   namespace: argocd
