@@ -43,11 +43,11 @@ Given that there may be a large number of these add-ons and that infrastructure/
 
 ### App of apps per cluster
 
-![Diagram](argo-addons.png)
+![Diagram](app-of-apps-per-cluster/argo-addons.png)
 
 ### App of apps per application
 
-![Diagram](argo-addons.png)
+![Diagram](app-of-apps-per-add-on/argo-addons.png)ß
 
 Additional Argo CD Resources:
 
