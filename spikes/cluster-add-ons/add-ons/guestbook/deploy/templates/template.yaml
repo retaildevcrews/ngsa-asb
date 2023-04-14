@@ -7,6 +7,7 @@ metadata:
   namespace: argocd
   annotations:
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+    argocd.argoproj.io/sync-wave: '{{values.syncwave}}'
   finalizers:
   - resources-finalizer.argocd.argoproj.io
 spec:
@@ -19,10 +20,10 @@ spec:
     namespace: {{ .Values.spec.destination.namespace }}
     server: {{ .Values.spec.destination.server }}
   syncPolicy:
-      automated:
-          prune: false
-          selfHeal: true
-      retry:
-        limit: 3
-      syncOptions:      
-      - CreateNamespace=true
+    automated:
+        prune: false
+        selfHeal: true
+    retry:
+      limit: 3
+    syncOptions:      
+    - CreateNamespace=true
