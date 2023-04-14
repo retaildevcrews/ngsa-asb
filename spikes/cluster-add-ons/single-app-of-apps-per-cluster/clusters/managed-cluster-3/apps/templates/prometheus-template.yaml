@@ -5,6 +5,8 @@ metadata:
   namespace: {{.Values.namespace}}
   finalizers:
   - resources-finalizer.argocd.argoproj.io
+  annotations:
+    argocd.argoproj.io/sync-wave: "5"
 spec:
   destination:
     namespace: {{.Values.spec.destination.namespace}}
