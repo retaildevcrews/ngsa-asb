@@ -1,0 +1,28 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+  name: prometheus
+  namespace: argocd
+spec:
+  project: default
+  source:
+    path: spikes/argo-helm/apps/prometheus
+    repoURL: https://github.com/retaildevcrews/ngsa-asb
+    targetRevision: anguyen/argo-helm
+  destination:
+    namespace: ngsa
+    server: https://argocluste-argoresource-ce2cc3-g50fhd0k.hcp.southcentralus.azmk8s.io:443
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    retry:
+      limit: 2
+      backoff:
+        duration: 5s
+        maxDuration: 1m0s
+        factor: 2
+    syncOptions:
+      - CreateNamespace=true
