@@ -13,9 +13,9 @@ metadata:
 spec:
   project: default
   source:
-    path: {{.Values.source.path}}
-    repoURL: {{.Values.source.repoURL}}
-    targetRevision: {{.Values.source.targetRevision}}
+    path: guestbook
+    repoURL:  https://github.com/argoproj/argocd-example-apps/
+    targetRevision:  HEAD
   destination:
     namespace: {{ .Values.spec.destination.namespace }}
     server: {{ .Values.spec.destination.server }}
@@ -27,3 +27,4 @@ spec:
       limit: 3
     syncOptions:      
     - CreateNamespace=true 
+  
