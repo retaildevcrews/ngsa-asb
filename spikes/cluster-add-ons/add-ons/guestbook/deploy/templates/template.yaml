@@ -6,7 +6,8 @@ metadata:
     testlabel: {{ .Values.testlabel }}
   namespace: argocd
   annotations:
-    argocd.argoproj.io/sync-wave: '{{ .Values.syncwave }}'
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+    argocd.argoproj.io/sync-wave: '{{values.syncwave}}'
   finalizers:
   - resources-finalizer.argocd.argoproj.io
 spec:

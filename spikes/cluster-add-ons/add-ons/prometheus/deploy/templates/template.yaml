@@ -6,6 +6,7 @@ metadata:
   finalizers:
   - resources-finalizer.argocd.argoproj.io
   annotations: 
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
     argocd.argoproj.io/sync-wave: '{{ .Values.syncwave }}'
 spec:
   destination:
@@ -19,7 +20,7 @@ spec:
     helm:
       parameters:
       - name: 'configmapReload.prometheus.enabled'
-        value: '{{ .Values.configmapReload.prometheus.enabled }}'
+        value: '{{ .Values.configmapReload.prometheus.enabled}}'
   syncPolicy:
     automated:
         prune: false
