@@ -12,7 +12,7 @@ Given that there may be a large number of these add-ons and that infrastructure/
 
 ### General
 
-- Add-ons should be able to be installed via various methods: HELM, Kubectl, shell scripts, etc.
+- Add-ons should be able to be installed via various methods: HELM, YAML, shell scripts, etc.
 - Add-on install/upgrade/removal should be performed in an automated fashion
 - Add-ons should be validated after install
 - Add-ons should be able to require dependencies to be available before they are installed
