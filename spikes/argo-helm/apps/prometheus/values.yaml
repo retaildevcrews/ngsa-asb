@@ -4,4 +4,5 @@ source:
   targetRevision: 20.1.0
 configmapReload:
     prometheus:
-        enabled: true
+        enabled: false
+syncwave: 1
