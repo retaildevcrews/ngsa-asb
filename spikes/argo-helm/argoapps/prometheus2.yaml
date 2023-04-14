@@ -2,8 +2,8 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   annotations:
-    argocd.argoproj.io/sync-wave: "1"
-  name: prometheus
+    argocd.argoproj.io/sync-wave: "2"
+  name: prometheus2
   namespace: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
@@ -18,7 +18,7 @@ spec:
           - name: 'clusterName'
             value: 'managed-cluster-1'
           - name: 'appname'
-            value: 1
+            value: 2
         valueFiles:
           - $values/spikes/argo-helm/clusters/managed-cluster-1/values.yaml
     - ref: values
