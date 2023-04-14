@@ -5,8 +5,6 @@ metadata:
   namespace: {{.Values.namespace}}
   finalizers:
   - resources-finalizer.argocd.argoproj.io
-  annotations: 
-    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:
   destination:
     namespace: {{.Values.spec.destination.namespace}}

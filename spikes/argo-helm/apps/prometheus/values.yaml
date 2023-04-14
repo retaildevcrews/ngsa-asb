@@ -5,4 +5,3 @@ source:
 configmapReload:
     prometheus:
         enabled: false
-syncwave: 1
