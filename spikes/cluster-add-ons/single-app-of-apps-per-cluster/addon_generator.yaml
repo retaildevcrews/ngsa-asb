@@ -28,6 +28,8 @@ spec:
             parameters:
             - name: 'spec.destination.server'
               value: '{{server}}'
+            - name: 'spec.destination.namespace'
+              value: 'addons'
             - name: 'clusterName'
               value: '{{name}}'
             valueFiles:
