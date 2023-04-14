@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: {{ .Values.clusterName }}-{{ .Values.testlabel }}-guestbook
+  name: {{ .Values.clusterName }}-guestbook
   labels:
     testlabel: {{ .Values.testlabel }}
   annotations: 
