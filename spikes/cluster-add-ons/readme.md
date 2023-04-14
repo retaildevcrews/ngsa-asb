@@ -38,10 +38,14 @@ Given that there may be a large number of these add-ons and that infrastructure/
 - [ApplicationSet Controller](https://argo-cd.readthedocs.io/en/stable/operator-manual/applicationset/) - Kubernetes controller that creates application resources based on a template and parameters used by the template.
 - [ApplicationSet](https://argo-cd.readthedocs.io/en/stable/operator-manual/applicationset/) - Kubernetes custom resource that is used by the ApplicationSet Controller to create Argo applications based on generated parameters and a template.
 - [Generators(matrix, list, cluster)](https://argo-cd.readthedocs.io/en/stable/operator-manual/applicationset/Generators/) - Generators generate parameters that can be used in the template of the ApplicationSet.
-- ~~[Sync Waves](https://argo-cd.readthedocs.io/en/stable/user-guide/sync-waves/) - Sync waves are used to control order of what resources are sychronized.~~  This feature unfortunately does not work across multiple applications when set up using this pattern
+- [Sync Waves](https://argo-cd.readthedocs.io/en/stable/user-guide/sync-waves/) - Sync waves are used to control order of what resources are sychronized.
 - [App of apps pattern](https://argo-cd.readthedocs.io/en/stable/operator-manual/cluster-bootstrapping/#app-of-apps-pattern) - This is the pattern that is used in this implementation to deploy cluster add-ons.
 
-### Implementation Diagram
+### App of apps per cluster
+
+![Diagram](argo-addons.png)
+
+### App of apps per application
 
 ![Diagram](argo-addons.png)
 
