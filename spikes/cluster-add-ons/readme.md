@@ -12,11 +12,11 @@ Given that there may be a large number of these add-ons and that infrastructure/
 
 ### General
 
-- Add-ons should be able to be installed via various methods: HELM, YAML, shell scripts, etc.
-- Add-on install/upgrade/removal should be performed in an automated fashion
-- Add-ons should be validated after install
-- Add-ons should be able to require dependencies to be available before they are installed
-- Add-ons should be able to be deployed at scale (potentially thousands of clusters)
+- Add-ons should be able to be installed via various methods: HELM, YAML, shell scripts, etc. :white_check_mark:
+- Add-on install/upgrade/removal should be performed in an automated fashion :white_check_mark:
+- Add-ons should be validated after install :white_check_mark:
+- Add-ons should be able to require dependencies to be available before they are installed :x:
+- Add-ons should be able to be deployed at scale (potentially thousands of clusters) :white_check_mark:
 
 ### Add On Management
 
@@ -38,7 +38,7 @@ Given that there may be a large number of these add-ons and that infrastructure/
 - [ApplicationSet Controller](https://argo-cd.readthedocs.io/en/stable/operator-manual/applicationset/) - Kubernetes controller that creates application resources based on a template and parameters used by the template.
 - [ApplicationSet](https://argo-cd.readthedocs.io/en/stable/operator-manual/applicationset/) - Kubernetes custom resource that is used by the ApplicationSet Controller to create Argo applications based on generated parameters and a template.
 - [Generators(matrix, list, cluster)](https://argo-cd.readthedocs.io/en/stable/operator-manual/applicationset/Generators/) - Generators generate parameters that can be used in the template of the ApplicationSet.
-- [Sync Waves](https://argo-cd.readthedocs.io/en/stable/user-guide/sync-waves/) - Sync waves are used to control order of what resources are sychronized.
+- ~~[Sync Waves](https://argo-cd.readthedocs.io/en/stable/user-guide/sync-waves/) - Sync waves are used to control order of what resources are sychronized.~~  This feature unfortunately does not work across multiple applications when set up using this pattern
 - [App of apps pattern](https://argo-cd.readthedocs.io/en/stable/operator-manual/cluster-bootstrapping/#app-of-apps-pattern) - This is the pattern that is used in this implementation to deploy cluster add-ons.
 
 ### Implementation Diagram
