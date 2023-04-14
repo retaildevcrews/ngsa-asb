@@ -24,6 +24,14 @@ spec:
         - repoURL: https://github.com/retaildevcrews/ngsa-asb.git
           targetRevision: 'pragmatical/cluster-add-ons'
           path: spikes/cluster-add-ons/single-app-of-apps-per-cluster/clusters/{{name}}/apps
+          helm:
+            parameters:
+            - name: 'spec.destination.server'
+              value: '{{server}}'
+            - name: 'clusterName'
+              value: '{{name}}'
+            valueFiles:
+            - $values/spikes/cluster-add-ons/single-app-of-apps-per-cluster/clusters/{{name}}/values.yaml
       destination:
         name: 'in-cluster'
         namespace: 'argocd'
