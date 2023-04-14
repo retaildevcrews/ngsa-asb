@@ -23,8 +23,8 @@ spec:
       repoURL: https://github.com/retaildevcrews/ngsa-asb
       targetRevision: anguyen/argo-helm
   destination:
-    namespace: ngsa
-    server: https://argocluste-argoresource-ce2cc3-g50fhd0k.hcp.southcentralus.azmk8s.io:443
+    namespace: argocd
+    server: https://kubernetes.default.svc
   syncPolicy:
     automated:
       prune: true
