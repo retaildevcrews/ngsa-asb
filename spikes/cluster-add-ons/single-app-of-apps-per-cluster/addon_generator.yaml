@@ -5,12 +5,10 @@ metadata:
   namespace: argocd
 spec:
   generators:
-    - matrix:
-        generators:
-          - clusters:
-              selector:
-                matchLabels:
-                  argocd.argoproj.io/secret-type: cluster
+      - clusters:
+          selector:
+            matchLabels:
+              argocd.argoproj.io/secret-type: cluster
   template:
     metadata:
       name: '{{name}}-root'
@@ -21,19 +19,11 @@ spec:
       project: default
       sources:
         - repoURL: https://github.com/retaildevcrews/ngsa-asb.git
-          targetRevision: '{{values.branchOrTag}}'
+          targetRevision: 'pragmatical/cluster-add-ons'
           ref: values
         - repoURL: https://github.com/retaildevcrews/ngsa-asb.git
-          targetRevision: '{{values.branchOrTag}}'
-          path: spikes/cluster-add-ons/add-ons/{{name}}/apps
-          helm:
-            parameters:
-            - name: 'spec.destination.server'
-              value: '{{server}}'
-            - name: 'clusterName'
-              value: '{{name}}'
-            valueFiles:
-            - $values/spikes/cluster-add-ons/clusters/{{name}}/values.yaml
+          targetRevision: 'pragmatical/cluster-add-ons'
+          path: spikes/cluster-add-ons/single-app-of-apps-per-cluster/clusters/{{name}}/apps
       destination:
         name: 'in-cluster'
         namespace: 'argocd'
