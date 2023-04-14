@@ -21,3 +21,7 @@ version: 0.0.1
 # incremented each time you make changes to the application. Versions are not expected to
 # follow Semantic Versioning. They should reflect the version the application is using.
 appVersion: "1.0"
+dependencies:
+- name: add-on-prometheus
+  version: "0.0.1"
+  repository: "https://github.com/retaildevcrews/ngsa-asb/tree/pragmatical/cluster-add-ons/spikes/cluster-add-ons/add-ons/prometheus/deploy" 

@@ -5,8 +5,6 @@ metadata:
   labels:
     testlabel: {{ .Values.testlabel }}
   namespace: argocd
-  annotations:
-    argocd.argoproj.io/sync-wave: '{{.Values.syncwave}}'
   finalizers:
   - resources-finalizer.argocd.argoproj.io
 spec:
@@ -26,3 +24,4 @@ spec:
       limit: 3
     syncOptions:      
     - CreateNamespace=true
+    

@@ -23,6 +23,20 @@ spec:
               selector:
                 matchLabels:
                   argocd.argoproj.io/secret-type: cluster
+  strategy:
+    type: RollingSync
+    rollingSync:
+      steps:
+        - matchExpressions:
+            - key: syncwave
+              operator: In
+              values:
+                - '0'
+        - matchExpressions:
+            - key: syncwave
+              operator: In
+              values:
+                - '2'
   template:
     metadata:
       name: '{{values.component}}-{{name}}-root'
@@ -51,7 +65,6 @@ spec:
               value: '{{values.syncwave}}'
             valueFiles:
             - $values/spikes/cluster-add-ons/clusters/{{name}}/values.yaml
-
       destination:
         name: 'in-cluster'
         namespace: 'argocd'
