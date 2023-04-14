@@ -4,7 +4,7 @@ The purpose of this example is to illustrate how ArgoCD can be used to deploy cl
 
 ## What is a cluster add-on?
 
-An add-on is component that is deployed to a Kubernetes cluster at the cluster level.  These add-ons are components leveraged by the applications that are deployed to the cluster.  For instance, application team may want their deployed application to provide metrics data to Prometheus, in this case the infrastructure/ops team would install the prometheus operator after cluster is created.
+A cluster add-on is component that is deployed to a Kubernetes cluster at the cluster level.  These add-ons are components leveraged by the applications that are deployed to the cluster.  For instance, application team may want their deployed application to provide metrics data to Prometheus, in this case the infrastructure/ops team would install the prometheus operator after cluster is created.
 
 Given that there may be a large number of these add-ons and that infrastructure/ops teams could be managing thousands of clusters, there is a desire to have an automated way to deploy and maintain these add-ons on the clusters.
 
@@ -16,7 +16,7 @@ Given that there may be a large number of these add-ons and that infrastructure/
 - Add-on install/upgrade/removal should be performed in an automated fashion
 - Add-ons should be validated after install
 - Add-ons should be able to require dependencies to be available before they are installed
-- Add-ons should be able to be deployed at scale (potentially thousands of clusters of clusters)
+- Add-ons should be able to be deployed at scale (potentially thousands of clusters)
 
 ### Add On Management
 
@@ -39,8 +39,7 @@ Given that there may be a large number of these add-ons and that infrastructure/
 - [ApplicationSet](https://argo-cd.readthedocs.io/en/stable/operator-manual/applicationset/) - Kubernetes custom resource that is used by the ApplicationSet Controller to create Argo applications based on generated parameters and a template.
 - [Generators(matrix, list, cluster)](https://argo-cd.readthedocs.io/en/stable/operator-manual/applicationset/Generators/) - Generators generate parameters that can be used in the template of the ApplicationSet.
 - [Sync Waves](https://argo-cd.readthedocs.io/en/stable/user-guide/sync-waves/) - Sync waves are used to control order of what resources are sychronized.
-
-- [App of app pattern](https://argo-cd.readthedocs.io/en/stable/operator-manual/cluster-bootstrapping/#app-of-apps-pattern) - This is the pattern that is implemented in this repository to deploy cluster add-ons.
+- [App of apps pattern](https://argo-cd.readthedocs.io/en/stable/operator-manual/cluster-bootstrapping/#app-of-apps-pattern) - This is the pattern that is used in this implementation to deploy cluster add-ons.
 
 ### Implementation Diagram
 
@@ -48,5 +47,5 @@ Given that there may be a large number of these add-ons and that infrastructure/
 
 Additional Argo CD Resources:
 
-- [Core Concepts](https://argo-cd.readthedocs.io/en/stable/core_concepts/)
-- [Architectural Overview](https://argo-cd.readthedocs.io/en/stable/operator-manual/architecture/)
+- [Argo CD Core Concepts](https://argo-cd.readthedocs.io/en/stable/core_concepts/)
+- [Argo CD Architectural Overview](https://argo-cd.readthedocs.io/en/stable/operator-manual/architecture/)
