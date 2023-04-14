@@ -1,6 +1,6 @@
 apiVersion: v2
-name: add-on-prometheus
-description: prometheus add on
+name: cluster-app-of-apps-root
+description: guestbook application
 
 # A chart can be either an 'application' or a 'library' chart.
 #
