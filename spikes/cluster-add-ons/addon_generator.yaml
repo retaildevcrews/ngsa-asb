@@ -13,16 +13,27 @@ spec:
                     component: guestbook
                     branchOrTag: pragmatical/cluster-add-ons
                     namespace: addons
-                    syncwave: '5'
                 - values:
                     component: prometheus
                     branchOrTag: pragmatical/cluster-add-ons
                     namespace: argocd
-                    syncwave: '0'
           - clusters:
               selector:
                 matchLabels:
                   argocd.argoproj.io/secret-type: cluster
+                # matchExpressions:
+                # #   - key: 'addon-{{values.component}}'
+                # #     operator: In
+                # #     values:
+                # #     - "true"
+                #   - key: provider
+                #     operator: In
+                #     values:
+                #     - "azure"
+                # #   - key: clusterType
+                # #     operator: NotIn
+                # #     values:
+                # #     - "self-managed"
   template:
     metadata:
       name: '{{values.component}}-{{name}}-root'
@@ -31,6 +42,8 @@ spec:
        component-version: '{{values.branchOrTag}}'
        cluster-id: '{{name}}'
        provider: '{{metadata.labels.provider}}'
+      annotations:
+        argocd.argoproj.io/sync-wave: "5"
     spec:
       project: default
       sources:
@@ -48,8 +61,6 @@ spec:
               value: '{{values.namespace}}'
             - name: 'clusterName'
               value: '{{name}}'
-            - name: 'syncwave'
-              value: '{{values.syncwave}}'
             valueFiles:
             - $values/spikes/cluster-add-ons/clusters/{{name}}/values.yaml
 
