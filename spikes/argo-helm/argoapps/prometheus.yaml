@@ -5,6 +5,8 @@ metadata:
     argocd.argoproj.io/sync-wave: "1"
   name: prometheus
   namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
   sources:
