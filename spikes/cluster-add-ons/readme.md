@@ -13,6 +13,7 @@ Given that there may be a large number of these add-ons and that infrastructure/
 ### General
 
 - Add-ons should be able to be installed via various methods: HELM, YAML, shell scripts, etc. :white_check_mark:
+- For helm deployments there should be an ability to overwrite values with context from the destination cluster or external values files :white_check_mark:
 - Add-on install/upgrade/removal should be performed in an automated fashion :white_check_mark:
 - Add-ons should be validated after install :white_check_mark:
 - Add-ons should be able to require dependencies to be available before they are installed :x:
@@ -25,7 +26,6 @@ Given that there may be a large number of these add-ons and that infrastructure/
 
 ### Observability
 
-- Visibility to what add-ons and their versions are installed in each cluster
 - Visibility to status of install
 - Visibility to result of install (success/failure)
 
