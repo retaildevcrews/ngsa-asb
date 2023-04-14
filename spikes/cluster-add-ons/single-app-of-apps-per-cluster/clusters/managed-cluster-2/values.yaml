@@ -1,1 +1,3 @@
-testlabel: 'testlabel'
+configmapReload:
+  prometheus:
+    enabled: false
