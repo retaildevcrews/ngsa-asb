@@ -6,7 +6,7 @@ metadata:
   finalizers:
   - resources-finalizer.argocd.argoproj.io
   annotations: 
-    argocd.argoproj.io/sync-wave: '{{ .Values.syncwave }}'
+    argocd.argoproj.io/sync-wave: '{{.Values.syncwave}}'
 spec:
   destination:
     namespace: {{.Values.spec.destination.namespace}}
