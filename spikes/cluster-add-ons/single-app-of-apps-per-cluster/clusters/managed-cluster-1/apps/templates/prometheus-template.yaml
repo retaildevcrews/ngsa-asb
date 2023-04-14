@@ -2,12 +2,12 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: {{ .Values.clusterName }}-prometheus
-  namespace: addons
+  namespace: argocd
   finalizers:
   - resources-finalizer.argocd.argoproj.io
 spec:
   destination:
-    namespace: 'addons'
+    namespace: {{.Values.spec.destination.namespace}}
     server: {{ .Values.spec.destination.server }}
   project: default
   source:
