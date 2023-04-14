@@ -4,4 +4,4 @@ spec:
         namespace: ngsa
 configmapReload:
     prometheus:
-        enabled: true
+        enabled: false
