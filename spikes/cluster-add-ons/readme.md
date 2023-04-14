@@ -1,21 +1,12 @@
 # Deploying Add-ons to K8's Clusters Using Argo CD ApplicationSets
 
-The purpose of this example is to illustrate how ArgoCD can be used to deploy cluster add-ons at scale while leveraging GitOps principles.
+The purpose of this example is to illustrate how ArgoCD can be used to deploy cluster add-ons at scale while leveraging GitOps principles. Argo CD is a declarative, GitOps continuous delivery tool for Kubernetes.
 
 ## What is a cluster add-on?
 
 An add-on is component that is deployed to a Kubernetes cluster at the cluster level.  These add-ons are components leveraged by the applications that are deployed to the cluster.  For instance, application team may want their deployed application to provide metrics data to Prometheus, in this case the infrastructure/ops team would install the prometheus operator after cluster is created.
 
 Given that there may be a large number of these add-ons and that infrastructure/ops teams could be managing thousands of clusters, there is a desire to have an automated way to deploy and maintain these add-ons on the clusters.
-
-## Personas
-
-- Cluster Owner
-  - Decides which add ons are installed on their clusters
-  - Can own one or multiple clusters
-- Add-on Owner
-  - Makes add-ons available for installing on clusters
-  - Controls the build pipeline for the add on
 
 ## Needs/Functionality
 
@@ -30,7 +21,7 @@ Given that there may be a large number of these add-ons and that infrastructure/
 ### Add On Management
 
 - Which add-ons are available to be installed to the clusters should be able to be managed by the individuals responsible for the add on and not the individuals responsible for the cluster
-- Add-on managers should be able to make new versions of add-ons
+- The individuals responsible for the add-on should be able to make new versions of add-ons
 
 ### Observability
 
@@ -38,27 +29,24 @@ Given that there may be a large number of these add-ons and that infrastructure/
 - Visibility to status of install
 - Visibility to result of install (success/failure)
 
-## Argo CD Overview
+## Implementations
 
-Argo CD is a declarative, GitOps continuous delivery tool for Kubernetes.
+### Argo Components/Concepts to be Used in this Implementation
 
-Argo CD Resources:
+- [Application Controller](https://argo-cd.readthedocs.io/en/stable/operator-manual/architecture/#application-controller) - Kubernetes controller that monitors and maintains current state of running applications in sync with the desired state (as specified in repo)
+- [Application](https://argo-cd.readthedocs.io/en/stable/operator-manual/declarative-setup/#applications) - Kubernetes custom resource that represents a deployed application instance in an environment.
+- [ApplicationSet Controller](https://argo-cd.readthedocs.io/en/stable/operator-manual/applicationset/) - Kubernetes controller that creates application resources based on a template and parameters used by the template.
+- [ApplicationSet](https://argo-cd.readthedocs.io/en/stable/operator-manual/applicationset/) - Kubernetes custom resource that is used by the ApplicationSet Controller to create Argo applications based on generated parameters and a template.
+- [Generators(matrix, list, cluster)](https://argo-cd.readthedocs.io/en/stable/operator-manual/applicationset/Generators/) - Generators generate parameters that can be used in the template of the ApplicationSet.
+- [Sync Waves](https://argo-cd.readthedocs.io/en/stable/user-guide/sync-waves/) - Sync waves are used to control order of what resources are sychronized.
+
+- [App of app pattern](https://argo-cd.readthedocs.io/en/stable/operator-manual/cluster-bootstrapping/#app-of-apps-pattern) - This is the pattern that is implemented in this repository to deploy cluster add-ons.
+
+### Implementation Diagram
+
+![Diagram](argo-addons.png)
+
+Additional Argo CD Resources:
 
 - [Core Concepts](https://argo-cd.readthedocs.io/en/stable/core_concepts/)
 - [Architectural Overview](https://argo-cd.readthedocs.io/en/stable/operator-manual/architecture/)
-
-### Argo Components to be Used in this Implementation
-
-- ApplicationSet
-- Application
-- Generators (matrix, list, cluster)
-- Sync Waves
-
-### Idea: Use app of apps pattern to inject values into applications (Helm or other flavors)
-
-App of app pattern: <https://argo-cd.readthedocs.io/en/stable/operator-manual/cluster-bootstrapping/#app-of-apps-pattern>
-
-In this approach the add on owner uses app of apps pattern to deploy their add-on, there is a wrapper helm chart which will take in parameters from the generator.  
-The helm chart can specify anything in its template(s) - call other helm charts, do a plain yaml deployment, etc.
-
-![Diagram](argo-addons.png)
