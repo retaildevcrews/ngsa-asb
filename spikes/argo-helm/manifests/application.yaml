@@ -11,7 +11,7 @@ spec:
             argocd.argoproj.io/secret: cluster
   template:
     metadata:
-      name: '{{name}}-root'
+      name: 'addon-root'
     spec:
       project: default
       sources:
