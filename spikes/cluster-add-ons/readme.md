@@ -47,6 +47,9 @@ Given that there may be a large number of these add-ons and that infrastructure/
 
 ### App of apps per application
 
+> **Note**
+> This approach does not provide capability to sequence deployments enforcing dependencies
+
 ![Diagram](app-of-apps-per-add-on/cluster-addons.png)
 
 Additional Argo CD Resources:
