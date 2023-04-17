@@ -15,12 +15,9 @@ spec:
     spec:
       project: default
       sources:
-        # path: spikes/argo-helm/argoapps
-        # repoURL: https://github.com/retaildevcrews/ngsa-asb
-        # targetRevision: anguyen/argo-helm
         - repoURL: https://github.com/retaildevcrews/ngsa-asb
           targetRevision: anguyen/argo-helm
-          path: spikes/argo-helm/argoapps
+          path: spikes/argo-helm/multi-apps/apps
           helm:
             parameters:
             - name: 'clusterName'

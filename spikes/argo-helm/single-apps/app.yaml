@@ -32,7 +32,7 @@ spec:
       sources:
         - repoURL: https://github.com/retaildevcrews/ngsa-asb
           targetRevision: '{{values.branch}}'
-          path: spikes/argo-helm/apps/{{values.component}}
+          path: spikes/argo-helm/single-apps/apps/{{values.component}}
           helm:
             parameters:
             - name: 'clusterName'
