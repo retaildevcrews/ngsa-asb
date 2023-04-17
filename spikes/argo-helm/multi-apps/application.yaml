@@ -11,7 +11,9 @@ spec:
             argocd.argoproj.io/secret: cluster
   template:
     metadata:
-      name: 'addon-root'
+      name: '{{name}}-root'
+      labels:
+        cluster-id: '{{name}}'
     spec:
       project: default
       sources:
@@ -23,7 +25,7 @@ spec:
             - name: 'clusterName'
               value: 'managed-cluster-1'
             valueFiles:
-            - $values/spikes/argo-helm/clusters/managed-cluster-1/values.yaml
+            - $values/spikes/argo-helm/clusters/{{name}}/values.yaml
         - ref: values
           repoURL: https://github.com/retaildevcrews/ngsa-asb
           targetRevision: anguyen/argo-helm
