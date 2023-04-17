@@ -52,7 +52,7 @@ spec:
           ref: values
         - repoURL: https://github.com/retaildevcrews/ngsa-asb.git
           targetRevision: '{{values.branchOrTag}}'
-          path: spikes/cluster-add-ons/add-ons/{{values.component}}/deploy
+          path: spikes/cluster-add-ons/app-of-apps-per-add-on/add-ons/{{values.component}}/deploy
           helm:
             parameters:
             - name: 'spec.destination.server'
@@ -64,7 +64,7 @@ spec:
             - name: 'syncwave'
               value: '{{values.syncwave}}'
             valueFiles:
-            - $values/spikes/cluster-add-ons/clusters/{{name}}/values.yaml
+            - $values/spikes/cluster-add-ons/app-of-apps-per-add-on/clusters/{{name}}/values.yaml
       destination:
         name: 'in-cluster'
         namespace: 'argocd'
