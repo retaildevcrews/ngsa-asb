@@ -12,32 +12,32 @@ spec:
   template:
     metadata:
       name: '{{name}}-root'
-  spec:
-    project: default
-    sources:
-      # path: spikes/argo-helm/argoapps
-      # repoURL: https://github.com/retaildevcrews/ngsa-asb
-      # targetRevision: anguyen/argo-helm
-      - repoURL: https://github.com/retaildevcrews/ngsa-asb
-        targetRevision: anguyen/argo-helm
-        path: spikes/argo-helm/argoapps
-        helm:
-          parameters:
-          - name: 'clusterName'
-            value: 'managed-cluster-1'
-          valueFiles:
-          - $values/spikes/argo-helm/clusters/managed-cluster-1/values.yaml
-      - ref: values
-        repoURL: https://github.com/retaildevcrews/ngsa-asb
-        targetRevision: anguyen/argo-helm
-    destination:
-      server: https://kubernetes.default.svc
-      namespace: 'argocd'
-    syncPolicy:
-      syncOptions:
-      - CreateNamespace=true
-      automated:
-        selfHeal: true
-        prune: true
-      retry:
-        limit: 2
+    spec:
+      project: default
+      sources:
+        # path: spikes/argo-helm/argoapps
+        # repoURL: https://github.com/retaildevcrews/ngsa-asb
+        # targetRevision: anguyen/argo-helm
+        - repoURL: https://github.com/retaildevcrews/ngsa-asb
+          targetRevision: anguyen/argo-helm
+          path: spikes/argo-helm/argoapps
+          helm:
+            parameters:
+            - name: 'clusterName'
+              value: 'managed-cluster-1'
+            valueFiles:
+            - $values/spikes/argo-helm/clusters/managed-cluster-1/values.yaml
+        - ref: values
+          repoURL: https://github.com/retaildevcrews/ngsa-asb
+          targetRevision: anguyen/argo-helm
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: 'argocd'
+      syncPolicy:
+        syncOptions:
+        - CreateNamespace=true
+        automated:
+          selfHeal: true
+          prune: true
+        retry:
+          limit: 2
