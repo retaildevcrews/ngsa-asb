@@ -10,9 +10,9 @@ metadata:
 spec:
   project: default
   source:
-    - path: guestbook
-      repoURL: https://github.com/argoproj/argocd-example-apps/
-      targetRevision: HEAD
+    path: guestbook
+    repoURL: https://github.com/argoproj/argocd-example-apps/
+    targetRevision: HEAD
   destination:
     namespace: {{ .Values.spec.destination.namespace }}
     server: {{ .Values.spec.destination.server }}

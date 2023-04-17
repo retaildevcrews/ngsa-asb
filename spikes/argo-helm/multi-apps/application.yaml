@@ -22,10 +22,14 @@ spec:
           path: spikes/argo-helm/multi-apps/apps
           helm:
             parameters:
+            - name: 'spec.destination.server'
+              value: '{{server}}'
+            - name: 'spec.destination.namespace'
+              value: 'ngsa'
             - name: 'clusterName'
               value: 'managed-cluster-1'
             valueFiles:
-            - $values/spikes/argo-helm/clusters/{{name}}/values.yaml
+              - $values/spikes/argo-helm/clusters/{{name}}/values.yaml
         - ref: values
           repoURL: https://github.com/retaildevcrews/ngsa-asb
           targetRevision: anguyen/argo-helm
