@@ -2,3 +2,6 @@ spec:
     destination:
         server: https://argocluste-argoresource-ce2cc3-g50fhd0k.hcp.southcentralus.azmk8s.io:443
         namespace: ngsa
+configmapReload:
+    prometheus:
+        enabled: false

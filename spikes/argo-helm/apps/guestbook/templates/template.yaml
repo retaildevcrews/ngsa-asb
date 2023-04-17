@@ -22,4 +22,3 @@ spec:
       limit: 3
     syncOptions:      
     - CreateNamespace=true
-    

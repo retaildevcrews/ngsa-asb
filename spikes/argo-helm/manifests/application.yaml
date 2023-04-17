@@ -1,60 +1,43 @@
 apiVersion: argoproj.io/v1alpha1
-kind: Application
+kind: ApplicationSet
 metadata:
   name: addons
   namespace: argocd
-# spec:
-  # generators:
-  #   - matrix:
-  #       generators:
-  #         - list:
-  #             elements:
-  #               - values:
-  #                   component: guestbook
-  #                   branchOrTag: anguyen/argo-helm
-  #                   namespace: ngsa
-  #                   syncwave: '2'
-  #               - values:
-  #                   component: prometheus
-  #                   branch: anguyen/argo-helm
-  #                   namespace: ngsa
-  #                   syncwave: '1'
-  #         - clusters: 
-  #             selector:
-  #               matchLabels:
-  #                 argocd.argoproj.io/secret: cluster
-  # template:
-  #   metadata:
-  #     name: '{{values.component}}-{{name}}-root'
-  #     labels:
-  #       component: '{{values.component}}'
-  #       cluster-id: '{{name}}'
 spec:
-  project: default
-  source:
-    path: spikes/argo-helm/argoapps
-    repoURL: https://github.com/retaildevcrews/ngsa-asb
-    targetRevision: anguyen/argo-helm
-    # - repoURL: https://github.com/retaildevcrews/ngsa-asb
-    #   targetRevision: anguyen/argo-helm
-    #   path: spikes/argo-helm/apps
-    #   helm:
-    #     parameters:
-    #     - name: 'clusterName'
-    #       value: 'managed-cluster-1'
-    #     valueFiles:
-    #     - $values/spikes/argo-helm/clusters/managed-cluster-1/values.yaml
-    # - ref: values
-    #   repoURL: https://github.com/retaildevcrews/ngsa-asb
-    #   targetRevision: anguyen/argo-helm
-  destination:
-    server: https://kubernetes.default.svc
-    namespace: 'argocd'
-  syncPolicy:
-    syncOptions:
-    - CreateNamespace=true
-    automated:
-      selfHeal: true
-      prune: true
-    retry:
-      limit: 2
+  generators:
+    - clusters: 
+        selector:
+          matchLabels:
+            argocd.argoproj.io/secret: cluster
+  template:
+    metadata:
+      name: '{{name}}-root'
+  spec:
+    project: default
+    sources:
+      # path: spikes/argo-helm/argoapps
+      # repoURL: https://github.com/retaildevcrews/ngsa-asb
+      # targetRevision: anguyen/argo-helm
+      - repoURL: https://github.com/retaildevcrews/ngsa-asb
+        targetRevision: anguyen/argo-helm
+        path: spikes/argo-helm/argoapps
+        helm:
+          parameters:
+          - name: 'clusterName'
+            value: 'managed-cluster-1'
+          valueFiles:
+          - $values/spikes/argo-helm/clusters/managed-cluster-1/values.yaml
+      - ref: values
+        repoURL: https://github.com/retaildevcrews/ngsa-asb
+        targetRevision: anguyen/argo-helm
+    destination:
+      server: https://kubernetes.default.svc
+      namespace: 'argocd'
+    syncPolicy:
+      syncOptions:
+      - CreateNamespace=true
+      automated:
+        selfHeal: true
+        prune: true
+      retry:
+        limit: 2
