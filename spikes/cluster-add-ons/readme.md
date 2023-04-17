@@ -16,7 +16,7 @@ Given that there may be a large number of these add-ons and that infrastructure/
 - For helm deployments there should be an ability to overwrite values with context from the destination cluster or external values files :white_check_mark:
 - Add-on install/upgrade/removal should be performed in an automated fashion :white_check_mark:
 - Add-ons should be validated after install :white_check_mark:
-- Add-ons should be able to require dependencies to be available before they are installed :x:
+- Add-ons should be able to require dependencies to be available before they are installed :white_check_mark:
 - Add-ons should be able to be deployed at scale (potentially thousands of clusters) :white_check_mark:
 
 ### Add On Management
