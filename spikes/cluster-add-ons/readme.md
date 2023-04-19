@@ -43,6 +43,10 @@ Given that there may be a large number of these add-ons and that infrastructure/
 
 ### App of apps per cluster
 
+> **Note**
+> In order to use sync waves with app of apps pattern, a CRD that was removed in 1.8 needs to be restored.  
+> <https://argo-cd.readthedocs.io/en/stable/operator-manual/upgrading/1.7-1.8/#health-assessment-of-argoprojioapplication-crd-has-been-removed>
+
 ![Diagram](single-app-of-apps-per-cluster/cluster-addons.png)
 
 ### App of apps per application
