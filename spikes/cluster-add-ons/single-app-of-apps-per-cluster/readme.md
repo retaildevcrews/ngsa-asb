@@ -18,9 +18,11 @@
     wget -q -O - https://raw.githubusercontent.com/rancher/k3d/main/install.sh | sudo bash
     ```
 
+5. Argo CLI - Install Argo CLI by following instructions found here: <https://argo-cd.readthedocs.io/en/stable/cli_installation/>
+
 ## Steps
 
-1. Install Argo CLI by following instructions found here: <https://argo-cd.readthedocs.io/en/stable/cli_installation/>
+1. Ensure you are executing this lab from the spikes/cluster-add-ons/single-app-of-apps-per-cluster directory
 
 2. Create k3d Clusters and network
 
