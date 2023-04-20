@@ -26,7 +26,7 @@
 
     ``` bash
     # Create Docker Network for k3d
-    docker network create argolab
+    docker network create k3d
     k3d cluster create workload-cluster-1 --network k3d;
     k3d cluster create workload-cluster-2 --network k3d;
     k3d cluster create workload-cluster-3 --network k3d;
@@ -79,7 +79,7 @@
     argocd login localhost:8080 --username admin --password <same_password_used_in_ui>
     argocd cluster add k3d-workload-cluster-1 --name workload-cluster-1 --insecure
     argocd cluster add k3d-workload-cluster-2 --name workload-cluster-2 --insecure
-    argocd cluster add k3d-workload-cluster-3 --name workload-cluster-3 
+    argocd cluster add k3d-workload-cluster-3 --name workload-cluster-3 --insecure
     ```
 
 8. Create applicationset to deploy workloads
@@ -95,5 +95,5 @@
     k3d cluster delete workload-cluster-2 ;
     k3d cluster delete workload-cluster-3 ;
     k3d cluster delete argomgmt;
-    docker network rm argolab
+    docker network rm k3d
     ```
