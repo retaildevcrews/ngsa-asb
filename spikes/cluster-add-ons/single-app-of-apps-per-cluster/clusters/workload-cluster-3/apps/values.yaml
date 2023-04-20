@@ -1,3 +1,0 @@
-cconfigmapReload:
-  prometheus:
-    enabled: false
