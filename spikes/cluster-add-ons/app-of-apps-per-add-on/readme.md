@@ -27,12 +27,11 @@
 2. Create k3d Clusters and network
 
     ``` bash
-    # Create Docker Network for k3d
-    docker network create k3d
-    k3d cluster create workload-cluster-1 --network k3d;
-    k3d cluster create workload-cluster-2 --network k3d;
-    k3d cluster create workload-cluster-3 --network k3d;
-    k3d cluster create argomgmt --network k3d
+    # Create Docker Network for this lab 
+    docker network create argolab;
+    k3d cluster create workload-cluster-1 --network argolab;
+    k3d cluster create workload-cluster-2 --network argolab;
+    k3d cluster create workload-cluster-3 --network argolab;
     ```
 
 3. Validate current kubectl context is set to k3d-argomgmt
