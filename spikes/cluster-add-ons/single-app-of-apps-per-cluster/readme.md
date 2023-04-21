@@ -144,5 +144,6 @@
     k3d cluster delete workload-cluster-2 ;
     k3d cluster delete workload-cluster-3 ;
     k3d cluster delete argomgmt;
-    unset KUBECONFIG
+    unset KUBECONFIG;
+    rm config-argo
     ```
