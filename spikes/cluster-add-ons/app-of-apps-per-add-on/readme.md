@@ -19,19 +19,27 @@
     ```
 
 5. Argo CLI - Install Argo CLI by following instructions found here: <https://argo-cd.readthedocs.io/en/stable/cli_installation/>
+   > **Note**
+   > When running certain commanda like cluster add, argocd cli will make calls to cluster using kubeconfig context's server value.  It will also use this within the argo management cluster to add the destination cluster.  Because the management cluster has no knowledge of the destination server's control plane at the default server in the context which is 0.0.0.0, it will not be able to reach the destination servers control plane.  To get around this we will use the host.k3d.internal feature to provide a dns alias to the server.  To do this we will need to edit your systems hosts file by adding the following entry:  
+
+   ``` bash
+   # Added to enable running argocd cli  on local k3d instances
+   0.0.0.0         host.k3d.internal
 
 ## Steps
 
 1. Ensure you are executing this lab from the spikes/cluster-add-ons/app-of-apps-per-add-on directory
 
-2. Create k3d Clusters and network
+2. Create k3d Clusters
 
     ``` bash
-    # Create Docker Network for this lab 
-    docker network create argolab;
-    k3d cluster create workload-cluster-1 --network argolab;
-    k3d cluster create workload-cluster-2 --network argolab;
-    k3d cluster create workload-cluster-3 --network argolab;
+    k3d cluster create workload-cluster-1 --kubeconfig-update-default=false;
+    k3d cluster create workload-cluster-2 --kubeconfig-update-default=false;
+    k3d cluster create workload-cluster-3 --kubeconfig-update-default=false;
+    k3d cluster create argomgmt --kubeconfig-update-default=false;
+    k3d kubeconfig merge --all -o config-argo;
+    export KUBECONFIG=config-argo
+    kubectl config use-context k3d-argomgmt 
     ```
 
 3. Validate current kubectl context is set to k3d-argomgmt
@@ -44,7 +52,7 @@
 
     ``` bash
     kubectl create namespace argocd;
-    kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml ;
+    kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml;
     # Wait until all pods are showing 1/1 in ready state
     kubectl wait pods -n argocd --all --for condition=ready
     ```
@@ -53,6 +61,7 @@
 
     ``` bash
     # Forward port to access UI outside of cluster
+    export KUBECONFIG=config-argo;
     kubectl port-forward svc/argocd-server -n argocd 8080:443
     ```
 
@@ -64,7 +73,7 @@
 
         ``` bash
         # Get the initial password for installation - make note
-        argocd admin initial-password -n argocd
+        argocd admin initial-password -n argocd --config
         ````
 
     2. You can now access UI by going to: <https://localhost:8080>
@@ -78,15 +87,15 @@
     ``` bash
     #Connect to api server 
     argocd login localhost:8080 --username admin --password <same_password_used_in_ui>
-    argocd cluster add k3d-workload-cluster-1 --name workload-cluster-1 --insecure
-    argocd cluster add k3d-workload-cluster-2 --name workload-cluster-2 --insecure
+    argocd cluster add k3d-workload-cluster-1 --name workload-cluster-1 --insecure;
+    argocd cluster add k3d-workload-cluster-2 --name workload-cluster-2 --insecure;
     argocd cluster add k3d-workload-cluster-3 --name workload-cluster-3 --insecure
     ```
 
 8. Create applicationset to deploy workloads
 
     ``` bash
-    kubectl apply -f /addon_generator.yaml
+    kubectl apply -f addon_generator.yaml --insecure-skip-tls-verify
     ```
 
 9. Delete Clusters
@@ -96,5 +105,5 @@
     k3d cluster delete workload-cluster-2 ;
     k3d cluster delete workload-cluster-3 ;
     k3d cluster delete argomgmt;
-    docker network rm k3d
+    docker network rm argolab
     ```
