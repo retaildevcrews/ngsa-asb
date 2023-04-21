@@ -1,5 +1,20 @@
 # Lab: Single App of Apps Per Cluster
 
+## Introduction
+
+This lab will walk you through the setup of a multi-cluster ArgoCD example of installing cluster add-ons using an app of apps pattern.  The goal of this lab is to demonstrate:
+
+- how ArgoCD can be used to deploy a set of applications to multiple clusters
+- how context values can be passed down to the app of apps
+- how values for a helm chart can be overwritten using an external values file
+- how dependencies can be configured by using sync waves
+
+During the lab you will:
+
+1. Set up 4 k3d clusters - management cluster, and 3 workload clusters
+2. Set up ArgoCD
+3. Deploy an application set that deploys the add-ons to the worker clusters
+
 ## Prerequisites
 
 1. Kubectl - Installation instructions here: <https://kubernetes.io/docs/tasks/tools/>
