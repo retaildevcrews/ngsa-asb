@@ -98,7 +98,16 @@
     kubectl apply -f addon_generator.yaml --insecure-skip-tls-verify
     ```
 
-9. Delete Clusters
+9. Navigate to UI by going to: <https://localhost:8080> to see applications being deployed
+
+   > **Note**
+   > At this point all applications are being deployed at once, the dependency between prometheus and guestbook is not being respected, this is because in ArgoCD 1.8 the health assesment has been removed from argoproj.io/Application CRD, we will patch th
+
+10. Turn on 
+
+11. Apply patch to 
+
+11. Delete Clusters
 
     ``` bash
     k3d cluster delete workload-cluster-1 ;

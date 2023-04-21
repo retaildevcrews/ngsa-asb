@@ -38,29 +38,31 @@
     k3d cluster create workload-cluster-3 --kubeconfig-update-default=false;
     k3d cluster create argomgmt --kubeconfig-update-default=false;
     k3d kubeconfig merge --all -o config-argo;
-    kubectl config --kubeconfig=config-argo use-context k3d-argomgmt 
+    export KUBECONFIG=config-argo
+    kubectl config use-context k3d-argomgmt 
     ```
 
 3. Validate current kubectl context is set to k3d-argomgmt
 
     ``` bashku
-    kubectl config current-context --kubeconfig=config-argo
+    kubectl config current-context
     ```
 
 4. Install ArgoCD
 
     ``` bash
-    kubectl create namespace argocd --kubeconfig=config-argo;
-    kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml ;
+    kubectl create namespace argocd;
+    kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml;
     # Wait until all pods are showing 1/1 in ready state
-    kubectl wait pods -n argocd --all --for condition=ready --kubeconfig=config-argo
+    kubectl wait pods -n argocd --all --for condition=ready
     ```
 
 5. Expose API Server External to Cluster (run this command in a new zsh terminal so port forwarding remains running)
 
     ``` bash
     # Forward port to access UI outside of cluster
-    kubectl port-forward svc/argocd-server -n argocd 8080:443 --kubeconfig=config-argo
+    export KUBECONFIG=config-argo;
+    kubectl port-forward svc/argocd-server -n argocd 8080:443
     ```
 
     After this step is complete go back to original terminal to run the rest of the commands
@@ -71,7 +73,7 @@
 
         ``` bash
         # Get the initial password for installation - make note
-        argocd admin initial-password -n argocd
+        argocd admin initial-password -n argocd --config
         ````
 
     2. You can now access UI by going to: <https://localhost:8080>
@@ -93,15 +95,55 @@
 8. Create applicationset to deploy workloads
 
     ``` bash
-    kubectl apply -f /addon_generator.yaml --kubeconfig=config-argo
+    kubectl apply -f addon_generator.yaml --insecure-skip-tls-verify
     ```
 
-9. Delete Clusters
+9. Navigate to UI by going to: <https://localhost:8080> to see applications being deployed
+
+   > **Note**
+   > At this point all applications are being deployed at once, the dependency configured in our sync waves between prometheus and guestbook is not being respected, this is because in ArgoCD 1.8 the health assesment has been removed from argoproj.io/Application CRD, we will patch this in the next step to enable this healthassesment in order for sync waves to work in our app of apps pattern.
+
+10. Delete applicationset
+
+    ``` bash
+    kubectl delete applicationset addons -n argocd
+    ```
+
+11. Navigate to UI by going to: <https://localhost:8080> to see all applications will be removed 
+
+12. Apply patch to enable health assessment requiring app to be healthy in order to proceed with the next sync wave deployment when using app of apps pattern
+
+    ``` bash
+    kubectl -n argocd patch configmaps argocd-cm --patch-file argocd-cm-patch.yaml;
+    #Restart the argocd server to use the patched configmap
+    kubectl get pods -n argocd --no-headers=true | awk '/argocd-server/{print $1}'| xargs  kubectl delete -n argocd pod;
+    kubectl wait pods -n argocd --all --for condition=ready
+    ```
+
+    > **Note**
+    > Since we restarted the server, we will need to port forward the server again in our other terminal - this will likely require terminating the process that is forwarding the port orignally
+
+    ``` bash
+    # Forward port to access UI outside of cluster
+    export KUBECONFIG=config-argo;
+    kubectl port-forward svc/argocd-server -n argocd 8080:443
+    ```
+
+
+13. Rereate applicationset to deploy workloads
+
+    ``` bash
+    kubectl apply -f addon_generator.yaml --insecure-skip-tls-verify
+    ```
+
+14. Navigate to UI by going to: <https://localhost:8080> to see applications being deployed, you will now see guestbook will not be deployed until prometheus is in a helthy state
+
+15. Clean up
 
     ``` bash
     k3d cluster delete workload-cluster-1 ;
     k3d cluster delete workload-cluster-2 ;
     k3d cluster delete workload-cluster-3 ;
     k3d cluster delete argomgmt;
-    docker network rm argolab
+    unset KUBECONFIG
     ```
