@@ -30,37 +30,37 @@
 
 1. Ensure you are executing this lab from the spikes/cluster-add-ons/single-app-of-apps-per-cluster directory
 
-2. Create k3d Clusters and network
+2. Create k3d Clusters
 
     ``` bash
-    # Create Docker Network for this lab 
-    docker network create argolab;
-    k3d cluster create workload-cluster-1 --network argolab;
-    k3d cluster create workload-cluster-2 --network argolab;
-    k3d cluster create workload-cluster-3 --network argolab;
-    k3d cluster create argomgmt --network argolab
+    k3d cluster create workload-cluster-1 --kubeconfig-update-default=false;
+    k3d cluster create workload-cluster-2 --kubeconfig-update-default=false;
+    k3d cluster create workload-cluster-3 --kubeconfig-update-default=false;
+    k3d cluster create argomgmt --kubeconfig-update-default=false;
+    k3d kubeconfig merge --all -o config-argo;
+    kubectl config --kubeconfig=config-argo use-context k3d-argomgmt 
     ```
 
 3. Validate current kubectl context is set to k3d-argomgmt
 
     ``` bashku
-    kubectl config current-context
+    kubectl config current-context --kubeconfig=config-argo
     ```
 
 4. Install ArgoCD
 
     ``` bash
-    kubectl create namespace argocd;
+    kubectl create namespace argocd --kubeconfig=config-argo;
     kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml ;
     # Wait until all pods are showing 1/1 in ready state
-    kubectl wait pods -n argocd --all --for condition=ready
+    kubectl wait pods -n argocd --all --for condition=ready --kubeconfig=config-argo
     ```
 
 5. Expose API Server External to Cluster (run this command in a new zsh terminal so port forwarding remains running)
 
     ``` bash
     # Forward port to access UI outside of cluster
-    kubectl port-forward svc/argocd-server -n argocd 8080:443
+    kubectl port-forward svc/argocd-server -n argocd 8080:443 --kubeconfig=config-argo
     ```
 
     After this step is complete go back to original terminal to run the rest of the commands
@@ -93,7 +93,7 @@
 8. Create applicationset to deploy workloads
 
     ``` bash
-    kubectl apply -f /addon_generator.yaml
+    kubectl apply -f /addon_generator.yaml --kubeconfig=config-argo
     ```
 
 9. Delete Clusters
@@ -103,5 +103,5 @@
     k3d cluster delete workload-cluster-2 ;
     k3d cluster delete workload-cluster-3 ;
     k3d cluster delete argomgmt;
-    docker network rm k3d
+    docker network rm argolab
     ```

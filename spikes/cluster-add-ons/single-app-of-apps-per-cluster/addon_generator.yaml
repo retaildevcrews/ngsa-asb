@@ -14,7 +14,6 @@ spec:
       name: '{{name}}-root'
       labels:
        cluster-id: '{{name}}'
-       provider: '{{metadata.labels.provider}}'
     spec:
       project: default
       sources:
