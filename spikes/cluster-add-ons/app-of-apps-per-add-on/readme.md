@@ -39,6 +39,9 @@ During the lab you will:
    ``` bash
    # Added to enable running argocd cli  on local k3d instances
    0.0.0.0         host.k3d.internal
+   ```
+
+   <https://www.howtogeek.com/27350/beginner-geek-how-to-edit-your-hosts-file/>
 
 ## Steps
 
