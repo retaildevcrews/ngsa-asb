@@ -42,7 +42,7 @@ During the lab you will:
    0.0.0.0         host.k3d.internal
    ```
 
-   <https://www.howtogeek.com/27350/beginner-geek-how-to-edit-your-hosts-file/>
+   Instructions on updating hosts file: <https://www.howtogeek.com/27350/beginner-geek-how-to-edit-your-hosts-file/>
 
 ## Steps
 
@@ -153,7 +153,7 @@ During the lab you will:
     kubectl apply -f addon_generator.yaml --insecure-skip-tls-verify
     ```
 
-14. Navigate to UI by going to: <https://localhost:8080> to see applications being deployed, you will now see guestbook will not be deployed until prometheus is in a helthy state
+14. Navigate to UI by going to: <https://localhost:8080> to see applications being deployed, you will now see guestbook will not be deployed until prometheus is in a healthy state
 
 15. Clean up
 

@@ -41,7 +41,7 @@ During the lab you will:
    0.0.0.0         host.k3d.internal
    ```
 
-   <https://www.howtogeek.com/27350/beginner-geek-how-to-edit-your-hosts-file/>
+   Instructions on updating hosts file: <https://www.howtogeek.com/27350/beginner-geek-how-to-edit-your-hosts-file/>
 
 ## Steps
 
