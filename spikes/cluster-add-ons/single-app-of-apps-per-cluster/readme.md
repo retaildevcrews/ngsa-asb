@@ -109,7 +109,7 @@
     kubectl delete applicationset addons -n argocd
     ```
 
-11. Navigate to UI by going to: <https://localhost:8080> to see all applications will be removed 
+11. Navigate to UI by going to: <https://localhost:8080> to see all applications will be removed
 
 12. Apply patch to enable health assessment requiring app to be healthy in order to proceed with the next sync wave deployment when using app of apps pattern
 
