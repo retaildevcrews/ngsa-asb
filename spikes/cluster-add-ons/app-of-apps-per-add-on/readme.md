@@ -69,10 +69,10 @@ During the lab you will:
 4. Install ArgoCD
 
     ``` bash
-    kubectl create namespace argocd
-    kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+    kubectl create namespace argocd --insecure-skip-tls-verify
+    kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml --insecure-skip-tls-verify
     # Wait until all pods are showing 1/1 in ready state
-    kubectl wait pods -n argocd --all --for condition=ready
+    kubectl wait pods -n argocd --all --for condition=ready --insecure-skip-tls-verify
     ```
 
 5. Expose API Server External to Cluster (run this command in a new zsh terminal so port forwarding remains running)
@@ -80,7 +80,7 @@ During the lab you will:
     ``` bash
     # Forward port to access UI outside of cluster
     export KUBECONFIG=config-argo
-    kubectl port-forward svc/argocd-server -n argocd 8080:443
+    kubectl port-forward svc/argocd-server -n argocd 8080:443  --insecure-skip-tls-verify
     ```
 
     After this step is complete go back to original terminal to run the rest of the commands
@@ -105,7 +105,6 @@ During the lab you will:
     ``` bash
     #Connect to api server 
     argocd login localhost:8080 --username admin --password <same_password_used_in_ui>
-    #You will need to run the following commands twice as they fail the first time with a certificate error
     argocd cluster add k3d-workload-cluster-1 --name workload-cluster-1 --insecure
     argocd cluster add k3d-workload-cluster-2 --name workload-cluster-2 --insecure
     argocd cluster add k3d-workload-cluster-3 --name workload-cluster-3 --insecure

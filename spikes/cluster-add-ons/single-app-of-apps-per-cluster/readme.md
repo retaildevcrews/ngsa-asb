@@ -70,10 +70,10 @@ During the lab you will:
 4. Install ArgoCD
 
     ``` bash
-    kubectl create namespace argocd
-    kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+    kubectl create namespace argocd --insecure-skip-tls-verify
+    kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml --insecure-skip-tls-verify
     # Wait until all pods are showing 1/1 in ready state
-    kubectl wait pods -n argocd --all --for condition=ready
+    kubectl wait pods -n argocd --all --for condition=ready --insecure-skip-tls-verify
     ```
 
 5. Expose API Server External to Cluster (run this command in a new zsh terminal so port forwarding remains running)
@@ -81,7 +81,7 @@ During the lab you will:
     ``` bash
     # Forward port to access UI outside of cluster
     export KUBECONFIG=config-argo
-    kubectl port-forward svc/argocd-server -n argocd 8080:443
+    kubectl port-forward svc/argocd-server -n argocd 8080:443  --insecure-skip-tls-verify
     ```
 
     After this step is complete go back to original terminal to run the rest of the commands
@@ -125,7 +125,7 @@ During the lab you will:
 10. Delete applicationset
 
     ``` bash
-    kubectl delete applicationset addons -n argocd
+    kubectl delete applicationset addons -n argocd --insecure-skip-tls-verify
     ```
 
 11. Navigate to UI by going to: <https://localhost:8080> to see all applications will be removed
@@ -133,10 +133,10 @@ During the lab you will:
 12. Apply patch to enable health assessment requiring app to be healthy in order to proceed with the next sync wave deployment when using app of apps pattern
 
     ``` bash
-    kubectl -n argocd patch configmaps argocd-cm --patch-file argocd-cm-patch.yaml
+    kubectl -n argocd patch configmaps argocd-cm --patch-file argocd-cm-patch.yaml --insecure-skip-tls-verify
     #Restart the argocd server to use the patched configmap
     kubectl get pods -n argocd --no-headers=true | awk '/argocd-server/{print $1}'| xargs  kubectl delete -n argocd pod
-    kubectl wait pods -n argocd --all --for condition=ready
+    kubectl wait pods -n argocd --all --for condition=ready --insecure-skip-tls-verify
     ```
 
     > **Note**
