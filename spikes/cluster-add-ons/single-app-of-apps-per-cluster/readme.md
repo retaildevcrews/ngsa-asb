@@ -44,7 +44,7 @@
 
 3. Validate current kubectl context is set to k3d-argomgmt
 
-    ``` bashku
+    ``` bash
     kubectl config current-context
     ```
 

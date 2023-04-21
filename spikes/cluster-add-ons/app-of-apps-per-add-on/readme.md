@@ -28,7 +28,7 @@
 
 ## Steps
 
-1. Ensure you are executing this lab from the spikes/cluster-add-ons/app-of-apps-per-add-on directory
+1. Ensure you are executing this lab from the spikes/cluster-add-ons/single-app-of-apps-per-cluster directory
 
 2. Create k3d Clusters
 
@@ -44,7 +44,7 @@
 
 3. Validate current kubectl context is set to k3d-argomgmt
 
-    ``` bashku
+    ``` bash
     kubectl config current-context
     ```
 
@@ -101,18 +101,15 @@
 9. Navigate to UI by going to: <https://localhost:8080> to see applications being deployed
 
    > **Note**
-   > At this point all applications are being deployed at once, the dependency between prometheus and guestbook is not being respected, this is because in ArgoCD 1.8 the health assesment has been removed from argoproj.io/Application CRD, we will patch th
+   > At this point all applications are being deployed at once, the dependency configured in our sync waves between prometheus and guestbook is not being respected, this is because in ArgoCD 1.8 the health assesment has been removed from argoproj.io/Application CRD, we will patch this in the next step to enable this healthassesment in order for sync waves to work in our app of apps pattern.
 
-10. Turn on 
-
-11. Apply patch to 
-
-11. Delete Clusters
+10. Clean Up
 
     ``` bash
     k3d cluster delete workload-cluster-1 ;
     k3d cluster delete workload-cluster-2 ;
     k3d cluster delete workload-cluster-3 ;
     k3d cluster delete argomgmt;
-    docker network rm argolab
+    unset KUBECONFIG;
+    rm config-argo
     ```
