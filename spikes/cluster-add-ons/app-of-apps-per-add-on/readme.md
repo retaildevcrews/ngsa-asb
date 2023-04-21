@@ -90,7 +90,7 @@ During the lab you will:
 
         ``` bash
         # Get the initial password for installation - make note
-        argocd admin initial-password -n argocd --config
+        argocd admin initial-password -n argocd
         ````
 
     2. You can now access UI by going to: <https://localhost:8080>
