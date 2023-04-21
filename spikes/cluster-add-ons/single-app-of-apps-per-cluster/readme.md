@@ -129,7 +129,6 @@
     kubectl port-forward svc/argocd-server -n argocd 8080:443
     ```
 
-
 13. Rereate applicationset to deploy workloads
 
     ``` bash
