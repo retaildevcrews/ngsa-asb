@@ -51,11 +51,12 @@ During the lab you will:
 2. Create k3d Clusters
 
     ``` bash
-    k3d cluster create workload-cluster-1 --kubeconfig-update-default=false;
-    k3d cluster create workload-cluster-2 --kubeconfig-update-default=false;
-    k3d cluster create workload-cluster-3 --kubeconfig-update-default=false;
-    k3d cluster create argomgmt --kubeconfig-update-default=false;
-    k3d kubeconfig merge --all -o config-argo;
+    k3d cluster create workload-cluster-1 --kubeconfig-update-default=false
+    k3d cluster create workload-cluster-2 --kubeconfig-update-default=false
+    k3d cluster create workload-cluster-3 --kubeconfig-update-default=false
+    k3d cluster create argomgmt --kubeconfig-update-default=false
+    k3d kubeconfig merge --all -o config-argo
+    sed -i'.original' 's/0.0.0.0/host.k3d.internal/g' config-argo
     export KUBECONFIG=config-argo
     kubectl config use-context k3d-argomgmt 
     ```
@@ -69,8 +70,8 @@ During the lab you will:
 4. Install ArgoCD
 
     ``` bash
-    kubectl create namespace argocd;
-    kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml;
+    kubectl create namespace argocd
+    kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
     # Wait until all pods are showing 1/1 in ready state
     kubectl wait pods -n argocd --all --for condition=ready
     ```
@@ -79,7 +80,7 @@ During the lab you will:
 
     ``` bash
     # Forward port to access UI outside of cluster
-    export KUBECONFIG=config-argo;
+    export KUBECONFIG=config-argo
     kubectl port-forward svc/argocd-server -n argocd 8080:443
     ```
 
@@ -105,8 +106,8 @@ During the lab you will:
     ``` bash
     #Connect to api server 
     argocd login localhost:8080 --username admin --password <same_password_used_in_ui>
-    argocd cluster add k3d-workload-cluster-1 --name workload-cluster-1 --insecure;
-    argocd cluster add k3d-workload-cluster-2 --name workload-cluster-2 --insecure;
+    argocd cluster add k3d-workload-cluster-1 --name workload-cluster-1 --insecure
+    argocd cluster add k3d-workload-cluster-2 --name workload-cluster-2 --insecure
     argocd cluster add k3d-workload-cluster-3 --name workload-cluster-3 --insecure
     ```
 
@@ -132,9 +133,9 @@ During the lab you will:
 12. Apply patch to enable health assessment requiring app to be healthy in order to proceed with the next sync wave deployment when using app of apps pattern
 
     ``` bash
-    kubectl -n argocd patch configmaps argocd-cm --patch-file argocd-cm-patch.yaml;
+    kubectl -n argocd patch configmaps argocd-cm --patch-file argocd-cm-patch.yaml
     #Restart the argocd server to use the patched configmap
-    kubectl get pods -n argocd --no-headers=true | awk '/argocd-server/{print $1}'| xargs  kubectl delete -n argocd pod;
+    kubectl get pods -n argocd --no-headers=true | awk '/argocd-server/{print $1}'| xargs  kubectl delete -n argocd pod
     kubectl wait pods -n argocd --all --for condition=ready
     ```
 
@@ -143,7 +144,7 @@ During the lab you will:
 
     ``` bash
     # Forward port to access UI outside of cluster
-    export KUBECONFIG=config-argo;
+    export KUBECONFIG=config-argo
     kubectl port-forward svc/argocd-server -n argocd 8080:443
     ```
 
@@ -158,10 +159,11 @@ During the lab you will:
 15. Clean up
 
     ``` bash
-    k3d cluster delete workload-cluster-1 ;
-    k3d cluster delete workload-cluster-2 ;
-    k3d cluster delete workload-cluster-3 ;
-    k3d cluster delete argomgmt;
-    unset KUBECONFIG;
+    k3d cluster delete workload-cluster-1
+    k3d cluster delete workload-cluster-2
+    k3d cluster delete workload-cluster-3
+    k3d cluster delete argomgmt
+    unset KUBECONFIG
     rm config-argo
+    rm config-argo.original
     ```

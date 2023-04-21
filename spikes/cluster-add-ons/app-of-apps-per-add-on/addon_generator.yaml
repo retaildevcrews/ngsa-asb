@@ -43,7 +43,6 @@ spec:
       labels:
        component: '{{values.component}}'
        cluster-id: '{{name}}'
-       provider: '{{metadata.labels.provider}}'
     spec:
       project: default
       sources:
