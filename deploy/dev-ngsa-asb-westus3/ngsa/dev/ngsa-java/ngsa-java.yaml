@@ -20,8 +20,8 @@ spec:
       labels:
         aadpodidbinding: wcnp-ngsa-id
         app: ngsa-java
-        deploy: 23-04-16-06-09-20
-        version: beta-2304-16-06
+        deploy: 23-04-23-06-07-20
+        version: beta-2304-23-06
     spec:
       automountServiceAccountToken: false
       securityContext:
