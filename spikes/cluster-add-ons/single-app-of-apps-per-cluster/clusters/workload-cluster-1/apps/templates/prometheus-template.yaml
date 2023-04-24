@@ -1,0 +1,30 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: {{ .Values.clusterName }}-prometheus
+  namespace: argocd
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+spec:
+  destination:
+    namespace: {{.Values.spec.destination.namespace}}
+    server: {{ .Values.spec.destination.server }}
+  project: default
+  source:
+    repoURL: https://prometheus-community.github.io/helm-charts
+    targetRevision: 20.1.0
+    chart: prometheus
+    helm:
+      parameters:
+      - name: 'configmapReload.prometheus.enabled'
+        value: '{{ .Values.configmapReload.prometheus.enabled}}'
+  syncPolicy:
+    automated:
+        prune: false
+        selfHeal: true
+    retry:
+      limit: 3
+    syncOptions:      
+    - CreateNamespace=true

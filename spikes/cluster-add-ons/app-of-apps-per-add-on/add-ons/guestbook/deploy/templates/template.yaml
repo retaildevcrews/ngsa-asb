@@ -1,0 +1,28 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: {{ .Values.clusterName }}-{{ .Values.testlabel }}-guestbook
+  labels:
+    testlabel: {{ .Values.testlabel }}
+  namespace: argocd
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+  annotations:
+    argocd.argoproj.io/sync-wave: "5"
+spec:
+  project: default
+  source:
+    path: {{.Values.source.path}}
+    repoURL: {{.Values.source.repoURL}}
+    targetRevision: {{.Values.source.targetRevision}}
+  destination:
+    namespace: {{ .Values.spec.destination.namespace }}
+    server: {{ .Values.spec.destination.server }}
+  syncPolicy:
+    automated:
+        prune: false
+        selfHeal: true
+    retry:
+      limit: 3
+    syncOptions:      
+    - CreateNamespace=true 

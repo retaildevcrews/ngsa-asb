@@ -1,0 +1,77 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: addons
+  namespace: argocd
+spec:
+  generators:
+    - matrix:
+        generators:
+          - list:
+              elements:
+                - values:
+                    component: guestbook
+                    branchOrTag: pragmatical/cluster-add-ons
+                    namespace: addons
+                    syncwave: '2'
+                - values:
+                    component: prometheus
+                    branchOrTag: pragmatical/cluster-add-ons
+                    namespace: argocd
+                    syncwave: '0'
+          - clusters:
+              selector:
+                matchLabels:
+                  argocd.argoproj.io/secret-type: cluster
+  strategy:
+    type: RollingSync
+    rollingSync:
+      steps:
+        - matchExpressions:
+            - key: syncwave
+              operator: In
+              values:
+                - '0'
+        - matchExpressions:
+            - key: syncwave
+              operator: In
+              values:
+                - '2'
+  template:
+    metadata:
+      name: '{{values.component}}-{{name}}-root'
+      labels:
+       component: '{{values.component}}'
+       cluster-id: '{{name}}'
+    spec:
+      project: default
+      sources:
+        - repoURL: https://github.com/retaildevcrews/ngsa-asb.git
+          targetRevision: '{{values.branchOrTag}}'
+          ref: values
+        - repoURL: https://github.com/retaildevcrews/ngsa-asb.git
+          targetRevision: '{{values.branchOrTag}}'
+          path: spikes/cluster-add-ons/app-of-apps-per-add-on/add-ons/{{values.component}}/deploy
+          helm:
+            parameters:
+            - name: 'spec.destination.server'
+              value: '{{server}}'
+            - name: 'spec.destination.namespace'
+              value: '{{values.namespace}}'
+            - name: 'clusterName'
+              value: '{{name}}'
+            - name: 'syncwave'
+              value: '{{values.syncwave}}'
+            valueFiles:
+            - $values/spikes/cluster-add-ons/app-of-apps-per-add-on/clusters/{{name}}/values.yaml
+      destination:
+        name: 'in-cluster'
+        namespace: 'argocd'
+      syncPolicy:
+        automated:
+           prune: false
+           selfHeal: true
+        retry:
+          limit: 3
+        syncOptions:      
+        - CreateNamespace=true
