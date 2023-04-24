@@ -35,7 +35,7 @@ Given that there may be a large number of these add-ons and that infrastructure/
 
 - [Application Controller](https://argo-cd.readthedocs.io/en/stable/operator-manual/architecture/#application-controller) - Kubernetes controller that monitors and maintains current state of running applications in sync with the desired state (as specified in repo)
 - [Application](https://argo-cd.readthedocs.io/en/stable/operator-manual/declarative-setup/#applications) - Kubernetes custom resource that represents a deployed application instance in an environment.
-- [ApplicationSet Controller](https://argo-cd.readthedocs.io/en/stable/operator-manual/applicationset/) - Kubernetes controller that creates application resources based on a template and parameters used by the template.
+- [ApplicationSet Controller](https://argo-cd.readthedocs.io/en/stable/operator-manual/server-commands/argocd-application-controller/) - Kubernetes controller that creates application resources based on a template and parameters used by the template.
 - [ApplicationSet](https://argo-cd.readthedocs.io/en/stable/operator-manual/applicationset/) - Kubernetes custom resource that is used by the ApplicationSet Controller to create Argo applications based on generated parameters and a template.
 - [Generators(matrix, list, cluster)](https://argo-cd.readthedocs.io/en/stable/operator-manual/applicationset/Generators/) - Generators generate parameters that can be used in the template of the ApplicationSet.
 - [Sync Waves](https://argo-cd.readthedocs.io/en/stable/user-guide/sync-waves/) - Sync waves are used to control order of what resources are sychronized.
