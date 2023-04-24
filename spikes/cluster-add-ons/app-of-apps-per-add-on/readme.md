@@ -45,7 +45,7 @@ During the lab you will:
 
 ## Steps
 
-1. Ensure you are executing this lab from the spikes/cluster-add-ons/single-app-of-apps-per-cluster directory
+1. Ensure you are executing this lab from the spikes/cluster-add-ons/app-of-apps-per-add-on directory
 
 2. Create k3d Clusters
 
@@ -79,6 +79,7 @@ During the lab you will:
 
     ``` bash
     # Forward port to access UI outside of cluster
+    # Ensure you are executing these commands from the spikes/cluster-add-ons/app-of-apps-per-add-on directory
     export KUBECONFIG=config-argo
     kubectl port-forward svc/argocd-server -n argocd 8080:443  --insecure-skip-tls-verify
     ```

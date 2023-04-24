@@ -135,7 +135,7 @@ During the lab you will:
     ``` bash
     kubectl -n argocd patch configmaps argocd-cm --patch-file argocd-cm-patch.yaml --insecure-skip-tls-verify
     #Restart the argocd server to use the patched configmap
-    kubectl get pods -n argocd --no-headers=true | awk '/argocd-server/{print $1}'| xargs  kubectl delete -n argocd pod
+    kubectl get pods -n argocd --no-headers=true | awk '/argocd-server/{print $1}'| xargs  kubectl delete -n argocd pod --insecure-skip-tls-verify
     kubectl wait pods -n argocd --all --for condition=ready --insecure-skip-tls-verify
     ```
 
@@ -144,6 +144,7 @@ During the lab you will:
 
     ``` bash
     # Forward port to access UI outside of cluster
+    # Ensure you are executing these commands from the spikes/cluster-add-ons/single-app-of-apps-per-cluster directory
     export KUBECONFIG=config-argo
     kubectl port-forward svc/argocd-server -n argocd 8080:443
     ```
