@@ -1,4 +1,4 @@
-apiVersion: kustomize.config.k8s.io/v1
+apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
 - ../../base/apps/namespaces
@@ -12,7 +12,7 @@ resources:
 # Quick k8s kustomize note on directory and file
 # <cur-dir> --> This is where the k8s kustomization.yaml resides
 # ---
-# apiVersion: kustomize.config.k8s.io/v1
+# apiVersion: kustomize.config.k8s.io/v1beta1
 # kind: Kustomization
 # resources:
 # - dir-1/app.yaml     # --> Applies <cur-dir>/dir-1/app.yaml
