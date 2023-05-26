@@ -5,6 +5,12 @@ resources:
 - ../../base/apps/monitoring/
 - grafana/04-grafana-pod-identity.yaml
 patches:
-- path: thanos/thanos-patch.yaml
-- path: prometheus/prometheus-patch.yaml
-- path: grafana/grafana-patch.yaml
+- path: thanos/thanos-compactor-ss-patch.yaml
+- path: thanos/thanos-deploy-patch.yaml
+- path: thanos/thanos-store-ss-patch.yaml
+- path: thanos/thanos-vs-patch.yaml
+- path: prometheus/prometheus-deploy-patch.yaml
+- path: prometheus/prometheus-vs-patch.yaml
+- path: grafana/grafana-deploy-patch.yaml
+- path: grafana/grafana-vs-patch.yaml
+
