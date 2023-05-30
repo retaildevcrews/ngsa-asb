@@ -5,4 +5,4 @@ metadata:
   namespace: monitoring
 spec:
   hosts:
-  - thanos-store-grpc-eastus-dev.austinrdc.dev
+  - thanos-store-grpc-eastus-pre.austinrdc.dev

@@ -14,5 +14,3 @@ spec:
             value: aks-jxdthrti3j3qu-eastus
       - name: thanos
         image: acraksjxdthrti3j3qu.azurecr.io/thanos/thanos:v0.23.0
-
-
