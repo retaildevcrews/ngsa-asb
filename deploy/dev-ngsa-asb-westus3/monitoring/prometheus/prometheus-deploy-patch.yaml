@@ -14,14 +14,3 @@ spec:
             value: aks-jxdthrti3j3qu-westus3
       - name: thanos
         image: acraksjxdthrti3j3qu.azurecr.io/thanos/thanos:v0.23.0
-
----
-
-apiVersion: networking.istio.io/v1alpha3
-kind: VirtualService
-metadata:
-  name: thanos-grpc-vs
-  namespace: monitoring
-spec:
-  hosts:
-  - thanos-grpc-westus3-dev.austinrdc.dev

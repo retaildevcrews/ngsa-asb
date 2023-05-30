@@ -4,5 +4,7 @@ resources:
 - ../../base/apps/monitoring/
 - grafana/04-grafana-pod-identity.yaml
 patches:
-- path: prometheus/prometheus-patch.yaml
-- path: grafana/grafana-patch.yaml
+- path: prometheus/prometheus-deploy-patch.yaml
+- path: prometheus/prometheus-vs-patch.yaml
+- path: grafana/grafana-deploy-patch.yaml
+- path: grafana/grafana-vs-patch.yaml
