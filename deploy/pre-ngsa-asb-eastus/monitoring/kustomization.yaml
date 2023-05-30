@@ -1,13 +1,20 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-- ../../base/apps/monitoring/thanos/ # First apply thanos
-- ../../base/apps/monitoring/ # Then apply rest of monitoring
+- ../../base/apps/monitoring/thanos/
+- ../../base/apps/monitoring/
 - grafana/04-grafana-pod-identity.yaml
-patchesStrategicMerge:
-- "thanos/thanos-patch.yaml"
-- prometheus/prometheus-patch.yaml
-- grafana/dashboards/ngsa-az-blocked-traffic.yaml
-- grafana/dashboards/ngsa-az-monitor-perf.yaml
-- grafana/dashboards/ngsa-az-monitor-rel.yaml
-- grafana/grafana-patch.yaml
+patches:
+- path: thanos/thanos-compactor-ss-patch.yaml
+- path: thanos/thanos-deploy-patch.yaml
+- path: thanos/thanos-store-ss-patch.yaml
+- path: thanos/thanos-vs-patch.yaml
+- path: prometheus/prometheus-deploy-patch.yaml
+- path: prometheus/prometheus-vs-patch.yaml
+- path: grafana/dashboards/ngsa-az-blocked-traffic.yaml
+- path: grafana/dashboards/ngsa-az-monitor-perf.yaml
+- path: grafana/dashboards/ngsa-az-monitor-rel.yaml
+- path: prometheus/prometheus-deploy-patch.yaml
+- path: prometheus/prometheus-vs-patch.yaml
+- path: grafana/grafana-deploy-patch.yaml
+- path: grafana/grafana-vs-patch.yaml

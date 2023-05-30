@@ -11,17 +11,6 @@ spec:
         image: acraksri3aov7twb4uy.azurecr.io/prom/prometheus:v2.30.0
         env:
           - name: PROM_EXT_LABEL_CLUSTER
-            value: aks-ri3aov7twb4uy-eastus
+            value: aks-ri3aov7twb4uy-northcentralus
       - name: thanos
         image: acraksri3aov7twb4uy.azurecr.io/thanos/thanos:v0.23.0
-
----
-
-apiVersion: networking.istio.io/v1alpha3
-kind: VirtualService
-metadata:
-  name: thanos-grpc-vs
-  namespace: monitoring
-spec:
-  hosts:
-  - thanos-grpc-eastus-pre.austinrdc.dev

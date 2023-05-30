@@ -13,9 +13,9 @@ spec:
           - name: GF_SERVER_ROOT_URL
             value: "https://%(domain)s/"
           - name: GF_SERVER_DOMAIN
-            value: "grafana-eastus-pre.austinrdc.dev"
+            value: "grafana-westus3-pre.austinrdc.dev"
           - name: PROMETHEUS_QUERY_URL # For data source
-            value: "http://thanos-query.monitoring.svc.cluster.local:10902"
+            value: "http://prometheus-server.monitoring.svc:9090"
           - name : AZURE_LA_WORKSPACE # For data source
             value: "35e52811-9906-4cb9-9b75-b4f313f22010"
           - name: GF_AUTH_AZUREAD_CLIENT_SECRET
@@ -41,12 +41,3 @@ spec:
               secretProviderClass: grafana-secrets
       nodeSelector:
         agentpool: npuser01
----
-apiVersion: networking.istio.io/v1alpha3
-kind: VirtualService
-metadata:
-  name: grafana-vs
-  namespace: monitoring
-spec:
-  hosts:
-  - grafana-eastus-pre.austinrdc.dev

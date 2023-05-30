@@ -1,0 +1,8 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: thanos-store-grpc-vs
+  namespace: monitoring
+spec:
+  hosts:
+  - thanos-store-grpc-eastus-pre.austinrdc.dev

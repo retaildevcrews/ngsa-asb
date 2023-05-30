@@ -2,7 +2,7 @@
 
 To make use of Flux's features we've adopted the following dir structure based on our original ASB repo structure.
 
-**Note:** _A Flux Kustomization CRD will always look for a `kustomization.yaml` file in a specified path. Otherwise it will generate one from the content of the directory. See [Kustomization doc (`path`description)](https://fluxcd.io/flux/components/kustomize/api/#kustomize.toolkit.fluxcd.io/v1beta2.KustomizationSpec)_
+**Note:** _A Flux Kustomization CRD will always look for a `kustomization.yaml` file in a specified path. Otherwise it will generate one from the content of the directory. See [Kustomization doc (`path`description)](https://fluxcd.io/flux/components/kustomize/api/#kustomize.toolkit.fluxcd.io/v1.KustomizationSpec)_
 
 ## `flux-init` Directory
 

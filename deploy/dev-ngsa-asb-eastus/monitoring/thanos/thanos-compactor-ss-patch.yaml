@@ -1,0 +1,11 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+    name: thanos-compactor
+    namespace: monitoring
+spec:
+  template:
+    spec:
+      containers:
+        - name: thanos-compactor
+          image: acraksjxdthrti3j3qu.azurecr.io/thanos/thanos:v0.23.0
