@@ -80,7 +80,7 @@ export ACCOUNT_EMAIL=<email address here>
 
 #### Get test certificate from staging environment
 
-When using Let's Encrypt, it is recommended to test first using the staging environment before moving to production. This will allow you to test the process without hitting the [rate limits](https://letsencrypt.org/docs/rate-limits/).
+:note: When using Let's Encrypt, it is recommended to test first using the staging environment before moving to production. This will allow you to test the process without hitting the [rate limits](https://letsencrypt.org/docs/rate-limits/).
 
 ```bash
 
