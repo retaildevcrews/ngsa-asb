@@ -20,5 +20,4 @@ az network dns record-set txt add-record \
   --value "$CERTBOT_VALIDATION"
 
 # wait some time for the TXT record to propagate
-# TODO: query DNS until record is available with a timeout?
 sleep 25

@@ -83,6 +83,8 @@ export ACCOUNT_EMAIL=<email address here>
 > **Note**
 > When using Let's Encrypt, it is recommended to test first using the staging environment before moving to production. This will allow you to test the process without hitting the [rate limits](https://letsencrypt.org/docs/rate-limits/).
 
+Certbot will use the `./scripts/certbot/authenticator.sh` script to generate the TXT record for domain validation. Then `./scripts/certbot/cleanup.sh` will be used to remove the TXT record after validation is complete.
+
 ```bash
 
 # Create a directory that is writable by the current user
