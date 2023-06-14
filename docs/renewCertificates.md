@@ -19,6 +19,16 @@ EXPIRATION_DATE=$(echo | \
 # view the expiration date
 echo $EXPIRATION_DATE
 
+# check that the date format is valid
+# on mac, use `date -j -f "%b %d %T %Y %Z" "$EXPIRATION_DATE"`
+if date -d "$EXPIRATION_DATE"; then
+  echo "Valid SSL certificate expiration date: $EXPIRATION_DATE"
+else
+  echo "Invalid SSL certificate expiration date: $EXPIRATION_DATE"
+  # exit early in automation
+  # exit 1
+fi
+
 ```
 
 Then calculate how many days are left until the certificate expires.
@@ -26,6 +36,7 @@ Then calculate how many days are left until the certificate expires.
 ```bash
 
 # expiration date in seconds
+# on mac, use `date -j -f "%b %d %T %Y %Z" "$EXPIRATION_DATE" +%s`
 EXP=$(date -d "$EXPIRATION_DATE" +%s)
 
 # today's date in seconds
