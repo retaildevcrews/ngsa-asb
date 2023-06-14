@@ -4,6 +4,40 @@ The following instructions will guide you on how to renew  the existing ssl cert
 
 ## Provision certificates
 
+### Check expiration date
+
+You can check the expiration date of the deployed certificate from the website. This can also be used in automation to check when to renew a certificate, in order to avoid downtime or hitting rate limits.
+
+```bash
+
+# get the expiration date of the certificate directly from the site
+EXPIRATION_DATE=$(echo | \
+  openssl s_client -connect grafana-eastus-dev.austinrdc.dev:443 -servername austinrdc.dev 2> /dev/null | \
+  openssl x509 -noout -enddate | \
+  cut -d'=' -f2)
+
+# view the expiration date
+echo $EXPIRATION_DATE
+
+```
+
+Then calculate how many days are left until the certificate expires.
+
+```bash
+
+# expiration date in seconds
+EXP=$(date -d "$EXPIRATION_DATE" +%s)
+
+# today's date in seconds
+TODAY=$(date +%s)
+
+# calculate the number of days remaining
+DAYS_REMAINING=$(( (EXP - TODAY) / 86400 ))
+
+echo $DAYS_REMAINING
+
+```
+
 ### Option 1 - Existing certificates
 
 This option assumes you have access to an existing certificate or are purchasing one.
