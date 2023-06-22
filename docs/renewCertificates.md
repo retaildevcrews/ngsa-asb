@@ -128,7 +128,7 @@ export ACCOUNT_EMAIL=<email address here>
 > **Note**
 > When using Let's Encrypt, it is recommended to test first using the staging environment before moving to production. This will allow you to test the process without hitting the [rate limits](https://letsencrypt.org/docs/rate-limits/).
 
-Certbot will use the `./scripts/certbot/authenticator.sh` script to generate the TXT record for domain validation. Then `./scripts/certbot/cleanup.sh` will be used to remove the TXT record after validation is complete.
+Certbot will use the `./cert-automation/certbot/authenticator.sh` script to generate the TXT record for domain validation. Then `./cert-automation/certbot/cleanup.sh` will be used to remove the TXT record after validation is complete.
 
 ```bash
 
@@ -147,8 +147,8 @@ certbot certonly \
   --logs-dir ~/"$CERTBOT_WORKING_DIR" \
   --config-dir ~/"$CERTBOT_WORKING_DIR" \
   --work-dir ~/"$CERTBOT_WORKING_DIR" \
-  --manual-auth-hook "./scripts/certbot/authenticator.sh" \
-  --manual-cleanup-hook "./scripts/certbot/cleanup.sh" \
+  --manual-auth-hook "./cert-automation/certbot/authenticator.sh" \
+  --manual-cleanup-hook "./cert-automation/certbot/cleanup.sh" \
   --keep-until-expiring \
   --agree-tos \
   --non-interactive \
