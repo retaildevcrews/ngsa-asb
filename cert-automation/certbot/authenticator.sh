@@ -17,7 +17,9 @@ az network dns record-set txt add-record \
   --resource-group "$AZURE_RESOURCE_GROUP" \
   --zone-name "$AZURE_DNS_ZONE" \
   --record-set-name "_acme-challenge" \
-  --value "$CERTBOT_VALIDATION"
+  --value "$CERTBOT_VALIDATION" \
+  --query "id" \
+  -o tsv
 
 # wait some time for the TXT record to propagate
 sleep 25

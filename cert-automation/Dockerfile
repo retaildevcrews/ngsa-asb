@@ -18,3 +18,8 @@ COPY --chown=certbot:certbot ./cert-automation ./cert-automation
 
 # change to certbot user
 USER certbot
+
+# set default entrypoint and command
+ENTRYPOINT [ "certbot" ]
+
+CMD [ "--version" ]

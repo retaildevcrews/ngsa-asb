@@ -33,9 +33,49 @@ commands
 ```bash
 
 # build docker image in cert-automation directory from root directory
-docker build -t cert-automation -f cert-automation/Dockerfile .
+docker build -t ghcr.io/retaildevcrews/cert-automation -f cert-automation/Dockerfile .
 
 # run docker image locally
-docker run -it --rm cert-automation sh
+docker run -it --rm ghcr.io/retaildevcrews/cert-automation sh
+
+# create a PAT and login
+# https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry#authenticating-with-a-personal-access-token-classic
+#
+# create token with package access only by going here https://github.com/settings/tokens/new?scopes=write:packages
+# export CR_PAT=YOUR_TOKEN
+# echo $CR_PAT | docker login ghcr.io -u USERNAME --password-stdin
+
+# push image to ghcr
+docker push ghcr.io/retaildevcrews/cert-automation
+
+```
+
+dev/test locally
+
+```bash
+
+az login
+az account set -s <subscription name or id>
+az account show
+
+# test script locally
+# these can be set in ACI as env vars
+export AZURE_DNS_ZONE="austinrdc.dev"
+export AZURE_RESOURCE_GROUP="dns-rg"
+export CERTBOT_ACCOUNT_EMAIL="<email address here>"
+export CERTBOT_CERTNAME="austinrdc-dev"
+export CERTBOT_DOMAIN="*.austinrdc.dev"
+export KV_FULL_CHAIN_SECRET_NAME="ak-automation-test-tls-crt"
+export KV_NAME="kv-aks-jxdthrti3j3qu"
+export KV_PFX_SECRET_NAME="ak-automation-test-tls-pfx"
+export KV_PRIVATE_KEY_SECRET_NAME="ak-automation-test-tls-key"
+# export LETS_ENCRYPT_ENVIRONMENT="<staging or production. defaults to staging if not set>"
+
+# create directory for certbot
+# already exists in docker image
+mkdir -p ~/certbot-files
+
+# run script
+./cert-automation/certbot/generate-certs.sh
 
 ```

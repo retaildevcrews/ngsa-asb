@@ -19,4 +19,6 @@ az network dns record-set txt remove-record \
   --zone-name "$AZURE_DNS_ZONE" \
   --record-set-name "_acme-challenge" \
   --value "$CERTBOT_VALIDATION" \
-  --keep-empty-record-set
+  --keep-empty-record-set \
+  --query "id" \
+  -o tsv
