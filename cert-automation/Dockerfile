@@ -14,7 +14,7 @@ WORKDIR /home/certbot
 RUN mkdir -p ./certbot-files && chown -R certbot:certbot ./certbot-files
 
 # copy scripts and change ownership
-COPY --chown=certbot:certbot ./cert-automation ./cert-automation
+COPY --chown=certbot:certbot ./cert-automation/certbot ./cert-automation/certbot
 
 # change to certbot user
 USER certbot

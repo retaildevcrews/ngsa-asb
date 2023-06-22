@@ -36,7 +36,7 @@ commands
 docker build -t ghcr.io/retaildevcrews/cert-automation -f cert-automation/Dockerfile .
 
 # run docker image locally
-docker run -it --rm ghcr.io/retaildevcrews/cert-automation sh
+docker run -it --entrypoint sh --rm ghcr.io/retaildevcrews/cert-automation
 
 # create a PAT and login
 # https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry#authenticating-with-a-personal-access-token-classic
