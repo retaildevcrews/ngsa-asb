@@ -12,21 +12,21 @@ TODO: context behind setup.
 
 TODO: overall setup:
 
-- docker image with az cli and certbot
+- [x] docker image with az cli and certbot
 
-- managed identity for automation
-- used for both azure function and aci
+- [ ] managed identity for automation
+- [ ] used for both azure function and aci
 
-- needs permissions to create aci
-- needs permissions to read and set keys in key vault
-- needs permissions to create and delete TXT records in dns zone
+- [ ] needs permissions to create aci
+- [ ] needs permissions to read and set keys in key vault
+- [ ] needs permissions to create and delete TXT records in dns zone
 
-- azure function with timer trigger creates azure container instance
-- aci runs docker image
-- docker image checks key vault for certificate expiration
-- if certificate is expired, run certbot to renew certificate
-- generate pfx file
-- save pfx, cert, and key to key vault
+- [ ] azure function with timer trigger creates azure container instance
+- [ ] aci runs docker image
+- [x] docker image checks key vault for certificate expiration
+- [x] if certificate is expired, run certbot to renew certificate
+- [x] generate pfx file
+- [x] save pfx, cert, and key to key vault
 
 commands
 
