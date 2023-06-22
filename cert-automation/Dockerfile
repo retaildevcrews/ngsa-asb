@@ -10,8 +10,11 @@ RUN addgroup -S certbot && adduser -S certbot -G certbot
 # change to certbot home directory
 WORKDIR /home/certbot
 
+# create a directory for certbot generate files
+RUN mkdir -p ./certbot-files && chown -R certbot:certbot ./certbot-files
+
 # copy scripts and change ownership
-COPY --chown=certbot:certbot ./cert-automation/certbot .
+COPY --chown=certbot:certbot ./cert-automation ./cert-automation
 
 # change to certbot user
 USER certbot
