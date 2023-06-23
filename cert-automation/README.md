@@ -13,7 +13,7 @@ sequenceDiagram
   participant DNS as Azure DNS
 
   loop
-    func->>aci: create container instance on timer trigger
+    func->>aci: start container instance on timer trigger
   end
 
   rect whitesmoke
