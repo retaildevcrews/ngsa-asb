@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # TODO: check if required environment variables are set and show error message if not
+# AZURE_DNS_RESOURCE_GROUP
 # AZURE_DNS_ZONE
-# AZURE_RESOURCE_GROUP
 # CERTBOT_ACCOUNT_EMAIL
 # CERTBOT_CERTNAME
 # CERTBOT_DOMAIN
@@ -16,39 +16,44 @@ LETS_ENCRYPT_ENVIRONMENT=${LETS_ENCRYPT_ENVIRONMENT:-staging}
 # Set the number of days before the certificate expires to renew it, defaults to 30
 NUM_DAYS_TO_RENEW=${NUM_DAYS_TO_RENEW:-30}
 
+expiration_date=""
 main() {
   check_certificate_expiration
   generate_certificate && upload_to_key_vault
 }
 
-# exit early if certificate from provided key vault is not close to expiration
-check_certificate_expiration() {
-  echo "Checking certificate expiration..."
+# set expiration date variable from certificate in key vault
+set_expiration_date() {
+  echo "Getting expiration date..."
 
-  local expiration_date=""
   local certificate_value=$(az keyvault secret show \
     --vault-name "$KV_NAME" \
     --name "$KV_FULL_CHAIN_SECRET_NAME" \
     --query value \
     --output tsv)
 
-  # stop validation early if the certificate is not found or empty
-  if [ -z "$certificate_value" ]; then
+  if [ -n "$certificate_value" ]; then
+    # get expiration date from certificate
+    expiration_date=$(echo "$certificate_value" | openssl x509 -noout -enddate | cut -d'=' -f2)
+  else
+    # default expiration date to today if missing, resulting in a new certificate being generated
     echo "Certificate '$KV_FULL_CHAIN_SECRET_NAME' not found or empty in key vault '$KV_NAME'."
-    return 0
+    echo "Default expiration date to today."
+    expiration_date=$(date)
   fi
 
-  # get expiration date
-  expiration_date=$(echo "$certificate_value" | openssl x509 -noout -enddate | cut -d'=' -f2)
-
-  # check that the date format is valid
-  if date -d "$expiration_date"; then
-    echo "Valid SSL certificate expiration date: $expiration_date"
-  else
+  # double check that the date format can be parsed
+  if ! date -d "$expiration_date"; then
     echo "Invalid SSL certificate expiration date: $expiration_date"
     exit 1
   fi
+}
 
+# check if the expiration date is close to the configured renewal threshold
+check_certificate_expiration() {
+  echo "Checking certificate expiration date..."
+
+  set_expiration_date
   local expiration_date_seconds=$(date -d "$expiration_date" +%s)
   local today_in_seconds=$(date +%s)
   local num_days_remaining=$(( (expiration_date_seconds - today_in_seconds) / 86400 ))
@@ -64,6 +69,7 @@ check_certificate_expiration() {
   fi
 }
 
+# generate staging or production certificate with certbot
 generate_certificate() {
   echo "Generating certificate..."
 
@@ -98,6 +104,7 @@ generate_certificate() {
     --no-eff-email
 }
 
+# upload certificate information to specified key vault
 upload_to_key_vault() {
   echo "Uploading to key vault..."
 

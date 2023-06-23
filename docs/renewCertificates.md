@@ -109,7 +109,7 @@ export DOMAIN="*.austinrdc.dev"
 export CERTBOT_WORKING_DIR="certbot"
 
 # Set Azure DNS variables for use in domain validation via DNS challenge
-export AZURE_RESOURCE_GROUP="dns-rg"
+export AZURE_DNS_RESOURCE_GROUP="dns-rg"
 export AZURE_DNS_ZONE="austinrdc.dev"
 
 ```
