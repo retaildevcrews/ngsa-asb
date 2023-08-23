@@ -45,4 +45,7 @@ echo '. <(flux completion bash)' >> ~/.bashrc
 # install flux completions for zsh
 echo '. <(flux completion zsh)' >> ~/.zshrc
 
+# Install certbot
+sudo apt-get install certbot=1.12.0-2 -y
+
 echo "on-create completed" >> $HOME/status
