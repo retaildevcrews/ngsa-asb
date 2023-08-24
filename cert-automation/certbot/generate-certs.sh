@@ -15,7 +15,8 @@ main() {
 set_expiration_date() {
   echo "Getting expiration date..."
 
-  local certificate_value=$(az keyvault secret show \
+  local certificate_value
+  certificate_value=$(az keyvault secret show \
     --vault-name "$KV_NAME" \
     --name "$KV_FULL_CHAIN_SECRET_NAME" \
     --query value \
@@ -43,9 +44,15 @@ check_certificate_expiration() {
   echo "Checking certificate expiration date..."
 
   set_expiration_date
-  local expiration_date_seconds=$(date -d "$expiration_date" +%s)
-  local today_in_seconds=$(date +%s)
-  local num_days_remaining=$(( (expiration_date_seconds - today_in_seconds) / 86400 ))
+
+  local expiration_date_seconds
+  expiration_date_seconds=$(date -d "$expiration_date" +%s)
+
+  local today_in_seconds
+  today_in_seconds=$(date +%s)
+
+  local num_days_remaining
+  num_days_remaining=$(( (expiration_date_seconds - today_in_seconds) / 86400 ))
 
   echo "Number of days until certificate expires: $num_days_remaining"
 
@@ -105,16 +112,17 @@ upload_to_key_vault() {
   # generate pfx file
   openssl pkcs12 \
     -export \
-    -inkey $key_location \
-    -in $full_chain_location \
+    -inkey "$key_location" \
+    -in "$full_chain_location" \
     -out certificate.pfx \
     -passout pass:
 
-  local pfx_base64=$(cat certificate.pfx | base64)
+  local pfx_base64
+  pfx_base64=$(base64 certificate.pfx)
 
-  az keyvault secret set --vault-name $KV_NAME --name "$KV_PFX_SECRET_NAME" --value "$pfx_base64" --query id -o tsv
-  az keyvault secret set --vault-name $KV_NAME --name "$KV_FULL_CHAIN_SECRET_NAME" --file "$full_chain_location" --query id -o tsv
-  az keyvault secret set --vault-name $KV_NAME --name "$KV_PRIVATE_KEY_SECRET_NAME" --file "$key_location" --query id -o tsv
+  az keyvault secret set --vault-name "$KV_NAME" --name "$KV_PFX_SECRET_NAME" --value "$pfx_base64" --query id -o tsv
+  az keyvault secret set --vault-name "$KV_NAME" --name "$KV_FULL_CHAIN_SECRET_NAME" --file "$full_chain_location" --query id -o tsv
+  az keyvault secret set --vault-name "$KV_NAME" --name "$KV_PRIVATE_KEY_SECRET_NAME" --file "$key_location" --query id -o tsv
 }
 
 main
