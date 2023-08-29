@@ -117,12 +117,22 @@ upload_to_key_vault() {
     -out certificate.pfx \
     -passout pass:
 
+  # check that file exists
+  if [ ! -f certificate.pfx ]; then
+    echo "Failed to generate pfx file."
+    exit 1
+  fi
+
   local pfx_base64
   pfx_base64=$(base64 certificate.pfx)
 
   az keyvault secret set --vault-name "$KV_NAME" --name "$KV_PFX_SECRET_NAME" --value "$pfx_base64" --query id -o tsv
   az keyvault secret set --vault-name "$KV_NAME" --name "$KV_FULL_CHAIN_SECRET_NAME" --file "$full_chain_location" --query id -o tsv
   az keyvault secret set --vault-name "$KV_NAME" --name "$KV_PRIVATE_KEY_SECRET_NAME" --file "$key_location" --query id -o tsv
+
+  # delete pfx file
+  echo "Deleting certificate.pfx file..."
+  rm -f certificate.pfx
 }
 
 main
